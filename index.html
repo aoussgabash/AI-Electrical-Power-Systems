@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>AI Applications in Electrical Power Systems</title>
 
   <style>
     :root{
       --bg:#07111f;
       --card:#0f2238;
+      --card2:#0b1b2c;
       --text:#f4f7fb;
       --muted:#b8c7d9;
       --blue:#38bdf8;
@@ -20,12 +22,18 @@
       box-sizing:border-box;
     }
 
+    html{
+      scroll-behavior:smooth;
+    }
+
     body{
       margin:0;
       font-family:Arial, Tahoma, sans-serif;
-      background:linear-gradient(180deg,#07111f,#0a1728);
+      background:
+        radial-gradient(circle at top right, rgba(56,189,248,.12), transparent 30%),
+        linear-gradient(180deg,#07111f,#0a1728);
       color:var(--text);
-      line-height:1.7;
+      line-height:1.8;
     }
 
     .container{
@@ -38,77 +46,131 @@
       border-bottom:1px solid var(--line);
       position:sticky;
       top:0;
+      z-index:10;
     }
 
     nav{
       display:flex;
       justify-content:space-between;
       align-items:center;
+      gap:20px;
       padding:18px 0;
     }
 
     .logo{
-      font-weight:bold;
       font-size:1.2rem;
+      font-weight:bold;
     }
 
     .logo span{
       color:var(--blue);
     }
 
+    .navlinks{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .navlinks a{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:.95rem;
+    }
+
+    .navlinks a:hover{
+      color:white;
+    }
+
     .hero{
-      padding:70px 0 50px;
+      padding:80px 0 55px;
       text-align:center;
     }
 
+    .badge{
+      display:inline-block;
+      border:1px solid var(--line);
+      color:#dff8ff;
+      background:rgba(56,189,248,.08);
+      padding:7px 13px;
+      border-radius:999px;
+      margin-bottom:16px;
+    }
+
     .hero h1{
-      font-size:clamp(2.2rem,7vw,4.5rem);
-      line-height:1.1;
-      margin-bottom:20px;
+      font-size:clamp(2.3rem,7vw,4.6rem);
+      line-height:1.08;
+      margin:0 0 18px;
     }
 
     .hero h1 span{
       color:var(--blue);
     }
 
-    .hero h2{
-      font-size:1.5rem;
-      color:#d7e5f3;
-      margin-bottom:12px;
+    .hero-ar{
+      direction:rtl;
+      font-size:1.6rem;
+      color:#e2edf7;
+      margin-bottom:14px;
     }
 
-    .hero p{
+    .subtitle{
       color:var(--muted);
-      font-size:1.1rem;
+      font-size:1.08rem;
+      max-width:850px;
+      margin:0 auto;
+    }
+
+    .buttons{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:25px;
     }
 
     .btn{
       display:inline-block;
-      margin-top:20px;
-      padding:12px 20px;
-      border-radius:10px;
-      background:linear-gradient(135deg,var(--blue),#2563eb);
-      color:white;
       text-decoration:none;
+      color:white;
+      padding:12px 20px;
+      border-radius:11px;
+      border:1px solid var(--line);
       font-weight:bold;
     }
 
+    .btn.primary{
+      background:linear-gradient(135deg,var(--blue),#2563eb);
+    }
+
+    .btn.secondary{
+      background:rgba(255,255,255,.04);
+    }
+
     section{
-      padding:45px 0;
+      padding:48px 0;
     }
 
     .section-title{
       text-align:center;
-      margin-bottom:25px;
+      margin-bottom:28px;
     }
 
     .section-title h2{
       font-size:2rem;
-      margin-bottom:5px;
+      margin:0 0 8px;
+    }
+
+    .section-title .ar-title{
+      direction:rtl;
+      font-size:1.25rem;
+      color:#e8f2fa;
+      margin-bottom:6px;
     }
 
     .section-title p{
       color:var(--muted);
+      margin:0;
     }
 
     .grid{
@@ -117,16 +179,48 @@
       gap:18px;
     }
 
+    .card-link{
+      text-decoration:none;
+      color:inherit;
+    }
+
     .card{
-      background:var(--card);
+      height:100%;
+      background:linear-gradient(180deg,var(--card),#0d1c2e);
       border:1px solid var(--line);
-      border-radius:16px;
+      border-radius:17px;
       padding:20px;
+      transition:.2s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(56,189,248,.45);
+    }
+
+    .icon{
+      font-size:1.8rem;
+      margin-bottom:8px;
+    }
+
+    .lecture-code{
+      color:var(--blue);
+      font-size:.85rem;
+      font-weight:bold;
+      letter-spacing:.7px;
     }
 
     .card h3{
-      margin-top:10px;
-      margin-bottom:8px;
+      margin:7px 0 3px;
+      color:white;
+    }
+
+    .card .arabic{
+      direction:rtl;
+      text-align:right;
+      color:#f0f6fb;
+      font-weight:bold;
+      margin-bottom:10px;
     }
 
     .card p{
@@ -134,8 +228,10 @@
       margin:0;
     }
 
-    .icon{
-      font-size:1.8rem;
+    .ar-text{
+      direction:rtl;
+      text-align:right;
+      margin-top:8px !important;
     }
 
     .applications{
@@ -145,14 +241,22 @@
     }
 
     .app{
-      background:#0d1c2e;
-      padding:20px;
-      border-radius:15px;
+      background:var(--card2);
       border:1px solid var(--line);
+      border-radius:15px;
+      padding:19px;
     }
 
     .app strong{
-      color:#dff8ff;
+      color:#eaf9ff;
+    }
+
+    .app .ar{
+      direction:rtl;
+      text-align:right;
+      color:#f0f6fa;
+      margin-top:5px;
+      font-weight:bold;
     }
 
     .app p{
@@ -160,22 +264,101 @@
       margin-bottom:0;
     }
 
+    .learning-path{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-top:24px;
+    }
+
+    .step{
+      background:var(--card2);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:17px;
+      text-align:center;
+    }
+
+    .step-number{
+      color:var(--blue);
+      font-weight:bold;
+      font-size:.9rem;
+    }
+
+    .step .ar{
+      direction:rtl;
+      margin-top:5px;
+      color:#eef5fb;
+    }
+
+    .coming{
+      opacity:.72;
+    }
+
+    .status{
+      display:inline-block;
+      margin-top:12px;
+      padding:4px 9px;
+      border-radius:999px;
+      font-size:.8rem;
+      background:rgba(34,197,94,.12);
+      color:#b8f5c9;
+      border:1px solid rgba(34,197,94,.25);
+    }
+
+    .coming .status{
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      border-color:var(--line);
+    }
+
+    .about{
+      background:var(--card2);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:24px;
+    }
+
+    .about .en{
+      direction:ltr;
+      text-align:left;
+    }
+
+    .about .ar{
+      direction:rtl;
+      text-align:right;
+      border-top:1px dashed var(--line);
+      margin-top:16px;
+      padding-top:16px;
+    }
+
     footer{
-      margin-top:40px;
-      padding:30px 0;
+      margin-top:30px;
+      padding:35px 0;
       text-align:center;
       color:var(--muted);
       border-top:1px solid var(--line);
     }
 
-    @media(max-width:800px){
-      .grid,
+    @media(max-width:850px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+
       .applications{
         grid-template-columns:1fr;
       }
 
+      .learning-path{
+        grid-template-columns:1fr;
+      }
+
+      .navlinks{
+        display:none;
+      }
+
       .hero{
-        padding-top:50px;
+        padding-top:55px;
       }
     }
   </style>
@@ -186,147 +369,613 @@
 <header>
   <div class="container">
     <nav>
-      <div class="logo">AI <span>×</span> Power Systems</div>
-      <div>Educational Platform</div>
+
+      <div class="logo">
+        AI <span>×</span> Power Systems
+      </div>
+
+      <div class="navlinks">
+        <a href="#lectures">Lectures | المحاضرات</a>
+        <a href="#labs">MATLAB Labs | المختبرات</a>
+        <a href="#applications">Applications | التطبيقات</a>
+        <a href="#about">About | عن المقرر</a>
+      </div>
+
     </nav>
   </div>
 </header>
 
+
 <main class="container">
 
   <section class="hero">
+
+    <div class="badge">
+      ⚡ Educational Platform | منصة تعليمية
+    </div>
+
     <h1>
       <span>AI Applications</span><br>
       in Electrical Power Systems
     </h1>
 
-    <h2>تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية</h2>
+    <div class="hero-ar">
+      تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+    </div>
 
-    <p>
+    <div class="subtitle">
       Artificial Intelligence • Machine Learning • Neural Networks •
       Fuzzy Logic • Optimization • Smart Grids
-    </p>
+      <br><br>
+      الذكاء الاصطناعي • التعلم الآلي • الشبكات العصبية •
+      المنطق الضبابي • التحسين • الشبكات الذكية
+    </div>
 
-    <a class="btn" href="#lectures">ابدأ التعلم</a>
+    <div class="buttons">
+      <a class="btn primary" href="#lectures">
+        Start Learning | ابدأ التعلم
+      </a>
+
+      <a class="btn secondary" href="#labs">
+        MATLAB Labs | مختبرات MATLAB
+      </a>
+    </div>
+
   </section>
+
+
+  <section>
+
+    <div class="section-title">
+      <h2>🧭 Learning Path</h2>
+      <div class="ar-title">مسار التعلم</div>
+
+      <p>
+        From AI fundamentals to intelligent power-system applications
+        <br>
+        من أساسيات الذكاء الاصطناعي إلى تطبيقاته في نظم الطاقة الكهربائية
+      </p>
+    </div>
+
+    <div class="learning-path">
+
+      <div class="step">
+        <div class="step-number">STEP 1</div>
+        <strong>AI Fundamentals</strong>
+        <div class="ar">أساسيات الذكاء الاصطناعي</div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">STEP 2</div>
+        <strong>Algorithms & Mathematics</strong>
+        <div class="ar">الخوارزميات والأساس الرياضي</div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">STEP 3</div>
+        <strong>MATLAB Implementation</strong>
+        <div class="ar">التطبيق باستخدام MATLAB</div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">STEP 4</div>
+        <strong>Power System Applications</strong>
+        <div class="ar">تطبيقات نظم الطاقة الكهربائية</div>
+      </div>
+
+    </div>
+
+  </section>
+
 
   <section id="lectures">
+
     <div class="section-title">
       <h2>📚 Lectures</h2>
-      <p>المحاضرات الأساسية في الذكاء الاصطناعي</p>
+      <div class="ar-title">المحاضرات</div>
+
+      <p>
+        Scientific foundations, mathematics, algorithms, and engineering applications
+        <br>
+        الأسس العلمية والرياضية والخوارزميات والتطبيقات الهندسية
+      </p>
     </div>
+
 
     <div class="grid">
 
-<a href="lecture01.html" style="text-decoration:none;color:inherit;">
-  <div class="card">
-    <div class="icon">🤖</div>
-    <h3>Introduction to AI</h3>
-    <p>مقدمة في الذكاء الاصطناعي والتطبيقات الهندسية.</p>
-  </div>
-</a>
+      <a href="lecture01.html" class="card-link">
+        <div class="card">
 
-      <div class="card">
+          <div class="icon">🤖</div>
+
+          <div class="lecture-code">
+            LECTURE 01 | المحاضرة 01
+          </div>
+
+          <h3>
+            Introduction to Artificial Intelligence
+          </h3>
+
+          <div class="arabic">
+            مقدمة في الذكاء الاصطناعي
+          </div>
+
+          <p>
+            Foundations, intelligent systems, AI methods, and applications.
+          </p>
+
+          <p class="ar-text">
+            الأسس والأنظمة الذكية وطرائق الذكاء الاصطناعي وتطبيقاتها.
+          </p>
+
+          <span class="status">
+            Available | متاحة
+          </span>
+
+        </div>
+      </a>
+
+
+      <div class="card coming">
+
         <div class="icon">🧭</div>
-        <h3>Intelligent Agents & Search</h3>
-        <p>الوكلاء الأذكياء واستراتيجيات البحث وحل المسائل.</p>
+
+        <div class="lecture-code">
+          LECTURE 02 | المحاضرة 02
+        </div>
+
+        <h3>
+          Intelligent Agents & Search
+        </h3>
+
+        <div class="arabic">
+          الوكلاء الأذكياء وخوارزميات البحث
+        </div>
+
+        <p>
+          State-space representation, search strategies, and problem solving.
+        </p>
+
+        <p class="ar-text">
+          تمثيل فضاء الحالات واستراتيجيات البحث وحل المسائل.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
-      <div class="card">
+
+      <div class="card coming">
+
         <div class="icon">🌫️</div>
-        <h3>Fuzzy Logic</h3>
-        <p>المجموعات الضبابية ودوال العضوية وأنظمة الاستدلال.</p>
+
+        <div class="lecture-code">
+          LECTURE 03 | المحاضرة 03
+        </div>
+
+        <h3>
+          Fuzzy Logic
+        </h3>
+
+        <div class="arabic">
+          المنطق الضبابي
+        </div>
+
+        <p>
+          Membership functions, fuzzy rules, inference, and control.
+        </p>
+
+        <p class="ar-text">
+          دوال العضوية والقواعد الضبابية والاستدلال والتحكم.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
-      <div class="card">
-        <div class="icon">📈</div>
-        <h3>Machine Learning</h3>
-        <p>التعلم الخاضع وغير الخاضع للإشراف وتحليل البيانات.</p>
+
+      <div class="card coming">
+
+        <div class="icon">📊</div>
+
+        <div class="lecture-code">
+          LECTURE 04 | المحاضرة 04
+        </div>
+
+        <h3>
+          Machine Learning
+        </h3>
+
+        <div class="arabic">
+          التعلم الآلي
+        </div>
+
+        <p>
+          Data, regression, classification, training, and evaluation.
+        </p>
+
+        <p class="ar-text">
+          البيانات والانحدار والتصنيف والتدريب وتقييم النماذج.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
-      <div class="card">
+
+      <div class="card coming">
+
         <div class="icon">🧠</div>
-        <h3>Neural Networks</h3>
-        <p>Forward Propagation و Backpropagation وتدريب الشبكات العصبية.</p>
+
+        <div class="lecture-code">
+          LECTURE 05 | المحاضرة 05
+        </div>
+
+        <h3>
+          Artificial Neural Networks
+        </h3>
+
+        <div class="arabic">
+          الشبكات العصبية الاصطناعية
+        </div>
+
+        <p>
+          Neurons, activation functions, loss, gradients, and backpropagation.
+        </p>
+
+        <p class="ar-text">
+          العصبونات ودوال التنشيط ودالة الخطأ والتدرجات والانتشار الخلفي.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
-      <div class="card">
+
+      <div class="card coming">
+
         <div class="icon">🧬</div>
-        <h3>Genetic Algorithms</h3>
-        <p>الخوارزميات الجينية والتحسين الذكي للمسائل الهندسية.</p>
+
+        <div class="lecture-code">
+          LECTURE 06 | المحاضرة 06
+        </div>
+
+        <h3>
+          Genetic Algorithms
+        </h3>
+
+        <div class="arabic">
+          الخوارزميات الجينية
+        </div>
+
+        <p>
+          Population, fitness, selection, crossover, mutation, and optimization.
+        </p>
+
+        <p class="ar-text">
+          المجتمع ودالة الملاءمة والاختيار والتزاوج والطفرة والتحسين.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
     </div>
+
   </section>
 
-  <section>
+
+  <section id="labs">
+
     <div class="section-title">
+
       <h2>💻 MATLAB Labs</h2>
-      <p>مختبرات برمجية لتطبيق الخوارزميات عمليًا</p>
+
+      <div class="ar-title">
+        مختبرات MATLAB
+      </div>
+
+      <p>
+        From equations and algorithms to executable engineering models
+        <br>
+        من المعادلات والخوارزميات إلى النماذج الهندسية القابلة للتنفيذ
+      </p>
+
     </div>
+
 
     <div class="grid">
 
-      <div class="card">
+      <div class="card coming">
+
         <div class="icon">🔢</div>
-        <h3>Lab 01</h3>
-        <p>AI basics and data processing in MATLAB.</p>
+
+        <h3>
+          Lab 01 — AI Fundamentals
+        </h3>
+
+        <div class="arabic">
+          المختبر 01 — أساسيات الذكاء الاصطناعي
+        </div>
+
+        <p>
+          Basic data processing and introductory AI examples.
+        </p>
+
+        <p class="ar-text">
+          معالجة البيانات والأمثلة التمهيدية للذكاء الاصطناعي.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
-      <div class="card">
+
+      <div class="card coming">
+
         <div class="icon">🧠</div>
-        <h3>Lab 02</h3>
-        <p>Neural Network from initial solution to convergence.</p>
+
+        <h3>
+          Lab 02 — Neural Network
+        </h3>
+
+        <div class="arabic">
+          المختبر 02 — الشبكة العصبية
+        </div>
+
+        <p>
+          Forward propagation, error, backpropagation, and convergence.
+        </p>
+
+        <p class="ar-text">
+          الانتشار الأمامي والخطأ والانتشار الخلفي والوصول إلى التقارب.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
-      <div class="card">
+
+      <div class="card coming">
+
         <div class="icon">⚡</div>
-        <h3>Lab 03</h3>
-        <p>AI applications in electrical power systems.</p>
+
+        <h3>
+          Lab 03 — AI for Power Systems
+        </h3>
+
+        <div class="arabic">
+          المختبر 03 — الذكاء الاصطناعي لنظم الطاقة
+        </div>
+
+        <p>
+          Forecasting, optimization, and intelligent energy-system operation.
+        </p>
+
+        <p class="ar-text">
+          التنبؤ والتحسين والتشغيل الذكي لأنظمة الطاقة.
+        </p>
+
+        <span class="status">
+          Coming Soon | قريبًا
+        </span>
+
       </div>
 
     </div>
+
   </section>
 
-  <section>
+
+  <section id="applications">
+
     <div class="section-title">
+
       <h2>⚡ Power System Applications</h2>
-      <p>ربط خوارزميات الذكاء الاصطناعي بتطبيقات نظم الطاقة الكهربائية</p>
+
+      <div class="ar-title">
+        تطبيقات نظم الطاقة الكهربائية
+      </div>
+
+      <p>
+        Connecting AI theory directly to electrical power engineering
+        <br>
+        ربط نظرية الذكاء الاصطناعي مباشرةً بهندسة القوى الكهربائية
+      </p>
+
     </div>
+
 
     <div class="applications">
 
       <div class="app">
-        <strong>Artificial Neural Networks</strong>
-        <p>Load Forecasting, PV Forecasting, Wind Power Forecasting.</p>
+
+        <strong>
+          Artificial Neural Networks
+        </strong>
+
+        <div class="ar">
+          الشبكات العصبية الاصطناعية
+        </div>
+
+        <p>
+          Load forecasting, PV forecasting, wind-power prediction,
+          fault classification.
+        </p>
+
+        <p class="ar-text">
+          التنبؤ بالحمل والطاقة الشمسية وطاقة الرياح وتصنيف الأعطال.
+        </p>
+
       </div>
 
-      <div class="app">
-        <strong>Fuzzy Logic</strong>
-        <p>Voltage Control, Frequency Control, MPPT.</p>
-      </div>
 
       <div class="app">
-        <strong>Genetic Algorithms</strong>
-        <p>Optimal Power Flow, Economic Dispatch, PV/BESS Sizing.</p>
+
+        <strong>
+          Fuzzy Logic
+        </strong>
+
+        <div class="ar">
+          المنطق الضبابي
+        </div>
+
+        <p>
+          Voltage control, frequency control, MPPT, and decision support.
+        </p>
+
+        <p class="ar-text">
+          التحكم بالجهد والتردد وتتبع نقطة الاستطاعة العظمى ودعم القرار.
+        </p>
+
       </div>
 
+
       <div class="app">
-        <strong>Machine Learning</strong>
-        <p>Fault Detection, Classification, Smart Grid Monitoring.</p>
+
+        <strong>
+          Genetic Algorithms
+        </strong>
+
+        <div class="ar">
+          الخوارزميات الجينية
+        </div>
+
+        <p>
+          Optimal Power Flow, Economic Dispatch,
+          PV and battery sizing.
+        </p>
+
+        <p class="ar-text">
+          تدفق القدرة الأمثل والتوزيع الاقتصادي وتحديد أحجام
+          الأنظمة الكهروضوئية والبطاريات.
+        </p>
+
+      </div>
+
+
+      <div class="app">
+
+        <strong>
+          Machine Learning
+        </strong>
+
+        <div class="ar">
+          التعلم الآلي
+        </div>
+
+        <p>
+          Fault detection, classification, forecasting,
+          condition monitoring, and smart-grid analysis.
+        </p>
+
+        <p class="ar-text">
+          اكتشاف الأعطال وتصنيفها والتنبؤ ومراقبة الحالة
+          وتحليل الشبكات الذكية.
+        </p>
+
       </div>
 
     </div>
+
+  </section>
+
+
+  <section id="about">
+
+    <div class="section-title">
+
+      <h2>🎓 About the Course</h2>
+
+      <div class="ar-title">
+        عن المقرر
+      </div>
+
+    </div>
+
+
+    <div class="about">
+
+      <div class="en">
+
+        <p>
+          This educational platform is designed to teach Artificial
+          Intelligence through a combination of scientific foundations,
+          mathematical models, algorithms, MATLAB implementation,
+          and real applications in electrical power systems.
+        </p>
+
+        <p>
+          Advanced topics will include equations, mathematical derivations,
+          diagrams, worked examples, and engineering interpretation so that
+          students can understand not only how an algorithm works, but also
+          why it works.
+        </p>
+
+      </div>
+
+
+      <div class="ar">
+
+        <p>
+          صُممت هذه المنصة التعليمية لتدريس الذكاء الاصطناعي من خلال
+          الجمع بين الأسس العلمية والنماذج الرياضية والخوارزميات
+          والتطبيق باستخدام MATLAB والتطبيقات الحقيقية في نظم الطاقة الكهربائية.
+        </p>
+
+        <p>
+          ستتضمن الموضوعات المتقدمة المعادلات والاشتقاقات الرياضية
+          والرسوم التوضيحية والأمثلة المحلولة والتفسير الهندسي،
+          بحيث يفهم الطالب ليس فقط كيف تعمل الخوارزمية،
+          بل لماذا تعمل أيضًا.
+        </p>
+
+      </div>
+
+    </div>
+
   </section>
 
 </main>
 
+
 <footer>
+
   <div class="container">
-    <strong>AI Applications in Electrical Power Systems</strong><br>
-    Educational Platform
+
+    <strong>
+      AI Applications in Electrical Power Systems
+    </strong>
+
+    <br>
+
+    تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+
+    <br><br>
+
+    Educational Platform | منصة تعليمية
+
   </div>
+
 </footer>
 
+
 </body>
-</html>
+          </html>
+
+      
