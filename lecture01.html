@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture 01 - Introduction to Artificial Intelligence</title>
+
+  <style>
+    :root{
+      --bg:#07111f;
+      --card:#0f2238;
+      --text:#f4f7fb;
+      --muted:#b8c7d9;
+      --blue:#38bdf8;
+      --green:#22c55e;
+      --line:rgba(255,255,255,.10);
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Tahoma, sans-serif;
+      background:linear-gradient(180deg,#07111f,#0a1728);
+      color:var(--text);
+      line-height:1.8;
+    }
+
+    .container{
+      width:min(1000px,92%);
+      margin:auto;
+    }
+
+    header{
+      background:rgba(7,17,31,.95);
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:18px 0;
+      gap:15px;
+    }
+
+    .logo{
+      font-weight:bold;
+      font-size:1.1rem;
+    }
+
+    .logo span{
+      color:var(--blue);
+    }
+
+    .back{
+      color:white;
+      text-decoration:none;
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:9px;
+    }
+
+    .hero{
+      padding:60px 0 35px;
+      text-align:center;
+    }
+
+    .lecture-number{
+      color:var(--blue);
+      font-weight:bold;
+      letter-spacing:1px;
+      margin-bottom:10px;
+    }
+
+    h1{
+      font-size:clamp(2rem,6vw,3.6rem);
+      line-height:1.15;
+      margin:0 0 16px;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:1.1rem;
+    }
+
+    section{
+      margin:22px 0;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+    }
+
+    h2{
+      color:#e9f7ff;
+      margin-top:0;
+    }
+
+    h3{
+      color:var(--blue);
+    }
+
+    p, li{
+      color:#d7e1ec;
+    }
+
+    ul{
+      padding-left:22px;
+    }
+
+    .highlight{
+      border-left:4px solid var(--blue);
+      background:#0b1b2c;
+      padding:16px;
+      border-radius:10px;
+      margin:16px 0;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+
+    .mini-card{
+      background:#0b1b2c;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:16px;
+    }
+
+    .mini-card strong{
+      color:white;
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      padding:35px 0;
+    }
+
+    @media(max-width:700px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo">AI <span>×</span> Power Systems</div>
+      <a class="back" href="index.html">← Home</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="hero">
+    <div class="lecture-number">LECTURE 01</div>
+    <h1>Introduction to Artificial Intelligence</h1>
+    <div class="subtitle">
+      Foundations, Concepts, and Applications in Electrical Power Systems
+    </div>
+  </div>
+
+  <section>
+    <h2>🎯 Learning Objectives</h2>
+    <p>By the end of this lecture, students should be able to:</p>
+
+    <ul>
+      <li>Explain the basic concept of Artificial Intelligence.</li>
+      <li>Distinguish AI from Machine Learning and Deep Learning.</li>
+      <li>Describe the main categories of AI systems.</li>
+      <li>Understand the concept of intelligent agents.</li>
+      <li>Identify important AI applications in electrical power systems.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>1. What is Artificial Intelligence?</h2>
+
+    <p>
+      Artificial Intelligence (AI) is a field of computer science concerned
+      with developing systems capable of performing tasks that normally
+      require human intelligence.
+    </p>
+
+    <div class="highlight">
+      AI systems can learn, reason, recognize patterns, make decisions,
+      solve problems, and adapt to changing conditions.
+    </div>
+
+    <p>
+      In engineering, AI is especially useful for complex problems where
+      conventional mathematical models are difficult, incomplete, or
+      computationally expensive.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Brief History of AI</h2>
+
+    <div class="grid">
+      <div class="mini-card">
+        <strong>1950s</strong>
+        <p>Early ideas about machine intelligence and symbolic reasoning.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>1980s</strong>
+        <p>Expert systems became an important AI application.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>1990s-2000s</strong>
+        <p>Machine learning gained increasing importance.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>2010s-Present</strong>
+        <p>Deep learning, big data, and high-performance computing accelerated AI development.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. AI, Machine Learning, and Deep Learning</h2>
+
+    <h3>Artificial Intelligence</h3>
+    <p>
+      The broad field concerned with creating intelligent computer systems.
+    </p>
+
+    <h3>Machine Learning</h3>
+    <p>
+      A branch of AI in which systems learn patterns and relationships
+      directly from data.
+    </p>
+
+    <h3>Deep Learning</h3>
+    <p>
+      A branch of Machine Learning based mainly on multi-layer neural networks.
+    </p>
+
+    <div class="highlight">
+      Artificial Intelligence → Machine Learning → Deep Learning
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Main Types of AI Methods</h2>
+
+    <div class="grid">
+      <div class="mini-card">
+        <strong>Search Algorithms</strong>
+        <p>Finding solutions within large spaces of possible alternatives.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Fuzzy Logic</strong>
+        <p>Reasoning with uncertainty and linguistic information.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Machine Learning</strong>
+        <p>Learning models and patterns from data.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Artificial Neural Networks</strong>
+        <p>Computational models inspired by biological neural systems.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Genetic Algorithms</strong>
+        <p>Optimization methods inspired by biological evolution.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Deep Learning</strong>
+        <p>Advanced neural-network models for complex data and large-scale learning.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>5. Intelligent Agents</h2>
+
+    <p>
+      An intelligent agent observes its environment through sensors,
+      processes information, and takes actions to achieve a specific goal.
+    </p>
+
+    <div class="highlight">
+      Environment → Sensors → Intelligent Agent → Actions
+    </div>
+
+    <p>
+      In electrical power systems, an intelligent controller can monitor
+      voltage, frequency, power flow, renewable generation, and battery state
+      and then select an appropriate control action.
+    </p>
+  </section>
+
+  <section>
+    <h2>6. Why AI in Electrical Power Systems?</h2>
+
+    <p>
+      Modern power systems are becoming increasingly complex because of
+      renewable energy sources, distributed generation, battery storage,
+      electric vehicles, smart meters, and active consumers.
+    </p>
+
+    <p>
+      AI can support faster and more adaptive operation when traditional
+      analytical methods alone are not sufficient.
+    </p>
+  </section>
+
+  <section>
+    <h2>7. AI Applications in Electrical Power Systems</h2>
+
+    <div class="grid">
+      <div class="mini-card">
+        <strong>Load Forecasting</strong>
+        <p>Predicting future electricity demand.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Renewable Forecasting</strong>
+        <p>Prediction of PV and wind generation.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Fault Detection</strong>
+        <p>Identification and classification of network faults.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Voltage Control</strong>
+        <p>Intelligent control of voltage profiles.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Optimal Power Flow</strong>
+        <p>AI-supported optimization of network operating points.</p>
+      </div>
+
+      <div class="mini-card">
+        <strong>Battery Energy Storage</strong>
+        <p>Intelligent charging, discharging, scheduling, and energy management.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>8. Summary</h2>
+
+    <ul>
+      <li>AI enables computers to perform intelligent tasks.</li>
+      <li>Machine Learning and Deep Learning are important branches of AI.</li>
+      <li>AI includes fuzzy logic, neural networks, genetic algorithms, and search methods.</li>
+      <li>Electrical power systems offer many important applications for AI.</li>
+      <li>AI can improve prediction, control, monitoring, and optimization.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>📝 Review Questions</h2>
+
+    <ol>
+      <li>What is Artificial Intelligence?</li>
+      <li>What is the difference between AI and Machine Learning?</li>
+      <li>What is an intelligent agent?</li>
+      <li>Why is AI useful in modern electrical power systems?</li>
+      <li>Name four applications of AI in power engineering.</li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  AI Applications in Electrical Power Systems · Lecture 01
+</footer>
+
+</body>
+</html>
