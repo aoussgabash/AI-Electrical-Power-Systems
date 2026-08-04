@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Lecture 01 - Introduction to Artificial Intelligence</title>
 
   <style>
     :root{
       --bg:#07111f;
       --card:#0f2238;
+      --card2:#0b1b2c;
       --text:#f4f7fb;
       --muted:#b8c7d9;
       --blue:#38bdf8;
@@ -45,8 +47,8 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      padding:18px 0;
       gap:15px;
+      padding:18px 0;
     }
 
     .logo{
@@ -75,18 +77,24 @@
       color:var(--blue);
       font-weight:bold;
       letter-spacing:1px;
-      margin-bottom:10px;
     }
 
     h1{
-      font-size:clamp(2rem,6vw,3.6rem);
+      font-size:clamp(2rem,6vw,3.5rem);
       line-height:1.15;
-      margin:0 0 16px;
+      margin:10px 0 12px;
+    }
+
+    .hero-ar{
+      direction:rtl;
+      font-size:1.5rem;
+      color:#dceaf6;
+      margin-bottom:10px;
     }
 
     .subtitle{
       color:var(--muted);
-      font-size:1.1rem;
+      font-size:1.05rem;
     }
 
     section{
@@ -98,28 +106,53 @@
     }
 
     h2{
-      color:#e9f7ff;
       margin-top:0;
+      color:#e9f7ff;
     }
 
     h3{
       color:var(--blue);
     }
 
+    .en{
+      direction:ltr;
+      text-align:left;
+    }
+
+    .ar{
+      direction:rtl;
+      text-align:right;
+      color:#edf4fa;
+      border-top:1px dashed var(--line);
+      margin-top:16px;
+      padding-top:16px;
+    }
+
     p, li{
       color:#d7e1ec;
     }
 
-    ul{
-      padding-left:22px;
+    ul, ol{
+      padding-left:24px;
+    }
+
+    .ar ul,
+    .ar ol{
+      padding-left:0;
+      padding-right:24px;
     }
 
     .highlight{
+      background:var(--card2);
       border-left:4px solid var(--blue);
-      background:#0b1b2c;
       padding:16px;
       border-radius:10px;
       margin:16px 0;
+    }
+
+    .ar .highlight{
+      border-left:none;
+      border-right:4px solid var(--blue);
     }
 
     .grid{
@@ -129,7 +162,7 @@
     }
 
     .mini-card{
-      background:#0b1b2c;
+      background:var(--card2);
       border:1px solid var(--line);
       border-radius:12px;
       padding:16px;
@@ -137,6 +170,17 @@
 
     .mini-card strong{
       color:white;
+    }
+
+    .pair{
+      margin-bottom:18px;
+    }
+
+    .tag{
+      display:inline-block;
+      color:var(--blue);
+      font-weight:bold;
+      margin-bottom:5px;
     }
 
     footer{
@@ -149,6 +193,10 @@
       .grid{
         grid-template-columns:1fr;
       }
+
+      nav{
+        align-items:flex-start;
+      }
     }
   </style>
 </head>
@@ -159,7 +207,7 @@
   <div class="container">
     <nav>
       <div class="logo">AI <span>×</span> Power Systems</div>
-      <a class="back" href="index.html">← Home</a>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
     </nav>
   </div>
 </header>
@@ -167,231 +215,740 @@
 <main class="container">
 
   <div class="hero">
-    <div class="lecture-number">LECTURE 01</div>
+    <div class="lecture-number">LECTURE 01 | المحاضرة 01</div>
+
     <h1>Introduction to Artificial Intelligence</h1>
+
+    <div class="hero-ar">
+      مقدمة في الذكاء الاصطناعي
+    </div>
+
     <div class="subtitle">
       Foundations, Concepts, and Applications in Electrical Power Systems
+      <br>
+      الأسس والمفاهيم والتطبيقات في نظم الطاقة الكهربائية
     </div>
   </div>
 
-  <section>
-    <h2>🎯 Learning Objectives</h2>
-    <p>By the end of this lecture, students should be able to:</p>
-
-    <ul>
-      <li>Explain the basic concept of Artificial Intelligence.</li>
-      <li>Distinguish AI from Machine Learning and Deep Learning.</li>
-      <li>Describe the main categories of AI systems.</li>
-      <li>Understand the concept of intelligent agents.</li>
-      <li>Identify important AI applications in electrical power systems.</li>
-    </ul>
-  </section>
 
   <section>
-    <h2>1. What is Artificial Intelligence?</h2>
+    <div class="en">
+      <h2>🎯 Learning Objectives</h2>
 
-    <p>
-      Artificial Intelligence (AI) is a field of computer science concerned
-      with developing systems capable of performing tasks that normally
-      require human intelligence.
-    </p>
+      <p>
+        By the end of this lecture, students should be able to:
+      </p>
 
-    <div class="highlight">
-      AI systems can learn, reason, recognize patterns, make decisions,
-      solve problems, and adapt to changing conditions.
+      <ul>
+        <li>Explain the basic concept of Artificial Intelligence.</li>
+        <li>Distinguish AI from Machine Learning and Deep Learning.</li>
+        <li>Describe the main categories of AI methods.</li>
+        <li>Understand the concept of intelligent agents.</li>
+        <li>Identify important AI applications in electrical power systems.</li>
+      </ul>
     </div>
 
-    <p>
-      In engineering, AI is especially useful for complex problems where
-      conventional mathematical models are difficult, incomplete, or
-      computationally expensive.
-    </p>
-  </section>
+    <div class="ar">
+      <h2>🎯 أهداف التعلم</h2>
 
-  <section>
-    <h2>2. Brief History of AI</h2>
+      <p>
+        بعد الانتهاء من هذه المحاضرة، يجب أن يكون الطالب قادرًا على:
+      </p>
 
-    <div class="grid">
-      <div class="mini-card">
-        <strong>1950s</strong>
-        <p>Early ideas about machine intelligence and symbolic reasoning.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>1980s</strong>
-        <p>Expert systems became an important AI application.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>1990s-2000s</strong>
-        <p>Machine learning gained increasing importance.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>2010s-Present</strong>
-        <p>Deep learning, big data, and high-performance computing accelerated AI development.</p>
-      </div>
+      <ul>
+        <li>شرح المفهوم الأساسي للذكاء الاصطناعي.</li>
+        <li>التمييز بين الذكاء الاصطناعي والتعلم الآلي والتعلم العميق.</li>
+        <li>التعرف على الفئات الرئيسية لطرائق الذكاء الاصطناعي.</li>
+        <li>فهم مفهوم الوكيل الذكي.</li>
+        <li>تحديد أهم تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية.</li>
+      </ul>
     </div>
   </section>
 
+
   <section>
-    <h2>3. AI, Machine Learning, and Deep Learning</h2>
+    <div class="en">
+      <h2>1. What is Artificial Intelligence?</h2>
 
-    <h3>Artificial Intelligence</h3>
-    <p>
-      The broad field concerned with creating intelligent computer systems.
-    </p>
+      <p>
+        Artificial Intelligence (AI) is a field of computer science concerned
+        with developing systems capable of performing tasks that normally
+        require human intelligence.
+      </p>
 
-    <h3>Machine Learning</h3>
-    <p>
-      A branch of AI in which systems learn patterns and relationships
-      directly from data.
-    </p>
+      <div class="highlight">
+        AI systems can learn, reason, recognize patterns, make decisions,
+        solve problems, and adapt to changing conditions.
+      </div>
 
-    <h3>Deep Learning</h3>
-    <p>
-      A branch of Machine Learning based mainly on multi-layer neural networks.
-    </p>
+      <p>
+        In engineering, AI is especially useful for complex problems where
+        conventional mathematical models are difficult, incomplete,
+        uncertain, or computationally expensive.
+      </p>
+    </div>
 
-    <div class="highlight">
-      Artificial Intelligence → Machine Learning → Deep Learning
+    <div class="ar">
+      <h2>1. ما هو الذكاء الاصطناعي؟</h2>
+
+      <p>
+        الذكاء الاصطناعي (AI) هو أحد مجالات علوم الحاسوب، ويهتم بتطوير
+        أنظمة قادرة على تنفيذ مهام تتطلب عادةً قدرات مرتبطة بالذكاء البشري.
+      </p>
+
+      <div class="highlight">
+        تستطيع أنظمة الذكاء الاصطناعي التعلم والاستدلال والتعرف على الأنماط
+        واتخاذ القرارات وحل المشكلات والتكيف مع الظروف المتغيرة.
+      </div>
+
+      <p>
+        في المجالات الهندسية، يكون الذكاء الاصطناعي مفيدًا بصورة خاصة في
+        المسائل المعقدة التي تكون فيها النماذج الرياضية التقليدية صعبة
+        أو غير كاملة أو غير مؤكدة أو تحتاج إلى زمن حسابي كبير.
+      </p>
     </div>
   </section>
 
+
   <section>
-    <h2>4. Main Types of AI Methods</h2>
+    <div class="en">
+      <h2>2. Brief History of Artificial Intelligence</h2>
 
-    <div class="grid">
-      <div class="mini-card">
-        <strong>Search Algorithms</strong>
-        <p>Finding solutions within large spaces of possible alternatives.</p>
-      </div>
+      <div class="grid">
 
-      <div class="mini-card">
-        <strong>Fuzzy Logic</strong>
-        <p>Reasoning with uncertainty and linguistic information.</p>
-      </div>
+        <div class="mini-card">
+          <strong>1950s</strong>
+          <p>
+            Early ideas about machine intelligence, symbolic reasoning,
+            and the possibility of intelligent computers.
+          </p>
+        </div>
 
-      <div class="mini-card">
-        <strong>Machine Learning</strong>
-        <p>Learning models and patterns from data.</p>
-      </div>
+        <div class="mini-card">
+          <strong>1980s</strong>
+          <p>
+            Expert systems became one of the most important practical
+            applications of AI.
+          </p>
+        </div>
 
-      <div class="mini-card">
-        <strong>Artificial Neural Networks</strong>
-        <p>Computational models inspired by biological neural systems.</p>
-      </div>
+        <div class="mini-card">
+          <strong>1990s–2000s</strong>
+          <p>
+            Machine Learning and data-driven approaches gained increasing importance.
+          </p>
+        </div>
 
-      <div class="mini-card">
-        <strong>Genetic Algorithms</strong>
-        <p>Optimization methods inspired by biological evolution.</p>
-      </div>
+        <div class="mini-card">
+          <strong>2010s–Present</strong>
+          <p>
+            Deep Learning, Big Data, cloud computing, and powerful processors
+            significantly accelerated AI development.
+          </p>
+        </div>
 
-      <div class="mini-card">
-        <strong>Deep Learning</strong>
-        <p>Advanced neural-network models for complex data and large-scale learning.</p>
       </div>
     </div>
-  </section>
 
-  <section>
-    <h2>5. Intelligent Agents</h2>
+    <div class="ar">
+      <h2>2. لمحة تاريخية عن الذكاء الاصطناعي</h2>
 
-    <p>
-      An intelligent agent observes its environment through sensors,
-      processes information, and takes actions to achieve a specific goal.
-    </p>
+      <div class="grid">
 
-    <div class="highlight">
-      Environment → Sensors → Intelligent Agent → Actions
-    </div>
+        <div class="mini-card">
+          <strong>الخمسينيات</strong>
+          <p>
+            ظهرت الأفكار المبكرة حول ذكاء الآلة والاستدلال الرمزي وإمكانية
+            تطوير حواسيب ذكية.
+          </p>
+        </div>
 
-    <p>
-      In electrical power systems, an intelligent controller can monitor
-      voltage, frequency, power flow, renewable generation, and battery state
-      and then select an appropriate control action.
-    </p>
-  </section>
+        <div class="mini-card">
+          <strong>الثمانينيات</strong>
+          <p>
+            أصبحت الأنظمة الخبيرة من أهم التطبيقات العملية للذكاء الاصطناعي.
+          </p>
+        </div>
 
-  <section>
-    <h2>6. Why AI in Electrical Power Systems?</h2>
+        <div class="mini-card">
+          <strong>التسعينيات والألفينات</strong>
+          <p>
+            ازداد الاهتمام بالتعلم الآلي والطرائق المعتمدة على البيانات.
+          </p>
+        </div>
 
-    <p>
-      Modern power systems are becoming increasingly complex because of
-      renewable energy sources, distributed generation, battery storage,
-      electric vehicles, smart meters, and active consumers.
-    </p>
+        <div class="mini-card">
+          <strong>منذ 2010 حتى الوقت الحاضر</strong>
+          <p>
+            أدى التعلم العميق والبيانات الضخمة والحوسبة السحابية والمعالجات
+            القوية إلى تسارع كبير في تطور الذكاء الاصطناعي.
+          </p>
+        </div>
 
-    <p>
-      AI can support faster and more adaptive operation when traditional
-      analytical methods alone are not sufficient.
-    </p>
-  </section>
-
-  <section>
-    <h2>7. AI Applications in Electrical Power Systems</h2>
-
-    <div class="grid">
-      <div class="mini-card">
-        <strong>Load Forecasting</strong>
-        <p>Predicting future electricity demand.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>Renewable Forecasting</strong>
-        <p>Prediction of PV and wind generation.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>Fault Detection</strong>
-        <p>Identification and classification of network faults.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>Voltage Control</strong>
-        <p>Intelligent control of voltage profiles.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>Optimal Power Flow</strong>
-        <p>AI-supported optimization of network operating points.</p>
-      </div>
-
-      <div class="mini-card">
-        <strong>Battery Energy Storage</strong>
-        <p>Intelligent charging, discharging, scheduling, and energy management.</p>
       </div>
     </div>
   </section>
 
-  <section>
-    <h2>8. Summary</h2>
 
-    <ul>
-      <li>AI enables computers to perform intelligent tasks.</li>
-      <li>Machine Learning and Deep Learning are important branches of AI.</li>
-      <li>AI includes fuzzy logic, neural networks, genetic algorithms, and search methods.</li>
-      <li>Electrical power systems offer many important applications for AI.</li>
-      <li>AI can improve prediction, control, monitoring, and optimization.</li>
-    </ul>
+  <section>
+    <div class="en">
+      <h2>3. AI, Machine Learning, and Deep Learning</h2>
+
+      <div class="pair">
+        <span class="tag">Artificial Intelligence</span>
+        <p>
+          The broad field concerned with creating systems capable of
+          intelligent behavior.
+        </p>
+      </div>
+
+      <div class="pair">
+        <span class="tag">Machine Learning</span>
+        <p>
+          A branch of AI in which systems learn patterns and relationships
+          from data instead of being explicitly programmed for every situation.
+        </p>
+      </div>
+
+      <div class="pair">
+        <span class="tag">Deep Learning</span>
+        <p>
+          A branch of Machine Learning based mainly on multi-layer
+          artificial neural networks.
+        </p>
+      </div>
+
+      <div class="highlight">
+        Artificial Intelligence → Machine Learning → Deep Learning
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>3. الذكاء الاصطناعي والتعلم الآلي والتعلم العميق</h2>
+
+      <div class="pair">
+        <span class="tag">الذكاء الاصطناعي</span>
+        <p>
+          المجال العام الذي يهتم ببناء أنظمة قادرة على إظهار سلوك ذكي.
+        </p>
+      </div>
+
+      <div class="pair">
+        <span class="tag">التعلم الآلي</span>
+        <p>
+          فرع من الذكاء الاصطناعي تتعلم فيه الأنظمة الأنماط والعلاقات
+          من البيانات بدلًا من برمجتها بصورة صريحة لكل حالة.
+        </p>
+      </div>
+
+      <div class="pair">
+        <span class="tag">التعلم العميق</span>
+        <p>
+          فرع من التعلم الآلي يعتمد بصورة أساسية على الشبكات العصبية
+          الاصطناعية متعددة الطبقات.
+        </p>
+      </div>
+
+      <div class="highlight">
+        الذكاء الاصطناعي ← التعلم الآلي ← التعلم العميق
+      </div>
+    </div>
   </section>
 
-  <section>
-    <h2>📝 Review Questions</h2>
 
-    <ol>
-      <li>What is Artificial Intelligence?</li>
-      <li>What is the difference between AI and Machine Learning?</li>
-      <li>What is an intelligent agent?</li>
-      <li>Why is AI useful in modern electrical power systems?</li>
-      <li>Name four applications of AI in power engineering.</li>
-    </ol>
+  <section>
+    <div class="en">
+      <h2>4. Main AI Methods</h2>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>Search Algorithms</strong>
+          <p>
+            Methods for finding suitable solutions within large spaces
+            of possible alternatives.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Fuzzy Logic</strong>
+          <p>
+            Methods for reasoning and decision-making with uncertainty
+            and linguistic information.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Machine Learning</strong>
+          <p>
+            Algorithms that learn models and patterns from data.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Artificial Neural Networks</strong>
+          <p>
+            Computational models inspired by biological neural systems.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Genetic Algorithms</strong>
+          <p>
+            Optimization methods inspired by biological evolution.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Deep Learning</strong>
+          <p>
+            Advanced multi-layer neural-network methods for complex learning tasks.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>4. أهم طرائق الذكاء الاصطناعي</h2>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>خوارزميات البحث</strong>
+          <p>
+            طرائق لإيجاد حلول مناسبة ضمن فضاءات كبيرة من البدائل الممكنة.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>المنطق الضبابي</strong>
+          <p>
+            طرائق للاستدلال واتخاذ القرار في وجود عدم اليقين والمعلومات اللغوية.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>التعلم الآلي</strong>
+          <p>
+            خوارزميات تتعلم النماذج والأنماط من البيانات.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>الشبكات العصبية الاصطناعية</strong>
+          <p>
+            نماذج حسابية مستوحاة بصورة مبسطة من الأنظمة العصبية الحيوية.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>الخوارزميات الجينية</strong>
+          <p>
+            طرائق تحسين مستوحاة من مبادئ التطور البيولوجي.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>التعلم العميق</strong>
+          <p>
+            طرائق متقدمة تعتمد على الشبكات العصبية متعددة الطبقات
+            لمعالجة مسائل التعلم المعقدة.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>5. Intelligent Agents</h2>
+
+      <p>
+        An intelligent agent observes its environment through sensors,
+        processes the available information, and selects actions that help
+        achieve a specific goal.
+      </p>
+
+      <div class="highlight">
+        Environment → Sensors → Intelligent Agent → Actions
+      </div>
+
+      <p>
+        In an electrical power system, an intelligent agent may monitor
+        voltage, frequency, power flow, renewable generation, electricity
+        demand, and battery state of charge before selecting a control action.
+      </p>
+    </div>
+
+    <div class="ar">
+      <h2>5. الوكلاء الأذكياء</h2>
+
+      <p>
+        يراقب الوكيل الذكي البيئة المحيطة باستخدام الحساسات، ثم يعالج
+        المعلومات المتاحة ويختار أفعالًا تساعد على تحقيق هدف محدد.
+      </p>
+
+      <div class="highlight">
+        البيئة ← الحساسات ← الوكيل الذكي ← الأفعال
+      </div>
+
+      <p>
+        في نظام الطاقة الكهربائية يمكن للوكيل الذكي مراقبة الجهد والتردد
+        وتدفق القدرة وتوليد الطاقة المتجددة والطلب الكهربائي وحالة شحن
+        البطاريات، ثم اختيار إجراء تحكم مناسب.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>6. Why AI in Electrical Power Systems?</h2>
+
+      <p>
+        Modern electrical power systems are becoming increasingly complex
+        because of renewable energy sources, distributed generation,
+        battery storage systems, electric vehicles, smart meters,
+        bidirectional power flows, and active consumers.
+      </p>
+
+      <p>
+        These developments create large amounts of data and introduce
+        uncertainty, variability, nonlinear behavior, and complex
+        optimization problems.
+      </p>
+
+      <div class="highlight">
+        AI can support prediction, monitoring, control, decision-making,
+        optimization, and automation in modern power systems.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>6. لماذا نستخدم الذكاء الاصطناعي في نظم الطاقة الكهربائية؟</h2>
+
+      <p>
+        أصبحت نظم الطاقة الكهربائية الحديثة أكثر تعقيدًا بسبب مصادر الطاقة
+        المتجددة والتوليد الموزع وأنظمة تخزين الطاقة بالبطاريات والمركبات
+        الكهربائية والعدادات الذكية وتدفقات القدرة ثنائية الاتجاه
+        والمستهلكين النشطين.
+      </p>
+
+      <p>
+        تؤدي هذه التطورات إلى توليد كميات كبيرة من البيانات، كما تزيد من
+        عدم اليقين والتغيرات الزمنية والسلوك غير الخطي وتعقيد مسائل التحسين.
+      </p>
+
+      <div class="highlight">
+        يمكن للذكاء الاصطناعي دعم التنبؤ والمراقبة والتحكم واتخاذ القرار
+        والتحسين والأتمتة في نظم الطاقة الحديثة.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>7. AI Applications in Electrical Power Systems</h2>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>Load Forecasting</strong>
+          <p>
+            Predicting future electricity demand using historical
+            and real-time data.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Renewable Energy Forecasting</strong>
+          <p>
+            Forecasting photovoltaic and wind power generation.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Fault Detection and Classification</strong>
+          <p>
+            Identifying abnormal operating conditions and classifying
+            electrical faults.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Voltage and Frequency Control</strong>
+          <p>
+            Intelligent support for maintaining secure operating conditions.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Optimal Power Flow</strong>
+          <p>
+            Supporting optimal operation while respecting network constraints.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Battery Energy Storage</strong>
+          <p>
+            Intelligent charging, discharging, scheduling, and
+            energy-management strategies.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>7. تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية</h2>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>التنبؤ بالحمل الكهربائي</strong>
+          <p>
+            التنبؤ بالطلب المستقبلي على الطاقة الكهربائية اعتمادًا
+            على البيانات التاريخية والآنية.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>التنبؤ بالطاقة المتجددة</strong>
+          <p>
+            التنبؤ بإنتاج الأنظمة الكهروضوئية وطاقة الرياح.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>اكتشاف الأعطال وتصنيفها</strong>
+          <p>
+            التعرف على حالات التشغيل غير الطبيعية وتصنيف الأعطال الكهربائية.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>التحكم بالجهد والتردد</strong>
+          <p>
+            دعم التشغيل الآمن من خلال التحكم الذكي بالجهد والتردد.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>تدفق القدرة الأمثل</strong>
+          <p>
+            دعم التشغيل الأمثل لنظام الطاقة مع مراعاة قيود الشبكة.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>أنظمة تخزين الطاقة بالبطاريات</strong>
+          <p>
+            الشحن والتفريغ والجدولة وإدارة الطاقة باستخدام طرائق ذكية.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>8. Example: AI-Based Power System Decision</h2>
+
+      <p>
+        Consider a power distribution system with photovoltaic generation
+        and battery energy storage.
+      </p>
+
+      <p>
+        An AI-based controller may receive information about:
+      </p>
+
+      <ul>
+        <li>Current electrical load</li>
+        <li>PV power generation</li>
+        <li>Bus voltages</li>
+        <li>Battery state of charge</li>
+        <li>Electricity price</li>
+      </ul>
+
+      <p>
+        Based on this information, the controller may decide whether the
+        battery should charge, discharge, or remain idle.
+      </p>
+
+      <div class="highlight">
+        Data → AI Model → Decision → Power System Action
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>8. مثال: اتخاذ قرار في نظام الطاقة باستخدام الذكاء الاصطناعي</h2>
+
+      <p>
+        لنفترض وجود شبكة توزيع كهربائية تحتوي على نظام كهروضوئي
+        وبطارية لتخزين الطاقة.
+      </p>
+
+      <p>
+        يمكن لوحدة تحكم تعتمد على الذكاء الاصطناعي استقبال معلومات عن:
+      </p>
+
+      <ul>
+        <li>الحمل الكهربائي الحالي</li>
+        <li>القدرة المنتجة من النظام الكهروضوئي</li>
+        <li>جهود العقد في الشبكة</li>
+        <li>حالة شحن البطارية</li>
+        <li>سعر الطاقة الكهربائية</li>
+      </ul>
+
+      <p>
+        وبناءً على هذه المعلومات يمكن لوحدة التحكم اتخاذ قرار بشحن
+        البطارية أو تفريغها أو إبقائها في حالة انتظار.
+      </p>
+
+      <div class="highlight">
+        البيانات ← نموذج الذكاء الاصطناعي ← القرار ← إجراء في نظام الطاقة
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>9. Advantages of AI in Power Engineering</h2>
+
+      <ul>
+        <li>Ability to process large amounts of data.</li>
+        <li>Capability to identify complex nonlinear relationships.</li>
+        <li>Fast prediction and classification.</li>
+        <li>Adaptability to changing operating conditions.</li>
+        <li>Support for real-time decision-making.</li>
+        <li>Potential improvement of reliability, efficiency, and flexibility.</li>
+      </ul>
+    </div>
+
+    <div class="ar">
+      <h2>9. مزايا الذكاء الاصطناعي في هندسة القوى الكهربائية</h2>
+
+      <ul>
+        <li>القدرة على معالجة كميات كبيرة من البيانات.</li>
+        <li>إمكانية اكتشاف العلاقات المعقدة وغير الخطية.</li>
+        <li>السرعة في التنبؤ والتصنيف.</li>
+        <li>القدرة على التكيف مع ظروف التشغيل المتغيرة.</li>
+        <li>دعم اتخاذ القرار في الزمن الحقيقي.</li>
+        <li>إمكانية تحسين الموثوقية والكفاءة والمرونة.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>10. Challenges and Limitations</h2>
+
+      <ul>
+        <li>AI models often require high-quality data.</li>
+        <li>Poor training data may lead to inaccurate decisions.</li>
+        <li>Some advanced models can be difficult to interpret.</li>
+        <li>AI cannot automatically replace engineering knowledge.</li>
+        <li>Safety, cybersecurity, and reliability must be considered.</li>
+      </ul>
+
+      <div class="highlight">
+        AI should support engineering judgment — not replace it.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>10. التحديات والقيود</h2>
+
+      <ul>
+        <li>تحتاج نماذج الذكاء الاصطناعي غالبًا إلى بيانات ذات جودة عالية.</li>
+        <li>يمكن أن تؤدي بيانات التدريب الضعيفة إلى قرارات غير دقيقة.</li>
+        <li>قد يكون تفسير بعض النماذج المتقدمة صعبًا.</li>
+        <li>لا يمكن للذكاء الاصطناعي أن يحل تلقائيًا محل المعرفة الهندسية.</li>
+        <li>يجب مراعاة السلامة والأمن السيبراني والموثوقية.</li>
+      </ul>
+
+      <div class="highlight">
+        يجب أن يدعم الذكاء الاصطناعي القرار الهندسي، لا أن يحل محله.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>11. Summary</h2>
+
+      <ul>
+        <li>Artificial Intelligence enables computers to perform intelligent tasks.</li>
+        <li>Machine Learning and Deep Learning are important branches of AI.</li>
+        <li>AI includes search algorithms, fuzzy logic, neural networks, and evolutionary optimization.</li>
+        <li>Modern power systems provide many important AI applications.</li>
+        <li>AI can improve prediction, control, monitoring, optimization, and decision-making.</li>
+      </ul>
+    </div>
+
+    <div class="ar">
+      <h2>11. الخلاصة</h2>
+
+      <ul>
+        <li>يتيح الذكاء الاصطناعي للحواسيب تنفيذ مهام تتطلب سلوكًا ذكيًا.</li>
+        <li>يعد التعلم الآلي والتعلم العميق من أهم فروع الذكاء الاصطناعي.</li>
+        <li>يشمل الذكاء الاصطناعي خوارزميات البحث والمنطق الضبابي والشبكات العصبية والتحسين التطوري.</li>
+        <li>توفر نظم الطاقة الحديثة مجالًا واسعًا لتطبيقات الذكاء الاصطناعي.</li>
+        <li>يمكن للذكاء الاصطناعي تحسين التنبؤ والتحكم والمراقبة والتحسين واتخاذ القرار.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>📝 Review Questions</h2>
+
+      <ol>
+        <li>What is Artificial Intelligence?</li>
+        <li>What is the difference between AI, Machine Learning, and Deep Learning?</li>
+        <li>What is an intelligent agent?</li>
+        <li>Why is AI useful in modern electrical power systems?</li>
+        <li>Name four applications of AI in power engineering.</li>
+        <li>What are the main advantages of AI?</li>
+        <li>What are some limitations of AI-based systems?</li>
+      </ol>
+    </div>
+
+    <div class="ar">
+      <h2>📝 أسئلة المراجعة</h2>
+
+      <ol>
+        <li>ما هو الذكاء الاصطناعي؟</li>
+        <li>ما الفرق بين الذكاء الاصطناعي والتعلم الآلي والتعلم العميق؟</li>
+        <li>ما المقصود بالوكيل الذكي؟</li>
+        <li>لماذا يعد الذكاء الاصطناعي مهمًا في نظم الطاقة الكهربائية الحديثة؟</li>
+        <li>اذكر أربعة تطبيقات للذكاء الاصطناعي في هندسة القوى الكهربائية.</li>
+        <li>ما أهم مزايا استخدام الذكاء الاصطناعي؟</li>
+        <li>ما بعض القيود والتحديات التي تواجه الأنظمة المعتمدة على الذكاء الاصطناعي؟</li>
+      </ol>
+    </div>
   </section>
 
 </main>
 
 <footer>
-  AI Applications in Electrical Power Systems · Lecture 01
+  AI Applications in Electrical Power Systems
+  <br>
+  تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+  <br><br>
+  Lecture 01 | المحاضرة 01
 </footer>
 
 </body>
