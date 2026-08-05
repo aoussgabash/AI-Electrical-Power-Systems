@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lecture 05 - Artificial Neural Networks</title>
+
+  <style>
+    :root{
+      --bg:#07111f;
+      --card:#0f2238;
+      --card2:#0b1b2c;
+      --text:#f4f7fb;
+      --muted:#b8c7d9;
+      --blue:#38bdf8;
+      --green:#22c55e;
+      --yellow:#facc15;
+      --red:#fb7185;
+      --line:rgba(255,255,255,.10);
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial,Tahoma,sans-serif;
+      background:linear-gradient(180deg,#07111f,#0a1728);
+      color:var(--text);
+      line-height:1.8;
+    }
+
+    .container{
+      width:min(1050px,92%);
+      margin:auto;
+    }
+
+    header{
+      background:rgba(7,17,31,.95);
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:17px 0;
+    }
+
+    .logo{
+      font-weight:bold;
+    }
+
+    .logo span{
+      color:var(--blue);
+    }
+
+    .back{
+      color:white;
+      text-decoration:none;
+      border:1px solid var(--line);
+      padding:8px 12px;
+      border-radius:9px;
+    }
+
+    .hero{
+      text-align:center;
+      padding:60px 0 35px;
+    }
+
+    .lecture-number{
+      color:var(--blue);
+      font-weight:bold;
+      letter-spacing:1px;
+    }
+
+    h1{
+      font-size:clamp(2rem,6vw,3.6rem);
+      line-height:1.15;
+      margin:10px 0;
+    }
+
+    .hero-ar{
+      direction:rtl;
+      font-size:1.5rem;
+      color:#e5edf6;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:10px;
+    }
+
+    section{
+      margin:22px 0;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+    }
+
+    h2{
+      margin-top:0;
+      color:#edf8ff;
+    }
+
+    h3{
+      color:var(--blue);
+    }
+
+    p,li{
+      color:#d8e2ec;
+    }
+
+    .en{
+      direction:ltr;
+      text-align:left;
+    }
+
+    .ar{
+      direction:rtl;
+      text-align:right;
+      border-top:1px dashed var(--line);
+      padding-top:18px;
+      margin-top:18px;
+    }
+
+    .highlight{
+      background:var(--card2);
+      border-left:4px solid var(--blue);
+      border-radius:10px;
+      padding:15px;
+      margin:15px 0;
+    }
+
+    .ar .highlight{
+      border-left:none;
+      border-right:4px solid var(--blue);
+    }
+
+    .formula{
+      direction:ltr;
+      text-align:center;
+      background:#06101d;
+      border:1px solid var(--line);
+      padding:18px;
+      margin:16px 0;
+      border-radius:12px;
+      font-size:1.23rem;
+      font-family:"Times New Roman",serif;
+      overflow-x:auto;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+
+    .mini-card{
+      background:var(--card2);
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:16px;
+    }
+
+    .mini-card strong{
+      color:white;
+    }
+
+    .flow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:20px 0;
+    }
+
+    .flow-box{
+      background:#0b1b2c;
+      border:1px solid rgba(56,189,248,.3);
+      padding:14px 17px;
+      border-radius:12px;
+      text-align:center;
+      min-width:120px;
+    }
+
+    .arrow{
+      color:var(--blue);
+      font-size:1.5rem;
+      font-weight:bold;
+    }
+
+    .svg-box{
+      background:#081523;
+      border:1px solid var(--line);
+      border-radius:15px;
+      padding:12px;
+      overflow-x:auto;
+      margin:16px 0;
+    }
+
+    svg{
+      width:100%;
+      min-width:650px;
+      height:auto;
+    }
+
+    .node{
+      fill:#10263d;
+      stroke:#38bdf8;
+      stroke-width:2.5;
+    }
+
+    .inputnode{
+      fill:#14283c;
+      stroke:#b8c7d9;
+      stroke-width:2;
+    }
+
+    .outputnode{
+      fill:#12351e;
+      stroke:#22c55e;
+      stroke-width:3;
+    }
+
+    .edge{
+      stroke:#7890a8;
+      stroke-width:2;
+    }
+
+    .svgtext{
+      fill:white;
+      font-size:15px;
+      text-anchor:middle;
+      dominant-baseline:middle;
+    }
+
+    .label{
+      fill:#facc15;
+      font-size:13px;
+      text-anchor:middle;
+    }
+
+    .table-wrap{
+      overflow-x:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:600px;
+      margin:15px 0;
+    }
+
+    th,td{
+      border:1px solid var(--line);
+      padding:11px;
+      text-align:center;
+    }
+
+    th{
+      background:#0b1b2c;
+      color:#eaf7ff;
+    }
+
+    code{
+      background:#071522;
+      color:#bdefff;
+      padding:2px 6px;
+      border-radius:5px;
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      padding:35px 0;
+    }
+
+    @media(max-width:750px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo">AI Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="hero">
+
+    <div class="lecture-number">
+      LECTURE 05 | المحاضرة 05
+    </div>
+
+    <h1>
+      Artificial Neural Networks
+    </h1>
+
+    <div class="hero-ar">
+      الشبكات العصبية الاصطناعية
+    </div>
+
+    <div class="subtitle">
+      Neurons, Activation Functions, Loss, Gradients, and Backpropagation
+      <br>
+      العصبونات ودوال التنشيط ودالة الخطأ والتدرجات والانتشار الخلفي
+    </div>
+
+  </div>
+
+
+  <section>
+
+    <div class="en">
+      <h2>🎯 Learning Objectives</h2>
+
+      <ul>
+        <li>Understand the mathematical model of an artificial neuron.</li>
+        <li>Explain weights, bias, weighted sum, and activation functions.</li>
+        <li>Understand the Sigmoid activation function.</li>
+        <li>Derive the derivative of the Sigmoid function.</li>
+        <li>Understand forward propagation.</li>
+        <li>Define and interpret a loss function.</li>
+        <li>Understand gradient descent.</li>
+        <li>Use the chain rule to derive backpropagation equations.</li>
+        <li>Apply neural networks to power-system problems.</li>
+      </ul>
+    </div>
+
+    <div class="ar">
+
+      <h2>🎯 أهداف التعلم</h2>
+
+      <ul>
+        <li>فهم النموذج الرياضي للعصبون الاصطناعي.</li>
+        <li>فهم الأوزان والانزياح والمجموع الموزون ودوال التنشيط.</li>
+        <li>فهم دالة Sigmoid.</li>
+        <li>اشتقاق مشتق دالة Sigmoid خطوة بخطوة.</li>
+        <li>فهم الانتشار الأمامي.</li>
+        <li>تعريف دالة الخطأ وفهم معناها.</li>
+        <li>فهم خوارزمية الانحدار المتدرج.</li>
+        <li>استخدام قاعدة السلسلة لاشتقاق معادلات الانتشار الخلفي.</li>
+        <li>تطبيق الشبكات العصبية على مسائل نظم الطاقة الكهربائية.</li>
+      </ul>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>1. From Biological Neuron to Artificial Neuron</h2>
+
+      <p>
+        Artificial neural networks are inspired by the idea of biological neurons:
+        receive signals, combine them, and generate an output.
+      </p>
+
+      <div class="flow">
+        <div class="flow-box">Inputs</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Weighted Sum</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Activation</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Output</div>
+      </div>
+
+      <div class="highlight">
+        An artificial neuron is fundamentally a mathematical function.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>1. من العصبون الحيوي إلى العصبون الاصطناعي</h2>
+
+      <p>
+        تستلهم الشبكات العصبية الاصطناعية فكرتها بصورة مبسطة من العصبونات الحيوية:
+        استقبال إشارات، دمجها، ثم إنتاج خرج.
+      </p>
+
+      <div class="highlight">
+        العصبون الاصطناعي في جوهره عبارة عن دالة رياضية.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>2. Mathematical Model of a Neuron</h2>
+
+      <p>
+        Suppose the neuron receives n inputs:
+      </p>
+
+      <div class="formula">
+        x₁, x₂, ..., xₙ
+      </div>
+
+      <p>
+        Each input has a corresponding weight:
+      </p>
+
+      <div class="formula">
+        w₁, w₂, ..., wₙ
+      </div>
+
+      <p>
+        The neuron first calculates the weighted sum:
+      </p>
+
+      <div class="formula">
+        z = w₁x₁ + w₂x₂ + ... + wₙxₙ + b
+      </div>
+
+      <p>
+        or more compactly:
+      </p>
+
+      <div class="formula">
+        z = Σ wᵢxᵢ + b
+      </div>
+
+      <p>
+        The output is:
+      </p>
+
+      <div class="formula">
+        y = φ(z)
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>2. النموذج الرياضي للعصبون</h2>
+
+      <p>
+        لنفترض أن العصبون يستقبل n من المدخلات:
+      </p>
+
+      <div class="formula">
+        x₁, x₂, ..., xₙ
+      </div>
+
+      <p>
+        ولكل مدخل وزن:
+      </p>
+
+      <div class="formula">
+        w₁, w₂, ..., wₙ
+      </div>
+
+      <p>
+        يقوم العصبون أولًا بحساب المجموع الموزون:
+      </p>
+
+      <div class="formula">
+        z = Σ wᵢxᵢ + b
+      </div>
+
+      <p>
+        ثم يتم تمرير z عبر دالة التنشيط:
+      </p>
+
+      <div class="formula">
+        y = φ(z)
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>3. Why Do We Need Weights?</h2>
+
+      <p>
+        The weights determine how strongly each input influences the output.
+      </p>
+
+      <div class="formula">
+        z = w₁x₁ + w₂x₂
+      </div>
+
+      <p>
+        If:
+      </p>
+
+      <div class="formula">
+        |w₁| > |w₂|
+      </div>
+
+      <p>
+        then input x₁ has a stronger influence than x₂.
+      </p>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>3. لماذا نحتاج إلى الأوزان؟</h2>
+
+      <p>
+        تحدد الأوزان مقدار تأثير كل مدخل على خرج العصبون.
+      </p>
+
+      <div class="formula">
+        z = w₁x₁ + w₂x₂
+      </div>
+
+      <p>
+        فإذا كان:
+      </p>
+
+      <div class="formula">
+        |w₁| > |w₂|
+      </div>
+
+      <p>
+        فإن تأثير x₁ على الخرج أكبر من تأثير x₂.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>4. What Does the Bias Do?</h2>
+
+      <p>
+        The bias shifts the activation function and allows the neuron
+        to produce useful outputs even when all inputs are zero.
+      </p>
+
+      <div class="formula">
+        z = Σ wᵢxᵢ + b
+      </div>
+
+      <div class="highlight">
+        Weights control the slope and importance of inputs.
+        Bias controls the horizontal shift of the neuron response.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>4. ما وظيفة الانزياح Bias؟</h2>
+
+      <p>
+        يسمح الانزياح بتحريك استجابة العصبون ويساعده على إعطاء خرج مناسب
+        حتى عندما تكون بعض المدخلات مساوية للصفر.
+      </p>
+
+      <div class="highlight">
+        الأوزان تحدد تأثير المدخلات، بينما يساعد الانزياح على تغيير موضع
+        دالة التنشيط.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>5. Structure of a Simple Neural Network</h2>
+
+      <div class="svg-box">
+
+        <svg viewBox="0 0 700 380">
+
+          <line class="edge" x1="120" y1="100" x2="350" y2="110"/>
+          <line class="edge" x1="120" y1="280" x2="350" y2="110"/>
+
+          <line class="edge" x1="120" y1="100" x2="350" y2="270"/>
+          <line class="edge" x1="120" y1="280" x2="350" y2="270"/>
+
+          <line class="edge" x1="350" y1="110" x2="580" y2="190"/>
+          <line class="edge" x1="350" y1="270" x2="580" y2="190"/>
+
+          <circle class="inputnode" cx="120" cy="100" r="36"/>
+          <text class="svgtext" x="120" y="100">x₁</text>
+
+          <circle class="inputnode" cx="120" cy="280" r="36"/>
+          <text class="svgtext" x="120" y="280">x₂</text>
+
+          <circle class="node" cx="350" cy="110" r="40"/>
+          <text class="svgtext" x="350" y="110">h₁</text>
+
+          <circle class="node" cx="350" cy="270" r="40"/>
+          <text class="svgtext" x="350" y="270">h₂</text>
+
+          <circle class="outputnode" cx="580" cy="190" r="42"/>
+          <text class="svgtext" x="580" y="190">y</text>
+
+          <text class="label" x="120" y="35">Input Layer</text>
+          <text class="label" x="350" y="35">Hidden Layer</text>
+          <text class="label" x="580" y="35">Output Layer</text>
+
+        </svg>
+
+      </div>
+
+      <p>
+        This is a 2–2–1 neural network:
+      </p>
+
+      <div class="formula">
+        2 Inputs → 2 Hidden Neurons → 1 Output
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>5. بنية شبكة عصبية بسيطة</h2>
+
+      <p>
+        يوضح الشكل شبكة عصبية من النوع:
+      </p>
+
+      <div class="formula">
+        2 → 2 → 1
+      </div>
+
+      <p>
+        أي مدخلان، عصبونان في الطبقة المخفية، وخرج واحد.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>6. Activation Functions</h2>
+
+      <p>
+        Without an activation function, a neural network would behave mainly
+        like a linear mathematical model.
+      </p>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>Sigmoid</strong>
+          <div class="formula">
+            σ(z)=1/(1+e⁻ᶻ)
+          </div>
+        </div>
+
+        <div class="mini-card">
+          <strong>Tanh</strong>
+          <div class="formula">
+            tanh(z)
+          </div>
+        </div>
+
+        <div class="mini-card">
+          <strong>ReLU</strong>
+          <div class="formula">
+            ReLU(z)=max(0,z)
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>6. دوال التنشيط</h2>
+
+      <p>
+        تسمح دوال التنشيط للشبكة بتمثيل علاقات غير خطية ومعقدة.
+      </p>
+
+      <p>
+        من أشهرها Sigmoid وTanh وReLU.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>7. The Sigmoid Function</h2>
+
+      <div class="formula">
+        σ(z)=1/(1+e⁻ᶻ)
+      </div>
+
+      <p>
+        The output always lies between 0 and 1:
+      </p>
+
+      <div class="formula">
+        0 &lt; σ(z) &lt; 1
+      </div>
+
+      <p>
+        This is useful when the output can be interpreted as a probability
+        or normalized response.
+      </p>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>7. دالة Sigmoid</h2>
+
+      <div class="formula">
+        σ(z)=1/(1+e⁻ᶻ)
+      </div>
+
+      <p>
+        تكون قيمة الخرج دائمًا بين الصفر والواحد:
+      </p>
+
+      <div class="formula">
+        0 &lt; σ(z) &lt; 1
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>8. Derivative of the Sigmoid Function</h2>
+
+      <p>
+        Start with:
+      </p>
+
+      <div class="formula">
+        σ(z) = (1+e⁻ᶻ)⁻¹
+      </div>
+
+      <p>
+        Differentiate using the chain rule:
+      </p>
+
+      <div class="formula">
+        dσ/dz =
+        -(1+e⁻ᶻ)⁻² × (-e⁻ᶻ)
+      </div>
+
+      <p>
+        Therefore:
+      </p>
+
+      <div class="formula">
+        dσ/dz =
+        e⁻ᶻ / (1+e⁻ᶻ)²
+      </div>
+
+      <p>
+        Now note:
+      </p>
+
+      <div class="formula">
+        σ(z)=1/(1+e⁻ᶻ)
+      </div>
+
+      <p>
+        and:
+      </p>
+
+      <div class="formula">
+        1-σ(z)=e⁻ᶻ/(1+e⁻ᶻ)
+      </div>
+
+      <p>
+        Multiplying both expressions:
+      </p>
+
+      <div class="formula">
+        σ(z)[1-σ(z)]
+        =
+        e⁻ᶻ/(1+e⁻ᶻ)²
+      </div>
+
+      <p>
+        Hence:
+      </p>
+
+      <div class="formula">
+        σ'(z)=σ(z)[1-σ(z)]
+      </div>
+
+      <div class="highlight">
+        This compact derivative is one reason Sigmoid is convenient
+        for learning derivations.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>8. اشتقاق دالة Sigmoid</h2>
+
+      <p>
+        نبدأ من:
+      </p>
+
+      <div class="formula">
+        σ(z)=(1+e⁻ᶻ)⁻¹
+      </div>
+
+      <p>
+        باستخدام قاعدة السلسلة نحصل على:
+      </p>
+
+      <div class="formula">
+        σ'(z)=e⁻ᶻ/(1+e⁻ᶻ)²
+      </div>
+
+      <p>
+        وبإعادة ترتيبها باستخدام قيمة σ نفسها:
+      </p>
+
+      <div class="formula">
+        σ'(z)=σ(z)[1-σ(z)]
+      </div>
+
+      <div class="highlight">
+        أي أننا لا نحتاج في التطبيق إلى إعادة حساب المشتقة من البداية؛
+        يمكن حسابها مباشرة باستخدام قيمة خرج Sigmoid.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>9. Forward Propagation</h2>
+
+      <p>
+        Forward propagation means calculating the network output from
+        the input toward the output layer.
+      </p>
+
+      <h3>Hidden neuron 1</h3>
+
+      <div class="formula">
+        z₁ = w₁x₁ + w₂x₂ + b₁
+      </div>
+
+      <div class="formula">
+        h₁ = σ(z₁)
+      </div>
+
+      <h3>Hidden neuron 2</h3>
+
+      <div class="formula">
+        z₂ = w₃x₁ + w₄x₂ + b₂
+      </div>
+
+      <div class="formula">
+        h₂ = σ(z₂)
+      </div>
+
+      <h3>Output neuron</h3>
+
+      <div class="formula">
+        z₃ = v₁h₁ + v₂h₂ + b₃
+      </div>
+
+      <div class="formula">
+        y = σ(z₃)
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>9. الانتشار الأمامي</h2>
+
+      <p>
+        يعني الانتشار الأمامي حساب خرج الشبكة بدءًا من المدخلات،
+        مرورًا بالطبقات المخفية، وصولًا إلى الخرج النهائي.
+      </p>
+
+      <div class="highlight">
+        Input → Hidden Layer → Output
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>10. Loss Function</h2>
+
+      <p>
+        The network prediction y must be compared with the desired target t.
+      </p>
+
+      <p>
+        A simple squared-error loss is:
+      </p>
+
+      <div class="formula">
+        E = 1/2 (y-t)²
+      </div>
+
+      <p>
+        The factor 1/2 is used because it simplifies the derivative.
+      </p>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>10. دالة الخطأ</h2>
+
+      <p>
+        نقارن خرج الشبكة y مع القيمة المطلوبة t.
+      </p>
+
+      <div class="formula">
+        E = 1/2 (y-t)²
+      </div>
+
+      <p>
+        نستخدم العامل 1/2 لأنه يجعل الاشتقاق أبسط.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>11. Derivative of the Loss</h2>
+
+      <p>
+        Start from:
+      </p>
+
+      <div class="formula">
+        E = 1/2 (y-t)²
+      </div>
+
+      <p>
+        Differentiate with respect to y:
+      </p>
+
+      <div class="formula">
+        ∂E/∂y = y-t
+      </div>
+
+      <div class="highlight">
+        If y is larger than t, the derivative is positive.
+        If y is smaller than t, the derivative is negative.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>11. مشتقة دالة الخطأ</h2>
+
+      <p>
+        نبدأ من:
+      </p>
+
+      <div class="formula">
+        E = 1/2 (y-t)²
+      </div>
+
+      <p>
+        وبالاشتقاق بالنسبة إلى y:
+      </p>
+
+      <div class="formula">
+        ∂E/∂y = y-t
+      </div>
+
+      <p>
+        هذه القيمة تخبرنا باتجاه الخطأ.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>12. Why Do We Need Backpropagation?</h2>
+
+      <p>
+        We know the final error, but we need to know:
+      </p>
+
+      <div class="highlight">
+        How much did each weight contribute to the error?
+      </div>
+
+      <p>
+        Backpropagation answers this question using derivatives
+        and the chain rule.
+      </p>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>12. لماذا نحتاج إلى الانتشار الخلفي؟</h2>
+
+      <p>
+        نعرف الخطأ النهائي، لكننا نحتاج إلى معرفة مقدار مساهمة كل وزن
+        في هذا الخطأ.
+      </p>
+
+      <div class="highlight">
+        الانتشار الخلفي يستخدم المشتقات وقاعدة السلسلة لحساب تأثير كل وزن.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>13. The Chain Rule</h2>
+
+      <p>
+        If:
+      </p>
+
+      <div class="formula">
+        E → y → z → w
+      </div>
+
+      <p>
+        then:
+      </p>
+
+      <div class="formula">
+        ∂E/∂w =
+        ∂E/∂y ×
+        ∂y/∂z ×
+        ∂z/∂w
+      </div>
+
+      <div class="highlight">
+        Backpropagation is essentially repeated application of the chain rule.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>13. قاعدة السلسلة</h2>
+
+      <p>
+        إذا كان الوزن w يؤثر على z، وz تؤثر على y، وy تؤثر على الخطأ E،
+        فإن تأثير w على E يحسب بضرب المشتقات الجزئية على طول المسار.
+      </p>
+
+      <div class="formula">
+        ∂E/∂w =
+        ∂E/∂y ×
+        ∂y/∂z ×
+        ∂z/∂w
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>14. Output-Layer Error Signal</h2>
+
+      <p>
+        For the output neuron:
+      </p>
+
+      <div class="formula">
+        y = σ(z₃)
+      </div>
+
+      <p>
+        We already know:
+      </p>
+
+      <div class="formula">
+        ∂E/∂y = y-t
+      </div>
+
+      <p>
+        and:
+      </p>
+
+      <div class="formula">
+        ∂y/∂z₃ = y(1-y)
+      </div>
+
+      <p>
+        Therefore:
+      </p>
+
+      <div class="formula">
+        δ₃ =
+        ∂E/∂z₃
+        =
+        (y-t)y(1-y)
+      </div>
+
+      <div class="highlight">
+        This is the origin of the MATLAB expression:
+        <br><br>
+        dO = (y - t) * y * (1 - y)
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>14. إشارة الخطأ في طبقة الخرج</h2>
+
+      <p>
+        لدينا:
+      </p>
+
+      <div class="formula">
+        y = σ(z₃)
+      </div>
+
+      <p>
+        وباستخدام قاعدة السلسلة:
+      </p>
+
+      <div class="formula">
+        δ₃ =
+        (y-t)y(1-y)
+      </div>
+
+      <p>
+        ولهذا تظهر في كود MATLAB العلاقة:
+      </p>
+
+      <div class="formula">
+        dO = (y - t) * y * (1 - y)
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>15. Gradient of an Output Weight</h2>
+
+      <p>
+        For weight v₁:
+      </p>
+
+      <div class="formula">
+        z₃ = v₁h₁ + v₂h₂ + b₃
+      </div>
+
+      <p>
+        Therefore:
+      </p>
+
+      <div class="formula">
+        ∂z₃/∂v₁ = h₁
+      </div>
+
+      <p>
+        Thus:
+      </p>
+
+      <div class="formula">
+        ∂E/∂v₁ = δ₃h₁
+      </div>
+
+      <p>
+        Similarly:
+      </p>
+
+      <div class="formula">
+        ∂E/∂v₂ = δ₃h₂
+      </div>
+
+      <p>
+        and for the bias:
+      </p>
+
+      <div class="formula">
+        ∂E/∂b₃ = δ₃
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>15. تدرج وزن في طبقة الخرج</h2>
+
+      <p>
+        لأن:
+      </p>
+
+      <div class="formula">
+        z₃ = v₁h₁ + v₂h₂ + b₃
+      </div>
+
+      <p>
+        فإن:
+      </p>
+
+      <div class="formula">
+        ∂z₃/∂v₁ = h₁
+      </div>
+
+      <p>
+        وبالتالي:
+      </p>
+
+      <div class="formula">
+        ∂E/∂v₁ = δ₃h₁
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>16. Hidden-Layer Error Signal</h2>
+
+      <p>
+        Hidden neuron h₁ influences the output through weight v₁.
+      </p>
+
+      <p>
+        Using the chain rule:
+      </p>
+
+      <div class="formula">
+        δ₁ =
+        δ₃ v₁ h₁(1-h₁)
+      </div>
+
+      <p>
+        Similarly:
+      </p>
+
+      <div class="formula">
+        δ₂ =
+        δ₃ v₂ h₂(1-h₂)
+      </div>
+
+      <div class="highlight">
+        The output error is propagated backward through the connection weights.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>16. إشارة الخطأ في الطبقة المخفية</h2>
+
+      <p>
+        يصل تأثير الخطأ من طبقة الخرج إلى الطبقة المخفية عبر الأوزان.
+      </p>
+
+      <div class="formula">
+        δ₁ =
+        δ₃ v₁ h₁(1-h₁)
+      </div>
+
+      <div class="formula">
+        δ₂ =
+        δ₃ v₂ h₂(1-h₂)
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>17. Gradient of Input-to-Hidden Weights</h2>
+
+      <p>
+        If:
+      </p>
+
+      <div class="formula">
+        z₁ = w₁x + b₁
+      </div>
+
+      <p>
+        then:
+      </p>
+
+      <div class="formula">
+        ∂z₁/∂w₁ = x
+      </div>
+
+      <p>
+        Therefore:
+      </p>
+
+      <div class="formula">
+        ∂E/∂w₁ = δ₁x
+      </div>
+
+      <p>
+        and:
+      </p>
+
+      <div class="formula">
+        ∂E/∂b₁ = δ₁
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>17. تدرجات الأوزان بين الدخل والطبقة المخفية</h2>
+
+      <p>
+        لأن:
+      </p>
+
+      <div class="formula">
+        z₁ = w₁x + b₁
+      </div>
+
+      <p>
+        فإن:
+      </p>
+
+      <div class="formula">
+        ∂E/∂w₁ = δ₁x
+      </div>
+
+      <div class="formula">
+        ∂E/∂b₁ = δ₁
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>18. Gradient Descent</h2>
+
+      <p>
+        After calculating the gradients, we update every parameter:
+      </p>
+
+      <div class="formula">
+        w(new) =
+        w(old) - η ∂E/∂w
+      </div>
+
+      <p>
+        where η is the learning rate.
+      </p>
+
+      <div class="highlight">
+        We move in the opposite direction of the gradient because
+        the gradient points toward increasing error.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>18. الانحدار المتدرج</h2>
+
+      <p>
+        بعد حساب المشتقات نقوم بتحديث الأوزان:
+      </p>
+
+      <div class="formula">
+        w(new) =
+        w(old) - η ∂E/∂w
+      </div>
+
+      <p>
+        حيث η هو معدل التعلم.
+      </p>
+
+      <div class="highlight">
+        نطرح التدرج لأننا نريد التحرك باتجاه انخفاض الخطأ وليس زيادته.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>19. Complete Training Cycle</h2>
+
+      <div class="flow">
+
+        <div class="flow-box">Input</div>
+        <div class="arrow">→</div>
+
+        <div class="flow-box">Forward Propagation</div>
+        <div class="arrow">→</div>
+
+        <div class="flow-box">Prediction</div>
+        <div class="arrow">→</div>
+
+        <div class="flow-box">Loss</div>
+        <div class="arrow">→</div>
+
+        <div class="flow-box">Backpropagation</div>
+        <div class="arrow">→</div>
+
+        <div class="flow-box">Update Weights</div>
+
+      </div>
+
+      <div class="highlight">
+        Repeat until the error becomes sufficiently small.
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>19. دورة التدريب الكاملة</h2>
+
+      <div class="highlight">
+        المدخلات ← الانتشار الأمامي ← التنبؤ ← الخطأ
+        ← الانتشار الخلفي ← تحديث الأوزان ← التكرار
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>20. Numerical Example</h2>
+
+      <p>
+        Assume:
+      </p>
+
+      <div class="formula">
+        x = 1
+      </div>
+
+      <div class="formula">
+        w = 0.5
+      </div>
+
+      <div class="formula">
+        b = 0
+      </div>
+
+      <p>
+        Then:
+      </p>
+
+      <div class="formula">
+        z = wx+b = 0.5
+      </div>
+
+      <p>
+        Sigmoid output:
+      </p>
+
+      <div class="formula">
+        y = σ(0.5) ≈ 0.622
+      </div>
+
+      <p>
+        Suppose the target is:
+      </p>
+
+      <div class="formula">
+        t = 1
+      </div>
+
+      <p>
+        Loss:
+      </p>
+
+      <div class="formula">
+        E = 1/2(0.622-1)²
+      </div>
+
+      <div class="formula">
+        E ≈ 0.0714
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>20. مثال عددي</h2>
+
+      <p>
+        إذا كان:
+      </p>
+
+      <div class="formula">
+        x=1, w=0.5, b=0
+      </div>
+
+      <p>
+        فإن:
+      </p>
+
+      <div class="formula">
+        z=0.5
+      </div>
+
+      <div class="formula">
+        y≈0.622
+      </div>
+
+      <p>
+        وإذا كانت القيمة المطلوبة t=1 فإن الخطأ:
+      </p>
+
+      <div class="formula">
+        E≈0.0714
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>21. MATLAB Connection</h2>
+
+      <p>
+        Forward propagation:
+      </p>
+
+      <div class="formula">
+        z1 = W.w1*x + W.b1
+      </div>
+
+      <div class="formula">
+        h1 = sigma(z1)
+      </div>
+
+      <p>
+        Output-layer error:
+      </p>
+
+      <div class="formula">
+        dO = (y - t) * y * (1 - y)
+      </div>
+
+      <p>
+        Output-weight gradients:
+      </p>
+
+      <div class="formula">
+        dV1 = dO*h1
+      </div>
+
+      <div class="formula">
+        dV2 = dO*h2
+      </div>
+
+      <p>
+        Hidden-layer error:
+      </p>
+
+      <div class="formula">
+        d1 = dO*W.v1*h1*(1-h1)
+      </div>
+
+      <p>
+        Weight gradient:
+      </p>
+
+      <div class="formula">
+        dW1 = d1*x
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>21. الربط مع MATLAB</h2>
+
+      <p>
+        الآن يمكن فهم كل سطر في كود الانتشار الخلفي بصورة رياضية.
+      </p>
+
+      <div class="highlight">
+        كل قيمة d تمثل مشتقة جزئية أو إشارة خطأ مستخدمة
+        لتحديد اتجاه تحديث الوزن.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>22. Power-System Application: Load Forecasting</h2>
+
+      <p>
+        A neural network can receive several power-system variables:
+      </p>
+
+      <div class="formula">
+        x =
+        [Temperature,
+        Hour,
+        Previous Load,
+        Day Type]
+      </div>
+
+      <p>
+        and predict:
+      </p>
+
+      <div class="formula">
+        y = Future Electrical Load
+      </div>
+
+      <div class="flow">
+
+        <div class="flow-box">
+          Weather + Historical Data
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="flow-box">
+          Neural Network
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="flow-box">
+          Load Forecast
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>22. تطبيق في نظم الطاقة: التنبؤ بالحمل</h2>
+
+      <p>
+        يمكن للشبكة العصبية استقبال معلومات مثل درجة الحرارة والوقت
+        والحمل السابق ونوع اليوم.
+      </p>
+
+      <p>
+        ثم تقوم بإنتاج تنبؤ للحمل الكهربائي المستقبلي.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>23. Other Power-System Applications</h2>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>PV Forecasting</strong>
+          <p>
+            Predict photovoltaic power generation.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Wind Forecasting</strong>
+          <p>
+            Predict wind-power generation.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Fault Classification</strong>
+          <p>
+            Identify and classify network faults.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Voltage Estimation</strong>
+          <p>
+            Estimate voltage states using measurements.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Battery Management</strong>
+          <p>
+            Estimate SOC or predict optimal operation.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Smart Grid Monitoring</strong>
+          <p>
+            Detect abnormal conditions from large datasets.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>23. تطبيقات أخرى في نظم الطاقة</h2>
+
+      <ul>
+        <li>التنبؤ بالطاقة الشمسية.</li>
+        <li>التنبؤ بطاقة الرياح.</li>
+        <li>تصنيف الأعطال.</li>
+        <li>تقدير الجهد والحالة التشغيلية.</li>
+        <li>إدارة أنظمة تخزين الطاقة.</li>
+        <li>مراقبة الشبكات الذكية.</li>
+      </ul>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>24. Summary</h2>
+
+      <ul>
+        <li>A neuron calculates a weighted sum and applies an activation function.</li>
+        <li>The fundamental neuron equation is z = Σwᵢxᵢ + b.</li>
+        <li>Sigmoid maps values into the interval (0,1).</li>
+        <li>Its derivative is σ'(z)=σ(z)[1-σ(z)].</li>
+        <li>Forward propagation calculates network predictions.</li>
+        <li>The loss function measures prediction error.</li>
+        <li>Backpropagation calculates gradients using the chain rule.</li>
+        <li>Gradient descent updates the weights to reduce error.</li>
+        <li>Neural networks have many applications in modern power systems.</li>
+      </ul>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>24. الخلاصة</h2>
+
+      <ul>
+        <li>يحسب العصبون مجموعًا موزونًا ثم يطبق دالة تنشيط.</li>
+        <li>المعادلة الأساسية للعصبون هي z = Σwᵢxᵢ + b.</li>
+        <li>تحول Sigmoid القيم إلى المجال بين الصفر والواحد.</li>
+        <li>مشتقتها هي σ'(z)=σ(z)[1-σ(z)].</li>
+        <li>يحسب الانتشار الأمامي خرج الشبكة.</li>
+        <li>تقيس دالة الخطأ الفرق بين التنبؤ والقيمة المطلوبة.</li>
+        <li>يحسب الانتشار الخلفي التدرجات باستخدام قاعدة السلسلة.</li>
+        <li>يحدث الانحدار المتدرج الأوزان لتقليل الخطأ.</li>
+        <li>للشبكات العصبية تطبيقات واسعة في نظم الطاقة الكهربائية.</li>
+      </ul>
+
+    </div>
+
+  </section>
+
+
+  <section>
+
+    <div class="en">
+
+      <h2>📝 Review Questions</h2>
+
+      <ol>
+        <li>What is the mathematical equation of an artificial neuron?</li>
+        <li>What is the role of weights?</li>
+        <li>What is the role of the bias?</li>
+        <li>Why are activation functions required?</li>
+        <li>Derive the derivative of the Sigmoid function.</li>
+        <li>What is forward propagation?</li>
+        <li>Why do we need a loss function?</li>
+        <li>Explain the chain rule in backpropagation.</li>
+        <li>Derive dO = (y-t)y(1-y).</li>
+        <li>Why do we subtract the gradient during training?</li>
+        <li>Name four neural-network applications in electrical power systems.</li>
+      </ol>
+
+    </div>
+
+    <div class="ar">
+
+      <h2>📝 أسئلة المراجعة</h2>
+
+      <ol>
+        <li>ما المعادلة الرياضية للعصبون الاصطناعي؟</li>
+        <li>ما وظيفة الأوزان؟</li>
+        <li>ما وظيفة الانزياح؟</li>
+        <li>لماذا نحتاج إلى دوال التنشيط؟</li>
+        <li>اشتق مشتقة دالة Sigmoid.</li>
+        <li>ما المقصود بالانتشار الأمامي؟</li>
+        <li>لماذا نحتاج إلى دالة خطأ؟</li>
+        <li>اشرح قاعدة السلسلة في الانتشار الخلفي.</li>
+        <li>اشتق العلاقة dO = (y-t)y(1-y).</li>
+        <li>لماذا نطرح التدرج أثناء التدريب؟</li>
+        <li>اذكر أربعة تطبيقات للشبكات العصبية في نظم الطاقة الكهربائية.</li>
+      </ol>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer>
+
+  AI Applications in Electrical Power Systems
+  <br>
+
+  تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+
+  <br><br>
+
+  Lecture 05 | المحاضرة 05
+
+</footer>
+
+</body>
+</html>
