@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lab 07 - Battery Energy Storage Optimization</title>
+
+<style>
+:root{
+  --bg:#07111f;
+  --card:#0f2238;
+  --card2:#0b1b2c;
+  --text:#f4f7fb;
+  --muted:#b8c7d9;
+  --blue:#38bdf8;
+  --green:#22c55e;
+  --yellow:#facc15;
+  --red:#fb7185;
+  --line:rgba(255,255,255,.10);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:linear-gradient(180deg,#07111f,#0a1728);
+  color:var(--text);
+  line-height:1.8;
+}
+
+.container{
+  width:min(1050px,92%);
+  margin:auto;
+}
+
+header{
+  background:rgba(7,17,31,.95);
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  padding:17px 0;
+}
+
+.logo{font-weight:bold}
+.logo span{color:var(--blue)}
+
+.back{
+  color:white;
+  text-decoration:none;
+  border:1px solid var(--line);
+  padding:8px 12px;
+  border-radius:9px;
+}
+
+.hero{
+  text-align:center;
+  padding:60px 0 35px;
+}
+
+.lab-number{
+  color:var(--blue);
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+h1{
+  font-size:clamp(2rem,6vw,3.6rem);
+  line-height:1.15;
+  margin:10px 0;
+}
+
+.hero-ar{
+  direction:rtl;
+  font-size:1.5rem;
+  color:#e5edf6;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin-top:10px;
+}
+
+section{
+  margin:22px 0;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:22px;
+}
+
+h2{margin-top:0;color:#edf8ff}
+h3{color:var(--blue)}
+p,li{color:#d8e2ec}
+
+.en{direction:ltr;text-align:left}
+
+.ar{
+  direction:rtl;
+  text-align:right;
+  border-top:1px dashed var(--line);
+  padding-top:18px;
+  margin-top:18px;
+}
+
+.highlight{
+  background:var(--card2);
+  border-left:4px solid var(--blue);
+  border-radius:10px;
+  padding:15px;
+  margin:15px 0;
+}
+
+.ar .highlight{
+  border-left:none;
+  border-right:4px solid var(--blue);
+}
+
+.formula{
+  direction:ltr;
+  text-align:center;
+  background:#06101d;
+  border:1px solid var(--line);
+  padding:18px;
+  margin:16px 0;
+  border-radius:12px;
+  font-size:1.22rem;
+  font-family:"Times New Roman",serif;
+  overflow-x:auto;
+}
+
+pre{
+  direction:ltr;
+  text-align:left;
+  background:#06101d;
+  color:#dff5ff;
+  border:1px solid var(--line);
+  padding:16px;
+  border-radius:12px;
+  overflow-x:auto;
+  white-space:pre;
+  line-height:1.55;
+}
+
+code{
+  font-family:Consolas,Monaco,monospace;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.mini-card{
+  background:var(--card2);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:16px;
+}
+
+.mini-card strong{color:white}
+
+.flow{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:20px 0;
+}
+
+.flow-box{
+  background:#0b1b2c;
+  border:1px solid rgba(56,189,248,.3);
+  padding:14px 17px;
+  border-radius:12px;
+  text-align:center;
+  min-width:120px;
+}
+
+.arrow{
+  color:var(--blue);
+  font-size:1.5rem;
+  font-weight:bold;
+}
+
+.table-wrap{overflow-x:auto}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+  margin:15px 0;
+}
+
+th,td{
+  border:1px solid var(--line);
+  padding:11px;
+  text-align:center;
+}
+
+th{
+  background:#0b1b2c;
+  color:#eaf7ff;
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  padding:35px 0;
+}
+
+@media(max-width:750px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<div class="hero">
+
+  <div class="lab-number">
+    LAB 07 | المختبر 07
+  </div>
+
+  <h1>Battery Energy Storage Optimization</h1>
+
+  <div class="hero-ar">
+    تحسين تشغيل بطارية تخزين الطاقة
+  </div>
+
+  <div class="subtitle">
+    State of Charge, Charging, Discharging, Electricity Price, and Optimal Scheduling
+    <br>
+    حالة الشحن والشحن والتفريغ وأسعار الكهرباء والجدولة المثلى
+  </div>
+
+</div>
+
+
+<section>
+
+<div class="en">
+
+<h2>🎯 Lab Objectives</h2>
+
+<ul>
+<li>Understand battery scheduling as an optimization problem.</li>
+<li>Model the battery State of Charge.</li>
+<li>Include charging and discharging efficiencies.</li>
+<li>Respect SOC and power limits.</li>
+<li>Use electricity price as part of the objective function.</li>
+<li>Compare uncontrolled and optimized battery operation.</li>
+<li>Implement a simple optimization routine in MATLAB.</li>
+</ul>
+
+</div>
+
+<div class="ar">
+
+<h2>🎯 أهداف المختبر</h2>
+
+<ul>
+<li>فهم جدولة البطارية كمسألة تحسين.</li>
+<li>نمذجة حالة الشحن SOC.</li>
+<li>إضافة كفاءة الشحن والتفريغ.</li>
+<li>احترام حدود SOC والقدرة.</li>
+<li>إدخال سعر الكهرباء ضمن دالة الهدف.</li>
+<li>مقارنة التشغيل غير المحسن بالتشغيل الأمثل.</li>
+<li>تنفيذ خوارزمية تحسين بسيطة في MATLAB.</li>
+</ul>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>1. Battery Scheduling Problem</h2>
+
+<p>
+A battery can charge when electricity is cheap and discharge when electricity is expensive.
+</p>
+
+<div class="formula">
+Low Price → Charge
+</div>
+
+<div class="formula">
+High Price → Discharge
+</div>
+
+<div class="highlight">
+The goal is to reduce the total cost of purchasing electricity while respecting battery constraints.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>1. مسألة جدولة البطارية</h2>
+
+<p>
+يمكن شحن البطارية عندما يكون سعر الكهرباء منخفضًا وتفريغها عندما يكون السعر مرتفعًا.
+</p>
+
+<div class="highlight">
+الهدف هو تقليل التكلفة الكلية للطاقة مع احترام القيود التشغيلية للبطارية.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>2. Time Horizon</h2>
+
+<p>
+Consider a six-hour scheduling horizon:
+</p>
+
+<div class="formula">
+k = 1,2,...,6
+</div>
+
+<div class="table-wrap">
+
+<table>
+<tr>
+<th>Hour</th>
+<th>Electricity Price [€/MWh]</th>
+<th>Load [MW]</th>
+</tr>
+
+<tr><td>1</td><td>50</td><td>6.0</td></tr>
+<tr><td>2</td><td>40</td><td>5.5</td></tr>
+<tr><td>3</td><td>35</td><td>5.0</td></tr>
+<tr><td>4</td><td>70</td><td>6.5</td></tr>
+<tr><td>5</td><td>90</td><td>7.0</td></tr>
+<tr><td>6</td><td>80</td><td>6.5</td></tr>
+</table>
+
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>2. أفق الجدولة</h2>
+
+<p>
+نقسم فترة الدراسة إلى ست ساعات، ولكل ساعة سعر للكهرباء وقيمة حمل.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>3. Battery Parameters</h2>
+
+<div class="table-wrap">
+
+<table>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+
+<tr><td>Energy Capacity Emax</td><td>4 MWh</td></tr>
+<tr><td>Minimum SOC</td><td>20%</td></tr>
+<tr><td>Maximum SOC</td><td>90%</td></tr>
+<tr><td>Initial SOC</td><td>50%</td></tr>
+<tr><td>Maximum Charge Power</td><td>2 MW</td></tr>
+<tr><td>Maximum Discharge Power</td><td>2 MW</td></tr>
+<tr><td>Charge Efficiency</td><td>0.95</td></tr>
+<tr><td>Discharge Efficiency</td><td>0.95</td></tr>
+</table>
+
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>3. معاملات البطارية</h2>
+
+<p>
+نحدد سعة الطاقة وحدود SOC والاستطاعة القصوى للشحن والتفريغ وكفاءة كل منهما.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>4. Battery Power Sign Convention</h2>
+
+<p>
+Define:
+</p>
+
+<div class="formula">
+PB(k) &gt; 0 → Discharging
+</div>
+
+<div class="formula">
+PB(k) &lt; 0 → Charging
+</div>
+
+<p>
+Therefore:
+</p>
+
+<div class="formula">
+-Pch,max ≤ PB(k) ≤ Pdis,max
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>4. إشارة قدرة البطارية</h2>
+
+<p>
+نستخدم الاتفاق التالي:
+</p>
+
+<ul>
+<li>PB موجبة → البطارية تفرغ.</li>
+<li>PB سالبة → البطارية تشحن.</li>
+</ul>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>5. State of Charge</h2>
+
+<p>
+Battery energy is:
+</p>
+
+<div class="formula">
+E(k)=SOC(k)Emax
+</div>
+
+<p>
+and:
+</p>
+
+<div class="formula">
+SOC(k)=E(k)/Emax
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>5. حالة الشحن SOC</h2>
+
+<div class="formula">
+SOC(k)=E(k)/Emax
+</div>
+
+<p>
+تمثل SOC النسبة بين الطاقة المخزنة حاليًا والسعة الكلية للبطارية.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>6. SOC During Charging</h2>
+
+<p>
+If PB is negative, the battery is charging:
+</p>
+
+<div class="formula">
+E(k+1)=E(k)+ηch |PB(k)| Δt
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>6. SOC أثناء الشحن</h2>
+
+<div class="formula">
+E(k+1)=E(k)+ηch |PB(k)| Δt
+</div>
+
+<p>
+لا تدخل كامل الطاقة القادمة إلى البطارية بسبب وجود خسائر شحن.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>7. SOC During Discharging</h2>
+
+<p>
+If PB is positive:
+</p>
+
+<div class="formula">
+E(k+1)=E(k)-PB(k)Δt/ηdis
+</div>
+
+<p>
+The stored energy decreases slightly more than the delivered electrical energy because efficiency is less than one.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>7. SOC أثناء التفريغ</h2>
+
+<div class="formula">
+E(k+1)=E(k)-PB(k)Δt/ηdis
+</div>
+
+<p>
+تنخفض الطاقة المخزنة بأكثر قليلًا من الطاقة التي تصل فعليًا إلى الشبكة بسبب خسائر التفريغ.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>8. SOC Constraints</h2>
+
+<div class="formula">
+SOCmin ≤ SOC(k) ≤ SOCmax
+</div>
+
+<p>For this battery:</p>
+
+<div class="formula">
+0.20 ≤ SOC(k) ≤ 0.90
+</div>
+
+<div class="highlight">
+These limits protect the battery and define the usable energy window.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>8. قيود SOC</h2>
+
+<div class="formula">
+0.20 ≤ SOC(k) ≤ 0.90
+</div>
+
+<p>
+يجب ألا تتجاوز حالة الشحن هذه الحدود خلال أي ساعة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>9. Grid Power</h2>
+
+<p>
+Without PV in this first example:
+</p>
+
+<div class="formula">
+Pgrid(k)=Pload(k)-PB(k)
+</div>
+
+<p>
+If the battery discharges, grid demand decreases.
+</p>
+
+<p>
+If the battery charges, grid demand increases.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>9. القدرة المسحوبة من الشبكة</h2>
+
+<div class="formula">
+Pgrid(k)=Pload(k)-PB(k)
+</div>
+
+<p>
+تفريغ البطارية يقلل ما نشتريه من الشبكة، بينما الشحن يزيده.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>10. Electricity Cost</h2>
+
+<p>
+For one hour:
+</p>
+
+<div class="formula">
+Cost(k)=Price(k) Pgrid(k) Δt
+</div>
+
+<p>
+The total operating cost is:
+</p>
+
+<div class="formula">
+J = Σ Price(k)Pgrid(k)Δt
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>10. تكلفة الكهرباء</h2>
+
+<div class="formula">
+J=Σ Price(k)Pgrid(k)Δt
+</div>
+
+<p>
+تحاول خوارزمية التحسين اختيار تشغيل البطارية الذي يجعل هذه التكلفة أصغر ما يمكن.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>11. Decision Vector</h2>
+
+<p>
+The optimization variables are battery powers over all hours:
+</p>
+
+<div class="formula">
+x=[PB(1),PB(2),...,PB(6)]
+</div>
+
+<p>
+One candidate schedule may be:
+</p>
+
+<div class="formula">
+[-1.5,-1,0,0.5,2,1]
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>11. متجه القرار</h2>
+
+<p>
+يمثل الحل الكامل قدرة البطارية في كل ساعة:
+</p>
+
+<div class="formula">
+x=[PB(1),PB(2),...,PB(6)]
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>12. Why Do We Need Penalties?</h2>
+
+<p>
+A randomly generated schedule may violate SOC limits.
+</p>
+
+<div class="formula">
+SOC(k)&lt;SOCmin
+</div>
+
+<p>or:</p>
+
+<div class="formula">
+SOC(k)&gt;SOCmax
+</div>
+
+<p>
+Therefore define:
+</p>
+
+<div class="formula">
+Jpen = J + PenaltySOC
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>12. لماذا نحتاج إلى العقوبات؟</h2>
+
+<p>
+قد يؤدي جدول تشغيل عشوائي إلى شحن أو تفريغ البطارية خارج الحدود المسموحة.
+</p>
+
+<div class="highlight">
+نضيف عقوبة كبيرة حتى تصبح هذه الحلول غير جذابة للمحسن.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>13. SOC Penalty</h2>
+
+<p>
+At every hour:
+</p>
+
+<div class="formula">
+Penalty =
+λ[SOCmin-SOC]²
+</div>
+
+<p>if SOC is too low, and:</p>
+
+<div class="formula">
+Penalty =
+λ[SOC-SOCmax]²
+</div>
+
+<p>if SOC is too high.</p>
+
+</div>
+
+<div class="ar">
+
+<h2>13. عقوبة SOC</h2>
+
+<p>
+تزداد العقوبة كلما ابتعدت SOC عن المجال المسموح.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>14. Final SOC Constraint</h2>
+
+<p>
+Without a final-energy condition, the optimizer may simply empty the battery near the end.
+</p>
+
+<p>
+Therefore require:
+</p>
+
+<div class="formula">
+SOCfinal ≈ SOCinitial
+</div>
+
+<p>
+and add:
+</p>
+
+<div class="formula">
+PenaltyFinal =
+λf(SOCfinal-SOCinitial)²
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>14. قيد SOC النهائي</h2>
+
+<p>
+إذا لم نفرض شرطًا نهائيًا، فقد تقوم الخوارزمية بتفريغ البطارية بالكامل في نهاية الفترة للحصول على تكلفة منخفضة ظاهريًا.
+</p>
+
+<div class="formula">
+SOCfinal ≈ SOCinitial
+</div>
+
+<div class="highlight">
+هذا يجعل المقارنة الاقتصادية أكثر عدالة بين بداية ونهاية أفق الجدولة.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>15. MATLAB Data</h2>
+
+<pre><code>price = [50 40 35 70 90 80];
+
+loadMW = [6.0 5.5 5.0 6.5 7.0 6.5];
+
+N = length(price);
+
+dt = 1;</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>15. البيانات في MATLAB</h2>
+
+<p>
+نخزن أسعار الكهرباء والحمل لكل ساعة، ونفترض أن طول الفترة الزمنية ساعة واحدة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>16. Battery Parameters in MATLAB</h2>
+
+<pre><code>Emax = 4;
+
+SOCmin = 0.20;
+SOCmax = 0.90;
+SOC0   = 0.50;
+
+PchMax  = 2;
+PdisMax = 2;
+
+etaCh  = 0.95;
+etaDis = 0.95;</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>16. معاملات البطارية في MATLAB</h2>
+
+<p>
+نعرّف سعة البطارية وحدود SOC والقدرة القصوى وكفاءات التشغيل.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>17. Evaluate One Schedule</h2>
+
+<p>
+Start with:
+</p>
+
+<div class="formula">
+E(1)=SOC0Emax
+</div>
+
+<p>
+Then simulate every hour sequentially.
+</p>
+
+<pre><code>E = SOC0*Emax;
+
+for k = 1:N
+
+    PB = schedule(k);
+
+    if PB &lt; 0
+
+        E = E + etaCh*(-PB)*dt;
+
+    else
+
+        E = E - PB*dt/etaDis;
+
+    end
+
+    SOC = E/Emax;
+
+end</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>17. تقييم جدول تشغيل واحد</h2>
+
+<p>
+يجب حساب SOC ساعة بعد ساعة، لأن حالة البطارية الحالية تعتمد على جميع قرارات الشحن والتفريغ السابقة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>18. Cost Calculation</h2>
+
+<pre><code>Pgrid = loadMW(k) - PB;
+
+cost = cost + price(k)*Pgrid*dt;</code></pre>
+
+<p>
+The cost is accumulated across the scheduling horizon.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>18. حساب التكلفة</h2>
+
+<p>
+نحسب في كل ساعة القدرة المسحوبة من الشبكة، ثم نضربها بالسعر الزمني.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>19. Evolutionary Optimizer</h2>
+
+<p>
+We use a simple population-based optimizer.
+</p>
+
+<div class="flow">
+<div class="flow-box">Random Schedules</div>
+<div class="arrow">→</div>
+<div class="flow-box">SOC Simulation</div>
+<div class="arrow">→</div>
+<div class="flow-box">Cost + Penalties</div>
+<div class="arrow">→</div>
+<div class="flow-box">Selection</div>
+<div class="arrow">→</div>
+<div class="flow-box">Crossover</div>
+<div class="arrow">→</div>
+<div class="flow-box">Mutation</div>
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>19. خوارزمية التحسين</h2>
+
+<p>
+يحتوي كل فرد في المجتمع على جدول كامل لقدرة البطارية عبر الساعات الست.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>20. Complete MATLAB Program</h2>
+
+<pre><code>clear; clc; close all;
+
+% ------------------------------------------------
+% Battery Energy Storage Optimization
+% Educational evolutionary scheduling example
+% ------------------------------------------------
+
+price = [50 40 35 70 90 80];
+
+loadMW = [6.0 5.5 5.0 6.5 7.0 6.5];
+
+N = length(price);
+
+dt = 1;
+
+% ------------------------------------------------
+% Battery parameters
+% ------------------------------------------------
+
+Emax = 4;
+
+SOCmin = 0.20;
+SOCmax = 0.90;
+
+SOC0 = 0.50;
+
+PchMax  = 2;
+PdisMax = 2;
+
+etaCh  = 0.95;
+etaDis = 0.95;
+
+% ------------------------------------------------
+% Optimization parameters
+% ------------------------------------------------
+
+popSize = 60;
+maxGen  = 150;
+
+Pc = 0.8;
+Pm = 0.12;
+
+sigmaMut = 0.4;
+
+lambdaSOC   = 1e5;
+lambdaFinal = 1e5;
+
+% ------------------------------------------------
+% Initial population
+% Each row is one battery schedule
+% ------------------------------------------------
+
+population = ...
+    -PchMax + ...
+    rand(popSize,N)*(PchMax+PdisMax);
+
+bestHist = zeros(maxGen,1);
+
+% ------------------------------------------------
+% Evolutionary loop
+% ------------------------------------------------
+
+for gen = 1:maxGen
+
+    Jvec = zeros(popSize,1);
+
+    for i = 1:popSize
+
+        schedule = population(i,:);
+
+        E = SOC0*Emax;
+
+        totalCost = 0;
+        penaltySOC = 0;
+
+        for k = 1:N
+
+            PB = schedule(k);
+
+            % ------------------------------------
+            % Battery energy update
+            % ------------------------------------
+
+            if PB &lt; 0
+
+                E = E + ...
+                    etaCh*(-PB)*dt;
+
+            else
+
+                E = E - ...
+                    PB*dt/etaDis;
+
+            end
+
+            SOC = E/Emax;
+
+            % ------------------------------------
+            % SOC penalties
+            % ------------------------------------
+
+            if SOC &lt; SOCmin
+
+                penaltySOC = penaltySOC + ...
+                    lambdaSOC*(SOCmin-SOC)^2;
+
+            elseif SOC &gt; SOCmax
+
+                penaltySOC = penaltySOC + ...
+                    lambdaSOC*(SOC-SOCmax)^2;
+
+            end
+
+            % ------------------------------------
+            % Grid power and electricity cost
+            % ------------------------------------
+
+            Pgrid = loadMW(k) - PB;
+
+            totalCost = ...
+                totalCost + ...
+                price(k)*Pgrid*dt;
+
+        end
+
+        % ----------------------------------------
+        % Final SOC penalty
+        % ----------------------------------------
+
+        SOCfinal = E/Emax;
+
+        penaltyFinal = ...
+            lambdaFinal*(SOCfinal-SOC0)^2;
+
+        % ----------------------------------------
+        % Total objective
+        % ----------------------------------------
+
+        Jvec(i) = ...
+            totalCost + ...
+            penaltySOC + ...
+            penaltyFinal;
+
+    end
+
+    % ------------------------------------------------
+    % Elitism
+    % ------------------------------------------------
+
+    [bestJ,bestIdx] = min(Jvec);
+
+    elite = population(bestIdx,:);
+
+    bestHist(gen) = bestJ;
+
+    % ------------------------------------------------
+    % New population
+    % ------------------------------------------------
+
+    newPopulation = zeros(size(population));
+
+    newPopulation(1,:) = elite;
+
+    row = 2;
+
+    while row &lt;= popSize
+
+        % ----------------------------------------
+        % Tournament selection - parent 1
+        % ----------------------------------------
+
+        a = randi(popSize);
+        b = randi(popSize);
+
+        if Jvec(a) &lt; Jvec(b)
+            parent1 = population(a,:);
+        else
+            parent1 = population(b,:);
+        end
+
+        % ----------------------------------------
+        % Tournament selection - parent 2
+        % ----------------------------------------
+
+        a = randi(popSize);
+        b = randi(popSize);
+
+        if Jvec(a) &lt; Jvec(b)
+            parent2 = population(a,:);
+        else
+            parent2 = population(b,:);
+        end
+
+        % ----------------------------------------
+        % Arithmetic crossover
+        % ----------------------------------------
+
+        if rand &lt; Pc
+
+            alpha = rand;
+
+            child1 = ...
+                alpha*parent1 + ...
+                (1-alpha)*parent2;
+
+            child2 = ...
+                (1-alpha)*parent1 + ...
+                alpha*parent2;
+
+        else
+
+            child1 = parent1;
+            child2 = parent2;
+
+        end
+
+        % ----------------------------------------
+        % Mutation
+        % ----------------------------------------
+
+        for k = 1:N
+
+            if rand &lt; Pm
+
+                child1(k) = ...
+                    child1(k) + ...
+                    sigmaMut*randn;
+
+            end
+
+            if rand &lt; Pm
+
+                child2(k) = ...
+                    child2(k) + ...
+                    sigmaMut*randn;
+
+            end
+
+        end
+
+        % ----------------------------------------
+        % Battery power limits
+        % ----------------------------------------
+
+        child1 = ...
+            min(max(child1,-PchMax),PdisMax);
+
+        child2 = ...
+            min(max(child2,-PchMax),PdisMax);
+
+        % ----------------------------------------
+        % Store offspring
+        % ----------------------------------------
+
+        newPopulation(row,:) = child1;
+
+        if row+1 &lt;= popSize
+            newPopulation(row+1,:) = child2;
+        end
+
+        row = row + 2;
+
+    end
+
+    population = newPopulation;
+
+end
+
+% ------------------------------------------------
+% Final evaluation
+% ------------------------------------------------
+
+Jvec = zeros(popSize,1);
+
+for i = 1:popSize
+
+    schedule = population(i,:);
+
+    E = SOC0*Emax;
+
+    totalCost = 0;
+    penaltySOC = 0;
+
+    for k = 1:N
+
+        PB = schedule(k);
+
+        if PB &lt; 0
+
+            E = E + ...
+                etaCh*(-PB)*dt;
+
+        else
+
+            E = E - ...
+                PB*dt/etaDis;
+
+        end
+
+        SOC = E/Emax;
+
+        if SOC &lt; SOCmin
+
+            penaltySOC = penaltySOC + ...
+                lambdaSOC*(SOCmin-SOC)^2;
+
+        elseif SOC &gt; SOCmax
+
+            penaltySOC = penaltySOC + ...
+                lambdaSOC*(SOC-SOCmax)^2;
+
+        end
+
+        Pgrid = loadMW(k) - PB;
+
+        totalCost = ...
+            totalCost + ...
+            price(k)*Pgrid*dt;
+
+    end
+
+    SOCfinal = E/Emax;
+
+    penaltyFinal = ...
+        lambdaFinal*(SOCfinal-SOC0)^2;
+
+    Jvec(i) = ...
+        totalCost + ...
+        penaltySOC + ...
+        penaltyFinal;
+
+end
+
+[bestJ,bestIdx] = min(Jvec);
+
+bestSchedule = population(bestIdx,:);
+
+% ------------------------------------------------
+% Simulate best schedule
+% ------------------------------------------------
+
+SOCbest = zeros(1,N+1);
+PgridBest = zeros(1,N);
+
+SOCbest(1) = SOC0;
+
+E = SOC0*Emax;
+
+bestCost = 0;
+
+for k = 1:N
+
+    PB = bestSchedule(k);
+
+    if PB &lt; 0
+
+        E = E + ...
+            etaCh*(-PB)*dt;
+
+    else
+
+        E = E - ...
+            PB*dt/etaDis;
+
+    end
+
+    SOCbest(k+1) = E/Emax;
+
+    PgridBest(k) = ...
+        loadMW(k) - PB;
+
+    bestCost = ...
+        bestCost + ...
+        price(k)*PgridBest(k)*dt;
+
+end
+
+% ------------------------------------------------
+% Cost without battery
+% ------------------------------------------------
+
+baseCost = ...
+    sum(price .* loadMW * dt);
+
+saving = baseCost - bestCost;
+
+% ------------------------------------------------
+% Display results
+% ------------------------------------------------
+
+fprintf('Battery Optimization Result\n\n')
+
+fprintf('Base cost without battery = %.2f\n', ...
+        baseCost)
+
+fprintf('Optimized cost = %.2f\n', ...
+        bestCost)
+
+fprintf('Cost saving = %.2f\n\n', ...
+        saving)
+
+fprintf('Battery schedule [MW]:\n')
+disp(bestSchedule)
+
+fprintf('SOC trajectory:\n')
+disp(SOCbest)
+
+% ------------------------------------------------
+% Plot convergence
+% ------------------------------------------------
+
+figure
+
+plot(1:maxGen,bestHist,'LineWidth',1.6)
+
+grid on
+
+xlabel('Generation')
+ylabel('Best Objective')
+
+title('Battery Scheduling Optimization Convergence')
+
+% ------------------------------------------------
+% Plot battery power
+% ------------------------------------------------
+
+figure
+
+bar(1:N,bestSchedule)
+
+grid on
+
+xlabel('Hour')
+ylabel('Battery Power [MW]')
+
+title('Optimal Battery Schedule')
+
+% ------------------------------------------------
+% Plot SOC
+% ------------------------------------------------
+
+figure
+
+plot(0:N,SOCbest,'o-','LineWidth',1.6)
+
+hold on
+
+yline(SOCmin,'--')
+yline(SOCmax,'--')
+
+grid on
+
+xlabel('Hour')
+ylabel('State of Charge')
+
+title('Battery SOC Trajectory')
+
+% ------------------------------------------------
+% Plot electricity price
+% ------------------------------------------------
+
+figure
+
+stairs(1:N,price,'LineWidth',1.6)
+
+grid on
+
+xlabel('Hour')
+ylabel('Electricity Price [EUR/MWh]')
+
+title('Electricity Price Profile')</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>20. البرنامج الكامل في MATLAB</h2>
+
+<p>
+ينشئ البرنامج عدة جداول تشغيل مرشحة، ثم يحاكي SOC لكل جدول، ويحسب تكلفة شراء الطاقة والعقوبات، ثم يطور الحلول عبر الأجيال.
+</p>
+
+<div class="highlight">
+النتيجة المتوقعة منطقية اقتصاديًا: تميل البطارية إلى الشحن في الساعات الرخيصة والتفريغ في الساعات الأعلى سعرًا، ضمن حدودها التشغيلية.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>21. Cost Without the Battery</h2>
+
+<p>
+The reference operating cost is:
+</p>
+
+<div class="formula">
+Jbase = Σ Price(k)Load(k)Δt
+</div>
+
+<p>
+MATLAB:
+</p>
+
+<pre><code>baseCost = sum(price .* loadMW * dt);</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>21. التكلفة دون استخدام البطارية</h2>
+
+<p>
+نحسب أولًا ما كانت ستدفعه المنشأة لو اشترت كامل الطاقة من الشبكة دون بطارية.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>22. Economic Saving</h2>
+
+<div class="formula">
+Saving = Jbase - Joptimized
+</div>
+
+<p>
+A positive value means the optimized battery schedule reduced electricity purchasing cost.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>22. الوفر الاقتصادي</h2>
+
+<div class="formula">
+Saving = Jbase - Joptimized
+</div>
+
+<p>
+إذا كانت القيمة موجبة فهذا يعني أن البطارية ساهمت في تقليل تكلفة الطاقة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>23. Interpreting the Optimal Schedule</h2>
+
+<div class="grid">
+
+<div class="mini-card">
+<strong>Negative PB</strong>
+<p>
+Battery charging.
+</p>
+</div>
+
+<div class="mini-card">
+<strong>Positive PB</strong>
+<p>
+Battery discharging.
+</p>
+</div>
+
+<div class="mini-card">
+<strong>Low Price Hours</strong>
+<p>
+Charging is economically attractive.
+</p>
+</div>
+
+<div class="mini-card">
+<strong>High Price Hours</strong>
+<p>
+Discharging may reduce expensive grid purchases.
+</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>23. تفسير جدول التشغيل الأمثل</h2>
+
+<p>
+راقب علاقة سعر الكهرباء بإشارة قدرة البطارية.
+</p>
+
+<div class="highlight">
+إذا كانت الخوارزمية تعمل بصورة جيدة، يجب أن يظهر منطق اقتصادي واضح في النتائج، وليس مجرد أرقام عشوائية.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>24. Experiment 1 — Change Initial SOC</h2>
+
+<pre><code>SOC0 = 0.30;
+SOC0 = 0.50;
+SOC0 = 0.80;</code></pre>
+
+<p>
+Compare optimal schedules and savings.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>24. التجربة 1 — تغيير SOC الابتدائية</h2>
+
+<p>
+تؤثر الطاقة المتاحة عند بداية الجدولة على قدرة البطارية على الاستفادة من الأسعار المرتفعة لاحقًا.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>25. Experiment 2 — Change Battery Capacity</h2>
+
+<pre><code>Emax = 2;
+Emax = 4;
+Emax = 8;</code></pre>
+
+<div class="highlight">
+A larger battery can shift more energy, but larger capacity does not automatically mean proportional economic benefit.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>25. التجربة 2 — تغيير سعة البطارية</h2>
+
+<p>
+قارن الوفر الاقتصادي عند استخدام بطاريات بأحجام مختلفة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>26. Experiment 3 — Change Efficiency</h2>
+
+<pre><code>etaCh  = 1.00;
+etaDis = 1.00;</code></pre>
+
+<p>Then compare with:</p>
+
+<pre><code>etaCh  = 0.90;
+etaDis = 0.90;</code></pre>
+
+<div class="highlight">
+Lower efficiency reduces the economic value of energy arbitrage.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>26. التجربة 3 — تغيير الكفاءة</h2>
+
+<p>
+كلما انخفضت كفاءة الشحن والتفريغ، ازدادت خسائر الطاقة وانخفضت فائدة البطارية الاقتصادية.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>27. Experiment 4 — Flat Electricity Price</h2>
+
+<p>Try:</p>
+
+<pre><code>price = [60 60 60 60 60 60];</code></pre>
+
+<p>
+Ask whether battery arbitrage still provides an economic benefit.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>27. التجربة 4 — سعر كهرباء ثابت</h2>
+
+<p>
+إذا كان السعر نفسه في جميع الساعات، تختفي تقريبًا فرصة شراء الطاقة رخيصة وبيعها أو استخدامها عند سعر أعلى.
+</p>
+
+<div class="highlight">
+هذا يوضح أن قيمة التخزين تعتمد على طبيعة النظام والسوق، وليس على البطارية وحدها.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>28. Add PV Generation</h2>
+
+<p>
+A natural extension is:
+</p>
+
+<div class="formula">
+Pgrid(k)=Pload(k)-PPV(k)-PB(k)
+</div>
+
+<p>
+The battery can then store excess PV energy and use it later.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>28. إضافة توليد PV</h2>
+
+<div class="formula">
+Pgrid(k)=Pload(k)-PPV(k)-PB(k)
+</div>
+
+<p>
+يمكن للبطارية تخزين فائض الطاقة الشمسية ثم استخدامها في وقت لاحق.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>29. Battery Degradation Cost</h2>
+
+<p>
+Real optimization should also consider battery aging.
+</p>
+
+<p>A simple educational approximation is:</p>
+
+<div class="formula">
+Cdeg = cdeg Σ|PB(k)|Δt
+</div>
+
+<p>
+Then:
+</p>
+
+<div class="formula">
+J =
+Energy Cost
++
+Degradation Cost
+</div>
+
+<div class="highlight">
+Without degradation cost, the optimizer may cycle the battery more aggressively than is economically realistic.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>29. تكلفة تدهور البطارية</h2>
+
+<p>
+كل عملية شحن وتفريغ تساهم في استهلاك عمر البطارية.
+</p>
+
+<div class="formula">
+Cdeg=cdegΣ|PB(k)|Δt
+</div>
+
+<p>
+لذلك يمكن إضافة تكلفة تدهور إلى دالة الهدف.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>30. From Scheduling to Smart Energy Management</h2>
+
+<p>
+A more advanced energy-management problem may optimize:
+</p>
+
+<div class="formula">
+x =
+[Battery Power,
+PV Curtailment,
+Flexible Load,
+Grid Exchange,...]
+</div>
+
+<p>and minimize:</p>
+
+<div class="formula">
+J =
+Energy Cost
++
+Losses
++
+Battery Degradation
++
+Penalties
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>30. من جدولة البطارية إلى إدارة الطاقة الذكية</h2>
+
+<p>
+يمكن توسيع المسألة لاحقًا لتشمل PV والأحمال المرنة والتبادل مع الشبكة والفواقد وتدهور البطارية.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>31. Lab Tasks</h2>
+
+<ol>
+<li>Enter the electricity-price and load profiles.</li>
+<li>Implement charging and discharging equations.</li>
+<li>Calculate SOC hour by hour.</li>
+<li>Add SOC penalties.</li>
+<li>Add the final-SOC condition.</li>
+<li>Run the evolutionary optimizer.</li>
+<li>Plot the optimal battery schedule.</li>
+<li>Plot the SOC trajectory.</li>
+<li>Calculate the cost without a battery.</li>
+<li>Calculate the optimized cost and savings.</li>
+<li>Change the initial SOC.</li>
+<li>Change battery capacity and efficiency.</li>
+<li>Test a flat electricity-price profile.</li>
+<li>Explain how PV could be added to the model.</li>
+</ol>
+
+</div>
+
+<div class="ar">
+
+<h2>31. مهام المختبر</h2>
+
+<ol>
+<li>أدخل أسعار الكهرباء والحمل.</li>
+<li>نفذ معادلات الشحن والتفريغ.</li>
+<li>احسب SOC ساعة بعد ساعة.</li>
+<li>أضف عقوبات SOC.</li>
+<li>أضف شرط SOC النهائي.</li>
+<li>شغّل خوارزمية التحسين.</li>
+<li>ارسم جدول قدرة البطارية الأمثل.</li>
+<li>ارسم مسار SOC.</li>
+<li>احسب التكلفة دون البطارية.</li>
+<li>احسب التكلفة المحسنة والوفر.</li>
+<li>غيّر SOC الابتدائية.</li>
+<li>غيّر سعة البطارية وكفاءتها.</li>
+<li>اختبر حالة السعر الثابت.</li>
+<li>اشرح كيف يمكن إضافة نظام PV.</li>
+</ol>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>📝 Review Questions</h2>
+
+<ol>
+<li>What does positive battery power mean in this laboratory?</li>
+<li>How does charging efficiency affect SOC?</li>
+<li>Why is SOC calculated sequentially?</li>
+<li>Why do we need SOC limits?</li>
+<li>Why is a final-SOC constraint useful?</li>
+<li>Why does the battery tend to charge during low-price hours?</li>
+<li>How does low efficiency affect economic savings?</li>
+<li>Why may a flat electricity price reduce the value of storage?</li>
+<li>Why should degradation cost be included in more realistic studies?</li>
+<li>How would PV generation modify the grid-power equation?</li>
+</ol>
+
+</div>
+
+<div class="ar">
+
+<h2>📝 أسئلة المراجعة</h2>
+
+<ol>
+<li>ماذا تعني قدرة بطارية موجبة في هذا المختبر؟</li>
+<li>كيف تؤثر كفاءة الشحن على SOC؟</li>
+<li>لماذا نحسب SOC بصورة متسلسلة زمنيًا؟</li>
+<li>لماذا نحتاج إلى حدود SOC؟</li>
+<li>لماذا نحتاج إلى شرط SOC النهائي؟</li>
+<li>لماذا تميل البطارية إلى الشحن عند انخفاض السعر؟</li>
+<li>كيف تؤثر الكفاءة المنخفضة على الوفر الاقتصادي؟</li>
+<li>لماذا يقل دور البطارية عند ثبات سعر الكهرباء؟</li>
+<li>لماذا نضيف تكلفة تدهور البطارية في الدراسات الواقعية؟</li>
+<li>كيف يتغير قانون قدرة الشبكة عند إضافة PV؟</li>
+</ol>
+
+</div>
+
+</section>
+
+</main>
+
+<footer>
+AI Applications in Electrical Power Systems
+<br>
+تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+<br><br>
+MATLAB Lab 07 | مختبر MATLAB 07
+</footer>
+
+</body>
+  </html>
