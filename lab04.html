@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lab 04 - AI-Based PV Power Forecasting</title>
+
+<style>
+:root{
+  --bg:#07111f;
+  --card:#0f2238;
+  --card2:#0b1b2c;
+  --text:#f4f7fb;
+  --muted:#b8c7d9;
+  --blue:#38bdf8;
+  --green:#22c55e;
+  --yellow:#facc15;
+  --red:#fb7185;
+  --line:rgba(255,255,255,.10);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:linear-gradient(180deg,#07111f,#0a1728);
+  color:var(--text);
+  line-height:1.8;
+}
+
+.container{
+  width:min(1050px,92%);
+  margin:auto;
+}
+
+header{
+  background:rgba(7,17,31,.95);
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  padding:17px 0;
+}
+
+.logo{font-weight:bold}
+.logo span{color:var(--blue)}
+
+.back{
+  color:white;
+  text-decoration:none;
+  border:1px solid var(--line);
+  padding:8px 12px;
+  border-radius:9px;
+}
+
+.hero{
+  text-align:center;
+  padding:60px 0 35px;
+}
+
+.lab-number{
+  color:var(--blue);
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+h1{
+  font-size:clamp(2rem,6vw,3.6rem);
+  line-height:1.15;
+  margin:10px 0;
+}
+
+.hero-ar{
+  direction:rtl;
+  font-size:1.5rem;
+  color:#e5edf6;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin-top:10px;
+}
+
+section{
+  margin:22px 0;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:22px;
+}
+
+h2{margin-top:0;color:#edf8ff}
+h3{color:var(--blue)}
+p,li{color:#d8e2ec}
+
+.en{direction:ltr;text-align:left}
+
+.ar{
+  direction:rtl;
+  text-align:right;
+  border-top:1px dashed var(--line);
+  padding-top:18px;
+  margin-top:18px;
+}
+
+.highlight{
+  background:var(--card2);
+  border-left:4px solid var(--blue);
+  border-radius:10px;
+  padding:15px;
+  margin:15px 0;
+}
+
+.ar .highlight{
+  border-left:none;
+  border-right:4px solid var(--blue);
+}
+
+.formula{
+  direction:ltr;
+  text-align:center;
+  background:#06101d;
+  border:1px solid var(--line);
+  padding:18px;
+  margin:16px 0;
+  border-radius:12px;
+  font-size:1.22rem;
+  font-family:"Times New Roman",serif;
+  overflow-x:auto;
+}
+
+pre{
+  direction:ltr;
+  text-align:left;
+  background:#06101d;
+  color:#dff5ff;
+  border:1px solid var(--line);
+  padding:16px;
+  border-radius:12px;
+  overflow-x:auto;
+  white-space:pre;
+  line-height:1.55;
+}
+
+code{
+  font-family:Consolas,Monaco,monospace;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.mini-card{
+  background:var(--card2);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:16px;
+}
+
+.mini-card strong{color:white}
+
+.flow{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:20px 0;
+}
+
+.flow-box{
+  background:#0b1b2c;
+  border:1px solid rgba(56,189,248,.3);
+  padding:14px 17px;
+  border-radius:12px;
+  text-align:center;
+  min-width:120px;
+}
+
+.arrow{
+  color:var(--blue);
+  font-size:1.5rem;
+  font-weight:bold;
+}
+
+.table-wrap{overflow-x:auto}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+  margin:15px 0;
+}
+
+th,td{
+  border:1px solid var(--line);
+  padding:11px;
+  text-align:center;
+}
+
+th{
+  background:#0b1b2c;
+  color:#eaf7ff;
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  padding:35px 0;
+}
+
+@media(max-width:750px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<div class="hero">
+
+  <div class="lab-number">
+    LAB 04 | المختبر 04
+  </div>
+
+  <h1>AI-Based PV Power Forecasting</h1>
+
+  <div class="hero-ar">
+    التنبؤ بقدرة الأنظمة الكهروضوئية باستخدام الذكاء الاصطناعي
+  </div>
+
+  <div class="subtitle">
+    Solar Irradiance, Temperature, Multiple Regression, and Forecasting
+    <br>
+    الإشعاع الشمسي ودرجة الحرارة والانحدار متعدد المتغيرات والتنبؤ
+  </div>
+
+</div>
+
+
+<section>
+
+<div class="en">
+
+<h2>🎯 Lab Objectives</h2>
+
+<ul>
+<li>Understand PV-power forecasting as a supervised-learning problem.</li>
+<li>Use solar irradiance and temperature as input features.</li>
+<li>Build a multiple linear-regression model.</li>
+<li>Interpret model parameters physically.</li>
+<li>Forecast PV output for new weather conditions.</li>
+<li>Evaluate predictions using MAE, MSE, and RMSE.</li>
+<li>Understand the limitations of a simple linear model.</li>
+</ul>
+
+</div>
+
+<div class="ar">
+
+<h2>🎯 أهداف المختبر</h2>
+
+<ul>
+<li>فهم التنبؤ بقدرة PV كمسألة تعلم خاضع للإشراف.</li>
+<li>استخدام الإشعاع الشمسي ودرجة الحرارة كمدخلات.</li>
+<li>بناء نموذج انحدار خطي متعدد المتغيرات.</li>
+<li>تفسير معاملات النموذج فيزيائيًا.</li>
+<li>التنبؤ بالقدرة الكهروضوئية لظروف جوية جديدة.</li>
+<li>تقييم التنبؤ باستخدام MAE وMSE وRMSE.</li>
+<li>فهم حدود النموذج الخطي البسيط.</li>
+</ul>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>1. PV Forecasting Problem</h2>
+
+<p>
+Photovoltaic power depends strongly on solar irradiance and is also affected by temperature.
+</p>
+
+<div class="formula">
+PPV = f(G,T,...)
+</div>
+
+<p>where:</p>
+
+<ul>
+<li>G = solar irradiance [W/m²]</li>
+<li>T = temperature [°C]</li>
+<li>PPV = PV electrical power [kW]</li>
+</ul>
+
+</div>
+
+<div class="ar">
+
+<h2>1. مسألة التنبؤ بقدرة PV</h2>
+
+<p>
+تعتمد قدرة النظام الكهروضوئي بصورة أساسية على الإشعاع الشمسي،
+كما تتأثر بدرجة الحرارة وعوامل أخرى.
+</p>
+
+<div class="formula">
+PPV = f(G,T,...)
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>2. Why Use Two Inputs?</h2>
+
+<div class="grid">
+
+<div class="mini-card">
+<strong>Solar Irradiance G</strong>
+<p>
+Higher irradiance generally increases available PV power.
+</p>
+</div>
+
+<div class="mini-card">
+<strong>Temperature T</strong>
+<p>
+Higher cell temperature often reduces PV conversion efficiency.
+</p>
+</div>
+
+</div>
+
+<div class="highlight">
+This makes PV forecasting a good example of a multivariable machine-learning problem.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>2. لماذا نستخدم مدخلين؟</h2>
+
+<p>
+زيادة الإشعاع الشمسي ترفع القدرة المتاحة عادةً، بينما يمكن لارتفاع
+درجة حرارة الخلايا أن يخفض الكفاءة الكهربائية.
+</p>
+
+<div class="highlight">
+لذلك تعد هذه المسألة مثالًا جيدًا على تعلم آلي متعدد المدخلات.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>3. Example Dataset</h2>
+
+<div class="table-wrap">
+
+<table>
+
+<tr>
+<th>Sample</th>
+<th>Irradiance G [W/m²]</th>
+<th>Temperature T [°C]</th>
+<th>PV Power [kW]</th>
+</tr>
+
+<tr><td>1</td><td>200</td><td>15</td><td>18</td></tr>
+<tr><td>2</td><td>300</td><td>18</td><td>27</td></tr>
+<tr><td>3</td><td>400</td><td>20</td><td>36</td></tr>
+<tr><td>4</td><td>500</td><td>22</td><td>44</td></tr>
+<tr><td>5</td><td>600</td><td>25</td><td>52</td></tr>
+<tr><td>6</td><td>700</td><td>27</td><td>60</td></tr>
+<tr><td>7</td><td>800</td><td>30</td><td>67</td></tr>
+<tr><td>8</td><td>900</td><td>32</td><td>74</td></tr>
+<tr><td>9</td><td>1000</td><td>35</td><td>81</td></tr>
+<tr><td>10</td><td>850</td><td>38</td><td>68</td></tr>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>3. مجموعة البيانات</h2>
+
+<p>
+تحتوي كل عينة على قيمة الإشعاع الشمسي ودرجة الحرارة والقدرة
+الكهربائية المقاسة للنظام الكهروضوئي.
+</p>
+
+<div class="highlight">
+البيانات هنا تعليمية ومبسطة، والغرض منها فهم النموذج والخوارزمية.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>4. Enter Data in MATLAB</h2>
+
+<pre><code>G = [200 300 400 500 600 700 800 900 1000 850]';
+
+T = [15 18 20 22 25 27 30 32 35 38]';
+
+Ppv = [18 27 36 44 52 60 67 74 81 68]';</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>4. إدخال البيانات في MATLAB</h2>
+
+<p>
+نخزن الإشعاع الشمسي ودرجة الحرارة وقدرة PV في ثلاثة متجهات عمودية.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>5. Multiple Linear-Regression Model</h2>
+
+<p>
+We assume:
+</p>
+
+<div class="formula">
+P̂PV = β₀ + β₁G + β₂T
+</div>
+
+<p>where:</p>
+
+<ul>
+<li>β₀ = intercept</li>
+<li>β₁ = irradiance coefficient</li>
+<li>β₂ = temperature coefficient</li>
+</ul>
+
+</div>
+
+<div class="ar">
+
+<h2>5. نموذج الانحدار متعدد المتغيرات</h2>
+
+<div class="formula">
+P̂PV = β₀ + β₁G + β₂T
+</div>
+
+<p>
+يمثل β₁ تأثير الإشعاع الشمسي، بينما يمثل β₂ التأثير المرتبط بدرجة الحرارة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>6. Matrix Form</h2>
+
+<div class="formula">
+P̂ = Xβ
+</div>
+
+<p>with:</p>
+
+<div class="formula">
+β = [β₀ β₁ β₂]ᵀ
+</div>
+
+<p>and:</p>
+
+<div class="formula">
+X =
+[1 G₁ T₁;
+ 1 G₂ T₂;
+ ...
+ 1 Gₙ Tₙ]
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>6. الصيغة المصفوفية</h2>
+
+<p>
+يمكن كتابة جميع عينات التدريب في صيغة مصفوفية واحدة:
+</p>
+
+<div class="formula">
+P̂ = Xβ
+</div>
+
+<p>
+حيث يحتوي كل صف من X على ثابت 1 ثم الإشعاع ودرجة الحرارة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>7. Least-Squares Training</h2>
+
+<p>
+We minimize:
+</p>
+
+<div class="formula">
+J(β)=Σ(PPV,i - P̂PV,i)²
+</div>
+
+<p>The normal equation is:</p>
+
+<div class="formula">
+β=(XᵀX)⁻¹XᵀP
+</div>
+
+<p>
+In MATLAB, use the more numerically stable backslash operator:
+</p>
+
+<pre><code>X = [ones(size(G)) G T];
+
+beta = X \ Ppv;</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>7. تدريب النموذج بالمربعات الصغرى</h2>
+
+<p>
+نبحث عن معاملات β التي تجعل مجموع مربعات أخطاء التنبؤ أصغر ما يمكن.
+</p>
+
+<div class="formula">
+β=(XᵀX)⁻¹XᵀP
+</div>
+
+<p>
+لكن في MATLAB يفضل عدديًا استخدام:
+</p>
+
+<pre><code>beta = X \ Ppv;</code></pre>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>8. Extract Model Parameters</h2>
+
+<pre><code>beta0 = beta(1);
+beta1 = beta(2);
+beta2 = beta(3);</code></pre>
+
+<p>The learned model becomes:</p>
+
+<div class="formula">
+P̂PV = β₀ + β₁G + β₂T
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>8. استخراج معاملات النموذج</h2>
+
+<p>
+بعد التدريب نحصل على ثلاثة معاملات تحدد النموذج الرياضي المتعلم.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>9. Physical Interpretation of β₁</h2>
+
+<p>
+β₁ approximates the sensitivity of PV power to irradiance:
+</p>
+
+<div class="formula">
+β₁ ≈ ΔPPV / ΔG
+</div>
+
+<p>Its approximate unit is:</p>
+
+<div class="formula">
+kW / (W/m²)
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>9. المعنى الفيزيائي للمعامل β₁</h2>
+
+<div class="formula">
+β₁ ≈ ΔPPV / ΔG
+</div>
+
+<p>
+أي أنه يعبّر تقريبًا عن تغير قدرة PV عند تغير الإشعاع الشمسي.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>10. Physical Interpretation of β₂</h2>
+
+<p>
+β₂ approximates the effect of temperature:
+</p>
+
+<div class="formula">
+β₂ ≈ ∂PPV / ∂T
+</div>
+
+<p>
+If β₂ is negative, the model indicates that increasing temperature tends
+to reduce PV electrical output when irradiance is held fixed.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>10. المعنى الفيزيائي للمعامل β₂</h2>
+
+<div class="formula">
+β₂ ≈ ∂PPV / ∂T
+</div>
+
+<p>
+إذا كانت β₂ سالبة، فهذا يشير إلى أن ارتفاع درجة الحرارة يميل إلى خفض
+القدرة الكهربائية عند تثبيت الإشعاع الشمسي.
+</p>
+
+<div class="highlight">
+وهنا نربط معامل التعلم الآلي بتأثير فيزيائي حقيقي للنظام الكهروضوئي.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>11. Prediction on Training Data</h2>
+
+<pre><code>Ppred = X * beta;</code></pre>
+
+<p>The residual error is:</p>
+
+<div class="formula">
+e = PPV - P̂PV
+</div>
+
+<pre><code>error = Ppv - Ppred;</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>11. التنبؤ على بيانات التدريب</h2>
+
+<p>
+بعد تعلم معاملات النموذج نحسب القدرة المتوقعة لكل عينة ثم نحسب
+الفرق بينها وبين القدرة الحقيقية.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>12. Performance Indices</h2>
+
+<div class="formula">
+MAE = (1/n)Σ|eᵢ|
+</div>
+
+<div class="formula">
+MSE = (1/n)Σeᵢ²
+</div>
+
+<div class="formula">
+RMSE = √MSE
+</div>
+
+<pre><code>MAE = mean(abs(error));
+
+MSE = mean(error.^2);
+
+RMSE = sqrt(MSE);</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>12. مؤشرات تقييم الأداء</h2>
+
+<p>
+نستخدم MAE وMSE وRMSE لقياس جودة التنبؤ.
+</p>
+
+<div class="highlight">
+تكون وحدة MAE وRMSE في هذا المثال kW، ولذلك يسهل تفسيرهما هندسيًا.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>13. Forecast a New Weather Condition</h2>
+
+<p>Assume:</p>
+
+<div class="formula">
+Gnew = 750 W/m²
+</div>
+
+<div class="formula">
+Tnew = 28°C
+</div>
+
+<p>Then:</p>
+
+<div class="formula">
+P̂new = β₀ + β₁Gnew + β₂Tnew
+</div>
+
+<pre><code>Gnew = 750;
+Tnew = 28;
+
+Pforecast = beta0 + beta1*Gnew + beta2*Tnew;
+
+fprintf('Forecast PV Power = %.2f kW\n',Pforecast);</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>13. التنبؤ بحالة جوية جديدة</h2>
+
+<p>
+إذا كان الإشعاع 750 W/m² ودرجة الحرارة 28°C، يستخدم النموذج المتعلم
+لإعطاء قدرة PV متوقعة.
+</p>
+
+<div class="formula">
+P̂new = β₀ + β₁(750) + β₂(28)
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>14. Plot Actual and Predicted PV Power</h2>
+
+<pre><code>figure
+
+plot(Ppv,'o-','LineWidth',1.6)
+hold on
+
+plot(Ppred,'s-','LineWidth',1.6)
+
+grid on
+
+xlabel('Sample')
+ylabel('PV Power [kW]')
+
+legend('Actual PV Power','Predicted PV Power', ...
+       'Location','best')
+
+title('PV Power Forecasting')</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>14. رسم القدرة الحقيقية والمتنبأ بها</h2>
+
+<p>
+يقارن الشكل بين القدرة المقاسة وقدرة PV التي تنبأ بها النموذج.
+</p>
+
+<div class="highlight">
+كلما تقاربت المنحنيات كان أداء النموذج أفضل على هذه البيانات.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>15. Plot Prediction Error</h2>
+
+<pre><code>figure
+
+stem(error,'LineWidth',1.5)
+
+grid on
+
+xlabel('Sample')
+ylabel('Prediction Error [kW]')
+
+title('PV Forecasting Residuals')</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>15. رسم أخطاء التنبؤ</h2>
+
+<p>
+يساعد رسم البواقي على معرفة العينات التي يخطئ عندها النموذج أكثر من غيرها.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>16. Complete MATLAB Program</h2>
+
+<pre><code>clear; clc; close all;
+
+% ------------------------------------------------
+% AI-Based PV Power Forecasting
+% Multiple Linear Regression
+% ------------------------------------------------
+
+% Dataset
+G = [200 300 400 500 600 700 800 900 1000 850]';
+
+T = [15 18 20 22 25 27 30 32 35 38]';
+
+Ppv = [18 27 36 44 52 60 67 74 81 68]';
+
+% ------------------------------------------------
+% Build regression matrix
+% Ppv = beta0 + beta1*G + beta2*T
+% ------------------------------------------------
+
+X = [ones(size(G)) G T];
+
+% Train model
+beta = X \ Ppv;
+
+beta0 = beta(1);
+beta1 = beta(2);
+beta2 = beta(3);
+
+% ------------------------------------------------
+% Prediction
+% ------------------------------------------------
+
+Ppred = X * beta;
+
+error = Ppv - Ppred;
+
+% ------------------------------------------------
+% Performance
+% ------------------------------------------------
+
+MAE = mean(abs(error));
+
+MSE = mean(error.^2);
+
+RMSE = sqrt(MSE);
+
+% ------------------------------------------------
+% Display learned model
+% ------------------------------------------------
+
+fprintf('Learned PV model:\n')
+fprintf('Ppv = %.4f + %.6f*G + %.4f*T\n\n', ...
+        beta0,beta1,beta2)
+
+fprintf('MAE  = %.4f kW\n',MAE)
+fprintf('MSE  = %.4f kW^2\n',MSE)
+fprintf('RMSE = %.4f kW\n\n',RMSE)
+
+% ------------------------------------------------
+% Forecast new weather condition
+% ------------------------------------------------
+
+Gnew = 750;
+Tnew = 28;
+
+Pforecast = beta0 + beta1*Gnew + beta2*Tnew;
+
+fprintf('New irradiance = %.1f W/m^2\n',Gnew)
+fprintf('New temperature = %.1f C\n',Tnew)
+fprintf('Forecast PV power = %.2f kW\n',Pforecast)
+
+% ------------------------------------------------
+% Plot actual and predicted PV power
+% ------------------------------------------------
+
+figure
+
+plot(Ppv,'o-','LineWidth',1.6)
+hold on
+
+plot(Ppred,'s-','LineWidth',1.6)
+
+grid on
+
+xlabel('Sample')
+ylabel('PV Power [kW]')
+
+legend('Actual PV Power','Predicted PV Power', ...
+       'Location','best')
+
+title('PV Power Forecasting')
+
+% ------------------------------------------------
+% Residual errors
+% ------------------------------------------------
+
+figure
+
+stem(error,'LineWidth',1.5)
+
+grid on
+
+xlabel('Sample')
+ylabel('Prediction Error [kW]')
+
+title('PV Forecasting Residuals')</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>16. البرنامج الكامل في MATLAB</h2>
+
+<p>
+ينفذ البرنامج جميع المراحل:
+</p>
+
+<div class="flow">
+<div class="flow-box">Weather Data</div>
+<div class="arrow">→</div>
+<div class="flow-box">Training</div>
+<div class="arrow">→</div>
+<div class="flow-box">PV Model</div>
+<div class="arrow">→</div>
+<div class="flow-box">Forecast</div>
+<div class="arrow">→</div>
+<div class="flow-box">Evaluation</div>
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>17. Why Multiple Regression?</h2>
+
+<p>
+If we used irradiance alone:
+</p>
+
+<div class="formula">
+P̂PV = β₀ + β₁G
+</div>
+
+<p>
+the model would ignore temperature effects.
+</p>
+
+<p>
+Adding T allows the model to separate part of the variation caused by temperature:
+</p>
+
+<div class="formula">
+P̂PV = β₀ + β₁G + β₂T
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>17. لماذا نستخدم الانحدار متعدد المتغيرات؟</h2>
+
+<p>
+استخدام الإشعاع وحده يهمل تأثير درجة الحرارة.
+</p>
+
+<div class="formula">
+P̂PV = β₀ + β₁G + β₂T
+</div>
+
+<p>
+إضافة T تسمح للنموذج بتمثيل جزء إضافي من السلوك الفيزيائي.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>18. Experiment 1 — Remove Temperature</h2>
+
+<p>Train a simpler model:</p>
+
+<pre><code>X1 = [ones(size(G)) G];
+
+beta1D = X1 \ Ppv;
+
+Ppred1D = X1 * beta1D;
+
+RMSE1D = sqrt(mean((Ppv-Ppred1D).^2));</code></pre>
+
+<p>
+Compare RMSE with the two-input model.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>18. التجربة 1 — حذف درجة الحرارة</h2>
+
+<p>
+درّب نموذجًا يستخدم الإشعاع فقط ثم قارن RMSE مع النموذج الذي يستخدم
+الإشعاع ودرجة الحرارة.
+</p>
+
+<div class="highlight">
+هذه تجربة بسيطة لفهم قيمة إضافة Feature جديد.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>19. Experiment 2 — Add Measurement Noise</h2>
+
+<pre><code>PpvNoisy = Ppv + 2*randn(size(Ppv));</code></pre>
+
+<p>
+Train the model using the noisy measurements and compare the learned coefficients.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>19. التجربة 2 — إضافة ضجيج إلى قياسات PV</h2>
+
+<p>
+أضف ضجيجًا للقدرة المقاسة، ثم أعد التدريب وراقب تغير معاملات النموذج والخطأ.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>20. Experiment 3 — Train/Test Split</h2>
+
+<pre><code>Gtrain = G(1:7);
+Ttrain = T(1:7);
+Ptrain = Ppv(1:7);
+
+Gtest = G(8:10);
+Ttest = T(8:10);
+Ptest = Ppv(8:10);
+
+Xtrain = [ones(size(Gtrain)) Gtrain Ttrain];
+
+betaTT = Xtrain \ Ptrain;
+
+Xtest = [ones(size(Gtest)) Gtest Ttest];
+
+PtestPred = Xtest * betaTT;
+
+RMSEtest = sqrt(mean((Ptest-PtestPred).^2));
+
+fprintf('Test RMSE = %.4f kW\n',RMSEtest)</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>20. التجربة 3 — التدريب والاختبار</h2>
+
+<p>
+استخدم بعض العينات للتدريب والباقي للاختبار حتى تقيس قدرة النموذج على
+التنبؤ ببيانات جديدة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>21. From Linear Regression to Neural Networks</h2>
+
+<p>
+Real PV behavior may be nonlinear:
+</p>
+
+<div class="formula">
+PPV = f(G,T,Clouds,History,...)
+</div>
+
+<p>
+For example, interactions between irradiance and temperature may not be well
+represented by a simple linear equation.
+</p>
+
+<div class="highlight">
+This motivates nonlinear regression, neural networks, and deep-learning models.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>21. من الانحدار الخطي إلى الشبكات العصبية</h2>
+
+<p>
+في الواقع قد تكون العلاقة بين الإشعاع والحرارة والقدرة غير خطية.
+</p>
+
+<div class="highlight">
+لذلك يمكن لاحقًا استخدام الشبكات العصبية أو نماذج أعمق لتحسين التنبؤ.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>22. Engineering Caution</h2>
+
+<p>
+A forecasting model should not be judged only by training accuracy.
+</p>
+
+<ul>
+<li>Weather conditions may change.</li>
+<li>Sensors may contain errors.</li>
+<li>PV modules may age.</li>
+<li>Shading patterns may change.</li>
+<li>New operating conditions may not exist in the training data.</li>
+</ul>
+
+<div class="highlight">
+Always evaluate the model on unseen and realistic operating conditions.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>22. ملاحظة هندسية مهمة</h2>
+
+<p>
+لا يجب تقييم نموذج التنبؤ اعتمادًا على بيانات التدريب فقط.
+</p>
+
+<p>
+قد تتغير الظروف الجوية، أو تتدهور الوحدات، أو تظهر ظلال جديدة،
+أو تتغير خصائص القياسات.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>23. Lab Tasks</h2>
+
+<ol>
+<li>Enter the PV dataset in MATLAB.</li>
+<li>Construct matrix X.</li>
+<li>Train the two-input regression model.</li>
+<li>Record β₀, β₁, and β₂.</li>
+<li>Explain the physical meaning of β₁ and β₂.</li>
+<li>Calculate MAE, MSE, and RMSE.</li>
+<li>Forecast PV power at G=750 W/m² and T=28°C.</li>
+<li>Plot actual and predicted PV power.</li>
+<li>Remove temperature and compare RMSE.</li>
+<li>Add measurement noise and retrain.</li>
+<li>Perform the train/test experiment.</li>
+</ol>
+
+</div>
+
+<div class="ar">
+
+<h2>23. مهام المختبر</h2>
+
+<ol>
+<li>أدخل بيانات PV في MATLAB.</li>
+<li>أنشئ المصفوفة X.</li>
+<li>درّب نموذج الانحدار ثنائي المدخل.</li>
+<li>سجل β₀ وβ₁ وβ₂.</li>
+<li>اشرح المعنى الفيزيائي للمعاملين β₁ وβ₂.</li>
+<li>احسب MAE وMSE وRMSE.</li>
+<li>تنبأ بقدرة PV عند G=750 W/m² وT=28°C.</li>
+<li>ارسم القدرة الحقيقية والمتنبأ بها.</li>
+<li>احذف درجة الحرارة وقارن RMSE.</li>
+<li>أضف ضجيجًا وأعد التدريب.</li>
+<li>نفذ تجربة التدريب والاختبار.</li>
+</ol>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>📝 Review Questions</h2>
+
+<ol>
+<li>Why is irradiance important for PV forecasting?</li>
+<li>Why can temperature influence PV electrical power?</li>
+<li>What is the meaning of β₁?</li>
+<li>What is the meaning of β₂?</li>
+<li>Why do we use multiple regression?</li>
+<li>What does RMSE represent?</li>
+<li>Why can a model perform well on training data but poorly on test data?</li>
+<li>When might a neural network outperform this linear model?</li>
+</ol>
+
+</div>
+
+<div class="ar">
+
+<h2>📝 أسئلة المراجعة</h2>
+
+<ol>
+<li>لماذا يعد الإشعاع الشمسي مهمًا في التنبؤ بقدرة PV؟</li>
+<li>لماذا تؤثر درجة الحرارة على القدرة الكهربائية؟</li>
+<li>ماذا يمثل β₁؟</li>
+<li>ماذا يمثل β₂؟</li>
+<li>لماذا نستخدم انحدارًا متعدد المتغيرات؟</li>
+<li>ماذا تمثل RMSE؟</li>
+<li>لماذا قد ينجح النموذج على بيانات التدريب ويفشل على بيانات الاختبار؟</li>
+<li>متى قد تكون الشبكة العصبية أفضل من هذا النموذج الخطي؟</li>
+</ol>
+
+</div>
+
+</section>
+
+</main>
+
+<footer>
+AI Applications in Electrical Power Systems
+<br>
+تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+<br><br>
+MATLAB Lab 04 | مختبر MATLAB 04
+</footer>
+
+</body>
+  </html>
