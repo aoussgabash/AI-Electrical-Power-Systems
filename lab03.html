@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lab 03 - Machine Learning Load Forecasting</title>
+
+<style>
+:root{
+  --bg:#07111f;
+  --card:#0f2238;
+  --card2:#0b1b2c;
+  --text:#f4f7fb;
+  --muted:#b8c7d9;
+  --blue:#38bdf8;
+  --green:#22c55e;
+  --yellow:#facc15;
+  --red:#fb7185;
+  --line:rgba(255,255,255,.10);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:linear-gradient(180deg,#07111f,#0a1728);
+  color:var(--text);
+  line-height:1.8;
+}
+
+.container{
+  width:min(1050px,92%);
+  margin:auto;
+}
+
+header{
+  background:rgba(7,17,31,.95);
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  padding:17px 0;
+}
+
+.logo{font-weight:bold}
+.logo span{color:var(--blue)}
+
+.back{
+  color:white;
+  text-decoration:none;
+  border:1px solid var(--line);
+  padding:8px 12px;
+  border-radius:9px;
+}
+
+.hero{
+  text-align:center;
+  padding:60px 0 35px;
+}
+
+.lab-number{
+  color:var(--blue);
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+h1{
+  font-size:clamp(2rem,6vw,3.6rem);
+  line-height:1.15;
+  margin:10px 0;
+}
+
+.hero-ar{
+  direction:rtl;
+  font-size:1.5rem;
+  color:#e5edf6;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin-top:10px;
+}
+
+section{
+  margin:22px 0;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:22px;
+}
+
+h2{margin-top:0;color:#edf8ff}
+h3{color:var(--blue)}
+p,li{color:#d8e2ec}
+
+.en{
+  direction:ltr;
+  text-align:left;
+}
+
+.ar{
+  direction:rtl;
+  text-align:right;
+  border-top:1px dashed var(--line);
+  padding-top:18px;
+  margin-top:18px;
+}
+
+.highlight{
+  background:var(--card2);
+  border-left:4px solid var(--blue);
+  border-radius:10px;
+  padding:15px;
+  margin:15px 0;
+}
+
+.ar .highlight{
+  border-left:none;
+  border-right:4px solid var(--blue);
+}
+
+.formula{
+  direction:ltr;
+  text-align:center;
+  background:#06101d;
+  border:1px solid var(--line);
+  padding:18px;
+  margin:16px 0;
+  border-radius:12px;
+  font-size:1.22rem;
+  font-family:"Times New Roman",serif;
+  overflow-x:auto;
+}
+
+pre{
+  direction:ltr;
+  text-align:left;
+  background:#06101d;
+  color:#dff5ff;
+  border:1px solid var(--line);
+  padding:16px;
+  border-radius:12px;
+  overflow-x:auto;
+  white-space:pre;
+  line-height:1.55;
+}
+
+code{
+  font-family:Consolas,Monaco,monospace;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.mini-card{
+  background:var(--card2);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:16px;
+}
+
+.mini-card strong{color:white}
+
+.flow{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:20px 0;
+}
+
+.flow-box{
+  background:#0b1b2c;
+  border:1px solid rgba(56,189,248,.3);
+  padding:14px 17px;
+  border-radius:12px;
+  text-align:center;
+  min-width:120px;
+}
+
+.arrow{
+  color:var(--blue);
+  font-size:1.5rem;
+  font-weight:bold;
+}
+
+.table-wrap{overflow-x:auto}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+  margin:15px 0;
+}
+
+th,td{
+  border:1px solid var(--line);
+  padding:11px;
+  text-align:center;
+}
+
+th{
+  background:#0b1b2c;
+  color:#eaf7ff;
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  padding:35px 0;
+}
+
+@media(max-width:750px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+<div class="hero">
+
+  <div class="lab-number">
+    LAB 03 | المختبر 03
+  </div>
+
+  <h1>Machine Learning Load Forecasting</h1>
+
+  <div class="hero-ar">
+    التنبؤ بالحمل الكهربائي باستخدام التعلم الآلي
+  </div>
+
+  <div class="subtitle">
+    Linear Regression, Training, Prediction, and Error Evaluation
+    <br>
+    الانحدار الخطي والتدريب والتنبؤ وتقييم الخطأ
+  </div>
+
+</div>
+
+
+<section>
+
+<div class="en">
+
+<h2>🎯 Lab Objectives</h2>
+
+<ul>
+<li>Understand load forecasting as a supervised-learning problem.</li>
+<li>Construct a simple electrical-load dataset.</li>
+<li>Understand linear regression mathematically.</li>
+<li>Estimate model parameters in MATLAB.</li>
+<li>Predict electrical load from temperature.</li>
+<li>Calculate MAE, MSE, and RMSE.</li>
+<li>Visualize actual and predicted load.</li>
+</ul>
+
+</div>
+
+<div class="ar">
+
+<h2>🎯 أهداف المختبر</h2>
+
+<ul>
+<li>فهم التنبؤ بالحمل كمسألة تعلم خاضع للإشراف.</li>
+<li>إنشاء مجموعة بيانات بسيطة للحمل الكهربائي.</li>
+<li>فهم الانحدار الخطي رياضيًا.</li>
+<li>تقدير معاملات النموذج باستخدام MATLAB.</li>
+<li>التنبؤ بالحمل اعتمادًا على درجة الحرارة.</li>
+<li>حساب MAE وMSE وRMSE.</li>
+<li>رسم الحمل الحقيقي والمتنبأ به.</li>
+</ul>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>1. Load Forecasting Problem</h2>
+
+<p>
+Electrical load forecasting estimates future power demand using
+historical measurements and explanatory variables.
+</p>
+
+<div class="formula">
+Future Load = f(Historical Data, Weather, Time, ...)
+</div>
+
+<p>
+In this first example, we intentionally use only one input:
+</p>
+
+<div class="formula">
+Temperature → Electrical Load
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>1. مسألة التنبؤ بالحمل</h2>
+
+<p>
+يهدف التنبؤ بالحمل الكهربائي إلى تقدير الطلب المستقبلي على القدرة
+اعتمادًا على البيانات التاريخية والعوامل المؤثرة.
+</p>
+
+<div class="formula">
+الحمل المستقبلي = f(البيانات السابقة، الطقس، الزمن، ...)
+</div>
+
+<p>
+سنبدأ بنموذج بسيط يستخدم درجة الحرارة كدخل واحد.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>2. Supervised Learning</h2>
+
+<p>
+For each training sample, we know both the input and the desired output.
+</p>
+
+<div class="formula">
+x → t
+</div>
+
+<p>In this laboratory:</p>
+
+<div class="formula">
+x = Temperature [°C]
+</div>
+
+<div class="formula">
+t = Electrical Load [MW]
+</div>
+
+<div class="highlight">
+The model learns the relationship between temperature and load from examples.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>2. التعلم الخاضع للإشراف</h2>
+
+<p>
+لكل عينة تدريب نعرف قيمة الدخل والقيمة الصحيحة المطلوبة.
+</p>
+
+<div class="formula">
+درجة الحرارة → الحمل الكهربائي
+</div>
+
+<div class="highlight">
+يتعلم النموذج العلاقة الرياضية من الأمثلة المتوفرة في بيانات التدريب.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>3. Example Dataset</h2>
+
+<div class="table-wrap">
+
+<table>
+
+<tr>
+<th>Sample</th>
+<th>Temperature [°C]</th>
+<th>Load [MW]</th>
+</tr>
+
+<tr><td>1</td><td>10</td><td>105</td></tr>
+<tr><td>2</td><td>12</td><td>110</td></tr>
+<tr><td>3</td><td>14</td><td>116</td></tr>
+<tr><td>4</td><td>16</td><td>121</td></tr>
+<tr><td>5</td><td>18</td><td>128</td></tr>
+<tr><td>6</td><td>20</td><td>134</td></tr>
+<tr><td>7</td><td>22</td><td>141</td></tr>
+<tr><td>8</td><td>24</td><td>147</td></tr>
+<tr><td>9</td><td>26</td><td>154</td></tr>
+<tr><td>10</td><td>28</td><td>162</td></tr>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>3. مجموعة البيانات</h2>
+
+<p>
+تمثل كل عينة درجة حرارة مقاسة والحمل الكهربائي المقابل لها.
+</p>
+
+<div class="highlight">
+هذه البيانات تعليمية ومبسطة لفهم الخوارزمية، وليست بيانات شبكة حقيقية.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>4. Enter the Data in MATLAB</h2>
+
+<pre><code>temperature = [10 12 14 16 18 20 22 24 26 28]';
+
+loadMW = [105 110 116 121 128 134 141 147 154 162]';</code></pre>
+
+<p>
+The apostrophe converts each vector into a column vector.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>4. إدخال البيانات إلى MATLAB</h2>
+
+<p>
+نخزن درجات الحرارة والحمل في متجهين عموديين بحيث تمثل كل
+صفّة عينة تدريب واحدة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>5. Linear Regression Model</h2>
+
+<p>
+Assume a linear relationship:
+</p>
+
+<div class="formula">
+ŷ = β₀ + β₁x
+</div>
+
+<p>where:</p>
+
+<ul>
+<li>ŷ = predicted electrical load</li>
+<li>x = temperature</li>
+<li>β₀ = intercept</li>
+<li>β₁ = slope</li>
+</ul>
+
+</div>
+
+<div class="ar">
+
+<h2>5. نموذج الانحدار الخطي</h2>
+
+<div class="formula">
+ŷ = β₀ + β₁x
+</div>
+
+<p>
+حيث β₀ هو الجزء الثابت، وβ₁ يمثل مقدار تغير الحمل المتوقع
+عند تغير درجة الحرارة بمقدار درجة واحدة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>6. Prediction Error</h2>
+
+<p>
+For sample i:
+</p>
+
+<div class="formula">
+eᵢ = tᵢ - ŷᵢ
+</div>
+
+<p>
+A good model should make these residual errors small.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>6. خطأ التنبؤ</h2>
+
+<div class="formula">
+eᵢ = tᵢ - ŷᵢ
+</div>
+
+<p>
+يمثل الخطأ الفرق بين الحمل الحقيقي والحمل الذي تنبأ به النموذج.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>7. Least-Squares Principle</h2>
+
+<p>
+Linear regression selects the parameters that minimize the sum of squared errors:
+</p>
+
+<div class="formula">
+J(β₀,β₁) = Σ [tᵢ-(β₀+β₁xᵢ)]²
+</div>
+
+<p>
+Therefore:
+</p>
+
+<div class="formula">
+min J(β₀,β₁)
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>7. مبدأ المربعات الصغرى</h2>
+
+<p>
+نبحث عن β₀ وβ₁ بحيث يصبح مجموع مربعات أخطاء التنبؤ أصغر ما يمكن.
+</p>
+
+<div class="formula">
+min Σ [tᵢ-(β₀+β₁xᵢ)]²
+</div>
+
+<div class="highlight">
+هنا تحدث عملية التعلم: نحدد معاملات النموذج من البيانات بدل اختيارها يدويًا.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>8. Matrix Form</h2>
+
+<p>
+Write the model for all samples:
+</p>
+
+<div class="formula">
+ŷ = Xβ
+</div>
+
+<p>with:</p>
+
+<div class="formula">
+β = [β₀ β₁]ᵀ
+</div>
+
+<p>and:</p>
+
+<div class="formula">
+X = [1  x₁; 1  x₂; ... ; 1  xₙ]
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>8. الصيغة المصفوفية</h2>
+
+<p>
+يمكن كتابة جميع معادلات عينات التدريب بصورة مختصرة:
+</p>
+
+<div class="formula">
+ŷ = Xβ
+</div>
+
+<p>
+العمود الأول من X يخص المعامل الثابت β₀، والعمود الثاني يحتوي
+على قيم درجة الحرارة.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>9. Deriving the Optimal Parameters</h2>
+
+<p>The squared-error function is:</p>
+
+<div class="formula">
+J(β) = (t-Xβ)ᵀ(t-Xβ)
+</div>
+
+<p>Differentiate with respect to β:</p>
+
+<div class="formula">
+∂J/∂β = -2Xᵀ(t-Xβ)
+</div>
+
+<p>At the minimum:</p>
+
+<div class="formula">
+∂J/∂β = 0
+</div>
+
+<p>therefore:</p>
+
+<div class="formula">
+XᵀXβ = Xᵀt
+</div>
+
+<p>which gives the normal-equation solution:</p>
+
+<div class="formula">
+β = (XᵀX)⁻¹Xᵀt
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>9. اشتقاق معاملات النموذج</h2>
+
+<p>
+نشتق دالة الخطأ بالنسبة إلى معاملات النموذج، ثم نساوي المشتقة بالصفر
+لأننا نبحث عن القيمة الدنيا.
+</p>
+
+<div class="formula">
+∂J/∂β = -2Xᵀ(t-Xβ)=0
+</div>
+
+<p>ومنها:</p>
+
+<div class="formula">
+XᵀXβ=Xᵀt
+</div>
+
+<div class="formula">
+β=(XᵀX)⁻¹Xᵀt
+</div>
+
+<div class="highlight">
+هذه المعادلة توضح رياضيًا كيف يتعلم الانحدار الخطي معاملاته من البيانات.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>10. MATLAB Implementation</h2>
+
+<pre><code>X = [ones(size(temperature)) temperature];
+
+beta = X \ loadMW;</code></pre>
+
+<p>
+MATLAB's backslash operator solves the least-squares problem directly
+and is generally preferable to explicitly computing a matrix inverse.
+</p>
+
+<pre><code>beta0 = beta(1);
+beta1 = beta(2);</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>10. التنفيذ في MATLAB</h2>
+
+<p>
+نبني المصفوفة X ثم نستخدم العامل <strong>\</strong> لحساب معاملات
+الانحدار بطريقة عددية مستقرة.
+</p>
+
+<pre><code>beta = X \ loadMW;</code></pre>
+
+<div class="highlight">
+من الأفضل عدديًا استخدام العامل \ بدل حساب inv(X'*X) بصورة مباشرة.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>11. Make Predictions</h2>
+
+<p>
+Once β₀ and β₁ are known:
+</p>
+
+<div class="formula">
+ŷᵢ = β₀ + β₁xᵢ
+</div>
+
+<p>MATLAB:</p>
+
+<pre><code>predictedLoad = X * beta;</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>11. إجراء التنبؤ</h2>
+
+<p>
+بعد تعلم معاملات النموذج يمكن حساب الحمل المتوقع لكل درجة حرارة.
+</p>
+
+<pre><code>predictedLoad = X * beta;</code></pre>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>12. Mean Absolute Error — MAE</h2>
+
+<div class="formula">
+MAE = (1/n) Σ |tᵢ-ŷᵢ|
+</div>
+
+<pre><code>MAE = mean(abs(loadMW - predictedLoad));</code></pre>
+
+<p>
+MAE gives the average magnitude of the prediction error in MW.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>12. متوسط الخطأ المطلق MAE</h2>
+
+<div class="formula">
+MAE = (1/n) Σ |tᵢ-ŷᵢ|
+</div>
+
+<p>
+إذا كان MAE=2 MW مثلًا، فهذا يعني أن مقدار خطأ التنبؤ المتوسط
+يقارب 2 MW.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>13. Mean Squared Error — MSE</h2>
+
+<div class="formula">
+MSE = (1/n) Σ (tᵢ-ŷᵢ)²
+</div>
+
+<pre><code>MSE = mean((loadMW - predictedLoad).^2);</code></pre>
+
+<p>
+Squaring makes larger errors more influential.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>13. متوسط مربع الخطأ MSE</h2>
+
+<p>
+يتم تربيع الخطأ قبل حساب المتوسط، ولذلك تحصل الأخطاء الكبيرة على
+وزن أكبر.
+</p>
+
+<div class="formula">
+MSE = (1/n) Σ (tᵢ-ŷᵢ)²
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>14. Root Mean Squared Error — RMSE</h2>
+
+<div class="formula">
+RMSE = √MSE
+</div>
+
+<pre><code>RMSE = sqrt(MSE);</code></pre>
+
+<div class="highlight">
+RMSE has the same physical unit as the electrical load: MW.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>14. الجذر التربيعي لمتوسط مربع الخطأ RMSE</h2>
+
+<div class="formula">
+RMSE = √MSE
+</div>
+
+<p>
+الميزة المهمة أن وحدة RMSE هي MW نفسها، مما يجعل تفسيرها أسهل.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>15. Actual vs Predicted Load</h2>
+
+<pre><code>figure
+
+plot(temperature,loadMW,'o','LineWidth',1.6)
+hold on
+
+plot(temperature,predictedLoad,'-','LineWidth',1.8)
+
+grid on
+
+xlabel('Temperature [°C]')
+ylabel('Electrical Load [MW]')
+
+legend('Actual Load','Predicted Load','Location','best')
+
+title('Electrical Load Forecasting')</code></pre>
+
+<div class="highlight">
+The distance between each measured point and the regression line represents
+the prediction residual.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>15. الحمل الحقيقي مقابل الحمل المتنبأ به</h2>
+
+<p>
+تمثل النقاط الحمل الحقيقي، بينما يمثل الخط خرج نموذج الانحدار الخطي.
+</p>
+
+<div class="highlight">
+كلما اقترب الخط من نقاط القياس، كانت أخطاء النموذج أصغر.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>16. Forecast a New Operating Point</h2>
+
+<p>
+Suppose tomorrow's expected temperature is:
+</p>
+
+<div class="formula">
+Tnew = 30°C
+</div>
+
+<p>The predicted load is:</p>
+
+<div class="formula">
+P̂new = β₀ + β₁Tnew
+</div>
+
+<pre><code>Tnew = 30;
+
+forecastLoad = beta0 + beta1*Tnew;
+
+fprintf('Forecast at %.1f C = %.2f MW\n', ...
+        Tnew,forecastLoad);</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>16. التنبؤ بحالة جديدة</h2>
+
+<p>
+إذا كانت درجة الحرارة المتوقعة غدًا 30°C، يمكن استخدام النموذج
+المتعلم للتنبؤ بالحمل دون وجود قيمة الحمل مسبقًا.
+</p>
+
+<div class="formula">
+P̂new = β₀ + β₁(30)
+</div>
+
+<div class="highlight">
+هذه هي الفكرة الأساسية للتنبؤ: التعلم من بيانات معروفة ثم استخدام النموذج
+مع بيانات جديدة.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>17. Complete MATLAB Program</h2>
+
+<pre><code>clear; clc; close all;
+
+% -----------------------------------------------
+% Machine Learning Load Forecasting
+% Linear Regression
+% -----------------------------------------------
+
+% Dataset
+temperature = [10 12 14 16 18 20 22 24 26 28]';
+
+loadMW = [105 110 116 121 128 134 141 147 154 162]';
+
+% -----------------------------------------------
+% Build regression matrix
+% y = beta0 + beta1*x
+% -----------------------------------------------
+
+X = [ones(size(temperature)) temperature];
+
+% Least-squares training
+beta = X \ loadMW;
+
+beta0 = beta(1);
+beta1 = beta(2);
+
+% -----------------------------------------------
+% Prediction on training data
+% -----------------------------------------------
+
+predictedLoad = X * beta;
+
+% Residual error
+error = loadMW - predictedLoad;
+
+% -----------------------------------------------
+% Performance indices
+% -----------------------------------------------
+
+MAE = mean(abs(error));
+
+MSE = mean(error.^2);
+
+RMSE = sqrt(MSE);
+
+% -----------------------------------------------
+% Display model
+% -----------------------------------------------
+
+fprintf('Learned model:\n')
+fprintf('Load = %.4f + %.4f * Temperature\n\n', ...
+        beta0,beta1)
+
+fprintf('MAE  = %.4f MW\n',MAE)
+fprintf('MSE  = %.4f MW^2\n',MSE)
+fprintf('RMSE = %.4f MW\n\n',RMSE)
+
+% -----------------------------------------------
+% Forecast new temperature
+% -----------------------------------------------
+
+Tnew = 30;
+
+forecastLoad = beta0 + beta1*Tnew;
+
+fprintf('Forecast for T = %.1f C: %.2f MW\n', ...
+        Tnew,forecastLoad)
+
+% -----------------------------------------------
+% Plot actual and predicted load
+% -----------------------------------------------
+
+figure
+
+plot(temperature,loadMW,'o','LineWidth',1.6)
+hold on
+
+plot(temperature,predictedLoad,'-','LineWidth',1.8)
+
+grid on
+
+xlabel('Temperature [°C]')
+ylabel('Electrical Load [MW]')
+
+legend('Actual Load','Predicted Load', ...
+       'Location','best')
+
+title('Machine Learning Load Forecasting')
+
+% -----------------------------------------------
+% Plot prediction errors
+% -----------------------------------------------
+
+figure
+
+stem(temperature,error,'LineWidth',1.5)
+
+grid on
+
+xlabel('Temperature [°C]')
+ylabel('Prediction Error [MW]')
+
+title('Load Forecasting Residuals')</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>17. البرنامج الكامل في MATLAB</h2>
+
+<p>
+ينفذ البرنامج جميع مراحل المسألة:
+</p>
+
+<div class="flow">
+<div class="flow-box">Data</div>
+<div class="arrow">→</div>
+<div class="flow-box">Training</div>
+<div class="arrow">→</div>
+<div class="flow-box">Model</div>
+<div class="arrow">→</div>
+<div class="flow-box">Prediction</div>
+<div class="arrow">→</div>
+<div class="flow-box">Evaluation</div>
+</div>
+
+<p>
+أي: البيانات ← التدريب ← النموذج ← التنبؤ ← تقييم الأداء.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>18. What Does β₁ Mean Physically?</h2>
+
+<div class="formula">
+β₁ = ΔLoad / ΔTemperature
+</div>
+
+<p>
+Its approximate unit is:
+</p>
+
+<div class="formula">
+MW / °C
+</div>
+
+<p>
+For this educational dataset, a positive β₁ means that load tends to
+increase as temperature increases.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>18. ماذا يعني β₁ فيزيائيًا؟</h2>
+
+<div class="formula">
+β₁ = ΔLoad / ΔTemperature
+</div>
+
+<p>
+أي أنه يمثل حساسية الحمل تجاه تغير درجة الحرارة، ووحدته التقريبية:
+</p>
+
+<div class="formula">
+MW / °C
+</div>
+
+<div class="highlight">
+هذا مثال مهم على الربط بين معامل رياضي داخل نموذج التعلم الآلي
+ومعناه الهندسي.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>19. Training Data vs Test Data</h2>
+
+<p>
+Evaluating a model only on the same data used for training can give an
+overly optimistic impression.
+</p>
+
+<div class="flow">
+<div class="flow-box">Dataset</div>
+<div class="arrow">→</div>
+<div class="flow-box">Training Set</div>
+<div class="arrow">+</div>
+<div class="flow-box">Test Set</div>
+</div>
+
+<div class="highlight">
+Training data are used to learn the parameters. Test data should be used
+to evaluate the model on unseen examples.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>19. بيانات التدريب وبيانات الاختبار</h2>
+
+<p>
+لا يكفي اختبار النموذج على البيانات نفسها التي استخدمناها في التدريب.
+</p>
+
+<div class="highlight">
+بيانات التدريب تستخدم لتعلم معاملات النموذج، بينما تستخدم بيانات الاختبار
+لقياس قدرة النموذج على التنبؤ بقيم لم يرها أثناء التدريب.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>20. Simple Train/Test Experiment</h2>
+
+<p>
+Use the first seven samples for training and the last three for testing:
+</p>
+
+<pre><code>xTrain = temperature(1:7);
+yTrain = loadMW(1:7);
+
+xTest = temperature(8:10);
+yTest = loadMW(8:10);
+
+Xtrain = [ones(size(xTrain)) xTrain];
+
+betaTest = Xtrain \ yTrain;
+
+Xtest = [ones(size(xTest)) xTest];
+
+yPrediction = Xtest * betaTest;
+
+testError = yTest - yPrediction;
+
+RMSEtest = sqrt(mean(testError.^2));
+
+fprintf('Test RMSE = %.4f MW\n',RMSEtest)</code></pre>
+
+</div>
+
+<div class="ar">
+
+<h2>20. تجربة بسيطة للتدريب والاختبار</h2>
+
+<p>
+نستخدم العينات السبع الأولى لتدريب النموذج، ثم نختبره على ثلاث عينات
+لم تدخل في عملية التدريب.
+</p>
+
+<div class="highlight">
+هذه الخطوة أقرب إلى الطريقة الصحيحة لتقييم نموذج تعلم آلي.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>21. Extending the Model</h2>
+
+<p>
+Real load forecasting rarely depends on temperature alone.
+</p>
+
+<p>A more realistic input vector may be:</p>
+
+<div class="formula">
+x = [Temperature, Hour, Day, Previous Load, Solar Irradiance, ...]
+</div>
+
+<p>The model becomes:</p>
+
+<div class="formula">
+P̂ =
+β₀ +
+β₁T +
+β₂H +
+β₃D +
+β₄Pprevious + ...
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>21. تطوير النموذج</h2>
+
+<p>
+في التطبيقات الحقيقية لا يعتمد الحمل عادةً على درجة الحرارة وحدها.
+</p>
+
+<p>
+يمكن إضافة الساعة، ونوع اليوم، والحمل السابق، والطقس وغيرها من المتغيرات.
+</p>
+
+<div class="formula">
+P̂ =
+β₀ +
+β₁T +
+β₂H +
+β₃D +
+β₄Pprevious + ...
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>22. Experiment 1 — Add Measurement Noise</h2>
+
+<p>Replace the original load data by:</p>
+
+<pre><code>loadNoisy = loadMW + 3*randn(size(loadMW));</code></pre>
+
+<p>
+Train the model again and observe how the regression line and RMSE change.
+</p>
+
+</div>
+
+<div class="ar">
+
+<h2>22. التجربة 1 — إضافة ضجيج للقياسات</h2>
+
+<p>
+أضف ضجيجًا عشوائيًا إلى بيانات الحمل، ثم أعد التدريب وقارن النتائج.
+</p>
+
+<div class="highlight">
+هذه التجربة توضح تأثير جودة القياسات على أداء التعلم الآلي.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>23. Experiment 2 — Remove Training Samples</h2>
+
+<p>
+Train using only a small number of samples and compare the prediction.
+</p>
+
+<p>For example:</p>
+
+<pre><code>temperatureSmall = temperature(1:4);
+loadSmall = loadMW(1:4);</code></pre>
+
+<div class="highlight">
+Ask: Does having fewer training examples affect confidence in the model?
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>23. التجربة 2 — تقليل بيانات التدريب</h2>
+
+<p>
+استخدم أربع عينات فقط في التدريب ثم قارن النموذج بالنموذج الأصلي.
+</p>
+
+<p>
+الهدف هو فهم أهمية كمية البيانات المستخدمة في التعلم.
+</p>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>24. Experiment 3 — Nonlinear Load Behavior</h2>
+
+<p>
+Suppose the real relationship becomes nonlinear:
+</p>
+
+<div class="formula">
+Load = 80 + 1.2T + 0.05T²
+</div>
+
+<p>
+A straight line may no longer represent the relationship sufficiently well.
+</p>
+
+<div class="highlight">
+This motivates more advanced machine-learning models and neural networks.
+</div>
+
+</div>
+
+<div class="ar">
+
+<h2>24. التجربة 3 — علاقة غير خطية</h2>
+
+<div class="formula">
+Load = 80 + 1.2T + 0.05T²
+</div>
+
+<p>
+إذا أصبحت العلاقة غير خطية، فقد لا يكون الانحدار الخطي كافيًا لتمثيلها.
+</p>
+
+<div class="highlight">
+وهنا تظهر الحاجة إلى نماذج أكثر تقدمًا مثل الانحدار غير الخطي
+والشبكات العصبية.
+</div>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>25. Lab Tasks</h2>
+
+<ol>
+<li>Enter the temperature and load dataset.</li>
+<li>Plot the raw data.</li>
+<li>Construct the regression matrix X.</li>
+<li>Calculate β₀ and β₁.</li>
+<li>Explain the physical meaning of β₁.</li>
+<li>Calculate predicted load values.</li>
+<li>Calculate MAE, MSE, and RMSE.</li>
+<li>Forecast the load at 30°C.</li>
+<li>Perform the train/test experiment.</li>
+<li>Add measurement noise and repeat the training.</li>
+<li>Explain when linear regression may become inadequate.</li>
+</ol>
+
+</div>
+
+<div class="ar">
+
+<h2>25. مهام المختبر</h2>
+
+<ol>
+<li>أدخل بيانات درجة الحرارة والحمل.</li>
+<li>ارسم البيانات الأصلية.</li>
+<li>أنشئ مصفوفة الانحدار X.</li>
+<li>احسب β₀ وβ₁.</li>
+<li>اشرح المعنى الفيزيائي للمعامل β₁.</li>
+<li>احسب قيم الحمل المتنبأ بها.</li>
+<li>احسب MAE وMSE وRMSE.</li>
+<li>تنبأ بالحمل عند 30°C.</li>
+<li>نفذ تجربة التدريب والاختبار.</li>
+<li>أضف ضجيجًا إلى القياسات وأعد التدريب.</li>
+<li>اشرح متى يصبح الانحدار الخطي غير كافٍ.</li>
+</ol>
+
+</div>
+
+</section>
+
+
+<section>
+
+<div class="en">
+
+<h2>📝 Review Questions</h2>
+
+<ol>
+<li>Why is load forecasting a supervised-learning problem?</li>
+<li>What do β₀ and β₁ represent?</li>
+<li>Why do we minimize squared errors?</li>
+<li>How is the least-squares solution obtained?</li>
+<li>What is the difference between MAE, MSE, and RMSE?</li>
+<li>Why should test data not be used for training?</li>
+<li>What does a large test RMSE indicate?</li>
+<li>Why can temperature alone be insufficient for realistic load forecasting?</li>
+<li>When would a nonlinear model be preferable?</li>
+</ol>
+
+</div>
+
+<div class="ar">
+
+<h2>📝 أسئلة المراجعة</h2>
+
+<ol>
+<li>لماذا يعد التنبؤ بالحمل مسألة تعلم خاضع للإشراف؟</li>
+<li>ماذا يمثل β₀ وβ₁؟</li>
+<li>لماذا نقلل مجموع مربعات الأخطاء؟</li>
+<li>كيف نحصل على حل المربعات الصغرى؟</li>
+<li>ما الفرق بين MAE وMSE وRMSE؟</li>
+<li>لماذا لا يجب استخدام بيانات الاختبار في التدريب؟</li>
+<li>ماذا تعني قيمة RMSE كبيرة على بيانات الاختبار؟</li>
+<li>لماذا لا تكفي درجة الحرارة وحدها في التنبؤ الحقيقي بالحمل؟</li>
+<li>متى نحتاج إلى نموذج غير خطي؟</li>
+</ol>
+
+</div>
+
+</section>
+
+</main>
+
+<footer>
+AI Applications in Electrical Power Systems
+<br>
+تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+<br><br>
+MATLAB Lab 03 | مختبر MATLAB 03
+</footer>
+
+</body>
+  </html>
