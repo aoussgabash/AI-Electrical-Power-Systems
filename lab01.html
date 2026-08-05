@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lab 01 - Neural Network Training</title>
+
+  <style>
+    :root{
+      --bg:#07111f;
+      --card:#0f2238;
+      --card2:#0b1b2c;
+      --text:#f4f7fb;
+      --muted:#b8c7d9;
+      --blue:#38bdf8;
+      --green:#22c55e;
+      --yellow:#facc15;
+      --line:rgba(255,255,255,.10);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial,Tahoma,sans-serif;
+      background:linear-gradient(180deg,#07111f,#0a1728);
+      color:var(--text);
+      line-height:1.8;
+    }
+
+    .container{
+      width:min(1050px,92%);
+      margin:auto;
+    }
+
+    header{
+      background:rgba(7,17,31,.95);
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:17px 0;
+    }
+
+    .logo{font-weight:bold}
+    .logo span{color:var(--blue)}
+
+    .back{
+      color:white;
+      text-decoration:none;
+      border:1px solid var(--line);
+      padding:8px 12px;
+      border-radius:9px;
+    }
+
+    .hero{
+      text-align:center;
+      padding:60px 0 35px;
+    }
+
+    .lab-number{
+      color:var(--blue);
+      font-weight:bold;
+      letter-spacing:1px;
+    }
+
+    h1{
+      font-size:clamp(2rem,6vw,3.6rem);
+      line-height:1.15;
+      margin:10px 0;
+    }
+
+    .hero-ar{
+      direction:rtl;
+      font-size:1.5rem;
+      color:#e5edf6;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:10px;
+    }
+
+    section{
+      margin:22px 0;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+    }
+
+    h2{margin-top:0;color:#edf8ff}
+    h3{color:var(--blue)}
+    p,li{color:#d8e2ec}
+
+    .en{direction:ltr;text-align:left}
+
+    .ar{
+      direction:rtl;
+      text-align:right;
+      border-top:1px dashed var(--line);
+      padding-top:18px;
+      margin-top:18px;
+    }
+
+    .highlight{
+      background:var(--card2);
+      border-left:4px solid var(--blue);
+      border-radius:10px;
+      padding:15px;
+      margin:15px 0;
+    }
+
+    .ar .highlight{
+      border-left:none;
+      border-right:4px solid var(--blue);
+    }
+
+    .formula{
+      direction:ltr;
+      text-align:center;
+      background:#06101d;
+      border:1px solid var(--line);
+      padding:18px;
+      margin:16px 0;
+      border-radius:12px;
+      font-size:1.22rem;
+      font-family:"Times New Roman",serif;
+      overflow-x:auto;
+    }
+
+    pre{
+      direction:ltr;
+      text-align:left;
+      background:#06101d;
+      color:#dff5ff;
+      border:1px solid var(--line);
+      padding:16px;
+      border-radius:12px;
+      overflow-x:auto;
+      white-space:pre;
+      line-height:1.55;
+    }
+
+    code{
+      font-family:Consolas,Monaco,monospace;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+
+    .mini-card{
+      background:var(--card2);
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:16px;
+    }
+
+    .mini-card strong{color:white}
+
+    .flow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:20px 0;
+    }
+
+    .flow-box{
+      background:#0b1b2c;
+      border:1px solid rgba(56,189,248,.3);
+      padding:14px 17px;
+      border-radius:12px;
+      text-align:center;
+      min-width:120px;
+    }
+
+    .arrow{
+      color:var(--blue);
+      font-size:1.5rem;
+      font-weight:bold;
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      padding:35px 0;
+    }
+
+    @media(max-width:750px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="hero">
+    <div class="lab-number">
+      LAB 01 | المختبر 01
+    </div>
+
+    <h1>
+      Neural Network Training
+    </h1>
+
+    <div class="hero-ar">
+      تدريب شبكة عصبية من الحل الابتدائي حتى التقارب
+    </div>
+
+    <div class="subtitle">
+      Forward Propagation, Backpropagation, Weight Update, and Convergence
+      <br>
+      الانتشار الأمامي والانتشار الخلفي وتحديث الأوزان والوصول إلى التقارب
+    </div>
+  </div>
+
+
+  <section>
+    <div class="en">
+      <h2>🎯 Lab Objectives</h2>
+      <ul>
+        <li>Implement a small neural network in MATLAB.</li>
+        <li>Calculate forward propagation step by step.</li>
+        <li>Calculate the loss function.</li>
+        <li>Implement backpropagation using analytical gradients.</li>
+        <li>Update weights using gradient descent.</li>
+        <li>Stop training when the error becomes smaller than ε.</li>
+      </ul>
+    </div>
+
+    <div class="ar">
+      <h2>🎯 أهداف المختبر</h2>
+      <ul>
+        <li>تنفيذ شبكة عصبية صغيرة باستخدام MATLAB.</li>
+        <li>حساب الانتشار الأمامي خطوة بخطوة.</li>
+        <li>حساب دالة الخطأ.</li>
+        <li>تنفيذ الانتشار الخلفي باستخدام المشتقات التحليلية.</li>
+        <li>تحديث الأوزان باستخدام الانحدار المتدرج.</li>
+        <li>إيقاف التدريب عندما يصبح الخطأ أصغر من ε.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>1. Network Structure</h2>
+
+      <p>
+        We use a simple 1–2–1 neural network:
+      </p>
+
+      <div class="formula">
+        1 Input → 2 Hidden Neurons → 1 Output
+      </div>
+
+      <div class="flow">
+        <div class="flow-box">x</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">h₁</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">y</div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-box">x</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">h₂</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">y</div>
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>1. بنية الشبكة</h2>
+      <p>
+        نستخدم شبكة بسيطة من النوع:
+      </p>
+      <div class="formula">
+        1 → 2 → 1
+      </div>
+      <p>
+        أي دخل واحد، عصبونان في الطبقة المخفية، وخرج واحد.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>2. Activation Function</h2>
+
+      <p>
+        We use the Sigmoid activation function:
+      </p>
+
+      <div class="formula">
+        σ(z)=1/(1+e⁻ᶻ)
+      </div>
+
+      <p>
+        Its derivative is:
+      </p>
+
+      <div class="formula">
+        σ'(z)=σ(z)[1-σ(z)]
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>2. دالة التنشيط</h2>
+      <p>
+        نستخدم دالة Sigmoid:
+      </p>
+
+      <div class="formula">
+        σ(z)=1/(1+e⁻ᶻ)
+      </div>
+
+      <p>
+        ومشتقتها:
+      </p>
+
+      <div class="formula">
+        σ'(z)=σ(z)[1-σ(z)]
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>3. MATLAB Sigmoid Function</h2>
+
+      <pre><code>sigma = @(z) 1 ./ (1 + exp(-z));</code></pre>
+
+      <p>
+        This anonymous function calculates the Sigmoid value for any input z.
+      </p>
+    </div>
+
+    <div class="ar">
+      <h2>3. دالة Sigmoid في MATLAB</h2>
+
+      <pre><code>sigma = @(z) 1 ./ (1 + exp(-z));</code></pre>
+
+      <p>
+        يحسب هذا السطر قيمة Sigmoid لأي قيمة z.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>4. Initial Parameters</h2>
+
+      <p>
+        Start with initial weights and biases:
+      </p>
+
+      <pre><code>W.w1 = 0.4;
+W.w2 = -0.3;
+
+W.v1 = 0.2;
+W.v2 = 0.5;
+
+W.b1 = 0.1;
+W.b2 = -0.1;
+W.b3 = 0.0;</code></pre>
+
+      <div class="highlight">
+        These are only initial values. Training will modify them.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>4. القيم الابتدائية</h2>
+
+      <p>
+        نبدأ بأوزان وانزياحات ابتدائية.
+      </p>
+
+      <div class="highlight">
+        هذه ليست القيم النهائية؛ ستقوم عملية التدريب بتعديلها تدريجيًا.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>5. Training Sample</h2>
+
+      <pre><code>x = 1;
+t = 0.8;</code></pre>
+
+      <p>
+        Here:
+      </p>
+
+      <div class="formula">
+        x = input
+      </div>
+
+      <div class="formula">
+        t = desired target
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>5. عينة التدريب</h2>
+
+      <pre><code>x = 1;
+t = 0.8;</code></pre>
+
+      <p>
+        حيث x هو الدخل، وt هي القيمة المطلوبة من الشبكة.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>6. Forward Propagation</h2>
+
+      <p>
+        Hidden neuron 1:
+      </p>
+
+      <div class="formula">
+        z₁ = w₁x + b₁
+      </div>
+
+      <div class="formula">
+        h₁ = σ(z₁)
+      </div>
+
+      <p>
+        Hidden neuron 2:
+      </p>
+
+      <div class="formula">
+        z₂ = w₂x + b₂
+      </div>
+
+      <div class="formula">
+        h₂ = σ(z₂)
+      </div>
+
+      <p>
+        Output neuron:
+      </p>
+
+      <div class="formula">
+        z₃ = v₁h₁ + v₂h₂ + b₃
+      </div>
+
+      <div class="formula">
+        y = σ(z₃)
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>6. الانتشار الأمامي</h2>
+
+      <p>
+        يتم حساب خرج كل عصبون في الطبقة المخفية، ثم استخدام هذه القيم
+        لحساب خرج الشبكة النهائي.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>7. MATLAB Forward Propagation</h2>
+
+      <pre><code>z1 = W.w1*x + W.b1;
+h1 = sigma(z1);
+
+z2 = W.w2*x + W.b2;
+h2 = sigma(z2);
+
+z3 = W.v1*h1 + W.v2*h2 + W.b3;
+y  = sigma(z3);</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>7. الانتشار الأمامي في MATLAB</h2>
+
+      <p>
+        هذه الأسطر تنفذ المعادلات الرياضية نفسها مباشرة في MATLAB.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>8. Loss Function</h2>
+
+      <p>
+        We use:
+      </p>
+
+      <div class="formula">
+        E = 1/2 (y-t)²
+      </div>
+
+      <p>
+        MATLAB:
+      </p>
+
+      <pre><code>E = 0.5*(y - t)^2;</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>8. دالة الخطأ</h2>
+
+      <div class="formula">
+        E = 1/2 (y-t)²
+      </div>
+
+      <p>
+        كلما اقترب y من t انخفضت قيمة E.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>9. Backpropagation: Output Error</h2>
+
+      <p>
+        From Lecture 05:
+      </p>
+
+      <div class="formula">
+        δ₃ = (y-t)y(1-y)
+      </div>
+
+      <p>
+        MATLAB:
+      </p>
+
+      <pre><code>dO = (y - t) * y * (1 - y);</code></pre>
+
+      <div class="highlight">
+        dO is the derivative ∂E/∂z₃.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>9. الانتشار الخلفي: خطأ طبقة الخرج</h2>
+
+      <div class="formula">
+        δ₃ = (y-t)y(1-y)
+      </div>
+
+      <p>
+        تمثل dO تأثير دخل عصبون الخرج z₃ على الخطأ النهائي.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>10. Output-Layer Gradients</h2>
+
+      <div class="formula">
+        ∂E/∂v₁ = δ₃h₁
+      </div>
+
+      <div class="formula">
+        ∂E/∂v₂ = δ₃h₂
+      </div>
+
+      <div class="formula">
+        ∂E/∂b₃ = δ₃
+      </div>
+
+      <pre><code>dV1 = dO*h1;
+dV2 = dO*h2;
+dB3 = dO;</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>10. تدرجات طبقة الخرج</h2>
+
+      <p>
+        نحسب تأثير كل وزن وانزياح في طبقة الخرج على دالة الخطأ.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>11. Hidden-Layer Error</h2>
+
+      <div class="formula">
+        δ₁ = δ₃v₁h₁(1-h₁)
+      </div>
+
+      <div class="formula">
+        δ₂ = δ₃v₂h₂(1-h₂)
+      </div>
+
+      <pre><code>d1 = dO*W.v1*h1*(1-h1);
+d2 = dO*W.v2*h2*(1-h2);</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>11. خطأ الطبقة المخفية</h2>
+
+      <p>
+        يتم إرجاع تأثير الخطأ من طبقة الخرج إلى العصبونات المخفية
+        عبر الأوزان v₁ وv₂.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>12. Input-to-Hidden Gradients</h2>
+
+      <div class="formula">
+        ∂E/∂w₁ = δ₁x
+      </div>
+
+      <div class="formula">
+        ∂E/∂w₂ = δ₂x
+      </div>
+
+      <pre><code>dW1 = d1*x;
+dB1 = d1;
+
+dW2 = d2*x;
+dB2 = d2;</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>12. تدرجات الأوزان بين الدخل والطبقة المخفية</h2>
+
+      <p>
+        نحصل أخيرًا على مشتقات الخطأ بالنسبة للأوزان والانزياحات الأولى.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>13. Gradient Descent Update</h2>
+
+      <div class="formula">
+        w(new)=w(old)-η∂E/∂w
+      </div>
+
+      <pre><code>W.w1 = W.w1 - eta*dW1;
+W.w2 = W.w2 - eta*dW2;
+
+W.v1 = W.v1 - eta*dV1;
+W.v2 = W.v2 - eta*dV2;
+
+W.b1 = W.b1 - eta*dB1;
+W.b2 = W.b2 - eta*dB2;
+W.b3 = W.b3 - eta*dB3;</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>13. تحديث الأوزان</h2>
+
+      <p>
+        نحدث كل معامل بعكس اتجاه التدرج حتى ينخفض الخطأ.
+      </p>
+
+      <div class="formula">
+        w(new)=w(old)-η∂E/∂w
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>14. Learning Rate</h2>
+
+      <p>
+        Choose:
+      </p>
+
+      <pre><code>eta = 0.5;</code></pre>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>η too small</strong>
+          <p>Training becomes slow.</p>
+        </div>
+
+        <div class="mini-card">
+          <strong>η too large</strong>
+          <p>Training may oscillate or diverge.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>14. معدل التعلم</h2>
+
+      <p>
+        إذا كان معدل التعلم صغيرًا جدًا يصبح التدريب بطيئًا،
+        وإذا كان كبيرًا جدًا فقد يصبح التدريب غير مستقر.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>15. Stopping Criterion</h2>
+
+      <p>
+        Define a required accuracy:
+      </p>
+
+      <pre><code>epsilon = 1e-6;</code></pre>
+
+      <p>
+        Stop when:
+      </p>
+
+      <div class="formula">
+        E &lt; ε
+      </div>
+
+      <p>
+        and also use a maximum epoch limit:
+      </p>
+
+      <pre><code>maxEpochs = 10000;</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>15. معيار التوقف</h2>
+
+      <p>
+        يتوقف التدريب عندما يصبح الخطأ أصغر من الدقة المطلوبة ε،
+        مع وضع حد أقصى لعدد دورات التدريب لتجنب حلقة لا نهائية.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>16. Complete MATLAB Program</h2>
+
+      <pre><code>clear; clc; close all;
+
+sigma = @(z) 1 ./ (1 + exp(-z));
+
+x = 1;
+t = 0.8;
+
+eta = 0.5;
+epsilon = 1e-6;
+maxEpochs = 10000;
+
+W.w1 = 0.4;
+W.w2 = -0.3;
+
+W.v1 = 0.2;
+W.v2 = 0.5;
+
+W.b1 = 0.1;
+W.b2 = -0.1;
+W.b3 = 0.0;
+
+lossHist = zeros(1,maxEpochs);
+
+epoch = 0;
+converged = false;
+
+while ~converged && epoch &lt; maxEpochs
+
+    epoch = epoch + 1;
+
+    % ----- Forward propagation -----
+
+    z1 = W.w1*x + W.b1;
+    h1 = sigma(z1);
+
+    z2 = W.w2*x + W.b2;
+    h2 = sigma(z2);
+
+    z3 = W.v1*h1 + W.v2*h2 + W.b3;
+    y  = sigma(z3);
+
+    % ----- Loss -----
+
+    E = 0.5*(y - t)^2;
+
+    lossHist(epoch) = E;
+
+    % ----- Backpropagation -----
+
+    dO = (y - t) * y * (1 - y);
+
+    dV1 = dO*h1;
+    dV2 = dO*h2;
+    dB3 = dO;
+
+    d1 = dO*W.v1*h1*(1-h1);
+    d2 = dO*W.v2*h2*(1-h2);
+
+    dW1 = d1*x;
+    dB1 = d1;
+
+    dW2 = d2*x;
+    dB2 = d2;
+
+    % ----- Update parameters -----
+
+    W.w1 = W.w1 - eta*dW1;
+    W.w2 = W.w2 - eta*dW2;
+
+    W.v1 = W.v1 - eta*dV1;
+    W.v2 = W.v2 - eta*dV2;
+
+    W.b1 = W.b1 - eta*dB1;
+    W.b2 = W.b2 - eta*dB2;
+    W.b3 = W.b3 - eta*dB3;
+
+    % ----- Stopping criterion -----
+
+    if E &lt; epsilon
+        converged = true;
+    end
+end
+
+disp('Final weights and biases:')
+disp(W)
+
+fprintf('Epochs = %d\n',epoch)
+fprintf('Final output y = %.6f\n',y)
+fprintf('Target t = %.6f\n',t)
+fprintf('Final error E = %.10f\n',E)
+
+figure
+semilogy(1:epoch,lossHist(1:epoch),'LineWidth',1.6)
+grid on
+
+xlabel('Epoch')
+ylabel('Loss E')
+title('Neural Network Training Convergence')</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>16. البرنامج الكامل في MATLAB</h2>
+
+      <p>
+        يجمع هذا البرنامج جميع الخطوات السابقة في حلقة تدريب واحدة:
+        الانتشار الأمامي، حساب الخطأ، الانتشار الخلفي، تحديث الأوزان،
+        ثم فحص شرط التقارب.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>17. Understanding the Training Loop</h2>
+
+      <div class="flow">
+        <div class="flow-box">Initial Weights</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Forward Pass</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Loss</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Backpropagation</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Update</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Repeat</div>
+      </div>
+
+      <div class="highlight">
+        The network learns because every iteration slightly modifies the
+        parameters in a direction that reduces the error.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>17. فهم حلقة التدريب</h2>
+
+      <div class="highlight">
+        الأوزان الابتدائية ← الانتشار الأمامي ← الخطأ ← الانتشار الخلفي
+        ← تحديث الأوزان ← التكرار حتى التقارب
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>18. Convergence Plot</h2>
+
+      <p>
+        The command:
+      </p>
+
+      <pre><code>semilogy(1:epoch,lossHist(1:epoch),'LineWidth',1.6)</code></pre>
+
+      <p>
+        plots the loss on a logarithmic vertical axis.
+      </p>
+
+      <div class="highlight">
+        A descending curve indicates that the network is learning.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>18. منحني التقارب</h2>
+
+      <p>
+        يستخدم الأمر semilogy مقياسًا لوغاريتميًا لمحور الخطأ،
+        وهذا يجعل متابعة انخفاض الخطأ عبر عدة مراتب عشرية أكثر وضوحًا.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>19. Experiment 1 — Change Learning Rate</h2>
+
+      <p>
+        Try:
+      </p>
+
+      <pre><code>eta = 0.05;
+eta = 0.5;
+eta = 2.0;</code></pre>
+
+      <p>
+        Compare:
+      </p>
+
+      <ul>
+        <li>Number of epochs</li>
+        <li>Stability</li>
+        <li>Final loss</li>
+      </ul>
+    </div>
+
+    <div class="ar">
+      <h2>19. التجربة 1 — تغيير معدل التعلم</h2>
+
+      <p>
+        غيّر قيمة η وقارن سرعة التقارب واستقرار عملية التدريب.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>20. Experiment 2 — Change Initial Weights</h2>
+
+      <p>
+        Modify the initial values of:
+      </p>
+
+      <pre><code>W.w1
+W.w2
+W.v1
+W.v2</code></pre>
+
+      <div class="highlight">
+        Different initial conditions may produce different training paths.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>20. التجربة 2 — تغيير الأوزان الابتدائية</h2>
+
+      <p>
+        غيّر القيم الابتدائية ولاحظ تأثيرها على مسار التدريب وعدد الدورات
+        المطلوبة للوصول إلى التقارب.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>21. Power-System Interpretation</h2>
+
+      <p>
+        The same training mechanism can be used for a power-system prediction problem.
+      </p>
+
+      <p>
+        For example:
+      </p>
+
+      <div class="formula">
+        x = Previous Load
+      </div>
+
+      <div class="formula">
+        t = Future Load
+      </div>
+
+      <p>
+        With more inputs:
+      </p>
+
+      <div class="formula">
+        x = [Load, Temperature, Time, PV Power, ...]
+      </div>
+
+      <div class="highlight">
+        The mathematics of backpropagation remains the same.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>21. التفسير في نظم الطاقة</h2>
+
+      <p>
+        يمكن استخدام آلية التدريب نفسها للتنبؤ بالحمل أو الطاقة المتجددة
+        أو تقدير حالات التشغيل.
+      </p>
+
+      <div class="highlight">
+        يتغير معنى المدخلات والمخرجات، لكن مبدأ الانتشار الخلفي يبقى نفسه.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>22. Lab Tasks</h2>
+
+      <ol>
+        <li>Run the original program.</li>
+        <li>Record the final output and number of epochs.</li>
+        <li>Change the learning rate and compare convergence.</li>
+        <li>Change the initial weights.</li>
+        <li>Change the target value t.</li>
+        <li>Explain every gradient expression mathematically.</li>
+        <li>Explain why the loss decreases during training.</li>
+      </ol>
+    </div>
+
+    <div class="ar">
+      <h2>22. مهام المختبر</h2>
+
+      <ol>
+        <li>شغّل البرنامج الأصلي.</li>
+        <li>سجل الخرج النهائي وعدد دورات التدريب.</li>
+        <li>غيّر معدل التعلم وقارن التقارب.</li>
+        <li>غيّر الأوزان الابتدائية.</li>
+        <li>غيّر القيمة المطلوبة t.</li>
+        <li>اشرح رياضيًا كل معادلة من معادلات التدرج.</li>
+        <li>اشرح لماذا ينخفض الخطأ أثناء التدريب.</li>
+      </ol>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>📝 Questions</h2>
+
+      <ol>
+        <li>What does dO represent?</li>
+        <li>Why does dO contain y(1-y)?</li>
+        <li>Why is dV1 equal to dO*h1?</li>
+        <li>Why does the hidden error contain W.v1?</li>
+        <li>Why do we subtract the gradient?</li>
+        <li>What happens if η is too large?</li>
+        <li>What is the role of ε?</li>
+      </ol>
+    </div>
+
+    <div class="ar">
+      <h2>📝 أسئلة المختبر</h2>
+
+      <ol>
+        <li>ماذا تمثل dO؟</li>
+        <li>لماذا تحتوي dO على y(1-y)؟</li>
+        <li>لماذا تساوي dV1 القيمة dO*h1؟</li>
+        <li>لماذا يحتوي خطأ الطبقة المخفية على W.v1؟</li>
+        <li>لماذا نطرح التدرج؟</li>
+        <li>ماذا يحدث إذا كان η كبيرًا جدًا؟</li>
+        <li>ما وظيفة ε؟</li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  AI Applications in Electrical Power Systems
+  <br>
+  تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+  <br><br>
+  MATLAB Lab 01 | مختبر MATLAB 01
+</footer>
+
+</body>
+            </html>
