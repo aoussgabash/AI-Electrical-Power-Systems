@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lab 02 - Fuzzy Logic Voltage Control</title>
+
+  <style>
+    :root{
+      --bg:#07111f;
+      --card:#0f2238;
+      --card2:#0b1b2c;
+      --text:#f4f7fb;
+      --muted:#b8c7d9;
+      --blue:#38bdf8;
+      --green:#22c55e;
+      --yellow:#facc15;
+      --red:#fb7185;
+      --line:rgba(255,255,255,.10);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial,Tahoma,sans-serif;
+      background:linear-gradient(180deg,#07111f,#0a1728);
+      color:var(--text);
+      line-height:1.8;
+    }
+
+    .container{
+      width:min(1050px,92%);
+      margin:auto;
+    }
+
+    header{
+      background:rgba(7,17,31,.95);
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:17px 0;
+    }
+
+    .logo{font-weight:bold}
+    .logo span{color:var(--blue)}
+
+    .back{
+      color:white;
+      text-decoration:none;
+      border:1px solid var(--line);
+      padding:8px 12px;
+      border-radius:9px;
+    }
+
+    .hero{
+      text-align:center;
+      padding:60px 0 35px;
+    }
+
+    .lab-number{
+      color:var(--blue);
+      font-weight:bold;
+      letter-spacing:1px;
+    }
+
+    h1{
+      font-size:clamp(2rem,6vw,3.6rem);
+      line-height:1.15;
+      margin:10px 0;
+    }
+
+    .hero-ar{
+      direction:rtl;
+      font-size:1.5rem;
+      color:#e5edf6;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin-top:10px;
+    }
+
+    section{
+      margin:22px 0;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+    }
+
+    h2{margin-top:0;color:#edf8ff}
+    h3{color:var(--blue)}
+    p,li{color:#d8e2ec}
+
+    .en{direction:ltr;text-align:left}
+
+    .ar{
+      direction:rtl;
+      text-align:right;
+      border-top:1px dashed var(--line);
+      padding-top:18px;
+      margin-top:18px;
+    }
+
+    .highlight{
+      background:var(--card2);
+      border-left:4px solid var(--blue);
+      border-radius:10px;
+      padding:15px;
+      margin:15px 0;
+    }
+
+    .ar .highlight{
+      border-left:none;
+      border-right:4px solid var(--blue);
+    }
+
+    .formula{
+      direction:ltr;
+      text-align:center;
+      background:#06101d;
+      border:1px solid var(--line);
+      padding:18px;
+      margin:16px 0;
+      border-radius:12px;
+      font-size:1.22rem;
+      font-family:"Times New Roman",serif;
+      overflow-x:auto;
+    }
+
+    pre{
+      direction:ltr;
+      text-align:left;
+      background:#06101d;
+      color:#dff5ff;
+      border:1px solid var(--line);
+      padding:16px;
+      border-radius:12px;
+      overflow-x:auto;
+      white-space:pre;
+      line-height:1.55;
+    }
+
+    code{
+      font-family:Consolas,Monaco,monospace;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+
+    .mini-card{
+      background:var(--card2);
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:16px;
+    }
+
+    .mini-card strong{color:white}
+
+    .flow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:20px 0;
+    }
+
+    .flow-box{
+      background:#0b1b2c;
+      border:1px solid rgba(56,189,248,.3);
+      padding:14px 17px;
+      border-radius:12px;
+      text-align:center;
+      min-width:120px;
+    }
+
+    .arrow{
+      color:var(--blue);
+      font-size:1.5rem;
+      font-weight:bold;
+    }
+
+    .svg-box{
+      background:#081523;
+      border:1px solid var(--line);
+      border-radius:15px;
+      padding:12px;
+      overflow-x:auto;
+      margin:16px 0;
+    }
+
+    svg{
+      width:100%;
+      min-width:650px;
+      height:auto;
+    }
+
+    .axis{
+      stroke:#9fb3c8;
+      stroke-width:2;
+    }
+
+    .neg{
+      fill:none;
+      stroke:#fb7185;
+      stroke-width:4;
+    }
+
+    .zero{
+      fill:none;
+      stroke:#38bdf8;
+      stroke-width:4;
+    }
+
+    .pos{
+      fill:none;
+      stroke:#22c55e;
+      stroke-width:4;
+    }
+
+    .svgtext{
+      fill:#dce8f4;
+      font-size:15px;
+    }
+
+    .table-wrap{
+      overflow-x:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:600px;
+      margin:15px 0;
+    }
+
+    th,td{
+      border:1px solid var(--line);
+      padding:11px;
+      text-align:center;
+    }
+
+    th{
+      background:#0b1b2c;
+      color:#eaf7ff;
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      padding:35px 0;
+    }
+
+    @media(max-width:750px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="hero">
+    <div class="lab-number">
+      LAB 02 | المختبر 02
+    </div>
+
+    <h1>
+      Fuzzy Logic Voltage Control
+    </h1>
+
+    <div class="hero-ar">
+      التحكم بالجهد باستخدام المنطق الضبابي
+    </div>
+
+    <div class="subtitle">
+      Membership Functions, Fuzzification, Rules, Defuzzification, and MATLAB
+      <br>
+      دوال العضوية والتضييب والقواعد وإزالة الضبابية والتطبيق باستخدام MATLAB
+    </div>
+  </div>
+
+
+  <section>
+    <div class="en">
+      <h2>🎯 Lab Objectives</h2>
+
+      <ul>
+        <li>Implement fuzzy membership functions in MATLAB.</li>
+        <li>Calculate voltage error.</li>
+        <li>Convert a crisp voltage error into fuzzy memberships.</li>
+        <li>Evaluate fuzzy IF–THEN rules.</li>
+        <li>Calculate a crisp reactive-power control action.</li>
+        <li>Plot membership functions and controller response.</li>
+        <li>Understand the physical meaning of fuzzy voltage control.</li>
+      </ul>
+    </div>
+
+    <div class="ar">
+      <h2>🎯 أهداف المختبر</h2>
+
+      <ul>
+        <li>تنفيذ دوال العضوية الضبابية في MATLAB.</li>
+        <li>حساب خطأ الجهد.</li>
+        <li>تحويل خطأ الجهد العددي إلى درجات عضوية ضبابية.</li>
+        <li>تقييم قواعد IF–THEN.</li>
+        <li>حساب أمر قدرة ردية عددي.</li>
+        <li>رسم دوال العضوية واستجابة المتحكم.</li>
+        <li>فهم المعنى الفيزيائي للتحكم الضبابي بالجهد.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>1. Voltage-Control Problem</h2>
+
+      <p>
+        Consider a bus in an electrical distribution network.
+      </p>
+
+      <p>
+        The desired voltage is:
+      </p>
+
+      <div class="formula">
+        Vref = 1.00 pu
+      </div>
+
+      <p>
+        The measured voltage is:
+      </p>
+
+      <div class="formula">
+        V = 0.96 pu
+      </div>
+
+      <p>
+        Define the voltage error:
+      </p>
+
+      <div class="formula">
+        e = Vref - V
+      </div>
+
+      <p>
+        therefore:
+      </p>
+
+      <div class="formula">
+        e = 1.00 - 0.96 = 0.04 pu
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>1. مسألة التحكم بالجهد</h2>
+
+      <p>
+        لنفترض وجود عقدة في شبكة توزيع كهربائية، والجهد المرجعي المطلوب:
+      </p>
+
+      <div class="formula">
+        Vref = 1.00 pu
+      </div>
+
+      <p>
+        بينما الجهد المقاس:
+      </p>
+
+      <div class="formula">
+        V = 0.96 pu
+      </div>
+
+      <p>
+        نعرّف خطأ الجهد:
+      </p>
+
+      <div class="formula">
+        e = Vref - V = 0.04 pu
+      </div>
+
+      <div class="highlight">
+        لأن الخطأ موجب، فهذا يعني أن الجهد الفعلي أقل من الجهد المرجعي.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>2. Fuzzy Input Sets</h2>
+
+      <p>
+        We define three fuzzy sets for the voltage error:
+      </p>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>Negative</strong>
+          <p>
+            Voltage is above the reference.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Zero</strong>
+          <p>
+            Voltage is close to the desired value.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>Positive</strong>
+          <p>
+            Voltage is below the reference.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>2. مجموعات دخل الخطأ</h2>
+
+      <p>
+        نستخدم ثلاث مجموعات ضبابية:
+      </p>
+
+      <ul>
+        <li>Negative | سالب</li>
+        <li>Zero | صفر</li>
+        <li>Positive | موجب</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>3. Membership Functions</h2>
+
+      <p>
+        Let the error range be:
+      </p>
+
+      <div class="formula">
+        -0.10 ≤ e ≤ 0.10 pu
+      </div>
+
+      <div class="svg-box">
+        <svg viewBox="0 0 700 340">
+
+          <line class="axis" x1="80" y1="280" x2="640" y2="280"/>
+          <line class="axis" x1="80" y1="280" x2="80" y2="50"/>
+
+          <polyline class="neg"
+            points="90,70 220,70 350,280"/>
+
+          <polyline class="zero"
+            points="220,280 350,70 480,280"/>
+
+          <polyline class="pos"
+            points="350,280 480,70 620,70"/>
+
+          <text class="svgtext" x="130" y="45">Negative</text>
+          <text class="svgtext" x="330" y="45">Zero</text>
+          <text class="svgtext" x="520" y="45">Positive</text>
+
+          <text class="svgtext" x="70" y="310">-0.10</text>
+          <text class="svgtext" x="338" y="310">0</text>
+          <text class="svgtext" x="610" y="310">0.10</text>
+
+          <text class="svgtext" x="315" y="332">Voltage Error e [pu]</text>
+
+        </svg>
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>3. دوال العضوية</h2>
+
+      <p>
+        نعرّف مجال خطأ الجهد من -0.10 إلى 0.10 pu، ثم نغطيه بثلاث
+        مجموعات متداخلة.
+      </p>
+
+      <div class="highlight">
+        التداخل يسمح للمتحكم بالانتقال بسلاسة بين الحالات بدل التبديل المفاجئ.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>4. Triangular Membership Function</h2>
+
+      <p>
+        We use a triangular function:
+      </p>
+
+      <div class="formula">
+        μ(x;a,b,c)
+        =
+        max(min((x-a)/(b-a),(c-x)/(c-b)),0)
+      </div>
+
+      <p>
+        This is convenient for MATLAB implementation.
+      </p>
+    </div>
+
+    <div class="ar">
+      <h2>4. دالة العضوية المثلثية</h2>
+
+      <div class="formula">
+        μ(x;a,b,c)
+        =
+        max(min((x-a)/(b-a),(c-x)/(c-b)),0)
+      </div>
+
+      <p>
+        هذه الصيغة تجمع الجزأين الصاعد والهابط في علاقة برمجية واحدة.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>5. MATLAB Membership Function</h2>
+
+      <pre><code>trimf = @(x,a,b,c) ...
+    max(min((x-a)/(b-a),(c-x)/(c-b)),0);</code></pre>
+
+      <p>
+        This anonymous MATLAB function evaluates a triangular membership function.
+      </p>
+    </div>
+
+    <div class="ar">
+      <h2>5. دالة العضوية في MATLAB</h2>
+
+      <p>
+        يمثل هذا السطر دالة عضوية مثلثية عامة يمكن استخدامها مع مجموعات متعددة.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>6. Define the Error Membership Sets</h2>
+
+      <pre><code>muN = @(e) trimf(e,-0.10,-0.05,0.00);
+muZ = @(e) trimf(e,-0.05, 0.00,0.05);
+muP = @(e) trimf(e, 0.00, 0.05,0.10);</code></pre>
+
+      <p>
+        where:
+      </p>
+
+      <ul>
+        <li>muN = Negative membership</li>
+        <li>muZ = Zero membership</li>
+        <li>muP = Positive membership</li>
+      </ul>
+    </div>
+
+    <div class="ar">
+      <h2>6. تعريف مجموعات خطأ الجهد</h2>
+
+      <p>
+        نعرّف ثلاث دوال عضوية تمثل الخطأ السالب والصفر والخطأ الموجب.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>7. Fuzzification</h2>
+
+      <p>
+        For:
+      </p>
+
+      <div class="formula">
+        e = 0.04 pu
+      </div>
+
+      <p>
+        calculate:
+      </p>
+
+      <pre><code>mN = muN(e);
+mZ = muZ(e);
+mP = muP(e);</code></pre>
+
+      <p>
+        For the selected membership functions, approximately:
+      </p>
+
+      <div class="formula">
+        μNegative ≈ 0
+      </div>
+
+      <div class="formula">
+        μZero ≈ 0.2
+      </div>
+
+      <div class="formula">
+        μPositive ≈ 0.8
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>7. التضييب</h2>
+
+      <p>
+        عند الخطأ e=0.04 pu ينتمي الخطأ بدرجة كبيرة إلى المجموعة Positive
+        وبدرجة صغيرة إلى المجموعة Zero.
+      </p>
+
+      <div class="highlight">
+        لذلك سيتم تفعيل أكثر من قاعدة في الوقت نفسه.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>8. Output Variable</h2>
+
+      <p>
+        Let the fuzzy-controller output be a reactive-power correction:
+      </p>
+
+      <div class="formula">
+        ΔQ [pu]
+      </div>
+
+      <p>
+        We define three singleton output values:
+      </p>
+
+      <div class="formula">
+        Decrease Q = -0.10
+      </div>
+
+      <div class="formula">
+        No Change = 0
+      </div>
+
+      <div class="formula">
+        Increase Q = +0.10
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>8. متغير الخرج</h2>
+
+      <p>
+        خرج المتحكم هو مقدار تصحيح في القدرة الردية:
+      </p>
+
+      <div class="formula">
+        ΔQ
+      </div>
+
+      <p>
+        نستخدم ثلاث قيم بسيطة: تقليل القدرة الردية، عدم تغييرها، أو زيادتها.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>9. Fuzzy Rule Base</h2>
+
+      <div class="table-wrap">
+        <table>
+          <tr>
+            <th>Rule</th>
+            <th>IF Voltage Error...</th>
+            <th>THEN ΔQ...</th>
+          </tr>
+
+          <tr>
+            <td>R1</td>
+            <td>Negative</td>
+            <td>Decrease Q</td>
+          </tr>
+
+          <tr>
+            <td>R2</td>
+            <td>Zero</td>
+            <td>No Change</td>
+          </tr>
+
+          <tr>
+            <td>R3</td>
+            <td>Positive</td>
+            <td>Increase Q</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>9. قاعدة القواعد الضبابية</h2>
+
+      <ul>
+        <li>إذا كان الخطأ سالبًا → قلل Q.</li>
+        <li>إذا كان الخطأ قريبًا من الصفر → لا تغيّر Q.</li>
+        <li>إذا كان الخطأ موجبًا → زد Q.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>10. Rule Activation</h2>
+
+      <p>
+        The activation levels are simply the input membership degrees:
+      </p>
+
+      <div class="formula">
+        α₁ = μNegative(e)
+      </div>
+
+      <div class="formula">
+        α₂ = μZero(e)
+      </div>
+
+      <div class="formula">
+        α₃ = μPositive(e)
+      </div>
+
+      <pre><code>a1 = mN;
+a2 = mZ;
+a3 = mP;</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>10. تفعيل القواعد</h2>
+
+      <p>
+        درجة تفعيل كل قاعدة تساوي درجة انتماء الخطأ إلى المجموعة المقابلة.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>11. Defuzzification Using Weighted Average</h2>
+
+      <p>
+        Because we use singleton outputs, a convenient defuzzification equation is:
+      </p>
+
+      <div class="formula">
+        ΔQ =
+        (α₁q₁ + α₂q₂ + α₃q₃)
+        /
+        (α₁ + α₂ + α₃)
+      </div>
+
+      <p>
+        where:
+      </p>
+
+      <div class="formula">
+        q₁=-0.10, q₂=0, q₃=0.10
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>11. إزالة الضبابية باستخدام المتوسط الموزون</h2>
+
+      <p>
+        بما أن قيم الخرج عبارة عن Singletons، يمكن حساب الخرج العددي
+        باستخدام المتوسط الموزون.
+      </p>
+
+      <div class="formula">
+        ΔQ =
+        Σ αᵢqᵢ / Σαᵢ
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>12. Numerical Example</h2>
+
+      <p>
+        Assume:
+      </p>
+
+      <div class="formula">
+        α₁=0
+      </div>
+
+      <div class="formula">
+        α₂=0.2
+      </div>
+
+      <div class="formula">
+        α₃=0.8
+      </div>
+
+      <p>
+        then:
+      </p>
+
+      <div class="formula">
+        ΔQ =
+        [0(-0.10)+0.2(0)+0.8(0.10)]
+        /
+        (0+0.2+0.8)
+      </div>
+
+      <div class="formula">
+        ΔQ = 0.08 pu
+      </div>
+
+      <div class="highlight">
+        The controller requests additional reactive power because the measured voltage is low.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>12. مثال عددي</h2>
+
+      <p>
+        بما أن الخطأ موجب بدرجة عالية، تكون قاعدة زيادة القدرة الردية
+        هي الأكثر تأثيرًا.
+      </p>
+
+      <div class="formula">
+        ΔQ = 0.08 pu
+      </div>
+
+      <div class="highlight">
+        الخرج موجب، أي أن المتحكم يطلب زيادة القدرة الردية للمساعدة في رفع الجهد.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>13. MATLAB Controller Calculation</h2>
+
+      <pre><code>Vref = 1.00;
+V    = 0.96;
+
+e = Vref - V;
+
+mN = muN(e);
+mZ = muZ(e);
+mP = muP(e);
+
+qN = -0.10;
+qZ =  0.00;
+qP =  0.10;
+
+dQ = (mN*qN + mZ*qZ + mP*qP) / ...
+     (mN + mZ + mP);</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>13. حساب خرج المتحكم في MATLAB</h2>
+
+      <p>
+        يحسب البرنامج أولًا خطأ الجهد، ثم درجات العضوية، وبعدها يجمع
+        نتائج القواعد لإنتاج ΔQ.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>14. Complete MATLAB Program</h2>
+
+      <pre><code>clear; clc; close all;
+
+% ------------------------------------------------
+% Fuzzy Logic Voltage Controller
+% ------------------------------------------------
+
+Vref = 1.00;
+V    = 0.96;
+
+% Voltage error
+e = Vref - V;
+
+% Triangular membership function
+trimf = @(x,a,b,c) ...
+    max(min((x-a)/(b-a),(c-x)/(c-b)),0);
+
+% Input fuzzy sets
+muN = @(e) trimf(e,-0.10,-0.05,0.00);
+muZ = @(e) trimf(e,-0.05, 0.00,0.05);
+muP = @(e) trimf(e, 0.00, 0.05,0.10);
+
+% Fuzzification
+mN = muN(e);
+mZ = muZ(e);
+mP = muP(e);
+
+% Singleton output values
+qN = -0.10;
+qZ =  0.00;
+qP =  0.10;
+
+% Defuzzification
+den = mN + mZ + mP;
+
+if den > 0
+    dQ = (mN*qN + mZ*qZ + mP*qP)/den;
+else
+    dQ = 0;
+end
+
+% Display results
+fprintf('Vref = %.3f pu\n',Vref)
+fprintf('V    = %.3f pu\n',V)
+fprintf('Error e = %.3f pu\n\n',e)
+
+fprintf('muNegative = %.3f\n',mN)
+fprintf('muZero     = %.3f\n',mZ)
+fprintf('muPositive = %.3f\n\n',mP)
+
+fprintf('Reactive power correction dQ = %.4f pu\n',dQ)
+
+% ------------------------------------------------
+% Plot membership functions
+% ------------------------------------------------
+
+eVec = linspace(-0.10,0.10,500);
+
+N = zeros(size(eVec));
+Z = zeros(size(eVec));
+P = zeros(size(eVec));
+
+for k = 1:length(eVec)
+
+    N(k) = muN(eVec(k));
+    Z(k) = muZ(eVec(k));
+    P(k) = muP(eVec(k));
+
+end
+
+figure
+
+plot(eVec,N,'LineWidth',1.6)
+hold on
+plot(eVec,Z,'LineWidth',1.6)
+plot(eVec,P,'LineWidth',1.6)
+
+xline(e,'--','Current Error')
+
+grid on
+
+xlabel('Voltage Error e [pu]')
+ylabel('Membership Degree')
+
+legend('Negative','Zero','Positive')
+
+title('Fuzzy Membership Functions')
+
+% ------------------------------------------------
+% Controller characteristic
+% ------------------------------------------------
+
+dQVec = zeros(size(eVec));
+
+for k = 1:length(eVec)
+
+    aN = muN(eVec(k));
+    aZ = muZ(eVec(k));
+    aP = muP(eVec(k));
+
+    den = aN + aZ + aP;
+
+    if den > 0
+
+        dQVec(k) = ...
+            (aN*qN + aZ*qZ + aP*qP)/den;
+
+    else
+
+        dQVec(k) = 0;
+
+    end
+end
+
+figure
+
+plot(eVec,dQVec,'LineWidth',1.6)
+
+grid on
+
+xlabel('Voltage Error e [pu]')
+ylabel('Reactive Power Correction \DeltaQ [pu]')
+
+title('Fuzzy Voltage Controller Characteristic')</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>14. البرنامج الكامل في MATLAB</h2>
+
+      <p>
+        يحتوي البرنامج على جميع مراحل المتحكم:
+        حساب الخطأ، التضييب، تقييم القواعد، إزالة الضبابية، رسم دوال العضوية،
+        ورسم العلاقة بين خطأ الجهد وأمر القدرة الردية.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>15. Understanding the Controller Characteristic</h2>
+
+      <p>
+        The second figure shows:
+      </p>
+
+      <div class="formula">
+        e → ΔQ
+      </div>
+
+      <div class="grid">
+
+        <div class="mini-card">
+          <strong>e &lt; 0</strong>
+          <p>
+            Voltage is too high → reduce reactive power.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>e ≈ 0</strong>
+          <p>
+            Voltage is close to reference → little or no action.
+          </p>
+        </div>
+
+        <div class="mini-card">
+          <strong>e &gt; 0</strong>
+          <p>
+            Voltage is too low → increase reactive power.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>15. فهم منحني المتحكم</h2>
+
+      <p>
+        يوضح المنحني كيف يتحول خطأ الجهد بصورة سلسة إلى أمر قدرة ردية.
+      </p>
+
+      <div class="highlight">
+        هذه السلاسة هي إحدى الميزات الرئيسية للمنطق الضبابي مقارنة
+        بقواعد تشغيل حادة ومفاجئة.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>16. Physical Interpretation</h2>
+
+      <p>
+        In many simplified voltage-control situations:
+      </p>
+
+      <div class="formula">
+        Increase Q → Voltage tends to rise
+      </div>
+
+      <div class="formula">
+        Decrease Q → Voltage tends to fall
+      </div>
+
+      <div class="highlight">
+        The exact sensitivity depends on the network, operating point,
+        line parameters, and converter/control configuration.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>16. التفسير الفيزيائي</h2>
+
+      <p>
+        في كثير من حالات التحكم المبسطة، تساعد زيادة حقن القدرة الردية
+        على رفع الجهد، بينما يساعد تقليلها على خفضه.
+      </p>
+
+      <div class="highlight">
+        العلاقة الفعلية تعتمد على خصائص الشبكة ونقطة التشغيل.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>17. Experiment 1 — Change the Measured Voltage</h2>
+
+      <p>
+        Try:
+      </p>
+
+      <pre><code>V = 0.92;
+V = 0.98;
+V = 1.00;
+V = 1.03;
+V = 1.08;</code></pre>
+
+      <p>
+        Record the resulting:
+      </p>
+
+      <div class="formula">
+        e, μNegative, μZero, μPositive, ΔQ
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>17. التجربة 1 — تغيير الجهد المقاس</h2>
+
+      <p>
+        غيّر الجهد ولاحظ كيف تتغير درجات العضوية وأمر القدرة الردية.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>18. Experiment 2 — Change Membership Width</h2>
+
+      <p>
+        Compare:
+      </p>
+
+      <pre><code>muZ = @(e) trimf(e,-0.05,0,0.05);</code></pre>
+
+      <p>
+        with a wider Zero set:
+      </p>
+
+      <pre><code>muZ = @(e) trimf(e,-0.08,0,0.08);</code></pre>
+
+      <div class="highlight">
+        A wider Zero set makes the controller less aggressive near the reference voltage.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>18. التجربة 2 — تغيير عرض دالة العضوية</h2>
+
+      <p>
+        عندما تصبح مجموعة Zero أعرض، يصبح المتحكم أقل حساسية للأخطاء الصغيرة.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>19. Experiment 3 — Change Output Strength</h2>
+
+      <p>
+        Compare:
+      </p>
+
+      <pre><code>qN = -0.10;
+qP =  0.10;</code></pre>
+
+      <p>
+        with:
+      </p>
+
+      <pre><code>qN = -0.20;
+qP =  0.20;</code></pre>
+
+      <div class="highlight">
+        Larger singleton magnitudes produce stronger control actions.
+      </div>
+    </div>
+
+    <div class="ar">
+      <h2>19. التجربة 3 — تغيير قوة خرج المتحكم</h2>
+
+      <p>
+        زيادة قيم qN وqP تجعل استجابة المتحكم أقوى لنفس خطأ الجهد.
+      </p>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>20. Optional Closed-Loop Simulation</h2>
+
+      <p>
+        We can create a very simple educational voltage-response model:
+      </p>
+
+      <div class="formula">
+        V(k+1) = V(k) + KQ ΔQ(k)
+      </div>
+
+      <p>
+        where KQ is an assumed voltage sensitivity.
+      </p>
+
+      <pre><code>KQ = 0.10;
+
+V = 0.94;
+
+for k = 1:20
+
+    e = Vref - V;
+
+    mN = muN(e);
+    mZ = muZ(e);
+    mP = muP(e);
+
+    den = mN + mZ + mP;
+
+    if den > 0
+        dQ = (mN*qN + mZ*qZ + mP*qP)/den;
+    else
+        dQ = 0;
+    end
+
+    V = V + KQ*dQ;
+
+    Vhist(k) = V;
+
+end
+
+figure
+plot(1:20,Vhist,'o-','LineWidth',1.6)
+hold on
+yline(Vref,'--')
+grid on
+
+xlabel('Iteration')
+ylabel('Voltage [pu]')
+title('Closed-Loop Fuzzy Voltage Control')</code></pre>
+    </div>
+
+    <div class="ar">
+      <h2>20. محاكاة اختيارية للحلقة المغلقة</h2>
+
+      <p>
+        نستخدم نموذجًا تعليميًا مبسطًا:
+      </p>
+
+      <div class="formula">
+        V(k+1) = V(k) + KQ ΔQ(k)
+      </div>
+
+      <p>
+        لمشاهدة كيف يقوم المتحكم تدريجيًا بإعادة الجهد نحو القيمة المرجعية.
+      </p>
+
+      <div class="highlight">
+        هذا نموذج تعليمي مبسط، وليس نموذج تدفق قدرة كامل للشبكة.
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>21. Lab Tasks</h2>
+
+      <ol>
+        <li>Run the complete fuzzy-controller program.</li>
+        <li>Record membership degrees for V=0.96 pu.</li>
+        <li>Calculate ΔQ manually and compare with MATLAB.</li>
+        <li>Test five different voltage values.</li>
+        <li>Change the width of the Zero membership function.</li>
+        <li>Change the output singleton values.</li>
+        <li>Plot the controller characteristic e→ΔQ.</li>
+        <li>Run the optional closed-loop example.</li>
+        <li>Explain the physical meaning of the resulting control action.</li>
+      </ol>
+    </div>
+
+    <div class="ar">
+      <h2>21. مهام المختبر</h2>
+
+      <ol>
+        <li>شغّل البرنامج الكامل.</li>
+        <li>سجل درجات العضوية عند V=0.96 pu.</li>
+        <li>احسب ΔQ يدويًا وقارنه بنتيجة MATLAB.</li>
+        <li>اختبر خمس قيم مختلفة للجهد.</li>
+        <li>غيّر عرض مجموعة Zero.</li>
+        <li>غيّر قيم الخرج Singleton.</li>
+        <li>ارسم العلاقة e→ΔQ.</li>
+        <li>نفّذ مثال الحلقة المغلقة الاختياري.</li>
+        <li>اشرح المعنى الفيزيائي لأمر التحكم الناتج.</li>
+      </ol>
+    </div>
+  </section>
+
+
+  <section>
+    <div class="en">
+      <h2>📝 Questions</h2>
+
+      <ol>
+        <li>Why do fuzzy membership functions overlap?</li>
+        <li>What is fuzzification?</li>
+        <li>Why can several rules be active simultaneously?</li>
+        <li>What does a positive voltage error mean?</li>
+        <li>Why does a positive error produce positive ΔQ in this example?</li>
+        <li>What is the effect of widening the Zero membership function?</li>
+        <li>What is the effect of increasing qP?</li>
+        <li>Why is the fuzzy-control characteristic smooth?</li>
+      </ol>
+    </div>
+
+    <div class="ar">
+      <h2>📝 أسئلة المختبر</h2>
+
+      <ol>
+        <li>لماذا تتداخل دوال العضوية الضبابية؟</li>
+        <li>ما المقصود بالتضييب؟</li>
+        <li>لماذا يمكن تفعيل عدة قواعد في الوقت نفسه؟</li>
+        <li>ماذا يعني خطأ جهد موجب؟</li>
+        <li>لماذا يؤدي الخطأ الموجب إلى ΔQ موجبة في هذا المثال؟</li>
+        <li>ماذا يحدث عند توسيع دالة العضوية Zero؟</li>
+        <li>ماذا يحدث عند زيادة qP؟</li>
+        <li>لماذا تكون استجابة المتحكم الضبابي سلسة؟</li>
+      </ol>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  AI Applications in Electrical Power Systems
+  <br>
+  تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+  <br><br>
+  MATLAB Lab 02 | مختبر MATLAB 02
+</footer>
+
+</body>
+  </html>
