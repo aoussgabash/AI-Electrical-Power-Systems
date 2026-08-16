@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lab 13 - Explainable Load Forecasting</title><style>
+:root{
+  --bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;
+  --muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;
+  --red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+.container{width:min(1100px,92%);margin:auto}
+header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+.logo{font-weight:bold}.logo span{color:var(--blue)}
+.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
+.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
+.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
+.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
+.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
+pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+code{font-family:Consolas,monospace}
+.svg-wrap{overflow-x:auto;background:#06101d;border:1px solid var(--line);border-radius:14px;padding:10px;margin:18px 0}
+svg{max-width:100%;height:auto;display:block;margin:auto}
+.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+footer{text-align:center;color:var(--muted);padding:35px 0}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
+</style></head><body><header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+<div class="hero">
+  <div class="lecture-number">LAB 13 | المخبر 13</div>
+  <h1>Explaining a Load-Forecasting Model</h1>
+  <div class="hero-ar">تفسير نموذج للتنبؤ بالحمل الكهربائي</div>
+  <div class="subtitle">MATLAB laboratory using feature importance, SHAP, LIME, and partial dependence<br>مخبر MATLAB باستخدام أهمية الميزات وSHAP وLIME والاعتماد الجزئي</div>
+</div>
+
+<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
+<li>Train a nonlinear regression ensemble for next-hour load prediction.</li>
+<li>Compute global predictor importance.</li>
+<li>Explain one forecast using SHAP.</li>
+<li>Explain the same forecast using LIME.</li>
+<li>Visualize partial dependence.</li>
+<li>Compare global and local explanations.</li></ul></div>
+<div class="ar"><h2>🎯 أهداف المخبر</h2><ul>
+<li>تدريب نموذج انحدار غير خطي لتوقع الحمل.</li><li>حساب الأهمية العامة للميزات.</li>
+<li>تفسير توقع باستخدام SHAP.</li><li>تفسيره باستخدام LIME.</li><li>رسم الاعتماد الجزئي.</li><li>مقارنة التفسير العام والمحلي.</li>
+</ul></div></section>
+
+<section><div class="en"><h2>1. Requirements</h2>
+<ul><li>MATLAB</li><li>Statistics and Machine Learning Toolbox</li></ul>
+<div class="note">The optional <code>permutationImportance</code> section requires MATLAB R2024a or newer. The remaining sections can use model-specific importance, SHAP, LIME, and partial dependence.</div></div>
+<div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Statistics and Machine Learning Toolbox. تتطلب دالة permutationImportance إصدار R2024a أو أحدث.</p></div></section>
+
+<section><div class="en"><h2>2. Predictors</h2>
+<div class="grid3"><div class="mini-card"><strong>LoadLag1</strong><p>Previous-hour load.</p></div>
+<div class="mini-card"><strong>LoadLag24</strong><p>Load at the same hour yesterday.</p></div>
+<div class="mini-card"><strong>Temperature</strong><p>Weather influence.</p></div>
+<div class="mini-card"><strong>Hour</strong><p>Daily cycle.</p></div>
+<div class="mini-card"><strong>Weekday</strong><p>Working-day effect.</p></div>
+<div class="mini-card"><strong>PV</strong><p>Distributed generation effect.</p></div></div></div>
+<div class="ar"><h2>2. الميزات</h2><p>يستخدم النموذج الحمل السابق وحمل اليوم السابق والحرارة والساعة ويوم العمل والإنتاج الشمسي.</p></div></section>
+
+<section><div class="en"><h2>3. Complete MATLAB Script</h2>
+<pre><code>%% Lab 13: Explainable AI for Load Forecasting
+clear; clc; close all;
+rng(13);
+
+%% 1) Generate synthetic hourly data
+nDays = 220;
+N = 24*nDays;
+t = (0:N-1)';
+
+Hour = mod(t,24);
+Day = floor(t/24);
+Weekday = double(mod(Day,7) &lt; 5);
+
+Temperature = 18 ...
+    + 8*sin(2*pi*(Hour-14)/24) ...
+    + 5*sin(2*pi*Day/nDays) ...
+    + 1.2*randn(N,1);
+
+PV = max(0,18*sin(pi*(Hour-6)/12));
+PV = PV.*(0.75+0.20*rand(N,1));
+
+BaseLoad = 110 ...
+    + 24*sin(2*pi*(Hour-7)/24) ...
+    + 8*sin(4*pi*(Hour-5)/24);
+
+Load = BaseLoad ...
+    + 9*Weekday ...
+    + 0.9*max(Temperature-23,0) ...
+    + 0.5*max(11-Temperature,0) ...
+    - 0.30*PV ...
+    + 2.5*randn(N,1);
+
+%% 2) Build lagged predictors
+LoadLag1 = [NaN; Load(1:end-1)];
+LoadLag24 = [NaN(24,1); Load(1:end-24)];
+Target = [Load(2:end); NaN];
+
+T = table(LoadLag1,LoadLag24,Temperature,Hour, ...
+    Weekday,PV,Target);
+
+T = rmmissing(T);
+
+%% 3) Chronological split
+n = height(T);
+nTrain = floor(0.70*n);
+nTest = n-nTrain;
+
+TTrain = T(1:nTrain,:);
+TTest = T(nTrain+1:end,:);
+
+predictorNames = ...
+    ["LoadLag1","LoadLag24","Temperature", ...
+     "Hour","Weekday","PV"];
+
+%% 4) Train nonlinear regression ensemble
+Mdl = fitrensemble(TTrain, ...
+    "Target", ...
+    Method="LSBoost", ...
+    NumLearningCycles=250, ...
+    Learners=templateTree(MaxNumSplits=20), ...
+    PredictorNames=predictorNames);
+
+%% 5) Test accuracy
+YPred = predict(Mdl,TTest);
+YTrue = TTest.Target;
+
+MAE = mean(abs(YPred-YTrue));
+RMSE = sqrt(mean((YPred-YTrue).^2));
+MAPE = 100*mean(abs((YPred-YTrue)./YTrue));
+
+fprintf("MAE  = %.3f MW\n",MAE);
+fprintf("RMSE = %.3f MW\n",RMSE);
+fprintf("MAPE = %.3f %%\n",MAPE);
+
+figure;
+plot(YTrue(1:240),"k",LineWidth=1.3); hold on;
+plot(YPred(1:240),LineWidth=1.2);
+grid on;
+xlabel("Test Hour");
+ylabel("Load (MW)");
+legend("Actual","Predicted");
+title("Load Forecasting Model");
+
+%% 6) Model-specific global importance
+impTree = predictorImportance(Mdl);
+
+figure;
+bar(categorical(predictorNames),impTree);
+grid on;
+ylabel("Predictor Importance");
+title("Global Tree-Ensemble Importance");
+
+%% 7) Optional permutation importance (R2024a+)
+try
+    impPerm = permutationImportance( ...
+        Mdl,TTest,"Target", ...
+        NumPermutations=20);
+
+    disp(impPerm);
+
+    figure;
+    bar(categorical(impPerm.Predictor), ...
+        impPerm.ImportanceMean);
+    grid on;
+    ylabel("Increase in Loss");
+    title("Permutation Importance");
+catch ME
+    warning("Permutation importance skipped: %s",ME.message);
+end
+
+%% 8) Select one query point
+queryIndex = 80;
+queryPoint = TTest(queryIndex,predictorNames);
+queryPrediction = predict(Mdl,queryPoint);
+
+fprintf("\nQuery prediction = %.3f MW\n",queryPrediction);
+disp(queryPoint);
+
+%% 9) SHAP explanation
+explainerSHAP = shapley(Mdl,TTrain(:,predictorNames), ...
+    QueryPoint=queryPoint);
+
+figure;
+plot(explainerSHAP);
+title("SHAP Explanation for One Load Forecast");
+
+disp(explainerSHAP.ShapleyValues);
+
+%% 10) LIME explanation
+explainerLIME = lime(Mdl,queryPoint,6);
+
+figure;
+plot(explainerLIME);
+title("LIME Explanation for the Same Forecast");
+
+%% 11) Partial dependence
+figure;
+plotPartialDependence(Mdl,"Temperature",TTrain);
+grid on;
+title("Partial Dependence on Temperature");
+
+figure;
+plotPartialDependence(Mdl,"Hour",TTrain);
+grid on;
+title("Partial Dependence on Hour");
+
+%% 12) Manual permutation importance
+XTest = TTest(:,predictorNames);
+basePred = predict(Mdl,XTest);
+baseLoss = mean((basePred-YTrue).^2);
+
+manualImp = zeros(numel(predictorNames),1);
+
+for j = 1:numel(predictorNames)
+    Xp = XTest;
+    Xp.(predictorNames(j)) = ...
+        Xp.(predictorNames(j))(randperm(height(Xp)));
+
+    predPerm = predict(Mdl,Xp);
+    permLoss = mean((predPerm-YTrue).^2);
+    manualImp(j) = permLoss-baseLoss;
+end
+
+figure;
+bar(categorical(predictorNames),manualImp);
+grid on;
+ylabel("Increase in MSE");
+title("Manual Permutation Importance");</code></pre></div>
+<div class="ar"><h2>3. الكود الكامل</h2>
+<p>ينشئ الكود بيانات حمل، ويدرب نموذج Boosted Trees، ثم يطبق الأهمية العامة وSHAP وLIME وPDP وأهمية التبديل اليدوية.</p></div></section>
+
+<section><div class="en"><h2>4. Why Use a Tree Ensemble?</h2>
+<p>A boosted-tree model captures nonlinear interactions while remaining compatible with several MATLAB explanation tools.</p>
+<div class="highlight">The aim is not to claim that trees are always the best forecasting model, but to create a transparent XAI laboratory.</div></div>
+<div class="ar"><h2>4. لماذا نستخدم نموذج أشجار؟</h2><p>يلتقط العلاقات اللاخطية ويتوافق مع عدة أدوات تفسير، لذلك يناسب الغرض التعليمي للمخبر.</p></div></section>
+
+<section><div class="en"><h2>5. Global Importance</h2>
+<p>Global importance answers: “Which predictors matter most across the test set?”</p>
+<ul><li>Tree importance reflects the ensemble structure.</li><li>Permutation importance reflects loss increase after feature disruption.</li></ul></div>
+<div class="ar"><h2>5. الأهمية العامة</h2><p>تجيب عن سؤال: ما الميزات الأهم للنموذج عبر كامل البيانات؟ ويمكن أن تختلف طريقة الأشجار عن طريقة التبديل.</p></div></section>
+
+<section><div class="en"><h2>6. SHAP Interpretation</h2>
+<div class="formula">Prediction = Baseline + Σ Feature Contributions</div>
+<p>For the selected hour, inspect which predictors increased or reduced the forecast relative to the baseline.</p></div>
+<div class="ar"><h2>6. تفسير SHAP</h2><p>يوضح الرسم كيف رفعت أو خفضت كل ميزة التنبؤ مقارنة بالقيمة الأساسية.</p></div></section>
+
+<section><div class="en"><h2>7. LIME Interpretation</h2>
+<p>LIME fits a simple local model around the query point. Compare the signs and rankings with SHAP.</p>
+<div class="warning">Disagreement does not automatically mean one method is wrong; the methods make different approximations.</div></div>
+<div class="ar"><h2>7. تفسير LIME</h2><p>يبني LIME نموذجًا بسيطًا قرب العينة المحددة. قارن اتجاهات وترتيب الميزات مع SHAP.</p></div></section>
+
+<section><div class="en"><h2>8. Partial Dependence</h2>
+<p>Temperature PDP should often show increased load under strong heating or cooling demand. Hour PDP should reveal the daily pattern.</p>
+<div class="warning">PDP can evaluate feature combinations that are rare or unrealistic when predictors are correlated.</div></div>
+<div class="ar"><h2>8. الاعتماد الجزئي</h2><p>قد يظهر منحنى الحرارة زيادة الحمل عند التدفئة أو التبريد، بينما يكشف منحنى الساعة النمط اليومي. لكن الارتباط قد ينتج حالات غير واقعية.</p></div></section>
+
+<section><div class="en"><h2>9. Expected Findings</h2><ul>
+<li>LoadLag1 and LoadLag24 are usually dominant.</li><li>Hour captures daily structure.</li><li>Temperature matters more at extreme values.</li>
+<li>Weekday changes the baseline demand.</li><li>PV tends to reduce net load.</li></ul></div>
+<div class="ar"><h2>9. النتائج المتوقعة</h2><p>غالبًا يكون الحمل السابق وحمل اليوم السابق الأكثر أهمية، وتظهر الساعة النمط اليومي، وتزداد أهمية الحرارة عند القيم المتطرفة.</p></div></section>
+
+<section><div class="en"><h2>10. Student Experiments</h2><div class="task"><ol>
+<li>Explain a low-load night and a high-load evening peak.</li><li>Compare SHAP and LIME stability across repeated runs.</li>
+<li>Add a holiday feature.</li><li>Remove LoadLag1 and retrain.</li><li>Create correlated copies of Temperature and inspect attribution.</li>
+<li>Change the background data used by SHAP.</li></ol></div></div>
+<div class="ar"><h2>10. تجارب الطالب</h2><div class="task"><ol>
+<li>فسر حالة ليلية منخفضة وقمة مسائية.</li><li>قارن استقرار SHAP وLIME.</li><li>أضف ميزة عطلة.</li>
+<li>احذف LoadLag1 وأعد التدريب.</li><li>أنشئ نسخة مترابطة من الحرارة.</li><li>غيّر بيانات الخلفية لـ SHAP.</li></ol></div></div></section>
+
+<section><div class="en"><h2>11. Mini Project</h2>
+<div class="research"><strong>Explainable peak-warning system:</strong> Build a classifier that predicts whether the next-hour load will exceed a threshold, then explain false alarms and missed peaks using SHAP and LIME.</div></div>
+<div class="ar"><h2>11. مشروع مصغر</h2><div class="research">ابنِ مصنفًا لتحذير القمم، ثم فسّر الإنذارات الكاذبة والقمم الفائتة باستخدام SHAP وLIME.</div></div></section>
+
+<section><div class="en"><h2>12. Laboratory Report</h2><ul>
+<li>Report forecasting accuracy.</li><li>Compare tree and permutation importance.</li><li>Explain two contrasting query points.</li>
+<li>Compare SHAP and LIME.</li><li>Discuss correlation and causality.</li><li>Evaluate explanation stability.</li></ul></div>
+<div class="ar"><h2>12. تقرير المخبر</h2><p>يتضمن دقة النموذج ومقارنة طرق الأهمية وتفسير حالتين ومقارنة SHAP وLIME وتحليل الارتباط والسببية والاستقرار.</p></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part II | Lab 13</footer>
+</body></html>

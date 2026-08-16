@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lecture 13 - Explainable Artificial Intelligence</title><style>
+:root{
+  --bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;
+  --muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;
+  --red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+.container{width:min(1100px,92%);margin:auto}
+header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+.logo{font-weight:bold}.logo span{color:var(--blue)}
+.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
+.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
+.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
+.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
+.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
+pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+code{font-family:Consolas,monospace}
+.svg-wrap{overflow-x:auto;background:#06101d;border:1px solid var(--line);border-radius:14px;padding:10px;margin:18px 0}
+svg{max-width:100%;height:auto;display:block;margin:auto}
+.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+footer{text-align:center;color:var(--muted);padding:35px 0}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
+</style></head><body><header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+<div class="hero">
+  <div class="lecture-number">LECTURE 13 | المحاضرة 13</div>
+  <h1>Explainable Artificial Intelligence</h1>
+  <div class="hero-ar">الذكاء الاصطناعي القابل للتفسير</div>
+  <div class="subtitle">Understanding, validating, and communicating AI decisions in power systems<br>فهم قرارات الذكاء الاصطناعي والتحقق منها وشرحها في أنظمة القدرة</div>
+</div>
+
+<section><div class="en"><h2>🎯 Learning Objectives</h2><ul>
+<li>Distinguish interpretability, explainability, transparency, and causality.</li>
+<li>Differentiate global and local explanations.</li>
+<li>Understand permutation importance, partial dependence, LIME, and SHAP.</li>
+<li>Explain Shapley values mathematically.</li>
+<li>Identify explanation pitfalls in correlated power-system data.</li>
+<li>Use XAI for load forecasting, fault detection, and state estimation.</li>
+</ul></div>
+<div class="ar"><h2>🎯 أهداف التعلم</h2><ul>
+<li>التمييز بين قابلية الفهم والتفسير والشفافية والسببية.</li>
+<li>التمييز بين التفسير العام والمحلي.</li>
+<li>فهم أهمية التبديل وPDP وLIME وSHAP.</li>
+<li>شرح قيم شابلي رياضيًا.</li>
+<li>معرفة أخطاء التفسير في البيانات المترابطة.</li>
+<li>استخدام XAI في التنبؤ والأعطال وتقدير الحالة.</li>
+</ul></div></section>
+
+<section><div class="en"><h2>1. Why Explainability Matters</h2>
+<p>Power systems are safety-critical. Engineers need to understand why an AI model recommends a decision, especially when the recommendation affects protection, dispatch, voltage control, or reliability.</p>
+<div class="highlight">High predictive accuracy does not automatically imply physical validity, robustness, fairness, or operational safety.</div></div>
+<div class="ar"><h2>1. لماذا نحتاج إلى التفسير؟</h2>
+<p>تعمل نماذج الذكاء الاصطناعي في تطبيقات حرجة، لذلك يجب معرفة سبب القرار قبل استخدامه في الحماية أو التشغيل أو التحكم.</p></div></section>
+
+<section><div class="en"><h2>2. Interpretability, Explainability, and Transparency</h2>
+<div class="grid3">
+<div class="mini-card"><strong>Interpretability</strong><p>How directly a human can understand the model.</p></div>
+<div class="mini-card"><strong>Explainability</strong><p>Methods used to explain a prediction or behavior.</p></div>
+<div class="mini-card"><strong>Transparency</strong><p>Visibility of data, training, assumptions, and implementation.</p></div>
+</div></div>
+<div class="ar"><h2>2. قابلية الفهم والتفسير والشفافية</h2>
+<p>النموذج البسيط قد يكون مفهومًا بذاته، بينما يحتاج النموذج المعقد إلى أدوات تفسير. أما الشفافية فتشمل البيانات وطريقة التدريب والافتراضات.</p></div></section>
+
+<section><div class="en"><h2>3. Global and Local Explanations</h2>
+<div class="grid"><div class="mini-card"><strong>Global explanation</strong><p>How the model behaves across the full dataset.</p></div>
+<div class="mini-card"><strong>Local explanation</strong><p>Why the model made one specific prediction.</p></div></div>
+<div class="note">A feature can be globally important but unimportant for one specific operating point, and vice versa.</div></div>
+<div class="ar"><h2>3. التفسير العام والمحلي</h2>
+<p>يشرح التفسير العام سلوك النموذج ككل، بينما يشرح التفسير المحلي قرارًا واحدًا أو حالة تشغيل محددة.</p></div></section>
+
+<section><div class="en"><h2>4. Intrinsic and Post-Hoc Explanations</h2>
+<div class="table-wrap"><table>
+<tr><th>Type</th><th>Example</th><th>Advantage</th><th>Limitation</th></tr>
+<tr><td>Intrinsic</td><td>Linear model, small tree</td><td>Model itself is understandable</td><td>May sacrifice flexibility</td></tr>
+<tr><td>Post-hoc</td><td>SHAP, LIME, PDP</td><td>Works with complex models</td><td>Explanation is an approximation</td></tr>
+</table></div></div>
+<div class="ar"><h2>4. التفسير الذاتي واللاحق</h2>
+<p>بعض النماذج قابلة للفهم بذاتها، بينما تحتاج النماذج المعقدة إلى أدوات تفسير بعد التدريب.</p></div></section>
+
+<section><div class="en"><h2>5. Feature Importance</h2>
+<p>Feature importance ranks predictors according to their influence on model performance or structure.</p>
+<div class="warning">Importance does not indicate the direction of influence and does not prove causality.</div></div>
+<div class="ar"><h2>5. أهمية الميزات</h2>
+<p>تحدد أهمية الميزات أي المتغيرات أكثر تأثيرًا، لكنها لا توضح دائمًا اتجاه التأثير ولا تثبت علاقة سببية.</p></div></section>
+
+<section><div class="en"><h2>6. Permutation Importance</h2>
+<div class="formula">Imp(j) = Loss(X with feature j permuted) − Loss(X)</div>
+<p>If permuting a feature destroys predictive structure, model loss increases and the feature is considered important.</p>
+<div class="warning">When predictors are strongly correlated, one feature can replace another, causing importance to be underestimated.</div></div>
+<div class="ar"><h2>6. أهمية التبديل</h2>
+<p>نبدل قيم ميزة واحدة عشوائيًا ثم نقيس زيادة الخطأ. إذا ازداد الخطأ كثيرًا كانت الميزة مهمة للنموذج.</p></div></section>
+
+<section><div class="en"><h2>7. Partial Dependence</h2>
+<div class="formula">PD_j(z) = E_X[-j][ f(z, X_-j) ]</div>
+<p>Partial dependence estimates the average prediction when one feature is fixed to z and all other features retain their observed values.</p></div>
+<div class="ar"><h2>7. الاعتماد الجزئي</h2>
+<p>يقيس PDP متوسط خرج النموذج عند تثبيت ميزة على قيمة محددة مع إبقاء بقية الميزات كما هي في البيانات.</p></div></section>
+
+<section><div class="en"><h2>8. Individual Conditional Expectation</h2>
+<p>ICE curves show one response curve per observation rather than only the average curve.</p>
+<div class="highlight">PDP may hide heterogeneous behavior. ICE reveals whether different operating points respond differently to the same feature.</div></div>
+<div class="ar"><h2>8. منحنيات ICE</h2>
+<p>تعرض ICE منحنى لكل عينة، ولذلك تكشف اختلاف استجابة حالات التشغيل التي قد يخفيها المتوسط في PDP.</p></div></section>
+
+<section><div class="en"><h2>9. LIME</h2>
+<p>LIME creates perturbed samples around a query point, obtains black-box predictions, and fits a weighted simple surrogate.</p>
+<div class="formula">g* = arg min_g [ L(f,g,π_x) + Ω(g) ]</div>
+<div class="grid"><div class="mini-card"><strong>L</strong><p>Local fidelity to the black-box model.</p></div>
+<div class="mini-card"><strong>Ω</strong><p>Penalty that keeps the surrogate simple.</p></div></div></div>
+<div class="ar"><h2>9. طريقة LIME</h2>
+<p>تنشئ LIME عينات قريبة من الحالة المطلوب تفسيرها، ثم تدرب نموذجًا بسيطًا موزونًا ليقلد النموذج المعقد محليًا.</p></div></section>
+
+<section><div class="en"><h2>10. Limits of LIME</h2>
+<ul><li>Results depend on the neighborhood definition.</li><li>Different random perturbations may produce different explanations.</li><li>The surrogate may have poor local fidelity.</li><li>Perturbed samples may be physically impossible.</li></ul></div>
+<div class="ar"><h2>10. قيود LIME</h2>
+<p>تعتمد النتيجة على تعريف الجوار والعينات الاصطناعية، وقد تكون بعض العينات غير واقعية فيزيائيًا.</p></div></section>
+
+<section><div class="en"><h2>11. Shapley Values</h2>
+<p>SHAP is based on cooperative game theory. Predictors are players and the model prediction is the payout.</p>
+<div class="formula">φ_j = Σ_{S⊆F\{j}} |S|!(M−|S|−1)! / M! · [v(S∪{j})−v(S)]</div>
+<p>The contribution of feature j is averaged over all possible coalitions of other features.</p></div>
+<div class="ar"><h2>11. قيم شابلي</h2>
+<p>تعامل SHAP الميزات كلاعبين في لعبة تعاونية، وتوزع التنبؤ بينهم بحسب مساهمة كل ميزة عبر جميع المجموعات الممكنة.</p></div></section>
+
+<section><div class="en"><h2>12. SHAP Additive Explanation</h2>
+<div class="formula">f(x) = φ₀ + Σ_j φ_j</div>
+<p>φ₀ is the baseline prediction. Positive SHAP values increase the prediction; negative values decrease it.</p></div>
+<div class="ar"><h2>12. التفسير الجمعي في SHAP</h2>
+<p>يتكون التنبؤ من قيمة أساس زائد مساهمات جميع الميزات. المساهمة الموجبة ترفع التنبؤ والسالبة تخفضه.</p></div></section>
+
+<section><div class="en"><h2>13. SHAP Properties</h2>
+<div class="grid3"><div class="mini-card"><strong>Local accuracy</strong><p>Contributions sum to the prediction.</p></div>
+<div class="mini-card"><strong>Missingness</strong><p>Absent features receive zero contribution.</p></div>
+<div class="mini-card"><strong>Consistency</strong><p>Increased model influence should not reduce attribution.</p></div></div></div>
+<div class="ar"><h2>13. خصائص SHAP</h2>
+<p>تتميز بالدقة المحلية وانعدام مساهمة الميزة الغائبة والاتساق في توزيع المساهمات.</p></div></section>
+
+<section><div class="en"><h2>14. Correlated Features</h2>
+<p>In power systems, load, temperature, hour, and previous load values are often correlated.</p>
+<div class="warning">Attributions can be split among correlated predictors or assigned differently depending on the background distribution and conditional assumptions.</div></div>
+<div class="ar"><h2>14. الميزات المترابطة</h2>
+<p>قد تتوزع المساهمة بين ميزات مترابطة مثل الحمل السابق والساعة والحرارة، لذلك يجب تفسير النتائج بحذر.</p></div></section>
+
+<section><div class="en"><h2>15. Explanation Is Not Causality</h2>
+<div class="formula">Predictive association ≠ causal effect</div>
+<p>A high SHAP value means the model used a feature strongly for this prediction. It does not prove that changing the feature will physically cause the predicted change.</p></div>
+<div class="ar"><h2>15. التفسير ليس سببية</h2>
+<p>توضح SHAP كيف استخدم النموذج الميزة، لكنها لا تثبت أن تغيير الميزة يسبب فعليًا تغير الخرج.</p></div></section>
+
+<section><div class="en"><h2>16. Explanation Fidelity</h2>
+<p>An explanation should be evaluated, not merely visualized.</p>
+<ul><li>Local surrogate R²</li><li>Stability under small perturbations</li><li>Consistency across similar samples</li><li>Agreement with physical knowledge</li><li>Sensitivity to background data</li></ul></div>
+<div class="ar"><h2>16. جودة التفسير</h2>
+<p>يجب تقييم دقة النموذج البديل واستقرار الشرح واتساقه وموافقته للمعرفة الفيزيائية.</p></div></section>
+
+<section><div class="en"><h2>17. XAI for Load Forecasting</h2>
+<div class="grid"><div class="mini-card"><strong>Global</strong><p>Rank temperature, hour, weekday, and lagged loads.</p></div>
+<div class="mini-card"><strong>Local</strong><p>Explain why tomorrow's 18:00 peak is high.</p></div></div></div>
+<div class="ar"><h2>17. XAI في التنبؤ بالحمل</h2>
+<p>يمكن ترتيب أهمية الحرارة والساعة والأيام وقيم الحمل السابقة، ثم تفسير توقع قمة محددة محليًا.</p></div></section>
+
+<section><div class="en"><h2>18. XAI for Fault Detection</h2>
+<p>Explanations can identify which current, voltage, harmonic, or sequence components drove a fault classification.</p>
+<div class="good">An explanation that highlights physically relevant phases and time intervals increases engineering confidence, but still requires validation.</div></div>
+<div class="ar"><h2>18. XAI في كشف الأعطال</h2>
+<p>يمكن للتفسير تحديد الأطوار أو المركبات أو المقاطع الزمنية التي أثرت في تصنيف العطل.</p></div></section>
+
+<section><div class="en"><h2>19. XAI for State Estimation and Stability</h2>
+<p>Feature attribution can indicate influential measurements, buses, or contingencies for a predicted state or stability margin.</p></div>
+<div class="ar"><h2>19. XAI في تقدير الحالة والاستقرار</h2>
+<p>يمكن تحديد القياسات والقضبان والحالات الطارئة الأكثر تأثيرًا في التقدير أو هامش الاستقرار المتوقع.</p></div></section>
+
+<section><div class="en"><h2>20. Explanation Workflow</h2>
+<div class="flow"><div class="flow-box">Train model</div><div class="arrow">→</div><div class="flow-box">Check accuracy</div><div class="arrow">→</div><div class="flow-box">Global XAI</div><div class="arrow">→</div><div class="flow-box">Local XAI</div><div class="arrow">→</div><div class="flow-box">Physical validation</div></div></div>
+<div class="ar"><h2>20. سير عمل التفسير</h2><p>بعد تدريب النموذج وفحص دقته، نبدأ بالتفسير العام ثم المحلي ونقارن النتائج بالمعرفة الفيزيائية.</p></div></section>
+
+<section><div class="en"><h2>21. Common Mistakes</h2>
+<div class="grid"><div class="mini-card"><strong>Cherry-picking</strong><p>Showing only explanations that look reasonable.</p></div>
+<div class="mini-card"><strong>Ignoring correlation</strong><p>Reading attribution as independent influence.</p></div>
+<div class="mini-card"><strong>No fidelity check</strong><p>Trusting a poor surrogate.</p></div>
+<div class="mini-card"><strong>Causal language</strong><p>Claiming explanation proves cause.</p></div></div></div>
+<div class="ar"><h2>21. الأخطاء الشائعة</h2><p>من الأخطاء اختيار أمثلة مريحة فقط، تجاهل الارتباط، عدم تقييم دقة الشرح، واستخدام لغة سببية دون دليل.</p></div></section>
+
+<section><div class="en"><h2>🔬 Research Corner</h2>
+<div class="research"><strong>Emerging directions:</strong> physics-consistent explanations, graph-based XAI, counterfactual explanations, uncertainty-aware attributions, causal XAI, and human-centered explanation interfaces for control rooms.</div></div>
+<div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">من الاتجاهات الحديثة التفسيرات المتوافقة مع الفيزياء وGraph-XAI والتفسيرات المضادة للواقع وعدم اليقين والسببية وواجهات غرف التحكم.</div></div></section>
+
+<section><div class="en"><h2>🧠 Review Questions</h2><ol>
+<li>Differentiate global and local explanations.</li><li>Explain permutation importance.</li><li>Derive the idea behind LIME.</li>
+<li>What does a SHAP value represent?</li><li>Why are correlated predictors difficult?</li><li>Why is explanation not causality?</li>
+</ol></div>
+<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol>
+<li>ما الفرق بين التفسير العام والمحلي؟</li><li>اشرح أهمية التبديل.</li><li>اشرح فكرة LIME.</li>
+<li>ماذا تمثل قيمة SHAP؟</li><li>لماذا تصعب الميزات المترابطة؟</li><li>لماذا لا يعني التفسير السببية؟</li>
+</ol></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part II | Lecture 13</footer>
+</body></html>
