@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lab 15 - Multi-Agent Energy Management</title>
+<style>
+body{font-family:Arial;margin:40px;line-height:1.7;background:#0b1220;color:#eef}
+h1,h2{color:#86efac}
+pre{background:#111827;padding:10px;overflow:auto}
+.ar{direction:rtl;text-align:right;border-top:1px solid #456;margin-top:20px;padding-top:15px}
+</style>
+</head>
+<body>
+<h1>Lab 15 – Multi-Agent Energy Management</h1>
+<p><b>المخبر 15 – إدارة الطاقة متعددة الوكلاء</b></p>
+
+<h2>Objectives</h2>
+<ul>
+<li>Create three cooperative agents.</li>
+<li>Exchange information.</li>
+<li>Reach a consensus on battery power.</li>
+</ul>
+
+<h2>MATLAB Example</h2>
+<pre>
+P = [10;20;30];
+W = [0.5 0.25 0.25;
+     0.25 0.5 0.25;
+     0.25 0.25 0.5];
+
+for k=1:20
+    P = W*P;
+end
+
+disp(P)
+</pre>
+
+<div class="ar">
+<h2>تجارب إضافية</h2>
+<ul>
+<li>غيّر عدد الوكلاء إلى 10.</li>
+<li>أضف انقطاع اتصال بين وكيلين.</li>
+<li>قارن سرعة التقارب.</li>
+</ul>
+</div>
+
+<h2>Mini Project</h2>
+<p>Develop a distributed controller for several microgrids coordinating battery storage and photovoltaic generation.</p>
+</body>
+</html>
