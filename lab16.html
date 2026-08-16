@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Lab 16 - Simple Digital Twin</title>
+<style>body{font-family:Arial;background:#0b1220;color:#eef;margin:40px;line-height:1.7}h1,h2{color:#86efac}.ar{direction:rtl;text-align:right;border-top:1px solid #456;padding-top:15px;margin-top:20px}pre{background:#111827;padding:10px}</style></head>
+<body>
+<h1>Lab 16 – Building a Simple Digital Twin</h1>
+<p><b>المخبر 16 – بناء توأم رقمي مبسط</b></p>
+<h2>Objectives</h2>
+<ul><li>Simulate streaming measurements.</li><li>Update the digital twin every second.</li><li>Detect abnormal behavior.</li></ul>
+<h2>MATLAB</h2>
+<pre>
+t=0:0.1:100;
+P=100+10*sin(0.2*t)+randn(size(t));
+threshold=115;
+alarm=P>threshold;
+plot(t,P); hold on;
+yline(threshold,'r--');
+</pre>
+<div class="ar"><h2>تمارين</h2><ul><li>أضف قياسات جهد.</li><li>استخدم متوسطاً متحركاً.</li><li>أضف كشف شذوذ بالذكاء الاصطناعي.</li></ul></div>
+</body></html>
