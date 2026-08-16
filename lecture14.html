@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lecture 14 - Generative AI and Large Language Models</title><style>
+:root{
+  --bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;
+  --muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;
+  --red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+.container{width:min(1100px,92%);margin:auto}
+header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+.logo{font-weight:bold}.logo span{color:var(--blue)}
+.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
+.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
+.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
+.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
+.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
+pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+code{font-family:Consolas,monospace}
+.svg-wrap{overflow-x:auto;background:#06101d;border:1px solid var(--line);border-radius:14px;padding:10px;margin:18px 0}
+svg{max-width:100%;height:auto;display:block;margin:auto}
+.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+footer{text-align:center;color:var(--muted);padding:35px 0}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
+</style></head><body><header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+<div class="hero">
+  <div class="lecture-number">LECTURE 14 | المحاضرة 14</div>
+  <h1>Generative AI and Large Language Models</h1>
+  <div class="hero-ar">الذكاء الاصطناعي التوليدي والنماذج اللغوية الكبيرة</div>
+  <div class="subtitle">From tokens and embeddings to retrieval-augmented engineering assistants<br>من الرموز والتمثيلات إلى المساعدات الهندسية المعززة بالاسترجاع</div>
+</div>
+
+<section><div class="en"><h2>🎯 Learning Objectives</h2><ul>
+<li>Explain generative modeling and autoregressive language modeling.</li>
+<li>Understand tokenization, embeddings, positional information, and decoder transformers.</li>
+<li>Describe pretraining, instruction tuning, and preference alignment.</li>
+<li>Explain prompting, context windows, and hallucination.</li>
+<li>Design a retrieval-augmented generation pipeline.</li>
+<li>Evaluate engineering assistants for accuracy, traceability, and safety.</li>
+</ul></div>
+<div class="ar"><h2>🎯 أهداف التعلم</h2><ul>
+<li>فهم النمذجة التوليدية والتوليد اللغوي الذاتي.</li>
+<li>فهم التقسيم إلى رموز والتمثيلات والترميز الموضعي وDecoder Transformer.</li>
+<li>شرح التدريب المسبق وضبط التعليمات ومواءمة التفضيلات.</li>
+<li>فهم الأوامر وسياق الإدخال والهلوسة.</li>
+<li>تصميم نظام RAG.</li>
+<li>تقييم المساعد الهندسي من حيث الدقة والتتبع والأمان.</li>
+</ul></div></section>
+
+<section><div class="en"><h2>1. What Is Generative AI?</h2>
+<p>Generative AI learns a probability distribution over data and produces new samples such as text, images, code, waveforms, or structured engineering reports.</p>
+<div class="formula">x̂ ~ pθ(x)</div>
+<div class="highlight">A discriminative model predicts a label or value. A generative model produces new content consistent with learned patterns.</div></div>
+<div class="ar"><h2>1. ما هو الذكاء الاصطناعي التوليدي؟</h2>
+<p>يتعلم توزيعًا احتماليًا للبيانات ثم يولد محتوى جديدًا، مثل النصوص والصور والأكواد والتقارير الهندسية.</p></div></section>
+
+<section><div class="en"><h2>2. Autoregressive Language Modeling</h2>
+<div class="formula">P(w₁,...,wₙ)=Πₜ P(wₜ | w₁,...,wₜ₋₁)</div>
+<p>The model generates one token at a time by estimating the probability of the next token given previous tokens.</p></div>
+<div class="ar"><h2>2. النمذجة اللغوية الذاتية</h2>
+<p>يولد النموذج رمزًا بعد آخر اعتمادًا على الرموز السابقة، ويختار الرمز التالي من توزيع احتمالي.</p></div></section>
+
+<section><div class="en"><h2>3. Tokenization</h2>
+<p>Text is split into tokens. A token can be a whole word, part of a word, punctuation, or a symbol.</p>
+<div class="formula">"voltage stability" → [token₁, token₂, token₃, ...]</div>
+<div class="warning">Tokenization affects sequence length, multilingual performance, formulas, and the representation of technical terminology.</div></div>
+<div class="ar"><h2>3. التقسيم إلى رموز</h2>
+<p>يُقسّم النص إلى رموز قد تكون كلمات كاملة أو أجزاء كلمات أو علامات. ويؤثر ذلك في طول السياق وفهم المصطلحات الهندسية.</p></div></section>
+
+<section><div class="en"><h2>4. Embeddings</h2>
+<div class="formula">eₜ = E[tokenₜ] ∈ Rᵈ</div>
+<p>Each token is mapped to a vector. Similar contexts often produce related vector representations.</p>
+<div class="grid"><div class="mini-card"><strong>Token embedding</strong><p>Represents lexical meaning.</p></div>
+<div class="mini-card"><strong>Document embedding</strong><p>Represents a sentence, paragraph, or chunk for retrieval.</p></div></div></div>
+<div class="ar"><h2>4. التمثيلات المتجهية</h2>
+<p>يُحوّل كل رمز أو مستند إلى متجه عددي يمكن استخدامه للمقارنة والاسترجاع والتعلم.</p></div></section>
+
+<section><div class="en"><h2>5. Decoder Transformer</h2>
+<div class="flow"><div class="flow-box">Tokens</div><div class="arrow">→</div><div class="flow-box">Embeddings + Position</div><div class="arrow">→</div><div class="flow-box">Masked Self-Attention</div><div class="arrow">→</div><div class="flow-box">Feed-Forward Blocks</div><div class="arrow">→</div><div class="flow-box">Next-token probabilities</div></div>
+<div class="formula">P(tokenₜ | token₁,...,tokenₜ₋₁)=softmax(W hₜ)</div></div>
+<div class="ar"><h2>5. بنية Decoder Transformer</h2>
+<p>تستخدم الانتباه الذاتي المقنّع حتى لا يرى الموضع الرموز المستقبلية، ثم تنتج احتمالات الرمز التالي.</p></div></section>
+
+<section><div class="en"><h2>6. Causal Masking</h2>
+<div class="formula">Attention score(i,j) = −∞ for j &gt; i</div>
+<p>The mask prevents a token from attending to future tokens during autoregressive training.</p></div>
+<div class="ar"><h2>6. القناع السببي</h2>
+<p>يمنع النموذج من رؤية الرموز اللاحقة أثناء التدريب، ويحافظ على طبيعة التوليد خطوة بخطوة.</p></div></section>
+
+<section><div class="en"><h2>7. Pretraining</h2>
+<p>During pretraining, the model learns statistical structure from large text collections by minimizing next-token prediction loss.</p>
+<div class="formula">L = −Σₜ log Pθ(wₜ | w₁,...,wₜ₋₁)</div></div>
+<div class="ar"><h2>7. التدريب المسبق</h2>
+<p>يتعلم النموذج البنية اللغوية والمعلومات العامة عبر تقليل خطأ توقع الرمز التالي على مجموعات نصية كبيرة.</p></div></section>
+
+<section><div class="en"><h2>8. Instruction Tuning and Alignment</h2>
+<div class="grid3"><div class="mini-card"><strong>Pretraining</strong><p>Learn language and broad patterns.</p></div>
+<div class="mini-card"><strong>Instruction tuning</strong><p>Learn to follow task descriptions.</p></div>
+<div class="mini-card"><strong>Preference alignment</strong><p>Improve helpfulness, safety, and style.</p></div></div></div>
+<div class="ar"><h2>8. ضبط التعليمات والمواءمة</h2>
+<p>بعد التدريب المسبق، يُضبط النموذج على تعليمات، ثم تُستخدم تفضيلات بشرية أو آلية لتحسين السلوك.</p></div></section>
+
+<section><div class="en"><h2>9. Prompting</h2>
+<p>A prompt defines the task, context, constraints, expected format, and sometimes examples.</p>
+<div class="highlight">Good engineering prompts specify units, assumptions, data boundaries, output format, and whether uncertainty must be stated.</div></div>
+<div class="ar"><h2>9. صياغة الأوامر</h2>
+<p>يجب أن يحدد الأمر المهمة والسياق والقيود والوحدات وشكل الخرج والافتراضات المطلوبة.</p></div></section>
+
+<section><div class="en"><h2>10. Zero-Shot, Few-Shot, and Structured Prompting</h2>
+<div class="table-wrap"><table>
+<tr><th>Method</th><th>Description</th><th>Engineering use</th></tr>
+<tr><td>Zero-shot</td><td>Instruction only</td><td>Simple summarization</td></tr>
+<tr><td>Few-shot</td><td>Include examples</td><td>Consistent report formatting</td></tr>
+<tr><td>Structured</td><td>Explicit sections/schema</td><td>JSON, tables, checklists</td></tr>
+</table></div></div>
+<div class="ar"><h2>10. الأوامر دون أمثلة ومع أمثلة</h2>
+<p>يمكن إعطاء التعليمات فقط، أو إضافة أمثلة، أو فرض بنية واضحة للخرج مثل جدول أو JSON.</p></div></section>
+
+<section><div class="en"><h2>11. Context Window</h2>
+<p>The context window contains the prompt, retrieved documents, conversation, and generated output.</p>
+<div class="warning">More context is not always better. Irrelevant text can distract the model and increase cost and latency.</div></div>
+<div class="ar"><h2>11. نافذة السياق</h2>
+<p>تضم الأمر والمستندات المسترجعة والمحادثة والخرج. وقد يؤدي السياق الزائد وغير المرتبط إلى نتائج أضعف.</p></div></section>
+
+<section><div class="en"><h2>12. Sampling</h2>
+<div class="grid"><div class="mini-card"><strong>Temperature</strong><p>Controls randomness of token selection.</p></div>
+<div class="mini-card"><strong>Top-p</strong><p>Restricts sampling to a probability mass.</p></div></div>
+<div class="note">For engineering calculations and factual extraction, lower randomness is usually preferable.</div></div>
+<div class="ar"><h2>12. أخذ العينات</h2>
+<p>تتحكم Temperature وTop-p بدرجة العشوائية. وتناسب القيم المنخفضة المهام الهندسية الدقيقة غالبًا.</p></div></section>
+
+<section><div class="en"><h2>13. Hallucination</h2>
+<p>A hallucination is a plausible-sounding output that is unsupported, incorrect, or fabricated.</p>
+<div class="warning">Language-model confidence is not a calibrated probability of factual correctness.</div></div>
+<div class="ar"><h2>13. الهلوسة</h2>
+<p>قد يولد النموذج إجابة مقنعة لغويًا لكنها خاطئة أو غير مدعومة. ولا تعني الصياغة الواثقة صحة المعلومة.</p></div></section>
+
+<section><div class="en"><h2>14. Retrieval-Augmented Generation</h2>
+<div class="flow"><div class="flow-box">User question</div><div class="arrow">→</div><div class="flow-box">Embedding</div><div class="arrow">→</div><div class="flow-box">Retrieve relevant chunks</div><div class="arrow">→</div><div class="flow-box">Prompt with evidence</div><div class="arrow">→</div><div class="flow-box">Generated answer + sources</div></div>
+<div class="highlight">RAG does not retrain the model. It supplies relevant external knowledge at query time.</div></div>
+<div class="ar"><h2>14. التوليد المعزز بالاسترجاع RAG</h2>
+<p>يحوّل السؤال إلى تمثيل، ويسترجع المقاطع الأقرب، ثم يضيفها إلى الأمر قبل توليد الإجابة مع المصادر.</p></div></section>
+
+<section><div class="en"><h2>15. Chunking</h2>
+<p>Documents are divided into chunks before indexing.</p>
+<div class="grid"><div class="mini-card"><strong>Small chunks</strong><p>Precise retrieval but limited context.</p></div>
+<div class="mini-card"><strong>Large chunks</strong><p>More context but less retrieval precision.</p></div></div></div>
+<div class="ar"><h2>15. تقسيم المستندات</h2>
+<p>تُقسّم المستندات إلى مقاطع. المقاطع الصغيرة أدق في الاسترجاع، والكبيرة توفر سياقًا أوسع.</p></div></section>
+
+<section><div class="en"><h2>16. Similarity Search</h2>
+<div class="formula">cos(q,d)=qᵀd / (||q||·||d||)</div>
+<p>The query embedding is compared with document-chunk embeddings. The highest-scoring chunks are returned.</p></div>
+<div class="ar"><h2>16. البحث بالتشابه</h2>
+<p>تُقارن متجهات السؤال بالمقاطع باستخدام تشابه جيب التمام، ثم تُسترجع المقاطع الأعلى تشابهًا.</p></div></section>
+
+<section><div class="en"><h2>17. Grounded Engineering Answers</h2>
+<p>A grounded assistant should:</p><ul>
+<li>Use only retrieved evidence for factual claims.</li><li>Cite the source chunk.</li><li>State when evidence is missing.</li>
+<li>Preserve units and equations.</li><li>Avoid inventing standards or limits.</li></ul></div>
+<div class="ar"><h2>17. الإجابات الهندسية المستندة إلى المصادر</h2>
+<p>يجب الاعتماد على الأدلة المسترجعة، وذكر المصدر، والتصريح عند نقص المعلومات، والحفاظ على الوحدات والمعادلات.</p></div></section>
+
+<section><div class="en"><h2>18. Tool Use and Agents</h2>
+<p>An LLM can call external tools such as calculators, simulators, databases, or optimization software.</p>
+<div class="formula">Plan → Tool call → Observation → Revised plan → Answer</div>
+<div class="warning">Tool output must be validated. A correct tool call does not guarantee the model interpreted the result correctly.</div></div>
+<div class="ar"><h2>18. استخدام الأدوات والوكلاء</h2>
+<p>يمكن للنموذج استدعاء حاسبة أو محاكي أو قاعدة بيانات، ثم استخدام الناتج في الإجابة. ويجب التحقق من تفسير النتائج.</p></div></section>
+
+<section><div class="en"><h2>19. Applications in Power Engineering</h2>
+<div class="grid"><div class="mini-card"><strong>Operator assistant</strong><p>Retrieve procedures and explain alarms.</p></div>
+<div class="mini-card"><strong>Report generation</strong><p>Draft event and maintenance reports.</p></div>
+<div class="mini-card"><strong>Code assistant</strong><p>Generate MATLAB or Python prototypes.</p></div>
+<div class="mini-card"><strong>Knowledge search</strong><p>Search manuals, theses, and standards.</p></div>
+<div class="mini-card"><strong>Training tutor</strong><p>Explain concepts and create exercises.</p></div>
+<div class="mini-card"><strong>Data interface</strong><p>Translate natural language into queries.</p></div></div></div>
+<div class="ar"><h2>19. التطبيقات في هندسة القدرة</h2>
+<p>تشمل مساعد المشغل وتوليد التقارير ومساعدة البرمجة والبحث في الوثائق والتعليم والتفاعل مع البيانات.</p></div></section>
+
+<section><div class="en"><h2>20. Security and Privacy</h2>
+<ul><li>Do not expose confidential grid data unnecessarily.</li><li>Separate trusted and untrusted documents.</li><li>Protect against prompt injection.</li><li>Log sources and tool calls.</li><li>Apply access control and data minimization.</li></ul></div>
+<div class="ar"><h2>20. الأمن والخصوصية</h2>
+<p>يجب حماية بيانات الشبكة وفصل المصادر الموثوقة وتقييد الصلاحيات ومقاومة حقن الأوامر وتسجيل الاستدعاءات.</p></div></section>
+
+<section><div class="en"><h2>21. Evaluation</h2>
+<div class="grid"><div class="mini-card"><strong>Retrieval quality</strong><p>Did the system retrieve the right evidence?</p></div>
+<div class="mini-card"><strong>Faithfulness</strong><p>Is the answer supported by evidence?</p></div>
+<div class="mini-card"><strong>Completeness</strong><p>Did it address all required points?</p></div>
+<div class="mini-card"><strong>Engineering validity</strong><p>Are units, equations, and limits correct?</p></div></div></div>
+<div class="ar"><h2>21. التقييم</h2>
+<p>يجب تقييم جودة الاسترجاع ووفاء الإجابة بالمصادر واكتمالها وصحتها الهندسية.</p></div></section>
+
+<section><div class="en"><h2>🔬 Research Corner</h2>
+<div class="research"><strong>Emerging directions:</strong> multimodal grid assistants, small domain-specific language models, structured generation, agentic simulation workflows, long-context engineering search, and uncertainty-aware RAG.</div></div>
+<div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">من الاتجاهات الحديثة المساعدات متعددة الوسائط والنماذج الصغيرة المتخصصة والتوليد المنظم والوكلاء والمحاكاة والسياق الطويل وRAG مع عدم اليقين.</div></div></section>
+
+<section><div class="en"><h2>🧠 Review Questions</h2><ol>
+<li>Derive autoregressive factorization.</li><li>What is the role of tokenization?</li><li>Why is causal masking required?</li>
+<li>What causes hallucination?</li><li>Explain the RAG pipeline.</li><li>How should an engineering assistant be evaluated?</li>
+</ol></div>
+<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol>
+<li>اشتق التحليل الذاتي الاحتمالي.</li><li>ما دور التقسيم إلى رموز؟</li><li>لماذا نحتاج القناع السببي؟</li>
+<li>ما أسباب الهلوسة؟</li><li>اشرح RAG.</li><li>كيف يُقيّم المساعد الهندسي؟</li>
+</ol></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part II | Lecture 14</footer>
+</body></html>
