@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lecture 17 - Physics-Informed Artificial Intelligence</title><style>
+:root{
+  --bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;
+  --muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;
+  --red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+.container{width:min(1100px,92%);margin:auto}
+header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+.logo{font-weight:bold}.logo span{color:var(--blue)}
+.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
+.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
+.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
+.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
+.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
+pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+code{font-family:Consolas,monospace}
+.svg-wrap{overflow-x:auto;background:#06101d;border:1px solid var(--line);border-radius:14px;padding:10px;margin:18px 0}
+svg{max-width:100%;height:auto;display:block;margin:auto}
+.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+footer{text-align:center;color:var(--muted);padding:35px 0}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
+</style></head><body><header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+<div class="hero">
+  <div class="lecture-number">LECTURE 17 | المحاضرة 17</div>
+  <h1>Physics-Informed Artificial Intelligence</h1>
+  <div class="hero-ar">الذكاء الاصطناعي الموجَّه بالقوانين الفيزيائية</div>
+  <div class="subtitle">Embedding power-system equations and constraints into learning models<br>دمج معادلات أنظمة القدرة وقيودها داخل نماذج التعلم</div>
+</div>
+
+<section><div class="en"><h2>🎯 Learning Objectives</h2><ul>
+<li>Explain the difference between purely data-driven and physics-informed learning.</li>
+<li>Construct a physics-informed loss function.</li>
+<li>Use automatic differentiation to evaluate differential-equation residuals.</li>
+<li>Apply PINNs to power flow, state estimation, and dynamic stability.</li>
+<li>Understand hard and soft physical constraints.</li>
+<li>Recognize identifiability, scaling, and optimization challenges.</li>
+</ul></div>
+<div class="ar"><h2>🎯 أهداف التعلم</h2><ul>
+<li>التمييز بين التعلم المعتمد على البيانات والتعلم الموجَّه بالفيزياء.</li>
+<li>بناء دالة خسارة فيزيائية.</li>
+<li>استخدام الاشتقاق التلقائي لحساب متبقي المعادلات التفاضلية.</li>
+<li>تطبيق PINNs في تدفق القدرة وتقدير الحالة والاستقرار الديناميكي.</li>
+<li>فهم القيود الفيزيائية الصلبة والمرنة.</li>
+<li>معرفة تحديات قابلية التعرف والتحجيم والتحسين.</li>
+</ul></div></section>
+
+<section><div class="en"><h2>1. Why Physics-Informed AI?</h2>
+<p>Purely data-driven models can fit historical samples while violating Kirchhoff laws, energy balance, dynamic equations, or equipment limits.</p>
+<div class="highlight">Physics-informed AI combines observations with equations so that the learned model is encouraged to remain physically meaningful.</div></div>
+<div class="ar"><h2>1. لماذا نحتاج الذكاء الاصطناعي الموجَّه بالفيزياء؟</h2>
+<p>قد يحقق النموذج دقة عالية على البيانات، لكنه يخالف قوانين كيرشوف أو اتزان القدرة أو القيود التشغيلية. لذلك نضيف الفيزياء إلى عملية التعلم.</p></div></section>
+
+<section><div class="en"><h2>2. Three Learning Paradigms</h2>
+<div class="grid3">
+<div class="mini-card"><strong>Data-driven</strong><p>Learn only from input-output samples.</p></div>
+<div class="mini-card"><strong>Model-based</strong><p>Solve explicit physical equations.</p></div>
+<div class="mini-card"><strong>Physics-informed</strong><p>Combine data, equations, and constraints.</p></div>
+</div></div>
+<div class="ar"><h2>2. ثلاثة أساليب للتعلم</h2>
+<p>الأول يعتمد على البيانات فقط، والثاني على النموذج الفيزيائي فقط، والثالث يجمع البيانات والمعادلات والقيود.</p></div></section>
+
+<section><div class="en"><h2>3. General PINN Formulation</h2>
+<p>Suppose the unknown state u(x,t) satisfies:</p>
+<div class="formula">N[u(x,t);λ] = 0</div>
+<p>A neural network ûθ(x,t) approximates the solution. Automatic differentiation computes required derivatives.</p></div>
+<div class="ar"><h2>3. الصياغة العامة لـ PINN</h2>
+<p>تقرب الشبكة العصبية الحل المجهول، ثم تُحسب مشتقاته تلقائيًا وتُقارن بالمعادلة الفيزيائية.</p></div></section>
+
+<section><div class="en"><h2>4. Composite Loss Function</h2>
+<div class="formula">J(θ)=λdata Jdata + λphys Jphysics + λIC Jinitial + λBC Jboundary + λreg Jregularization</div>
+<div class="grid">
+<div class="mini-card"><strong>Data loss</strong><p>Agreement with measurements.</p></div>
+<div class="mini-card"><strong>Physics loss</strong><p>Residual of governing equations.</p></div>
+<div class="mini-card"><strong>Initial/boundary loss</strong><p>Enforce known conditions.</p></div>
+<div class="mini-card"><strong>Regularization</strong><p>Controls model complexity.</p></div>
+</div></div>
+<div class="ar"><h2>4. دالة الخسارة المركبة</h2>
+<p>تجمع الخسارة بين مطابقة القياسات ومتطلبات المعادلات الفيزيائية والشروط الابتدائية والحدودية والتنظيم.</p></div></section>
+
+<section><div class="en"><h2>5. Soft and Hard Constraints</h2>
+<div class="table-wrap"><table>
+<tr><th>Constraint</th><th>Implementation</th><th>Property</th></tr>
+<tr><td>Soft</td><td>Add penalty to loss</td><td>May be slightly violated</td></tr>
+<tr><td>Hard</td><td>Build into architecture/output transform</td><td>Satisfied exactly</td></tr>
+</table></div>
+<div class="formula">û(t)=u₀+t·NNθ(t)</div>
+<p>This transformation enforces û(0)=u₀ exactly.</p></div>
+<div class="ar"><h2>5. القيود المرنة والصلبة</h2>
+<p>تضاف القيود المرنة كعقوبات، بينما تُبنى القيود الصلبة في شكل الخرج بحيث تتحقق تمامًا.</p></div></section>
+
+<section><div class="en"><h2>6. Automatic Differentiation</h2>
+<p>PINNs require derivatives of network outputs with respect to inputs.</p>
+<div class="formula">dû/dt, d²û/dt², ∂û/∂x, ∂²û/∂x²</div>
+<div class="highlight">Automatic differentiation evaluates exact derivatives of the computational graph up to floating-point precision, avoiding finite-difference truncation errors.</div></div>
+<div class="ar"><h2>6. الاشتقاق التلقائي</h2>
+<p>يحسب مشتقات خرج الشبكة بالنسبة إلى الزمن أو المكان مباشرة من الرسم الحسابي، دون استخدام فروق عددية تقريبية.</p></div></section>
+
+<section><div class="en"><h2>7. Collocation Points</h2>
+<p>Physics residuals are evaluated at points in the problem domain, even when no measurements exist there.</p>
+<div class="formula">Jphysics = (1/Nf) Σ_i |N[ûθ(x_i,t_i)]|²</div></div>
+<div class="ar"><h2>7. نقاط الفحص الفيزيائي</h2>
+<p>تُقيّم المعادلة عند نقاط داخل المجال، حتى لو لم توجد قياسات عندها، مما يسمح باستخدام الفيزياء كإشراف إضافي.</p></div></section>
+
+<section><div class="en"><h2>8. Power-Flow Physics</h2>
+<div class="formula">P_i = Σ_j |V_i||V_j|(G_ij cosθ_ij + B_ij sinθ_ij)</div>
+<div class="formula">Q_i = Σ_j |V_i||V_j|(G_ij sinθ_ij − B_ij cosθ_ij)</div>
+<p>A physics-informed estimator can penalize active- and reactive-power mismatches.</p></div>
+<div class="ar"><h2>8. فيزياء تدفق القدرة</h2>
+<p>يمكن إضافة متبقي معادلات القدرة الفعالة والردية إلى خسارة نموذج تقدير الجهود والزوايا.</p></div></section>
+
+<section><div class="en"><h2>9. Kirchhoff-Informed Learning</h2>
+<div class="formula">Σ P_generation − Σ P_load − Σ P_flow = 0</div>
+<div class="formula">Σ I_in = Σ I_out</div>
+<p>Network balance constraints can be enforced at every bus.</p></div>
+<div class="ar"><h2>9. التعلم الموجَّه بقوانين كيرشوف</h2>
+<p>تُفرض معادلات اتزان القدرة أو التيار عند كل عقدة، مما يقلل الحلول غير الفيزيائية.</p></div></section>
+
+<section><div class="en"><h2>10. Swing Equation</h2>
+<div class="formula">M d²δ/dt² + D dδ/dt = P_m − P_e(δ)</div>
+<div class="formula">P_e(δ)=P_max sinδ</div>
+<p>The swing equation describes rotor-angle dynamics after disturbances.</p></div>
+<div class="ar"><h2>10. معادلة التأرجح</h2>
+<p>تصف ديناميكا زاوية الدوار اعتمادًا على العطالة والتخميد والقدرة الميكانيكية والكهربائية.</p></div></section>
+
+<section><div class="en"><h2>11. PINN Residual for the Swing Equation</h2>
+<div class="formula">r(t)=M δ̂″(t)+D δ̂′(t)−P_m+P_max sin(δ̂(t))</div>
+<div class="formula">Jphysics = mean(r(t)²)</div>
+<p>Initial-angle and initial-speed conditions are added to the loss or enforced exactly.</p></div>
+<div class="ar"><h2>11. متبقي PINN لمعادلة التأرجح</h2>
+<p>يُحسب متبقي المعادلة من خرج الشبكة ومشتقاته، ثم يُصغّر متوسط مربعه أثناء التدريب.</p></div></section>
+
+<section><div class="en"><h2>12. Forward and Inverse Problems</h2>
+<div class="grid"><div class="mini-card"><strong>Forward problem</strong><p>Known parameters, unknown state trajectory.</p></div>
+<div class="mini-card"><strong>Inverse problem</strong><p>Measurements available, unknown physical parameters.</p></div></div>
+<div class="formula">Learn M, D, or line parameters jointly with the state.</div></div>
+<div class="ar"><h2>12. المسائل المباشرة والعكسية</h2>
+<p>في المسألة المباشرة نعرف المعاملات ونبحث عن الحالة، وفي العكسية نتعلم معاملات مجهولة مثل العطالة أو التخميد من القياسات.</p></div></section>
+
+<section><div class="en"><h2>13. Hybrid Models</h2>
+<p>Physics can be incorporated at different levels:</p>
+<ul><li>Physics-based features</li><li>Physics penalties</li><li>Physics layers</li><li>Residual correction models</li><li>Neural differential equations</li></ul></div>
+<div class="ar"><h2>13. النماذج الهجينة</h2>
+<p>يمكن دمج الفيزياء كميزات أو عقوبات أو طبقات أو نماذج تصحيح أو معادلات تفاضلية عصبية.</p></div></section>
+
+<section><div class="en"><h2>14. Benefits</h2>
+<div class="grid">
+<div class="mini-card"><strong>Less labeled data</strong><p>Equations provide additional supervision.</p></div>
+<div class="mini-card"><strong>Physical consistency</strong><p>Reduces impossible predictions.</p></div>
+<div class="mini-card"><strong>Parameter estimation</strong><p>Supports inverse problems.</p></div>
+<div class="mini-card"><strong>Generalization</strong><p>Can improve behavior outside dense data regions.</p></div>
+</div></div>
+<div class="ar"><h2>14. الفوائد</h2>
+<p>قد تقل الحاجة إلى البيانات وتزداد الاتساق الفيزيائي وإمكانات تقدير المعاملات والتعميم.</p></div></section>
+
+<section><div class="en"><h2>15. Challenges</h2>
+<div class="grid">
+<div class="mini-card"><strong>Loss imbalance</strong><p>One loss component may dominate.</p></div>
+<div class="mini-card"><strong>Stiff dynamics</strong><p>Multiple time scales are difficult to train.</p></div>
+<div class="mini-card"><strong>Scaling</strong><p>Variables and residuals have different magnitudes.</p></div>
+<div class="mini-card"><strong>Optimization</strong><p>Nonconvex training can stagnate.</p></div>
+</div></div>
+<div class="ar"><h2>15. التحديات</h2>
+<p>تشمل عدم توازن مكونات الخسارة، والأنظمة الصلبة، واختلاف المقاييس، وصعوبة التحسين غير المحدب.</p></div></section>
+
+<section><div class="en"><h2>16. Adaptive Loss Weighting</h2>
+<div class="formula">J = Σ_k λ_k J_k</div>
+<p>Weights can be adjusted using gradient magnitudes, uncertainty, or curriculum learning.</p>
+<div class="warning">A small total loss does not guarantee that every physical residual is acceptably small.</div></div>
+<div class="ar"><h2>16. الموازنة التكيفية للخسائر</h2>
+<p>يمكن تعديل أوزان مكونات الخسارة حسب التدرجات أو عدم اليقين أو مراحل التدريب.</p></div></section>
+
+<section><div class="en"><h2>17. Applications in Power Systems</h2>
+<div class="grid">
+<div class="mini-card"><strong>Power flow surrogates</strong><p>Fast physically constrained approximations.</p></div>
+<div class="mini-card"><strong>State estimation</strong><p>Measurements plus network equations.</p></div>
+<div class="mini-card"><strong>Dynamic stability</strong><p>Learn trajectories and parameters.</p></div>
+<div class="mini-card"><strong>Parameter identification</strong><p>Estimate inertia, damping, and impedances.</p></div>
+<div class="mini-card"><strong>Battery models</strong><p>Combine electrochemical dynamics and data.</p></div>
+<div class="mini-card"><strong>Renewable systems</strong><p>Embed converter and plant equations.</p></div>
+</div></div>
+<div class="ar"><h2>17. التطبيقات</h2>
+<p>تشمل تقريب تدفق القدرة وتقدير الحالة والاستقرار وتحديد المعاملات ونماذج البطاريات والطاقة المتجددة.</p></div></section>
+
+<section><div class="en"><h2>18. Validation</h2>
+<ul><li>Compare with a trusted numerical solver.</li><li>Evaluate equation residuals separately.</li><li>Test unseen disturbances and parameters.</li><li>Check conservation laws.</li><li>Report uncertainty and failure cases.</li></ul></div>
+<div class="ar"><h2>18. التحقق</h2>
+<p>يجب المقارنة مع محلل عددي موثوق وفحص المتبقي الفيزيائي والحالات غير المرئية وقوانين الحفظ وحالات الفشل.</p></div></section>
+
+<section><div class="en"><h2>🔬 Research Corner</h2>
+<div class="research"><strong>Emerging directions:</strong> physics-informed graph networks, operator learning, differentiable power-flow solvers, neural ODEs, uncertainty-aware PINNs, and domain decomposition for large grids.</div></div>
+<div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">من الاتجاهات الحديثة GNN الموجهة بالفيزياء، والمؤثرات العصبية، ومحللات تدفق القدرة القابلة للاشتقاق، وNeural ODE، وعدم اليقين، وتقسيم المجال.</div></div></section>
+
+<section><div class="en"><h2>🧠 Review Questions</h2><ol>
+<li>Construct a composite physics-informed loss.</li><li>What is the difference between hard and soft constraints?</li>
+<li>How does automatic differentiation support PINNs?</li><li>Write the swing-equation residual.</li>
+<li>What is an inverse PINN problem?</li><li>Why is loss scaling important?</li>
+</ol></div>
+<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol>
+<li>ابنِ دالة خسارة موجهة بالفيزياء.</li><li>ما الفرق بين القيود الصلبة والمرنة؟</li>
+<li>كيف يدعم الاشتقاق التلقائي PINNs؟</li><li>اكتب متبقي معادلة التأرجح.</li>
+<li>ما المسألة العكسية؟</li><li>لماذا تحجيم الخسائر مهم؟</li>
+</ol></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part III | Lecture 17</footer>
+</body></html>

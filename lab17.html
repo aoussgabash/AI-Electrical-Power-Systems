@@ -1,0 +1,290 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lab 17 - PINN Swing Equation</title><style>
+:root{
+  --bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;
+  --muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;
+  --red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+.container{width:min(1100px,92%);margin:auto}
+header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+.logo{font-weight:bold}.logo span{color:var(--blue)}
+.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
+.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
+.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
+.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
+.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
+pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+code{font-family:Consolas,monospace}
+.svg-wrap{overflow-x:auto;background:#06101d;border:1px solid var(--line);border-radius:14px;padding:10px;margin:18px 0}
+svg{max-width:100%;height:auto;display:block;margin:auto}
+.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+footer{text-align:center;color:var(--muted);padding:35px 0}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
+</style></head><body><header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+<div class="hero">
+  <div class="lecture-number">LAB 17 | المخبر 17</div>
+  <h1>PINN Solution of the Swing Equation</h1>
+  <div class="hero-ar">حل معادلة التأرجح باستخدام شبكة عصبية موجهة بالفيزياء</div>
+  <div class="subtitle">MATLAB custom training loop with second-order automatic differentiation<br>حلقة تدريب MATLAB مخصصة مع اشتقاق تلقائي من الرتبة الثانية</div>
+</div>
+
+<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
+<li>Build a PINN that approximates rotor angle δ(t).</li><li>Compute first- and second-order derivatives using automatic differentiation.</li>
+<li>Minimize swing-equation and initial-condition residuals.</li><li>Compare the PINN with a numerical ODE solver.</li><li>Analyze the influence of loss weights and collocation points.</li></ul></div>
+<div class="ar"><h2>🎯 أهداف المخبر</h2><ul>
+<li>بناء PINN لتقريب زاوية الدوار.</li><li>حساب المشتقات الأولى والثانية تلقائيًا.</li><li>تقليل متبقي معادلة التأرجح والشروط الابتدائية.</li><li>المقارنة مع محلل ODE عددي.</li><li>تحليل أوزان الخسارة ونقاط الفحص.</li></ul></div></section>
+
+<section><div class="en"><h2>1. Dynamic Model</h2>
+<div class="formula">Mδ″ + Dδ′ = Pm − Pmax sinδ</div>
+<div class="formula">δ(0)=δ₀, &nbsp; δ′(0)=ω₀</div>
+<p>The PINN receives time t and outputs δ̂(t).</p></div>
+<div class="ar"><h2>1. النموذج الديناميكي</h2>
+<p>تدخل قيمة الزمن إلى الشبكة وتنتج زاوية الدوار، ثم تُستخدم المشتقات في معادلة التأرجح.</p></div></section>
+
+<section><div class="en"><h2>2. Requirements</h2>
+<ul><li>MATLAB</li><li>Deep Learning Toolbox</li></ul>
+<div class="note">The code uses a <code>dlnetwork</code>, <code>dlgradient</code> with higher derivatives, and <code>adamupdate</code>.</div></div>
+<div class="ar"><h2>2. المتطلبات</h2><p>يلزم MATLAB مع Deep Learning Toolbox لدعم الشبكات الديناميكية والاشتقاق التلقائي والتدريب المخصص.</p></div></section>
+
+<section><div class="en"><h2>3. Complete MATLAB Script</h2>
+<pre><code>%% Lab 17: PINN for the Swing Equation
+clear; clc; close all;
+rng(17);
+
+%% 1) Physical parameters
+M = 4.0;
+D = 1.0;
+Pm = 0.80;
+Pmax = 1.20;
+
+delta0 = 0.30;
+omega0 = 0.00;
+
+tMin = 0;
+tMax = 10;
+
+%% 2) Collocation points
+numPoints = 500;
+tData = linspace(tMin,tMax,numPoints);
+dlT = dlarray(tData,"CB");
+
+%% 3) Neural network
+layers = [
+    featureInputLayer(1,Normalization="none",Name="time")
+    fullyConnectedLayer(32,Name="fc1")
+    tanhLayer(Name="tanh1")
+    fullyConnectedLayer(32,Name="fc2")
+    tanhLayer(Name="tanh2")
+    fullyConnectedLayer(32,Name="fc3")
+    tanhLayer(Name="tanh3")
+    fullyConnectedLayer(1,Name="delta")
+];
+
+net = dlnetwork(layers);
+
+%% 4) Training settings
+numIterations = 8000;
+learnRate = 1e-3;
+
+lambdaPhysics = 1.0;
+lambdaDelta0 = 50.0;
+lambdaOmega0 = 50.0;
+
+averageGrad = [];
+averageSqGrad = [];
+
+lossHistory = zeros(numIterations,1);
+physicsHistory = zeros(numIterations,1);
+icHistory = zeros(numIterations,1);
+
+%% 5) Custom training loop
+for iteration = 1:numIterations
+
+    [loss,gradients,lossPhysics,lossIC] = ...
+        dlfeval(@modelLoss,net,dlT, ...
+        M,D,Pm,Pmax,delta0,omega0, ...
+        lambdaPhysics,lambdaDelta0,lambdaOmega0);
+
+    [net,averageGrad,averageSqGrad] = adamupdate( ...
+        net,gradients,averageGrad,averageSqGrad, ...
+        iteration,learnRate);
+
+    lossHistory(iteration) = ...
+        double(gather(extractdata(loss)));
+    physicsHistory(iteration) = ...
+        double(gather(extractdata(lossPhysics)));
+    icHistory(iteration) = ...
+        double(gather(extractdata(lossIC)));
+
+    if mod(iteration,500)==0
+        fprintf(['Iteration %5d | Total %.3e | ' ...
+                 'Physics %.3e | IC %.3e\n'], ...
+            iteration,lossHistory(iteration), ...
+            physicsHistory(iteration), ...
+            icHistory(iteration));
+    end
+end
+
+%% 6) PINN prediction
+tTest = linspace(tMin,tMax,1000);
+dlTTest = dlarray(tTest,"CB");
+deltaPINN = extractdata(forward(net,dlTTest));
+
+%% 7) Numerical reference solution
+state0 = [delta0;omega0];
+
+odefun = @(t,x) [
+    x(2)
+    (Pm-Pmax*sin(x(1))-D*x(2))/M
+];
+
+[tODE,xODE] = ode45(odefun,[tMin tMax],state0);
+
+deltaODE = interp1(tODE,xODE(:,1),tTest,"pchip");
+
+%% 8) Error
+MAE = mean(abs(deltaPINN-deltaODE));
+RMSE = sqrt(mean((deltaPINN-deltaODE).^2));
+
+fprintf('\nPINN MAE  = %.4e rad\n',MAE);
+fprintf('PINN RMSE = %.4e rad\n',RMSE);
+
+%% 9) Plots
+figure;
+plot(tTest,deltaODE,"k",LineWidth=1.5); hold on;
+plot(tTest,deltaPINN,"--",LineWidth=1.5);
+grid on;
+xlabel("Time (s)");
+ylabel("Rotor Angle delta (rad)");
+legend("ODE45 Reference","PINN");
+title("Swing-Equation Solution");
+
+figure;
+semilogy(lossHistory,LineWidth=1.2); hold on;
+semilogy(physicsHistory,LineWidth=1.2);
+semilogy(icHistory,LineWidth=1.2);
+grid on;
+xlabel("Iteration");
+ylabel("Loss");
+legend("Total","Physics","Initial Conditions");
+title("PINN Training History");
+
+%% Local loss function
+function [loss,gradients,lossPhysics,lossIC] = ...
+    modelLoss(net,t,M,D,Pm,Pmax,delta0,omega0, ...
+    lambdaPhysics,lambdaDelta0,lambdaOmega0)
+
+    % Network prediction
+    delta = forward(net,t);
+
+    % First derivative
+    delta_t = dlgradient(sum(delta,"all"),t, ...
+        EnableHigherDerivatives=true);
+
+    % Second derivative
+    delta_tt = dlgradient(sum(delta_t,"all"),t, ...
+        EnableHigherDerivatives=true);
+
+    % Swing-equation residual
+    residual = M*delta_tt + D*delta_t ...
+        - Pm + Pmax*sin(delta);
+
+    lossPhysics = mean(residual.^2,"all");
+
+    % Initial conditions
+    t0 = dlarray(0,"CB");
+    deltaAt0 = forward(net,t0);
+
+    delta0_t = dlgradient(sum(deltaAt0,"all"),t0, ...
+        EnableHigherDerivatives=true);
+
+    lossDelta0 = (deltaAt0-delta0).^2;
+    lossOmega0 = (delta0_t-omega0).^2;
+    lossIC = lossDelta0+lossOmega0;
+
+    % Total loss
+    loss = lambdaPhysics*lossPhysics ...
+        + lambdaDelta0*lossDelta0 ...
+        + lambdaOmega0*lossOmega0;
+
+    % Gradients with respect to network parameters
+    gradients = dlgradient(loss,net.Learnables);
+end</code></pre></div>
+<div class="ar"><h2>3. الكود الكامل</h2>
+<p>يبني الكود شبكة تستقبل الزمن وتنتج الزاوية، ثم يحسب المشتقتين ويصغر متبقي معادلة التأرجح والشروط الابتدائية.</p></div></section>
+
+<section><div class="en"><h2>4. Physics Loss</h2>
+<div class="formula">r(t)=Mδ̂″+Dδ̂′−Pm+Pmax sinδ̂</div>
+<div class="formula">Jphysics=mean(r²)</div>
+<p>The network is trained even without labeled trajectory data.</p></div>
+<div class="ar"><h2>4. الخسارة الفيزيائية</h2>
+<p>تُدرب الشبكة باستخدام المعادلة نفسها، حتى دون توفير قيم صحيحة للزاوية داخل المجال.</p></div></section>
+
+<section><div class="en"><h2>5. Initial-Condition Loss</h2>
+<div class="formula">JIC=(δ̂(0)−δ₀)²+(δ̂′(0)−ω₀)²</div>
+<p>Large initial-condition weights help anchor the solution at t=0.</p></div>
+<div class="ar"><h2>5. خسارة الشروط الابتدائية</h2>
+<p>تثبت قيمة الزاوية والسرعة في بداية المحاكاة، وتساعد الأوزان الكبيرة على منع انحراف الحل.</p></div></section>
+
+<section><div class="en"><h2>6. Why Higher Derivatives Are Enabled</h2>
+<p>The second derivative requires differentiating a derivative. Therefore the first call to automatic differentiation must preserve the derivative graph.</p></div>
+<div class="ar"><h2>6. لماذا نفعّل الاشتقاقات العليا؟</h2>
+<p>لأننا نشتق المشتقة الأولى مرة ثانية، يجب الاحتفاظ بالرسم الحسابي أثناء الاشتقاق الأول.</p></div></section>
+
+<section><div class="en"><h2>7. Expected Results</h2>
+<ul><li>Total and physics losses decrease.</li><li>The PINN follows the ODE45 reference trajectory.</li><li>Largest errors may occur near rapid transients.</li><li>Insufficient collocation points can produce oscillatory residuals.</li></ul></div>
+<div class="ar"><h2>7. النتائج المتوقعة</h2><p>يجب أن ينخفض الخطأ ويتبع حل PINN مسار ODE45، وقد تظهر أكبر الأخطاء خلال التغيرات السريعة.</p></div></section>
+
+<section><div class="en"><h2>8. Student Experiments</h2><div class="task"><ol>
+<li>Change inertia M from 4 to 2 and 8.</li><li>Change damping D.</li><li>Increase disturbance severity by changing Pm.</li>
+<li>Compare 100, 500, and 2000 collocation points.</li><li>Test different loss weights.</li><li>Add 10 noisy measured angle samples to the loss.</li>
+</ol></div></div>
+<div class="ar"><h2>8. تجارب الطالب</h2><div class="task"><ol>
+<li>غيّر العطالة.</li><li>غيّر التخميد.</li><li>زد شدة الاضطراب.</li><li>غيّر عدد نقاط الفحص.</li><li>اختبر أوزان خسارة مختلفة.</li><li>أضف قياسات زاوية مشوبة بالضجيج.</li>
+</ol></div></div></section>
+
+<section><div class="en"><h2>9. Inverse PINN Extension</h2>
+<p>Make M or D learnable and estimate them from sparse trajectory measurements.</p>
+<div class="formula">J=Jphysics+λdata Σ|δ̂(ti)−δmeas,i|²</div></div>
+<div class="ar"><h2>9. توسع إلى مسألة عكسية</h2>
+<p>اجعل العطالة أو التخميد معاملًا قابلًا للتعلم، ثم قدره من عدد محدود من القياسات.</p></div></section>
+
+<section><div class="en"><h2>10. Mini Project</h2>
+<div class="research"><strong>Multi-machine PINN:</strong> Extend the formulation to several coupled generators and compare a shared network with one network per machine.</div></div>
+<div class="ar"><h2>10. مشروع مصغر</h2><div class="research">وسّع النموذج إلى عدة مولدات مترابطة وقارن بين شبكة مشتركة وشبكة مستقلة لكل مولد.</div></div></section>
+
+<section><div class="en"><h2>11. Laboratory Report</h2><ul>
+<li>Derive the swing residual.</li><li>Explain automatic differentiation.</li><li>Report loss weights and collocation points.</li>
+<li>Compare PINN and ODE45 using MAE and RMSE.</li><li>Discuss failure cases.</li><li>Present one inverse-problem extension.</li></ul></div>
+<div class="ar"><h2>11. تقرير المخبر</h2><p>يتضمن اشتقاق المتبقي وشرح الاشتقاق التلقائي وأوزان الخسارة والمقارنة مع ODE45 وحالات الفشل وتوسعًا عكسيًا.</p></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part III | Lab 17</footer>
+</body></html>
