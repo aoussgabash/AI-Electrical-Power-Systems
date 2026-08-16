@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Lab 19 - AI Intrusion Detection</title>
+<style>
+body{font-family:Arial;margin:40px;background:#0b1220;color:#eef;line-height:1.7}
+h1,h2{color:#86efac}.ar{direction:rtl;text-align:right}
+pre{background:#111827;padding:10px}
+</style></head><body>
+<h1>Lab 19 – AI-based Intrusion Detection</h1>
+<p><b>المخبر 19 – كشف الهجمات السيبرانية باستخدام الذكاء الاصطناعي</b></p>
+
+<h2>Objectives</h2>
+<ul>
+<li>Generate normal and attack measurements.</li>
+<li>Train a binary classifier.</li>
+<li>Evaluate accuracy and confusion matrix.</li>
+</ul>
+
+<h2>MATLAB Example</h2>
+<pre>
+rng(19)
+N=1000;
+normal=randn(N,2);
+attack=randn(N,2)+2;
+
+X=[normal;attack];
+Y=[zeros(N,1);ones(N,1)];
+
+mdl=fitcsvm(X,Y);
+
+pred=predict(mdl,X);
+
+cm=confusionmat(Y,pred)
+
+gscatter(X(:,1),X(:,2),pred)
+grid on
+title('Predicted Classes')
+</pre>
+
+<div class="ar">
+<h2>تجارب إضافية</h2>
+<ul>
+<li>زد نسبة الهجمات.</li>
+<li>أضف ضوضاء للقياسات.</li>
+<li>قارن SVM مع Random Forest وشبكة عصبية.</li>
+</ul>
+</div>
+
+<h2>Mini Project</h2>
+<p>Develop an AI-based intrusion detector for PMU measurements and evaluate resilience against false-data injection attacks.</p>
+</body></html>
