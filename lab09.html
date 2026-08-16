@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MATLAB LSTM load forecasting laboratory">
+  <title>Lab 09 - Load Forecasting with LSTM</title>
+
+  <style>
+    :root{
+      --bg:#07111f; --card:#0f2238; --card2:#0b1b2c; --text:#f4f7fb;
+      --muted:#b8c7d9; --blue:#38bdf8; --green:#22c55e; --yellow:#facc15;
+      --red:#fb7185; --violet:#a78bfa; --line:rgba(255,255,255,.10);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; font-family:Arial,Tahoma,sans-serif;
+      background:linear-gradient(180deg,#07111f,#0a1728);
+      color:var(--text); line-height:1.8;
+    }
+    .container{width:min(1050px,92%);margin:auto}
+    header{
+      background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);
+      position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)
+    }
+    nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+    .logo{font-weight:bold}.logo span{color:var(--blue)}
+    .back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+    .hero{text-align:center;padding:58px 0 34px}
+    .lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+    h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+    .hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}
+    .subtitle{color:var(--muted);margin-top:10px}
+    .toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+    .toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+    section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+    h2{margin-top:0;color:#edf8ff} h3{color:var(--blue)}
+    p,li{color:#d8e2ec}
+    .en{direction:ltr;text-align:left}
+    .ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+    .highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+    .ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+    .good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+    .warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+    .formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}
+    .mini-card strong{color:white}
+    .flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+    .flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+    .arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+    th,td{border:1px solid var(--line);padding:11px;text-align:center}
+    th{background:#0b1b2c;color:#eaf7ff}
+    code{font-family:Consolas,monospace}
+    pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+    .tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+    .task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+    footer{text-align:center;color:var(--muted);padding:35px 0}
+    @media(max-width:750px){.grid,.grid3{grid-template-columns:1fr}nav{align-items:flex-start}.back{font-size:.86rem}}
+  </style>
+
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="hero">
+    <div class="lecture-number">LAB 09 | المخبر 09</div>
+    <h1>Short-Term Load Forecasting with LSTM</h1>
+    <div class="hero-ar">التنبؤ قصير الأمد بالحمل الكهربائي باستخدام LSTM</div>
+    <div class="subtitle">
+      MATLAB practical laboratory: data preparation, sequence learning, testing, and error analysis<br>
+      مخبر عملي باستخدام MATLAB: تجهيز البيانات، تعلم المتتاليات، الاختبار وتحليل الأخطاء
+    </div>
+  </div>
+
+  <section>
+    <div class="en">
+      <h2>🎯 Laboratory Objectives</h2>
+      <ul>
+        <li>Generate or import hourly electrical-load data.</li>
+        <li>Create lagged input sequences for one-step-ahead forecasting.</li>
+        <li>Normalize training data without leaking test information.</li>
+        <li>Build and train an LSTM regression network.</li>
+        <li>Evaluate predictions using MAE, RMSE, and MAPE.</li>
+        <li>Compare the LSTM against a persistence baseline.</li>
+      </ul>
+    </div>
+    <div class="ar">
+      <h2>🎯 أهداف المخبر</h2>
+      <ul>
+        <li>إنشاء أو استيراد بيانات حمل كهربائي ساعية.</li>
+        <li>بناء متتاليات دخل للتنبؤ بخطوة زمنية واحدة.</li>
+        <li>تطبيع بيانات التدريب دون تسريب معلومات الاختبار.</li>
+        <li>بناء وتدريب شبكة LSTM للانحدار.</li>
+        <li>تقييم النتائج باستخدام MAE وRMSE وMAPE.</li>
+        <li>مقارنة LSTM بخط أساس يعتمد على آخر قيمة.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>1. Problem Definition</h2>
+      <p>Use the previous 24 hourly load values to predict the next hour:</p>
+      <div class="formula">[Pₜ₋₂₃,...,Pₜ] → Pₜ₊₁</div>
+      <div class="tag">Sequence length = 24</div>
+      <div class="tag">Regression</div>
+      <div class="tag">One-step ahead</div>
+    </div>
+    <div class="ar">
+      <h2>1. تعريف المسألة</h2>
+      <p>نستخدم قيم الحمل خلال الساعات الأربع والعشرين السابقة لتوقع حمل الساعة التالية.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>2. Requirements</h2>
+      <ul>
+        <li>MATLAB</li>
+        <li>Deep Learning Toolbox</li>
+        <li>No external dataset is required for the basic version</li>
+      </ul>
+      <div class="note">The code first creates a realistic synthetic load profile. It can later be replaced by measured CSV data.</div>
+    </div>
+    <div class="ar">
+      <h2>2. المتطلبات</h2>
+      <p>يلزم MATLAB مع Deep Learning Toolbox. يولد الكود بيانات تعليمية اصطناعية، ويمكن لاحقًا استبدالها بملف CSV حقيقي.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>3. Complete MATLAB Script</h2>
+<pre><code>%% Lab 09: Short-Term Load Forecasting using LSTM
+clear; clc; close all;
+rng(7);   % Reproducible results
+
+%% 1) Generate hourly load data
+nDays = 180;
+N = 24*nDays;
+t = (0:N-1)';
+
+hour = mod(t,24);
+day  = floor(t/24);
+weekday = mod(day,7);
+
+dailyPattern  = 120 + 28*sin(2*pi*(hour-7)/24) ...
+                    + 10*sin(4*pi*(hour-5)/24);
+weeklyPattern = 8*(weekday &lt; 5) - 7*(weekday &gt;= 5);
+seasonPattern = 12*sin(2*pi*day/180);
+temperature   = 18 + 8*sin(2*pi*(hour-14)/24) ...
+                   + 5*sin(2*pi*day/180) + 1.2*randn(N,1);
+
+loadMW = dailyPattern + weeklyPattern + seasonPattern ...
+       + 0.9*max(temperature-22,0) ...
+       + 0.5*max(12-temperature,0) ...
+       + 2.5*randn(N,1);
+
+%% 2) Plot the first two weeks
+figure;
+plot(t(1:24*14),loadMW(1:24*14),'LineWidth',1.2);
+grid on;
+xlabel('Hour'); ylabel('Load (MW)');
+title('Synthetic Electrical Load - First 14 Days');
+
+%% 3) Create 24-hour sequences
+seqLen = 24;
+numSamples = N-seqLen;
+
+X = cell(numSamples,1);
+Y = zeros(numSamples,1);
+
+for k = 1:numSamples
+    X{k} = loadMW(k:k+seqLen-1)';  % 1 x 24
+    Y(k)   = loadMW(k+seqLen);
+end
+
+%% 4) Chronological split: 70% / 15% / 15%
+nTrain = floor(0.70*numSamples);
+nVal   = floor(0.15*numSamples);
+
+idxTrain = 1:nTrain;
+idxVal   = nTrain+1:nTrain+nVal;
+idxTest  = nTrain+nVal+1:numSamples;
+
+XTrain = X(idxTrain); YTrain = Y(idxTrain);
+XVal   = X(idxVal);   YVal   = Y(idxVal);
+XTest  = X(idxTest);  YTest  = Y(idxTest);
+
+%% 5) Normalize using TRAINING statistics only
+trainValues = cell2mat(XTrain);
+mu = mean(trainValues,'all');
+sigma = std(trainValues,0,'all');
+
+XTrainN = cellfun(@(x)(x-mu)/sigma,XTrain,'UniformOutput',false);
+XValN   = cellfun(@(x)(x-mu)/sigma,XVal,'UniformOutput',false);
+XTestN  = cellfun(@(x)(x-mu)/sigma,XTest,'UniformOutput',false);
+
+YTrainN = (YTrain-mu)/sigma;
+YValN   = (YVal-mu)/sigma;
+
+%% 6) Define LSTM network
+layers = [
+    sequenceInputLayer(1)
+    lstmLayer(64,'OutputMode','last')
+    dropoutLayer(0.20)
+    fullyConnectedLayer(32)
+    reluLayer
+    fullyConnectedLayer(1)
+    regressionLayer
+];
+
+options = trainingOptions('adam', ...
+    'MaxEpochs',80, ...
+    'MiniBatchSize',64, ...
+    'InitialLearnRate',1e-3, ...
+    'GradientThreshold',1, ...
+    'Shuffle','never', ...
+    'ValidationData',{XValN,YValN}, ...
+    'ValidationFrequency',30, ...
+    'ValidationPatience',8, ...
+    'Verbose',false, ...
+    'Plots','training-progress');
+
+%% 7) Train
+net = trainNetwork(XTrainN,YTrainN,layers,options);
+
+%% 8) Predict and reverse normalization
+YPredN = predict(net,XTestN,'MiniBatchSize',64);
+YPred = YPredN*sigma + mu;
+
+%% 9) Persistence baseline
+YPersistence = cellfun(@(x)x(end),XTest);
+
+%% 10) Performance indicators
+errLSTM = YPred-YTest;
+errBase = YPersistence-YTest;
+
+MAE_LSTM  = mean(abs(errLSTM));
+RMSE_LSTM = sqrt(mean(errLSTM.^2));
+MAPE_LSTM = 100*mean(abs(errLSTM./YTest));
+
+MAE_Base  = mean(abs(errBase));
+RMSE_Base = sqrt(mean(errBase.^2));
+MAPE_Base = 100*mean(abs(errBase./YTest));
+
+Results = table( ...
+    [MAE_Base;MAE_LSTM], ...
+    [RMSE_Base;RMSE_LSTM], ...
+    [MAPE_Base;MAPE_LSTM], ...
+    'VariableNames',{'MAE_MW','RMSE_MW','MAPE_percent'}, ...
+    'RowNames',{'Persistence','LSTM'});
+
+disp(Results);
+
+%% 11) Plot predictions
+nShow = min(240,length(YTest));
+
+figure;
+plot(YTest(1:nShow),'k','LineWidth',1.35); hold on;
+plot(YPersistence(1:nShow),'--','LineWidth',1.0);
+plot(YPred(1:nShow),'LineWidth',1.2);
+grid on;
+xlabel('Test hour'); ylabel('Load (MW)');
+legend('Actual','Persistence','LSTM','Location','best');
+title('One-Step-Ahead Load Forecast');
+
+%% 12) Plot prediction error
+figure;
+histogram(errLSTM,30);
+grid on;
+xlabel('Prediction error (MW)');
+ylabel('Frequency');
+title('LSTM Prediction Error Distribution');</code></pre>
+    </div>
+    <div class="ar">
+      <h2>3. الكود الكامل في MATLAB</h2>
+      <p>ينشئ الكود حملًا ساعيًّا يجمع نمطًا يوميًا وأسبوعيًا وموسميًا وتأثير درجة الحرارة والضجيج، ثم يبني متتاليات بطول 24 ساعة ويدرّب LSTM.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>4. Understanding the Data Model</h2>
+      <div class="formula">
+        P(t)=Pdaily(t)+Pweekly(t)+Pseason(t)+Ptemperature(t)+noise
+      </div>
+      <p>This is not intended to be a complete physical model. It is a controlled educational signal with realistic temporal structure.</p>
+    </div>
+    <div class="ar">
+      <h2>4. فهم نموذج البيانات</h2>
+      <p>الإشارة الاصطناعية ليست نموذجًا فيزيائيًا كاملًا، لكنها تحتوي أنماطًا زمنية واقعية تساعد على فهم التنبؤ قبل استخدام بيانات حقيقية.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>5. Why Chronological Splitting?</h2>
+      <div class="flow">
+        <div class="flow-box">Oldest 70%<br>Training</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Next 15%<br>Validation</div>
+        <div class="arrow">→</div>
+        <div class="flow-box">Newest 15%<br>Testing</div>
+      </div>
+      <div class="warning">Never compute normalization statistics from the complete dataset. That would allow test-period information to influence training.</div>
+    </div>
+    <div class="ar">
+      <h2>5. لماذا التقسيم الزمني؟</h2>
+      <p>نريد محاكاة الاستخدام الحقيقي: يتعلم النموذج من الماضي ثم يُختبر على فترة أحدث لم يرها سابقًا.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>6. Network Architecture</h2>
+      <div class="flow">
+        <div class="flow-box">1 feature × 24 steps</div><div class="arrow">→</div>
+        <div class="flow-box">LSTM<br>64 units</div><div class="arrow">→</div>
+        <div class="flow-box">Dropout<br>20%</div><div class="arrow">→</div>
+        <div class="flow-box">Dense 32 + ReLU</div><div class="arrow">→</div>
+        <div class="flow-box">Load forecast</div>
+      </div>
+      <p><strong>OutputMode = last</strong> means the network uses the final sequence representation to produce one forecast value.</p>
+    </div>
+    <div class="ar">
+      <h2>6. بنية الشبكة</h2>
+      <p>تستقبل الشبكة متتالية من 24 خطوة، ثم تلخصها LSTM في تمثيل واحد يُمرر إلى طبقات كاملة الاتصال لإنتاج قيمة الحمل المتوقعة.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>7. Evaluation Metrics</h2>
+      <div class="formula">MAE = mean(|ŷ-y|)</div>
+      <div class="formula">RMSE = √mean((ŷ-y)²)</div>
+      <div class="formula">MAPE = 100·mean(|(ŷ-y)/y|)</div>
+      <div class="highlight">A useful LSTM should outperform the persistence model. Otherwise, the added complexity is not justified.</div>
+    </div>
+    <div class="ar">
+      <h2>7. مؤشرات التقييم</h2>
+      <p>يقيس MAE متوسط مقدار الخطأ، بينما يعاقب RMSE الأخطاء الكبيرة أكثر. أما MAPE فيعرض الخطأ كنسبة مئوية.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>8. Expected Results</h2>
+      <p>Exact values vary because of random initialization, but the following behavior is expected:</p>
+      <ul>
+        <li>Training and validation losses decrease and then stabilize.</li>
+        <li>LSTM follows the daily load pattern and peaks.</li>
+        <li>LSTM normally improves upon persistence for changing load periods.</li>
+        <li>Larger errors may occur near sudden peaks or regime changes.</li>
+      </ul>
+    </div>
+    <div class="ar">
+      <h2>8. النتائج المتوقعة</h2>
+      <p>يُفترض أن يتتبع النموذج النمط اليومي للحمل وأن يتفوق غالبًا على خط الأساس، مع بقاء أخطاء أكبر قرب القمم والتغيرات المفاجئة.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>9. Student Tasks</h2>
+      <div class="task">
+        <ol>
+          <li>Change the sequence length from 24 to 48 and compare RMSE.</li>
+          <li>Change the number of LSTM units: 16, 32, 64, and 128.</li>
+          <li>Remove dropout and observe training/validation behavior.</li>
+          <li>Add temperature as a second input feature.</li>
+          <li>Forecast 24 hours ahead instead of one hour ahead.</li>
+          <li>Replace synthetic data with measured load data from a CSV file.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="ar">
+      <h2>9. مهام الطالب</h2>
+      <div class="task">
+        <ol>
+          <li>غيّر طول المتتالية من 24 إلى 48 وقارن RMSE.</li>
+          <li>جرّب 16 و32 و64 و128 وحدة LSTM.</li>
+          <li>احذف طبقة Dropout وراقب التدريب والتحقق.</li>
+          <li>أضف درجة الحرارة كميزة دخل ثانية.</li>
+          <li>حوّل المسألة إلى توقع 24 ساعة مقبلة.</li>
+          <li>استبدل البيانات الاصطناعية ببيانات حقيقية من CSV.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>10. Optional Extension: Two Input Features</h2>
+      <p>Each sequence can contain load and temperature:</p>
+<pre><code>X2{k} = [loadMW(k:k+seqLen-1)'; ...
+          temperature(k:k+seqLen-1)'];
+
+layers2 = [
+    sequenceInputLayer(2)
+    lstmLayer(64,'OutputMode','last')
+    fullyConnectedLayer(1)
+    regressionLayer
+];</code></pre>
+    </div>
+    <div class="ar">
+      <h2>10. توسع اختياري: ميزتا دخل</h2>
+      <p>تصبح كل خطوة زمنية متجهًا يحتوي الحمل ودرجة الحرارة، ويجب تغيير عدد ميزات طبقة الدخل إلى 2.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="en">
+      <h2>11. Laboratory Report</h2>
+      <p>The report should contain:</p>
+      <ul>
+        <li>Problem statement and data description</li>
+        <li>Network architecture</li>
+        <li>Training options</li>
+        <li>Plots of actual and predicted load</li>
+        <li>MAE, RMSE, and MAPE comparison table</li>
+        <li>Discussion of errors and limitations</li>
+      </ul>
+    </div>
+    <div class="ar">
+      <h2>11. تقرير المخبر</h2>
+      <p>يجب أن يتضمن التقرير تعريف المسألة والبيانات، بنية الشبكة، إعدادات التدريب، الرسوم، جدول مؤشرات الخطأ، ومناقشة القيود والنتائج.</p>
+    </div>
+  </section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part II | Lab 09</footer>
+</body>
+</html>
