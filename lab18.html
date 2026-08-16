@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Lab 18</title>
+<style>body{font-family:Arial;margin:40px;background:#0b1220;color:#eef;line-height:1.7}h1,h2{color:#86efac}.ar{direction:rtl;text-align:right}pre{background:#111827;padding:10px}</style>
+</head><body>
+<h1>Lab 18 – Federated Learning Simulation</h1>
+<p><b>المخبر 18 – محاكاة التعلم الاتحادي</b></p>
+<h2>MATLAB Example</h2>
+<pre>
+clients=5;
+localModels=randn(clients,10);
+weights=ones(clients,1)/clients;
+globalModel=weights'*localModels;
+disp(globalModel)
+</pre>
+<div class="ar">
+<p>جرّب تغيير عدد العملاء وأوزان الدمج وقارن تأثير البيانات غير المتجانسة.</p>
+</div>
+</body></html>
