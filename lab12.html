@@ -1,0 +1,290 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lab 12 - Battery Scheduling with DQN</title><style>
+:root{
+  --bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;
+  --muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;
+  --red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+.container{width:min(1100px,92%);margin:auto}
+header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+.logo{font-weight:bold}.logo span{color:var(--blue)}
+.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
+.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
+.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
+.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
+.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
+pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+code{font-family:Consolas,monospace}
+.svg-wrap{overflow-x:auto;background:#06101d;border:1px solid var(--line);border-radius:14px;padding:10px;margin:18px 0}
+svg{max-width:100%;height:auto;display:block;margin:auto}
+.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+footer{text-align:center;color:var(--muted);padding:35px 0}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
+</style></head><body><header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+<div class="hero"><div class="lecture-number">LAB 12 | المخبر 12</div><h1>Battery Scheduling with Deep Q-Learning</h1>
+<div class="hero-ar">جدولة بطارية باستخدام DQN</div>
+<div class="subtitle">A MATLAB custom environment for time-of-use energy management<br>بيئة MATLAB مخصصة لإدارة الطاقة وفق التعرفة الزمنية</div></div>
+
+<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
+<li>Create a custom battery environment with <code>rlFunctionEnv</code>.</li><li>Define observations and discrete actions.</li>
+<li>Implement SOC dynamics, cost, degradation, and penalties.</li><li>Train a DQN agent.</li>
+<li>Compare the learned policy with a no-battery baseline.</li></ul></div>
+<div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>إنشاء بيئة بطارية مخصصة.</li><li>تعريف الملاحظات والأفعال.</li><li>تنفيذ SOC والكلفة والتآكل والعقوبات.</li><li>تدريب وكيل DQN.</li><li>المقارنة مع عدم استخدام البطارية.</li></ul></div></section>
+
+<section><div class="en"><h2>1. Requirements</h2><ul><li>MATLAB</li><li>Reinforcement Learning Toolbox</li><li>Deep Learning Toolbox</li></ul></div>
+<div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Reinforcement Learning Toolbox وDeep Learning Toolbox.</p></div></section>
+
+<section><div class="en"><h2>2. Environment</h2>
+<div class="grid"><div class="mini-card"><strong>Observation</strong><p>SOC, load, price, hour.</p></div>
+<div class="mini-card"><strong>Actions</strong><p>−1 charge, 0 idle, +1 discharge.</p></div>
+<div class="mini-card"><strong>Episode</strong><p>24 hourly steps.</p></div>
+<div class="mini-card"><strong>Reward</strong><p>Negative operating cost and penalties.</p></div></div></div>
+<div class="ar"><h2>2. البيئة</h2><p>تتكون الملاحظة من SOC والحمل والسعر والساعة، والأفعال من الشحن والتوقف والتفريغ، والحلقة يوم واحد.</p></div></section>
+
+<section><div class="en"><h2>3. Main MATLAB Script</h2>
+<pre><code>%% Lab 12: Battery Scheduling using DQN
+clear; clc; close all;
+rng(12);
+
+%% Observation and action specifications
+obsInfo = rlNumericSpec([4 1], ...
+    LowerLimit=[0;0;0;0], ...
+    UpperLimit=[1;2;2;1]);
+obsInfo.Name = "battery_observation";
+
+actInfo = rlFiniteSetSpec({-1,0,1});
+actInfo.Name = "battery_action";
+
+%% Create custom environment
+env = rlFunctionEnv(obsInfo,actInfo, ...
+    @batteryStepFunction,@batteryResetFunction);
+
+validateEnvironment(env);
+
+%% Create a default DQN agent
+agent = rlDQNAgent(obsInfo,actInfo);
+
+agent.AgentOptions.UseDoubleDQN = true;
+agent.AgentOptions.DiscountFactor = 0.99;
+agent.AgentOptions.MiniBatchSize = 128;
+agent.AgentOptions.ExperienceBufferLength = 1e5;
+agent.AgentOptions.TargetUpdateFrequency = 4;
+
+agent.AgentOptions.EpsilonGreedyExploration.Epsilon = 1.0;
+agent.AgentOptions.EpsilonGreedyExploration.EpsilonMin = 0.05;
+agent.AgentOptions.EpsilonGreedyExploration.EpsilonDecay = 1e-4;
+
+%% Training options
+trainOpts = rlTrainingOptions( ...
+    MaxEpisodes=1200, ...
+    MaxStepsPerEpisode=24, ...
+    ScoreAveragingWindowLength=50, ...
+    StopTrainingCriteria="AverageReward", ...
+    StopTrainingValue=-8, ...
+    Verbose=false, ...
+    Plots="training-progress");
+
+%% Train
+trainingStats = train(agent,env,trainOpts);
+
+%% Simulate one day
+simOpts = rlSimulationOptions(MaxSteps=24);
+experience = sim(env,agent,simOpts);
+
+obs = experience.Observation.battery_observation.Data;
+act = experience.Action.battery_action.Data;
+rew = experience.Reward.Data;
+
+soc = squeeze(obs(1,1,:));
+actions = squeeze(act);
+rewards = squeeze(rew);
+hours = 0:numel(actions)-1;
+
+figure;
+stairs(0:numel(soc)-1,soc,'LineWidth',1.4);
+grid on;
+xlabel('Hour'); ylabel('SOC');
+title('Battery State of Charge');
+
+figure;
+stairs(hours,actions,'LineWidth',1.4);
+grid on;
+yticks([-1 0 1]);
+yticklabels({'Charge','Idle','Discharge'});
+xlabel('Hour'); ylabel('Action');
+title('DQN Battery Actions');
+
+fprintf('Episode reward = %.3f\n',sum(rewards));</code></pre></div>
+<div class="ar"><h2>3. البرنامج الرئيسي</h2><p>ينشئ مواصفات الملاحظات والأفعال والبيئة، ثم ينشئ وكيل DQN ويدربه ويشغله ليوم واحد.</p></div></section>
+
+<section><div class="en"><h2>4. Reset Function</h2>
+<pre><code>function [InitialObservation,Info] = batteryResetFunction()
+
+Info.Load = [2.2 2.0 1.9 1.8 1.9 2.3 ...
+             3.0 3.8 4.2 4.0 3.7 3.5 ...
+             3.4 3.6 4.0 4.8 5.8 6.5 ...
+             6.1 5.4 4.7 4.0 3.2 2.6]';
+
+Info.Price = [0.18*ones(6,1); ...
+              0.25*ones(10,1); ...
+              0.42*ones(5,1); ...
+              0.23*ones(3,1)];
+
+Info.Capacity = 10;       % kWh
+Info.Pmax = 2.5;          % kW
+Info.EtaCharge = 0.95;
+Info.EtaDischarge = 0.95;
+Info.SOCmin = 0.10;
+Info.SOCmax = 0.90;
+
+Info.Hour = 1;
+Info.SOC = 0.50;
+Info.TotalCost = 0;
+
+InitialObservation = makeObservation(Info);
+end</code></pre></div>
+<div class="ar"><h2>4. دالة إعادة الضبط</h2><p>تهيئ الحمل والتعرفة ومعاملات البطارية والساعة وحالة الشحن في بداية كل حلقة.</p></div></section>
+
+<section><div class="en"><h2>5. Step Function</h2>
+<pre><code>function [NextObservation,Reward,IsDone,Info] = ...
+    batteryStepFunction(Action,Info)
+
+action = double(Action);
+h = Info.Hour;
+loadPower = Info.Load(h);
+price = Info.Price(h);
+
+% -1 charge, 0 idle, +1 discharge
+PbattCommand = action*Info.Pmax;
+socOld = Info.SOC;
+violation = 0;
+
+if PbattCommand &lt; 0
+    Pcharge = -PbattCommand;
+    socNew = socOld + ...
+        Info.EtaCharge*Pcharge/Info.Capacity;
+elseif PbattCommand &gt; 0
+    Pdischarge = PbattCommand;
+    socNew = socOld - ...
+        Pdischarge/(Info.EtaDischarge*Info.Capacity);
+else
+    socNew = socOld;
+end
+
+if socNew &gt; Info.SOCmax
+    violation = socNew-Info.SOCmax;
+    socNew = Info.SOCmax;
+elseif socNew &lt; Info.SOCmin
+    violation = Info.SOCmin-socNew;
+    socNew = Info.SOCmin;
+end
+
+deltaSOC = socNew-socOld;
+
+if deltaSOC &gt;= 0
+    gridBatteryPower = ...
+        deltaSOC*Info.Capacity/Info.EtaCharge;
+else
+    deliveredPower = ...
+        -deltaSOC*Info.Capacity*Info.EtaDischarge;
+    gridBatteryPower = -deliveredPower;
+end
+
+gridPower = max(0,loadPower+gridBatteryPower);
+energyCost = price*gridPower;
+degradationCost = 0.015*abs(gridBatteryPower);
+
+Reward = -energyCost ...
+         -degradationCost ...
+         -30*violation;
+
+Info.SOC = socNew;
+Info.TotalCost = Info.TotalCost+energyCost;
+Info.Hour = Info.Hour+1;
+
+IsDone = Info.Hour &gt; 24;
+
+if IsDone
+    terminalPenalty = 3*abs(Info.SOC-0.50);
+    Reward = Reward-terminalPenalty;
+    Info.Hour = 24;
+end
+
+NextObservation = makeObservation(Info);
+end</code></pre></div>
+<div class="ar"><h2>5. دالة الخطوة</h2><p>تحدث حالة الشحن، وتفرض الحدود، وتحسب قدرة الشبكة والكلفة والتآكل والمكافأة.</p></div></section>
+
+<section><div class="en"><h2>6. Observation Helper</h2>
+<pre><code>function observation = makeObservation(Info)
+h = min(Info.Hour,24);
+
+loadNorm = Info.Load(h)/max(Info.Load);
+priceNorm = Info.Price(h)/max(Info.Price);
+hourNorm = (h-1)/23;
+
+observation = [
+    Info.SOC
+    loadNorm
+    priceNorm
+    hourNorm
+];
+end</code></pre></div>
+<div class="ar"><h2>6. بناء الملاحظة</h2><p>تُطبع قيم الحمل والسعر والساعة وتُجمع مع SOC في متجه من أربعة عناصر.</p></div></section>
+
+<section><div class="en"><h2>7. Reward</h2>
+<div class="formula">rₜ = −Costₜ − Degradationₜ − 30·SOCViolationₜ</div>
+<p>A final-SOC penalty prevents the agent from emptying the battery at the end of every episode.</p></div>
+<div class="ar"><h2>7. المكافأة</h2><p>تعاقب الكلفة والتآكل وتجاوز SOC، وتمنع العقوبة النهائية تفريغ البطارية بالكامل في نهاية اليوم.</p></div></section>
+
+<section><div class="en"><h2>8. Baseline</h2>
+<pre><code>[~,baseInfo] = batteryResetFunction();
+baselineCost = sum(baseInfo.Load.*baseInfo.Price);
+fprintf('No-battery daily cost = %.2f EUR\n',baselineCost);</code></pre>
+<div class="highlight">Judge the trained policy against a simple baseline, not only by episode reward.</div></div>
+<div class="ar"><h2>8. خط الأساس</h2><p>احسب كلفة شراء الحمل كاملًا دون بطارية ثم قارنها بسياسة DQN.</p></div></section>
+
+<section><div class="en"><h2>9. Expected Behavior</h2><ul><li>Charge during low-price hours.</li><li>Discharge during expensive evening hours.</li><li>Avoid SOC violations.</li><li>Preserve final SOC.</li></ul>
+<div class="warning">Training is stochastic. Stopping thresholds may need adjustment when reward scaling changes.</div></div>
+<div class="ar"><h2>9. السلوك المتوقع</h2><p>يُتوقع الشحن في الساعات الرخيصة والتفريغ في الذروة مع احترام الحدود والمحافظة على SOC نهائية مناسبة.</p></div></section>
+
+<section><div class="en"><h2>10. Student Experiments</h2><div class="task"><ol>
+<li>Change capacity to 5 and 20 kWh.</li><li>Use five action levels.</li><li>Add PV generation.</li>
+<li>Add a demand-charge penalty.</li><li>Randomize load and price at reset.</li><li>Compare with a rule-based controller.</li></ol></div></div>
+<div class="ar"><h2>10. تجارب الطالب</h2><div class="task"><ol><li>غيّر سعة البطارية.</li><li>استخدم خمسة مستويات قدرة.</li><li>أضف PV.</li><li>أضف عقوبة للذروة.</li><li>غيّر الحمل والسعر عشوائيًا.</li><li>قارن بتحكم قائم على قواعد.</li></ol></div></div></section>
+
+<section><div class="en"><h2>11. Mini Project</h2><div class="research"><strong>Microgrid extension:</strong> Add PV, a diesel generator, grid-import limits, and load shedding. Balance cost, emissions, reliability, and degradation.</div></div>
+<div class="ar"><h2>11. مشروع مصغر</h2><div class="research">وسّع البيئة إلى شبكة مصغرة تضم PV ومولد ديزل وحدود استيراد وفصل أحمال.</div></div></section>
+
+<section><div class="en"><h2>12. Laboratory Report</h2><ul><li>Define the MDP.</li><li>Explain SOC dynamics.</li><li>Plot training reward, SOC, and actions.</li><li>Compare cost with the baseline.</li><li>Report violations.</li><li>Discuss reward sensitivity and safety.</li></ul></div>
+<div class="ar"><h2>12. تقرير المخبر</h2><p>يتضمن تعريف MDP ومعادلات SOC والرسوم والمقارنة مع خط الأساس والمخالفات وتحليل المكافأة والأمان.</p></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part II | Lab 12</footer>
+</body></html>

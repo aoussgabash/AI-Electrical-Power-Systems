@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Lecture 12 - Reinforcement Learning in Energy Management</title><style>
+:root{
+  --bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;
+  --muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;
+  --red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+.container{width:min(1100px,92%);margin:auto}
+header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
+.logo{font-weight:bold}.logo span{color:var(--blue)}
+.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
+h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
+.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
+.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
+.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
+.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
+.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
+.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
+.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
+.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
+.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
+.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
+.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
+.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
+th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
+pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
+code{font-family:Consolas,monospace}
+.svg-wrap{overflow-x:auto;background:#06101d;border:1px solid var(--line);border-radius:14px;padding:10px;margin:18px 0}
+svg{max-width:100%;height:auto;display:block;margin:auto}
+.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
+.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
+footer{text-align:center;color:var(--muted);padding:35px 0}
+@media(max-width:760px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
+</style></head><body><header>
+  <div class="container">
+    <nav>
+      <div class="logo"><span>AI</span> Power Systems</div>
+      <a class="back" href="index.html">← Home | الرئيسية</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+<div class="hero">
+  <div class="lecture-number">LECTURE 12 | المحاضرة 12</div>
+  <h1>Reinforcement Learning in Energy Management</h1>
+  <div class="hero-ar">التعلم المعزز في إدارة الطاقة</div>
+  <div class="subtitle">Sequential decision-making for batteries, microgrids, demand response, and grid control<br>اتخاذ القرار المتتابع للبطاريات والشبكات المصغرة والاستجابة للطلب والتحكم بالشبكة</div>
+</div>
+
+<section><div class="en"><h2>🎯 Learning Objectives</h2><ul>
+<li>Formulate energy management as a Markov decision process.</li><li>Define state, action, reward, policy, and return.</li>
+<li>Derive Bellman equations and Q-learning updates.</li><li>Explain DQN, actor-critic, PPO, DDPG, and SAC.</li>
+<li>Design a reward for battery scheduling.</li><li>Recognize safety and generalization challenges.</li></ul></div>
+<div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>صياغة إدارة الطاقة كعملية قرار ماركوفية.</li><li>تعريف الحالة والفعل والمكافأة والسياسة والعائد.</li><li>اشتقاق معادلات بيلمان وQ-learning.</li><li>فهم DQN وActor-Critic وPPO وDDPG وSAC.</li><li>تصميم مكافأة لجدولة البطارية.</li><li>فهم الأمان والتعميم.</li></ul></div></section>
+
+<section><div class="en"><h2>1. Reinforcement Learning Loop</h2>
+<div class="flow"><div class="flow-box">State sₜ</div><div class="arrow">→</div><div class="flow-box">Agent selects aₜ</div><div class="arrow">→</div><div class="flow-box">Environment</div><div class="arrow">→</div><div class="flow-box">Reward rₜ and next state</div></div>
+<div class="highlight">The agent is not given the correct action for every state. It discovers a policy through interaction.</div></div>
+<div class="ar"><h2>1. حلقة التعلم المعزز</h2><p>يراقب الوكيل الحالة ويختار فعلًا، ثم تنتقل البيئة إلى حالة جديدة وتعيد مكافأة. ومن تكرار هذه العملية يتعلم الوكيل سياسة القرار.</p></div></section>
+
+<section><div class="en"><h2>2. Markov Decision Process</h2>
+<div class="formula">MDP = (S, A, P, R, γ)</div>
+<div class="grid3"><div class="mini-card"><strong>State</strong><p>Information for decision-making.</p></div>
+<div class="mini-card"><strong>Action</strong><p>Available control decision.</p></div>
+<div class="mini-card"><strong>Transition</strong><p>Evolution after the action.</p></div>
+<div class="mini-card"><strong>Reward</strong><p>Immediate decision quality.</p></div>
+<div class="mini-card"><strong>Discount</strong><p>Importance of future reward.</p></div>
+<div class="mini-card"><strong>Policy</strong><p>State-to-action mapping.</p></div></div></div>
+<div class="ar"><h2>2. عملية قرار ماركوفية</h2><p>تتكون من الحالات والأفعال وديناميكا الانتقال والمكافأة ومعامل الخصم والسياسة.</p></div></section>
+
+<section><div class="en"><h2>3. Markov Property</h2>
+<div class="formula">P(sₜ₊₁ | s₀,a₀,...,sₜ,aₜ) = P(sₜ₊₁ | sₜ,aₜ)</div>
+<p>For battery control, SOC alone may be insufficient; time, load, price, renewable output, and forecasts may also be needed.</p></div>
+<div class="ar"><h2>3. خاصية ماركوف</h2><p>يجب أن تحتوي الحالة على المعلومات المهمة للمستقبل، ولذلك نضيف إلى SOC الزمن والسعر والحمل والتوقعات.</p></div></section>
+
+<section><div class="en"><h2>4. Return and Discount</h2>
+<div class="formula">Gₜ = rₜ₊₁ + γrₜ₊₂ + γ²rₜ₊₃ + ...</div>
+<div class="formula">Gₜ = Σₖ₌₀∞ γᵏ rₜ₊ₖ₊₁</div>
+<p>A small γ emphasizes immediate savings; γ near one emphasizes long-term operation.</p></div>
+<div class="ar"><h2>4. العائد والخصم</h2><p>العائد هو مجموع المكافآت الحالية والمستقبلية بعد خصمها، ويحدد γ مقدار اهتمام الوكيل بالمستقبل.</p></div></section>
+
+<section><div class="en"><h2>5. Value Functions</h2>
+<div class="formula">Vπ(s) = Eπ[Gₜ | sₜ=s]</div>
+<div class="formula">Qπ(s,a) = Eπ[Gₜ | sₜ=s, aₜ=a]</div>
+<p>V evaluates a state; Q evaluates a particular action in that state.</p></div>
+<div class="ar"><h2>5. دوال القيمة</h2><p>تقيس V جودة الحالة، بينما تقيس Q جودة اختيار فعل معين ضمن تلك الحالة.</p></div></section>
+
+<section><div class="en"><h2>6. Bellman Optimality</h2>
+<div class="formula">Q*(s,a) = E[r + γ maxₐ′ Q*(s′,a′)]</div>
+<div class="highlight">A long-horizon problem becomes an immediate reward plus the best value of the next state.</div></div>
+<div class="ar"><h2>6. أمثلية بيلمان</h2><p>تربط قيمة القرار الحالي بالمكافأة الفورية وأفضل قيمة مستقبلية، وهي الأساس الرياضي لخوارزميات القيمة.</p></div></section>
+
+<section><div class="en"><h2>7. Q-Learning</h2>
+<div class="formula">Q(sₜ,aₜ) ← Q(sₜ,aₜ) + α[rₜ₊₁ + γ maxₐQ(sₜ₊₁,a) − Q(sₜ,aₜ)]</div>
+<div class="formula">δₜ = rₜ₊₁ + γ maxₐQ(sₜ₊₁,a) − Q(sₜ,aₜ)</div></div>
+<div class="ar"><h2>7. خوارزمية Q-Learning</h2><p>تُحدّث قيمة الفعل باستخدام خطأ الفرق الزمني بين القيمة الحالية والهدف الجديد.</p></div></section>
+
+<section><div class="en"><h2>8. Exploration and Exploitation</h2>
+<div class="formula">With probability ε: choose a random action; otherwise: choose arg max Q(s,a)</div>
+<div class="warning">Too little exploration can trap the agent in a poor policy. Excessive exploration wastes experience and may violate limits.</div></div>
+<div class="ar"><h2>8. الاستكشاف والاستغلال</h2><p>توازن سياسة ε-greedy بين تجربة أفعال جديدة واستخدام أفضل فعل معروف.</p></div></section>
+
+<section><div class="en"><h2>9. Deep Q-Network</h2>
+<p>DQN approximates Q(s,a) using a neural network and is suited to discrete actions.</p>
+<div class="formula">L(θ) = E[(r + γ maxₐ′Q(s′,a′;θ⁻) − Q(s,a;θ))²]</div>
+<div class="grid"><div class="mini-card"><strong>Experience replay</strong><p>Random mini-batches reduce correlation.</p></div>
+<div class="mini-card"><strong>Target network</strong><p>Stabilizes the learning target.</p></div></div></div>
+<div class="ar"><h2>9. شبكة DQN</h2><p>تستخدم DQN شبكة عصبية لتقريب Q، وتناسب الأفعال المنفصلة مثل الشحن أو التوقف أو التفريغ.</p></div></section>
+
+<section><div class="en"><h2>10. Actor-Critic Methods</h2>
+<div class="formula">∇θJ(θ) = E[∇θ log πθ(a|s) · A(s,a)]</div>
+<div class="grid"><div class="mini-card"><strong>Actor</strong><p>Produces an action or probability distribution.</p></div>
+<div class="mini-card"><strong>Critic</strong><p>Estimates value and guides the actor.</p></div></div></div>
+<div class="ar"><h2>10. أساليب Actor-Critic</h2><p>يتعلم Actor السياسة مباشرة، بينما يقيم Critic جودة الأفعال ويوجه تحديث السياسة.</p></div></section>
+
+<section><div class="en"><h2>11. Algorithm Selection</h2>
+<div class="table-wrap"><table><tr><th>Algorithm</th><th>Action space</th><th>Typical energy use</th></tr>
+<tr><td>DQN</td><td>Discrete</td><td>Charge / idle / discharge</td></tr>
+<tr><td>DDPG / TD3</td><td>Continuous</td><td>Continuous storage or inverter power</td></tr>
+<tr><td>PPO</td><td>Discrete or continuous</td><td>General robust control policy</td></tr>
+<tr><td>SAC</td><td>Continuous</td><td>Exploratory storage and microgrid control</td></tr></table></div></div>
+<div class="ar"><h2>11. اختيار الخوارزمية</h2><p>تناسب DQN الأفعال المنفصلة، بينما تناسب DDPG وTD3 وSAC التحكم المستمر، ويمكن استخدام PPO في الحالتين.</p></div></section>
+
+<section><div class="en"><h2>12. Battery Scheduling as an MDP</h2>
+<div class="grid"><div class="mini-card"><strong>State</strong><p>SOC, load, price, PV, hour, forecasts.</p></div>
+<div class="mini-card"><strong>Action</strong><p>Charge or discharge power.</p></div>
+<div class="mini-card"><strong>Transition</strong><p>SOC dynamics and next-hour data.</p></div>
+<div class="mini-card"><strong>Reward</strong><p>Negative cost, degradation, and violations.</p></div></div></div>
+<div class="ar"><h2>12. جدولة البطارية كـ MDP</h2><p>تتكون الحالة من SOC والحمل والسعر والزمن، والفعل من قدرة البطارية، والمكافأة من الكلفة والتآكل والعقوبات.</p></div></section>
+
+<section><div class="en"><h2>13. Battery Dynamics</h2>
+<div class="formula">SOCₜ₊₁ = SOCₜ + ηc Pc,t Δt/Emax − Pd,t Δt/(ηd Emax)</div>
+<div class="formula">SOCmin ≤ SOCₜ ≤ SOCmax</div></div>
+<div class="ar"><h2>13. ديناميكا البطارية</h2><p>تزداد SOC عند الشحن وتنخفض عند التفريغ مع مراعاة الكفاءة والسعة وحدود التشغيل.</p></div></section>
+
+<section><div class="en"><h2>14. Reward Design</h2>
+<div class="formula">rₜ = −cₜPgrid,tΔt − λdeg|Pb,t| − λviol·Violationₜ</div>
+<div class="warning">Reward scaling strongly changes the learned behavior. Weak penalties may be ignored; excessive penalties can make the policy too conservative.</div></div>
+<div class="ar"><h2>14. تصميم المكافأة</h2><p>تجمع المكافأة كلفة الطاقة وتآكل البطارية وعقوبات تجاوز القيود، ويجب موازنة معاملات هذه الحدود بعناية.</p></div></section>
+
+<section><div class="en"><h2>15. RL versus Optimization</h2>
+<div class="table-wrap"><table><tr><th>Aspect</th><th>Optimization</th><th>Reinforcement learning</th></tr>
+<tr><td>Model</td><td>Usually explicit</td><td>Can learn from interaction</td></tr>
+<tr><td>Online use</td><td>Solve repeatedly</td><td>Fast policy inference</td></tr>
+<tr><td>Guarantees</td><td>Possible under assumptions</td><td>Usually limited</td></tr>
+<tr><td>Best use</td><td>Well-modeled constrained problems</td><td>Complex sequential uncertainty</td></tr></table></div></div>
+<div class="ar"><h2>15. مقارنة RL والتحسين</h2><p>يوفر التحسين ضمانات أقوى عند توفر نموذج واضح، بينما قد يوفر RL قرارًا سريعًا بعد التدريب. ولا ينبغي اعتباره بديلًا تلقائيًا للتحسين.</p></div></section>
+
+<section><div class="en"><h2>16. Safe Reinforcement Learning</h2>
+<ul><li>Action clipping</li><li>Safety filters</li><li>Constrained MDPs</li><li>Lagrangian penalties</li><li>MPC safety layers</li><li>Offline validation</li></ul>
+<div class="good">In a critical grid, learned actions should pass deterministic feasibility and protection checks.</div></div>
+<div class="ar"><h2>16. التعلم المعزز الآمن</h2><p>يمكن استخدام قص الأفعال ومرشحات الأمان والقيود وطبقات MPC، ويجب التحقق من القرار قبل تطبيقه.</p></div></section>
+
+<section><div class="en"><h2>17. Power-System Applications</h2>
+<div class="grid"><div class="mini-card"><strong>Microgrids</strong><p>Storage, generation, and grid exchange.</p></div>
+<div class="mini-card"><strong>Demand response</strong><p>Shift flexible loads.</p></div>
+<div class="mini-card"><strong>Voltage control</strong><p>Coordinate inverter reactive power.</p></div>
+<div class="mini-card"><strong>Electric vehicles</strong><p>Charging and vehicle-to-grid.</p></div>
+<div class="mini-card"><strong>Restoration</strong><p>Sequential switching after faults.</p></div>
+<div class="mini-card"><strong>Market bidding</strong><p>Storage participation under uncertainty.</p></div></div></div>
+<div class="ar"><h2>17. التطبيقات</h2><p>تشمل الشبكات المصغرة والاستجابة للطلب والتحكم بالجهد والمركبات واستعادة الشبكة والأسواق.</p></div></section>
+
+<section><div class="en"><h2>🔬 Research Corner</h2>
+<div class="research"><strong>Emerging directions:</strong> offline RL, safe RL, multi-agent systems, model-based RL, distributional RL, and hybrid optimization-RL controllers.</div></div>
+<div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">من الاتجاهات الحديثة التعلم دون اتصال، التعلم الآمن، الأنظمة متعددة الوكلاء، التعلم القائم على نموذج، والدمج مع التحسين.</div></div></section>
+
+<section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Define an MDP for battery scheduling.</li><li>Derive the Q-learning update.</li><li>Why does DQN need replay memory?</li><li>When is DQN unsuitable?</li><li>How does reward design affect degradation?</li><li>Why are safety filters needed?</li></ol></div>
+<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>عرّف MDP لجدولة البطارية.</li><li>اشتق تحديث Q-learning.</li><li>لماذا تحتاج DQN إلى ذاكرة خبرة؟</li><li>متى لا تناسب DQN المسألة؟</li><li>كيف تؤثر المكافأة في التآكل؟</li><li>لماذا نحتاج مرشحات الأمان؟</li></ol></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems – Part II | Lecture 12</footer>
+</body></html>
