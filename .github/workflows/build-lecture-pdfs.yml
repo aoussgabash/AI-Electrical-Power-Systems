@@ -1,0 +1,140 @@
+name: Build downloadable lecture PDFs
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-lecture-pdfs.yml'
+      - 'lecture*.html'
+      - 'course-common.css'
+      - 'course-navigation.js'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-pdfs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright Chromium
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local website
+        run: |
+          python3 -m http.server 8000 > /tmp/course-http.log 2>&1 &
+          echo $! > /tmp/course-http.pid
+          sleep 3
+
+      - name: Generate lecture PDFs
+        run: |
+          mkdir -p pdf
+          cat > /tmp/build-pdfs.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+
+          for (let number = 1; number <= 20; number += 1) {
+            const num = String(number).padStart(2, '0');
+            const html = `lecture${num}.html`;
+            if (!fs.existsSync(html)) continue;
+
+            await page.goto(`http://127.0.0.1:8000/${html}`, {
+              waitUntil: 'networkidle',
+              timeout: 120000
+            });
+
+            await page.emulateMedia({ media: 'print' });
+            await page.evaluate(() => document.fonts?.ready);
+            await page.pdf({
+              path: `pdf/lecture${num}.pdf`,
+              format: 'A4',
+              printBackground: true,
+              preferCSSPageSize: true,
+              margin: { top: '14mm', right: '14mm', bottom: '14mm', left: '14mm' },
+              displayHeaderFooter: false
+            });
+
+            const size = fs.statSync(`pdf/lecture${num}.pdf`).size;
+            if (size < 10000) throw new Error(`Generated PDF for ${html} is unexpectedly small.`);
+            console.log(`Generated pdf/lecture${num}.pdf (${size} bytes)`);
+          }
+
+          await browser.close();
+          EOF
+          node /tmp/build-pdfs.mjs
+
+      - name: Update direct PDF download button
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('course-navigation.js')
+          text = path.read_text(encoding='utf-8')
+
+          old = """    const downloadButton = card({
+      tag: 'button',
+      className: 'course-action-download',
+      icon: '📥',
+      title: 'Download Lecture PDF',
+      subtitle: 'تحميل المحاضرة بصيغة PDF',
+      meta: 'Print / Save as PDF | طباعة / حفظ PDF'
+    });
+    downloadButton.addEventListener('click', () => {
+      const originalTitle = document.title;
+      document.title = `Lecture_${num}_AI_Power_Systems_Version_1.0`;
+      window.addEventListener('afterprint', () => { document.title = originalTitle; }, { once: true });
+      window.print();
+    });
+    actions.appendChild(downloadButton);
+"""
+
+          new = """    const downloadButton = card({
+      className: 'course-action-download',
+      href: `pdf/lecture${num}.pdf`,
+      icon: '📥',
+      title: 'Download Lecture PDF',
+      subtitle: 'تحميل المحاضرة بصيغة PDF',
+      meta: 'Ready PDF | ملف PDF جاهز'
+    });
+    downloadButton.setAttribute('download', `Lecture_${num}_AI_Power_Systems_Version_1.0.pdf`);
+    actions.appendChild(downloadButton);
+"""
+
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif "href: `pdf/lecture${num}.pdf`" not in text:
+              raise RuntimeError('Could not find the lecture PDF button block in course-navigation.js')
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Validate generated PDFs
+        run: |
+          count=$(find pdf -maxdepth 1 -type f -name 'lecture*.pdf' | wc -l)
+          test "$count" -gt 0
+          echo "Generated $count lecture PDF files."
+          grep -q 'pdf/lecture${num}.pdf' course-navigation.js
+
+      - name: Commit PDFs and direct links
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pdf/ course-navigation.js
+          if git diff --cached --quiet; then
+            echo "Lecture PDFs are already up to date."
+          else
+            git commit -m "Generate downloadable lecture PDF files"
+            git push
+          fi
