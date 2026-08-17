@@ -1,0 +1,59 @@
+name: Fix certificate Arabic font URL
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-certificate-font-url.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-font-url:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Replace broken font URL
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('course-quiz.js')
+          text = path.read_text(encoding='utf-8')
+
+          broken = 'https://raw.githubusercontent.com/notofonts/arabic/main/fonts/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf'
+          working = 'https://raw.githubusercontent.com/notofonts/noto-fonts/main/unhinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf'
+
+          if broken in text:
+              text = text.replace(broken, working)
+              path.write_text(text, encoding='utf-8')
+              print('Replaced broken Arabic font URL.')
+          elif working in text:
+              print('Arabic font URL is already correct.')
+          else:
+              raise RuntimeError('Expected certificate font URL was not found in course-quiz.js')
+
+      - name: Validate updated URL
+        shell: python
+        run: |
+          from pathlib import Path
+
+          text = Path('course-quiz.js').read_text(encoding='utf-8')
+          assert 'notofonts/noto-fonts/main/unhinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf' in text
+          assert 'notofonts/arabic/main/fonts/ttf/NotoNaskhArabic' not in text
+          print('Certificate font URL validated.')
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add course-quiz.js
+          if git diff --cached --quiet; then
+            echo "No change needed."
+          else
+            git commit -m "Fix Arabic certificate font download URL"
+            git push
+          fi
