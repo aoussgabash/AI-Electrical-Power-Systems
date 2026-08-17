@@ -1,0 +1,73 @@
+name: Vendor Arabic font for certificates
+
+on:
+  push:
+    paths:
+      - '.github/workflows/vendor-arabic-font.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vendor-font:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download Arabic font into repository
+        run: |
+          set -euo pipefail
+          mkdir -p assets/fonts
+          curl -fL --retry 3 --retry-delay 2 \
+            'https://raw.githubusercontent.com/notofonts/noto-fonts/main/unhinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf' \
+            -o assets/fonts/NotoNaskhArabic-Regular.ttf
+          test -s assets/fonts/NotoNaskhArabic-Regular.ttf
+          file assets/fonts/NotoNaskhArabic-Regular.ttf
+
+      - name: Update certificate code to use local font
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('course-quiz.js')
+          text = path.read_text(encoding='utf-8')
+
+          pattern = re.compile(
+              r"https://raw\.githubusercontent\.com/[^'\"]+/NotoNaskhArabic-Regular\.ttf"
+          )
+          replacement = 'assets/fonts/NotoNaskhArabic-Regular.ttf'
+
+          updated, count = pattern.subn(replacement, text)
+          if count == 0 and replacement not in text:
+              raise RuntimeError('Could not find the external Arabic font URL in course-quiz.js')
+
+          path.write_text(updated, encoding='utf-8')
+          print(f'Replaced {count} external font URL(s).')
+
+      - name: Validate local font integration
+        shell: python
+        run: |
+          from pathlib import Path
+
+          font = Path('assets/fonts/NotoNaskhArabic-Regular.ttf')
+          script = Path('course-quiz.js').read_text(encoding='utf-8')
+
+          assert font.exists() and font.stat().st_size > 10000, 'Arabic font file is missing or too small.'
+          assert 'assets/fonts/NotoNaskhArabic-Regular.ttf' in script
+          assert 'raw.githubusercontent.com' not in script or 'NotoNaskhArabic-Regular.ttf' not in script.split('raw.githubusercontent.com', 1)[-1]
+          print(f'Local Arabic font ready: {font.stat().st_size} bytes')
+
+      - name: Commit local font and code update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/fonts/NotoNaskhArabic-Regular.ttf course-quiz.js
+          if git diff --cached --quiet; then
+            echo "Local Arabic font is already configured."
+          else
+            git commit -m "Bundle Arabic font for PDF certificates"
+            git push
+          fi
