@@ -1,0 +1,71 @@
+name: Unify course page footers
+
+on:
+  push:
+    paths:
+      - '.github/workflows/unify-footers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unify-footers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Unify Lecture 09–20 and Lab 09–20 footers
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def replace_footer(text, number, kind):
+              if kind == 'lecture':
+                  label = f'Lecture {number:02d} | المحاضرة {number:02d}'
+              else:
+                  label = f'MATLAB Lab {number:02d} | مختبر MATLAB {number:02d}'
+
+              footer = f'''<footer>
+          AI Applications in Electrical Power Systems
+          <br>
+          تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
+          <br><br>
+          {label}
+          </footer>'''
+
+              pattern = r'<footer\b[^>]*>.*?</footer>'
+              if re.search(pattern, text, flags=re.S | re.I):
+                  return re.sub(pattern, footer, text, count=1, flags=re.S | re.I)
+              return re.sub(r'</body>', footer + '\n</body>', text, count=1, flags=re.I)
+
+          changed = []
+          for number in range(9, 21):
+              for kind, prefix in [('lecture', 'lecture'), ('lab', 'lab')]:
+                  path = Path(f'{prefix}{number:02d}.html')
+                  if not path.exists():
+                      print(f'Skipping missing file: {path}')
+                      continue
+                  old = path.read_text(encoding='utf-8')
+                  new = replace_footer(old, number, kind)
+                  if new != old:
+                      path.write_text(new, encoding='utf-8')
+                      changed.append(str(path))
+
+          print('Changed files:')
+          for path in changed:
+              print(path)
+
+      - name: Commit unified footers
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lecture{09..20}.html lab{09..20}.html
+          if git diff --cached --quiet; then
+            echo "No footer changes were necessary."
+          else
+            git commit -m "Unify footer style for Lectures 09-20 and Labs 09-20"
+            git push
+          fi
