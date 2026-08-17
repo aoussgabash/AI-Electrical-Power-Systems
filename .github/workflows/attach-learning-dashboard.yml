@@ -1,0 +1,155 @@
+name: Attach learning dashboard to homepage
+
+on:
+  push:
+    paths:
+      - '.github/workflows/attach-learning-dashboard.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  attach-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add dashboard assets and markup
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          original = text
+
+          css_tag = '<link rel="stylesheet" href="course-progress.css">'
+          script_tag = '<script src="course-progress.js" defer></script>'
+
+          dashboard = '''
+<section id="progress" class="learning-dashboard" data-learning-dashboard>
+  <div class="section-title">
+    <h2>Learning Dashboard</h2>
+    <div class="ar">لوحة تقدّم الطالب</div>
+    <p>Your results are stored locally in this browser only.</p>
+  </div>
+
+  <div class="progress-panel">
+    <div class="progress-summary">
+      <div class="progress-stat">
+        <strong data-progress-completed>0/20</strong>
+        <span>Passed Quizzes | اختبارات ناجحة</span>
+      </div>
+      <div class="progress-stat">
+        <strong data-progress-attempted>0/20</strong>
+        <span>Attempted | تمت المحاولة</span>
+      </div>
+      <div class="progress-stat">
+        <strong data-progress-average>—</strong>
+        <span>Quiz Average | متوسط النتائج</span>
+      </div>
+      <div class="progress-stat">
+        <strong data-progress-course>0%</strong>
+        <span>Course Progress | تقدم المقرر</span>
+      </div>
+    </div>
+
+    <div class="progress-main">
+      <article class="progress-card">
+        <h3>Lecture Progress | تقدم المحاضرات</h3>
+        <div class="progress-track" aria-label="Course progress">
+          <div class="progress-fill" data-progress-fill></div>
+        </div>
+        <div class="progress-caption">
+          <span data-progress-caption>0 of 20 lectures completed</span>
+          <span>Pass mark: 80%</span>
+        </div>
+        <div class="progress-list" data-progress-list></div>
+        <p class="progress-note">
+          Green = passed, yellow = attempted, number = not attempted.<br>
+          الأخضر = ناجح، الأصفر = تمت المحاولة، الرقم = لم تتم المحاولة.
+        </p>
+        <button type="button" class="progress-reset" data-progress-reset>
+          Reset Local Progress | حذف التقدم المحلي
+        </button>
+      </article>
+
+      <aside class="progress-card">
+        <h3>Achievements | الإنجازات</h3>
+        <div class="achievement locked" data-achievement-first>
+          <span class="achievement-icon">🏅</span>
+          <div><strong>First Quiz Passed</strong><span>اجتياز أول اختبار</span></div>
+        </div>
+        <div class="achievement locked" data-achievement-five>
+          <span class="achievement-icon">🥉</span>
+          <div><strong>Five Lectures Completed</strong><span>إكمال خمس محاضرات</span></div>
+        </div>
+        <div class="achievement locked" data-achievement-half>
+          <span class="achievement-icon">🥇</span>
+          <div><strong>Half Course Completed</strong><span>إكمال نصف المقرر</span></div>
+        </div>
+        <div class="achievement locked" data-achievement-expert>
+          <span class="achievement-icon">🏆</span>
+          <div><strong>AI Power Systems Expert</strong><span>خبير الذكاء الاصطناعي في أنظمة القدرة</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+'''
+
+          if 'course-progress.css' not in text:
+              text = re.sub(r'</head\s*>', css_tag + '\n</head>', text, count=1, flags=re.I)
+
+          if 'data-learning-dashboard' not in text:
+              structure_match = re.search(r'<section\s+id=["\']structure["\'][^>]*>.*?</section>', text, flags=re.S | re.I)
+              if not structure_match:
+                  raise RuntimeError('Could not find the Course Structure section in index.html')
+              insert_at = structure_match.end()
+              text = text[:insert_at] + '\n' + dashboard + text[insert_at:]
+
+          if 'course-progress.js' not in text:
+              text = re.sub(r'</body\s*>', script_tag + '\n</body>', text, count=1, flags=re.I)
+
+          # Add a navigation link when the desktop navigation exists.
+          if 'href="#progress"' not in text:
+              text = text.replace('<a href="#courses">Lectures & Labs</a>', '<a href="#progress">Progress</a><a href="#courses">Lectures & Labs</a>', 1)
+
+          path.write_text(text, encoding='utf-8')
+          print('Homepage changed:', text != original)
+
+      - name: Validate dashboard integration
+        shell: python
+        run: |
+          from pathlib import Path
+
+          text = Path('index.html').read_text(encoding='utf-8')
+          checks = [
+              'course-progress.css',
+              'course-progress.js',
+              'data-learning-dashboard',
+              'data-progress-completed',
+              'data-progress-list',
+              'data-achievement-expert'
+          ]
+          for item in checks:
+              assert item in text, f'Missing required dashboard item: {item}'
+          assert text.count('data-learning-dashboard') == 1, 'Dashboard was inserted more than once'
+          assert text.count('course-progress.css') == 1, 'Progress CSS was linked more than once'
+          assert text.count('course-progress.js') == 1, 'Progress JS was linked more than once'
+          print('Learning dashboard integration validated.')
+
+      - name: Commit learning dashboard
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Learning dashboard is already attached."
+          else
+            git commit -m "Add learning progress dashboard to homepage"
+            git push
+          fi
