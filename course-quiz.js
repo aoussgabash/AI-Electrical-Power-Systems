@@ -189,7 +189,7 @@
       const fontFile = 'NotoNaskhArabic-Regular.ttf';
       if (!window.pdfMake.vfs?.[fontFile]) {
         const fontBase64 = await fetchAsBase64(
-          'https://raw.githubusercontent.com/notofonts/noto-fonts/main/unhinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf'
+          'assets/fonts/NotoNaskhArabic-Regular.ttf'
         );
         window.pdfMake.vfs = window.pdfMake.vfs || {};
         window.pdfMake.vfs[fontFile] = fontBase64;
