@@ -6,6 +6,12 @@
   function loadScript(src, check) {
     if (check()) return Promise.resolve();
     return new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) {
+        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('error', reject, { once: true });
+        return;
+      }
       const script = document.createElement('script');
       script.src = src;
       script.async = true;
@@ -13,23 +19,6 @@
       script.onerror = () => reject(new Error(`Could not load ${src}`));
       document.head.appendChild(script);
     });
-  }
-
-  async function loadCertificateFont() {
-    if (!('FontFace' in window)) return 'Arial';
-    try {
-      const font = new FontFace(
-        'CertificateSans',
-        'url(assets/fonts/DejaVuSans.ttf) format("truetype")'
-      );
-      await font.load();
-      document.fonts.add(font);
-      await document.fonts.ready;
-      return 'CertificateSans';
-    } catch (error) {
-      console.warn('Local certificate font could not be loaded.', error);
-      return 'Arial';
-    }
   }
 
   function getLectureNumber() {
@@ -62,39 +51,27 @@
     return `APS-${new Date().getFullYear()}-L${lectureNumber}-${(hash >>> 0).toString(36).toUpperCase()}`;
   }
 
-  function containsArabic(text) {
-    return /[\u0600-\u06FF]/.test(text);
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
   }
 
-  function drawCenteredText(ctx, text, x, y, options = {}) {
-    const {
-      font = '32px Arial',
-      color = '#0f172a',
-      direction = 'ltr',
-      align = 'center'
-    } = options;
-    ctx.save();
-    ctx.font = font;
-    ctx.fillStyle = color;
-    ctx.direction = direction;
-    ctx.textAlign = align;
-    ctx.textBaseline = 'middle';
-    ctx.fillText(text, x, y);
-    ctx.restore();
-  }
-
-  function roundedRect(ctx, x, y, width, height, radius, fill, stroke) {
-    ctx.beginPath();
-    ctx.roundRect(x, y, width, height, radius);
-    if (fill) {
-      ctx.fillStyle = fill;
-      ctx.fill();
+  async function ensureCertificateFonts() {
+    if (!('FontFace' in window)) return;
+    const fonts = [
+      new FontFace('CertificateSans', 'url(assets/fonts/DejaVuSans.ttf) format("truetype")', { weight: '400' }),
+      new FontFace('CertificateSans', 'url(assets/fonts/DejaVuSans-Bold.ttf) format("truetype")', { weight: '700' })
+    ];
+    for (const font of fonts) {
+      try {
+        const loaded = await font.load();
+        document.fonts.add(loaded);
+      } catch (error) {
+        console.warn('Certificate font could not be loaded.', error);
+      }
     }
-    if (stroke) {
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
+    await document.fonts?.ready;
   }
 
   async function createCertificatePDF(button) {
@@ -109,127 +86,104 @@
     button.disabled = true;
     button.textContent = '⏳ Creating PDF... | جارٍ إنشاء PDF...';
 
+    let certificate;
     try {
-      await loadScript(
-        'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js',
-        () => Boolean(window.jspdf?.jsPDF)
-      );
-
-      const fontFamily = await loadCertificateFont();
-      const width = 1684;
-      const height = 1190;
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Canvas is not supported.');
+      await Promise.all([
+        loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js', () => typeof window.html2canvas === 'function'),
+        loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js', () => Boolean(window.jspdf?.jsPDF)),
+        loadScript('https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js', () => Boolean(window.QRCode))
+      ]);
+      await ensureCertificateFonts();
 
       const completed = stored.completedAt ? new Date(stored.completedAt) : new Date();
       const completedDate = completed.toLocaleDateString('en-GB');
       const [levelEn, levelAr] = performanceLevel(Number(stored.percent));
       const certificateId = makeCertificateId(studentName.trim(), lectureNumber, stored.completedAt);
-      const verificationUrl = `aoussgabash.com/?certificate=${certificateId}`;
+      const verificationUrl = `https://aoussgabash.com/?certificate=${encodeURIComponent(certificateId)}`;
+      const safeStudentName = escapeHtml(studentName.trim());
 
-      ctx.fillStyle = '#f8fbff';
-      ctx.fillRect(0, 0, width, height);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(45, 45, width - 90, height - 90);
-      ctx.strokeStyle = '#075985';
-      ctx.lineWidth = 10;
-      ctx.strokeRect(45, 45, width - 90, height - 90);
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(65, 65, width - 130, height - 130);
+      certificate = document.createElement('div');
+      certificate.setAttribute('aria-hidden', 'true');
+      certificate.style.cssText = [
+        'position:fixed', 'left:-10000px', 'top:0', 'width:1400px', 'height:990px',
+        'padding:28px', 'background:#f8fbff', 'font-family:CertificateSans,Arial,Tahoma,sans-serif',
+        'color:#0f172a', 'z-index:-9999', 'box-sizing:border-box'
+      ].join(';');
 
-      drawCenteredText(ctx, 'AI POWER SYSTEMS', width / 2, 120, {
-        font: `700 30px ${fontFamily}`,
-        color: '#0284c7'
-      });
-      drawCenteredText(ctx, 'Certificate of Lecture Completion', width / 2, 190, {
-        font: `700 58px ${fontFamily}`,
-        color: '#075985'
-      });
-      drawCenteredText(ctx, 'شهادة إتمام المحاضرة', width / 2, 255, {
-        font: `700 44px ${fontFamily}`,
-        color: '#334155',
-        direction: 'rtl'
-      });
-      drawCenteredText(ctx, 'This certifies that', width / 2, 320, {
-        font: `28px ${fontFamily}`
-      });
+      certificate.innerHTML = `
+        <main style="height:100%;background:#fff;border:8px double #0b4f91;box-shadow:inset 0 0 0 3px #60a5fa;padding:42px 68px;box-sizing:border-box;text-align:center;display:flex;flex-direction:column;align-items:center;">
+          <div style="font-size:20px;font-weight:700;letter-spacing:7px;color:#075985;margin-top:2px;">AI POWER SYSTEMS</div>
+          <div style="font-size:50px;font-weight:700;color:#083f77;line-height:1.15;margin-top:12px;">Certificate of Lecture Completion</div>
+          <div lang="ar" dir="rtl" style="font-size:40px;font-weight:700;color:#0b4f91;line-height:1.35;margin-top:14px;unicode-bidi:isolate;">شهادة إتمام محاضرة</div>
+          <div style="width:520px;height:2px;background:#3978bf;margin:13px 0 18px;"></div>
 
-      const nameDirection = containsArabic(studentName) ? 'rtl' : 'ltr';
-      drawCenteredText(ctx, studentName.trim(), width / 2, 395, {
-        font: `700 55px ${fontFamily}`,
-        color: '#111827',
-        direction: nameDirection
-      });
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(420, 438);
-      ctx.lineTo(width - 420, 438);
-      ctx.stroke();
+          <div style="font-size:26px;line-height:1.3;">This certifies that</div>
+          <div lang="ar" dir="rtl" style="font-size:27px;line-height:1.4;unicode-bidi:isolate;">تشهد هذه الشهادة بأن</div>
+          <div dir="auto" style="font-size:52px;font-weight:700;color:#111827;line-height:1.25;margin:10px 0 4px;unicode-bidi:plaintext;">${safeStudentName}</div>
+          <div style="width:430px;height:2px;background:#93b9df;margin:2px 0 14px;"></div>
 
-      drawCenteredText(ctx, `has successfully completed Lecture ${lectureNumber}`, width / 2, 490, {
-        font: `30px ${fontFamily}`
-      });
-      drawCenteredText(ctx, 'AI Applications in Electrical Power Systems', width / 2, 550, {
-        font: `700 40px ${fontFamily}`
-      });
-      drawCenteredText(ctx, 'تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية', width / 2, 605, {
-        font: `34px ${fontFamily}`,
-        color: '#334155',
-        direction: 'rtl'
-      });
+          <div style="font-size:25px;line-height:1.3;">has successfully completed Lecture ${lectureNumber}</div>
+          <div lang="ar" dir="rtl" style="font-size:27px;line-height:1.45;margin-top:4px;unicode-bidi:isolate;">قد أتم بنجاح المحاضرة رقم <bdi dir="ltr">${lectureNumber}</bdi></div>
 
-      roundedRect(ctx, 480, 665, 330, 85, 18, '#ecfdf5', '#86efac');
-      roundedRect(ctx, 875, 665, 330, 85, 18, '#eff6ff', '#93c5fd');
-      drawCenteredText(ctx, `Score: ${stored.percent}%`, 645, 708, {
-        font: `700 34px ${fontFamily}`,
-        color: '#15803d'
-      });
-      drawCenteredText(ctx, levelEn, 1040, 708, {
-        font: `700 34px ${fontFamily}`,
-        color: '#1d4ed8'
-      });
-      drawCenteredText(ctx, `النتيجة: ${stored.percent}٪ — ${levelAr}`, width / 2, 790, {
-        font: `700 34px ${fontFamily}`,
-        color: '#15803d',
-        direction: 'rtl'
-      });
+          <div style="font-size:36px;font-weight:700;color:#0b3f79;line-height:1.25;margin-top:13px;">AI Applications in Electrical Power Systems</div>
+          <div lang="ar" dir="rtl" style="font-size:28px;font-weight:700;color:#0b4f91;line-height:1.45;margin-top:4px;unicode-bidi:isolate;">تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
 
-      drawCenteredText(ctx, `Completion Date: ${completedDate}`, 430, 890, {
-        font: `25px ${fontFamily}`,
-        color: '#475569'
-      });
-      drawCenteredText(ctx, 'Dr.-Ing. Aouss Gabash', 430, 950, {
-        font: `700 29px ${fontFamily}`
-      });
-      drawCenteredText(ctx, 'IEEE Senior Member', 430, 990, {
-        font: `23px ${fontFamily}`,
-        color: '#64748b'
+          <div style="display:flex;justify-content:center;gap:32px;margin-top:22px;">
+            <div style="width:300px;padding:14px 18px;border:2px solid #34a853;border-radius:12px;background:#effcf3;color:#148436;font-size:32px;font-weight:700;box-sizing:border-box;">Score: ${stored.percent}%</div>
+            <div style="width:300px;padding:14px 18px;border:2px solid #6ea8f7;border-radius:12px;background:#f3f7ff;color:#2458b8;font-size:32px;font-weight:700;box-sizing:border-box;">${levelEn}</div>
+          </div>
+
+          <div lang="ar" dir="rtl" style="font-size:28px;font-weight:700;color:#148436;line-height:1.5;margin-top:12px;unicode-bidi:isolate;">
+            <span>${levelAr}</span>
+            <span> — </span>
+            <span>النتيجة</span>
+            <bdi dir="ltr">: ${stored.percent}%</bdi>
+          </div>
+
+          <div style="width:100%;display:grid;grid-template-columns:1fr 150px 1fr;align-items:end;gap:30px;margin-top:auto;padding:0 10px 10px;box-sizing:border-box;">
+            <div style="text-align:left;line-height:1.45;">
+              <div style="font-size:20px;color:#0b4f91;">Completion Date:</div>
+              <div style="font-size:22px;margin-bottom:13px;">${completedDate}</div>
+              <div style="font-size:27px;font-weight:700;font-style:italic;">Dr.-Ing. Aouss Gabash</div>
+              <div style="font-size:19px;color:#42648a;">IEEE Senior Member</div>
+              <div style="font-size:18px;color:#42648a;">Version 1.0</div>
+            </div>
+
+            <div style="text-align:center;">
+              <canvas data-certificate-qr width="112" height="112" style="display:block;margin:auto;"></canvas>
+              <div style="font-size:18px;color:#334155;margin-top:4px;">Verify</div>
+            </div>
+
+            <div style="text-align:right;line-height:1.5;">
+              <div style="font-size:21px;font-weight:700;color:#0b4f91;">Certificate ID</div>
+              <div style="font-size:19px;">${certificateId}</div>
+              <div style="font-size:20px;color:#0b4f91;margin-top:4px;">aoussgabash.com</div>
+            </div>
+          </div>
+        </main>`;
+
+      document.body.appendChild(certificate);
+      const qrCanvas = certificate.querySelector('[data-certificate-qr]');
+      await window.QRCode.toCanvas(qrCanvas, verificationUrl, {
+        width: 112,
+        margin: 1,
+        color: { dark: '#0f172a', light: '#ffffff' }
       });
 
-      drawCenteredText(ctx, 'Certificate ID', 1245, 885, {
-        font: `700 24px ${fontFamily}`,
-        color: '#075985'
-      });
-      drawCenteredText(ctx, certificateId, 1245, 930, {
-        font: `22px ${fontFamily}`
-      });
-      drawCenteredText(ctx, verificationUrl, 1245, 975, {
-        font: `20px ${fontFamily}`,
-        color: '#475569'
-      });
-      drawCenteredText(ctx, 'Version 1.0', width / 2, 1080, {
-        font: `20px ${fontFamily}`,
-        color: '#64748b'
+      await document.fonts?.ready;
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const canvas = await window.html2canvas(certificate, {
+        scale: 2,
+        backgroundColor: '#f8fbff',
+        useCORS: true,
+        logging: false,
+        letterRendering: true
       });
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 297, 210, undefined, 'FAST');
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.97), 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
       pdf.setProperties({
         title: `Lecture ${lectureNumber} Certificate - ${studentName.trim()}`,
         author: 'Dr.-Ing. Aouss Gabash',
@@ -244,15 +198,15 @@
       console.error(error);
       alert('The PDF could not be created. Please reload the page and try again. | تعذر إنشاء ملف PDF. أعد تحميل الصفحة ثم حاول مجددًا.');
     } finally {
+      certificate?.remove();
       button.disabled = false;
       button.textContent = originalText;
     }
   }
 
-  function installCanvasCertificateButton() {
+  function installCertificateButton() {
     const oldButton = document.querySelector('[data-quiz-certificate]');
     if (!oldButton) return;
-
     const replacement = oldButton.cloneNode(true);
     replacement.textContent = '📄 Download PDF Certificate | تنزيل شهادة PDF';
     oldButton.replaceWith(replacement);
@@ -260,8 +214,8 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', installCanvasCertificateButton, { once: true });
+    document.addEventListener('DOMContentLoaded', installCertificateButton, { once: true });
   } else {
-    installCanvasCertificateButton();
+    installCertificateButton();
   }
 })();
