@@ -78,6 +78,35 @@
     });
   }
 
+  async function fetchAsBase64(url) {
+    const response = await fetch(url, { cache: 'force-cache' });
+    if (!response.ok) throw new Error(`Font request failed: ${response.status}`);
+    const buffer = await response.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    const chunk = 0x8000;
+    for (let index = 0; index < bytes.length; index += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(index, index + chunk));
+    }
+    return btoa(binary);
+  }
+
+  function toArabicIndicDigits(value) {
+    const digits = '٠١٢٣٤٥٦٧٨٩';
+    return String(value).replace(/\d/g, digit => digits[Number(digit)]);
+  }
+
+  function makeCertificateId(studentName, completedAt) {
+    const source = `${studentName}|${lectureNumber}|${completedAt || ''}|${location.hostname}`;
+    let hash = 2166136261;
+    for (let i = 0; i < source.length; i += 1) {
+      hash ^= source.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    const code = (hash >>> 0).toString(36).toUpperCase().padStart(7, '0');
+    return `APS-${new Date().getFullYear()}-L${lectureNumber}-${code}`;
+  }
+
   function gradeQuiz() {
     clearVisualState();
 
@@ -153,73 +182,127 @@
 
     try {
       await loadScript(
-        'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js',
-        () => typeof window.html2canvas === 'function'
-      );
-      await loadScript(
-        'https://unpkg.com/jspdf@4.2.1/dist/jspdf.umd.min.js',
-        () => Boolean(window.jspdf?.jsPDF)
+        'https://cdn.jsdelivr.net/npm/pdfmake@0.2.20/build/pdfmake.min.js',
+        () => Boolean(window.pdfMake)
       );
 
-      const completedDate = stored.completedAt
-        ? new Date(stored.completedAt).toLocaleDateString()
-        : new Date().toLocaleDateString();
+      const fontFile = 'NotoNaskhArabic-Regular.ttf';
+      if (!window.pdfMake.vfs?.[fontFile]) {
+        const fontBase64 = await fetchAsBase64(
+          'https://raw.githubusercontent.com/notofonts/arabic/main/fonts/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf'
+        );
+        window.pdfMake.vfs = window.pdfMake.vfs || {};
+        window.pdfMake.vfs[fontFile] = fontBase64;
+      }
+
+      window.pdfMake.fonts = {
+        NotoNaskhArabic: {
+          normal: fontFile,
+          bold: fontFile,
+          italics: fontFile,
+          bolditalics: fontFile
+        }
+      };
+
+      const completed = stored.completedAt ? new Date(stored.completedAt) : new Date();
+      const completedDate = completed.toLocaleDateString('en-GB');
       const [levelEn, levelAr] = performanceLevel(Number(stored.percent));
-      const safeStudentName = studentName.trim().replace(/[&<>"']/g, '');
-      const arabicFont = "Tahoma, 'Noto Naskh Arabic', 'Noto Sans Arabic', Arial, sans-serif";
-
-      const certificate = document.createElement('div');
-      certificate.style.cssText = [
-        'position:fixed','left:-10000px','top:0','width:1123px','height:794px',
-        'background:#f8fbff','padding:36px','font-family:Arial,Tahoma,sans-serif',
-        'color:#0b1b2c','z-index:-1'
-      ].join(';');
-      certificate.innerHTML = `
-        <div style="height:100%;border:12px double #0b6fa4;background:white;padding:44px;text-align:center;display:flex;flex-direction:column;justify-content:center;position:relative;box-shadow:inset 0 0 0 4px #dbeafe;">
-          <div style="position:absolute;top:24px;left:32px;font-size:42px;color:#facc15;">⚡</div>
-          <div style="position:absolute;bottom:24px;right:32px;font-size:42px;color:#facc15;">⚡</div>
-          <div style="font-size:18px;color:#0ea5e9;font-weight:700;letter-spacing:2px;">AI POWER SYSTEMS</div>
-          <h1 style="font-size:46px;color:#075985;margin:14px 0 6px;">Certificate of Lecture Completion</h1>
-          <div lang="ar" dir="rtl" style="font-family:${arabicFont};font-size:28px;color:#334155;margin-bottom:16px;direction:rtl;unicode-bidi:isolate;letter-spacing:normal;word-spacing:normal;">شهادة إتمام المحاضرة</div>
-          <p style="font-size:20px;margin:8px 0;">This certifies that</p>
-          <div dir="auto" style="font-family:${arabicFont};font-size:38px;font-weight:700;color:#111827;margin:10px auto 20px;padding:0 42px 10px;border-bottom:3px solid #94a3b8;max-width:850px;unicode-bidi:plaintext;letter-spacing:normal;word-spacing:normal;">${safeStudentName}</div>
-          <p style="font-size:22px;line-height:1.7;margin:4px 0;">has successfully completed <strong>Lecture ${lectureNumber}</strong></p>
-          <div style="font-size:28px;font-weight:700;color:#0f172a;margin:8px 0 10px;">AI Applications in Electrical Power Systems</div>
-          <div lang="ar" dir="rtl" style="font-family:${arabicFont};font-size:22px;color:#334155;margin-bottom:18px;direction:rtl;unicode-bidi:isolate;letter-spacing:normal;word-spacing:normal;">تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
-          <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0 12px;">
-            <div style="min-width:210px;padding:12px 18px;border-radius:12px;background:#ecfdf5;border:1px solid #86efac;font-size:24px;font-weight:700;color:#15803d;">Score: ${stored.percent}%</div>
-            <div style="min-width:210px;padding:12px 18px;border-radius:12px;background:#eff6ff;border:1px solid #93c5fd;font-size:24px;font-weight:700;color:#1d4ed8;">${levelEn}</div>
-          </div>
-          <div lang="ar" dir="rtl" style="font-family:${arabicFont};font-size:22px;font-weight:700;color:#15803d;margin:4px 0 12px;direction:rtl;unicode-bidi:isolate;letter-spacing:normal;word-spacing:normal;">
-            <span>النتيجة:</span>
-            <span dir="ltr" style="display:inline-block;unicode-bidi:isolate;">${stored.percent}%</span>
-            <span>— ${levelAr}</span>
-          </div>
-          <div style="font-size:18px;color:#475569;margin-top:8px;">Completion Date: ${completedDate}</div>
-          <div style="margin-top:30px;font-size:21px;font-weight:700;color:#0f172a;">Dr.-Ing. Aouss Gabash</div>
-          <div style="font-size:15px;color:#64748b;margin-top:8px;">Version 1.0</div>
-        </div>`;
-      document.body.appendChild(certificate);
-
-      if (document.fonts?.ready) await document.fonts.ready;
-      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
-      const canvas = await window.html2canvas(certificate, {
-        scale: 2,
-        backgroundColor: '#f8fbff',
-        useCORS: true,
-        logging: false,
-        letterRendering: true
-      });
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-      const image = canvas.toDataURL('image/jpeg', 0.96);
-      pdf.addImage(image, 'JPEG', 0, 0, 297, 210);
-
+      const certificateId = makeCertificateId(studentName.trim(), stored.completedAt);
+      const verificationUrl = `https://aoussgabash.com/?certificate=${encodeURIComponent(certificateId)}`;
       const safeName = studentName.trim().replace(/[^\p{L}\p{N}_-]+/gu, '_').replace(/^_+|_+$/g, '') || 'Student';
-      pdf.save(`${safeName}_Lecture_${lectureNumber}_Certificate.pdf`);
-      certificate.remove();
+
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [34, 30, 34, 28],
+        defaultStyle: {
+          font: 'NotoNaskhArabic',
+          color: '#0f172a',
+          fontSize: 12
+        },
+        background(currentPage, pageSize) {
+          return {
+            canvas: [
+              { type: 'rect', x: 14, y: 14, w: pageSize.width - 28, h: pageSize.height - 28, lineWidth: 3, lineColor: '#075985' },
+              { type: 'rect', x: 22, y: 22, w: pageSize.width - 44, h: pageSize.height - 44, lineWidth: 1, lineColor: '#38bdf8' }
+            ]
+          };
+        },
+        content: [
+          { text: 'AI POWER SYSTEMS', alignment: 'center', color: '#0284c7', bold: true, fontSize: 15, characterSpacing: 2, margin: [0, 2, 0, 2] },
+          { text: 'Certificate of Lecture Completion', alignment: 'center', color: '#075985', bold: true, fontSize: 31, margin: [0, 2, 0, 0] },
+          { text: 'شهادة إتمام المحاضرة', alignment: 'center', color: '#334155', bold: true, fontSize: 22, margin: [0, 0, 0, 8] },
+          { text: 'This certifies that', alignment: 'center', fontSize: 14, margin: [0, 2, 0, 0] },
+          { text: studentName.trim(), alignment: 'center', bold: true, fontSize: 28, color: '#111827', margin: [25, 3, 25, 3], decoration: 'underline', decorationColor: '#94a3b8' },
+          { text: `has successfully completed Lecture ${lectureNumber}`, alignment: 'center', fontSize: 15, margin: [0, 4, 0, 1] },
+          { text: 'AI Applications in Electrical Power Systems', alignment: 'center', bold: true, fontSize: 21, margin: [0, 3, 0, 0] },
+          { text: 'تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية', alignment: 'center', color: '#334155', fontSize: 17, margin: [0, 0, 0, 7] },
+          {
+            columns: [
+              { width: '*', text: '' },
+              {
+                width: 170,
+                table: {
+                  widths: ['*'],
+                  body: [[{ text: `Score: ${stored.percent}%`, alignment: 'center', bold: true, fontSize: 18, color: '#15803d', fillColor: '#ecfdf5', margin: [4, 5, 4, 5] }]]
+                },
+                layout: { hLineColor: () => '#86efac', vLineColor: () => '#86efac' }
+              },
+              { width: 12, text: '' },
+              {
+                width: 170,
+                table: {
+                  widths: ['*'],
+                  body: [[{ text: levelEn, alignment: 'center', bold: true, fontSize: 18, color: '#1d4ed8', fillColor: '#eff6ff', margin: [4, 5, 4, 5] }]]
+                },
+                layout: { hLineColor: () => '#93c5fd', vLineColor: () => '#93c5fd' }
+              },
+              { width: '*', text: '' }
+            ],
+            margin: [0, 3, 0, 4]
+          },
+          { text: `النتيجة: ${toArabicIndicDigits(stored.percent)}٪ — ${levelAr}`, alignment: 'center', bold: true, fontSize: 17, color: '#15803d', margin: [0, 0, 0, 5] },
+          {
+            columns: [
+              {
+                width: '*',
+                stack: [
+                  { text: `Completion Date: ${completedDate}`, alignment: 'center', color: '#475569', fontSize: 12 },
+                  { text: 'Dr.-Ing. Aouss Gabash', alignment: 'center', bold: true, fontSize: 15, margin: [0, 8, 0, 0] },
+                  { text: 'IEEE Senior Member', alignment: 'center', color: '#64748b', fontSize: 11 },
+                  { text: 'Version 1.0', alignment: 'center', color: '#64748b', fontSize: 10, margin: [0, 3, 0, 0] }
+                ]
+              },
+              {
+                width: 95,
+                stack: [
+                  { qr: verificationUrl, fit: 64, alignment: 'center', foreground: '#0f172a' },
+                  { text: 'Verify', alignment: 'center', fontSize: 9, color: '#475569', margin: [0, 2, 0, 0] }
+                ]
+              },
+              {
+                width: '*',
+                stack: [
+                  { text: 'Certificate ID', alignment: 'center', bold: true, color: '#075985', fontSize: 11 },
+                  { text: certificateId, alignment: 'center', fontSize: 11, margin: [0, 2, 0, 4] },
+                  { text: 'aoussgabash.com', alignment: 'center', color: '#475569', fontSize: 11 }
+                ],
+                margin: [0, 16, 0, 0]
+              }
+            ],
+            columnGap: 12,
+            margin: [35, 5, 35, 0]
+          }
+        ],
+        metadata: {
+          title: `Lecture ${lectureNumber} Certificate - ${studentName.trim()}`,
+          author: 'Dr.-Ing. Aouss Gabash',
+          subject: 'AI Applications in Electrical Power Systems',
+          keywords: `certificate, lecture ${lectureNumber}, AI, electrical power systems`
+        }
+      };
+
+      window.pdfMake.createPdf(docDefinition).download(`${safeName}_Lecture_${lectureNumber}_Certificate.pdf`);
     } catch (error) {
       console.error(error);
       alert('The PDF could not be created. Please check the internet connection and try again. | تعذر إنشاء ملف PDF. تحقق من اتصال الإنترنت ثم حاول مجددًا.');
