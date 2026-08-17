@@ -165,6 +165,8 @@
         ? new Date(stored.completedAt).toLocaleDateString()
         : new Date().toLocaleDateString();
       const [levelEn, levelAr] = performanceLevel(Number(stored.percent));
+      const safeStudentName = studentName.trim().replace(/[&<>"']/g, '');
+      const arabicFont = "Tahoma, 'Noto Naskh Arabic', 'Noto Sans Arabic', Arial, sans-serif";
 
       const certificate = document.createElement('div');
       certificate.style.cssText = [
@@ -178,15 +180,20 @@
           <div style="position:absolute;bottom:24px;right:32px;font-size:42px;color:#facc15;">⚡</div>
           <div style="font-size:18px;color:#0ea5e9;font-weight:700;letter-spacing:2px;">AI POWER SYSTEMS</div>
           <h1 style="font-size:46px;color:#075985;margin:14px 0 6px;">Certificate of Lecture Completion</h1>
-          <div dir="rtl" style="font-size:28px;color:#334155;margin-bottom:16px;">شهادة إتمام المحاضرة</div>
+          <div lang="ar" dir="rtl" style="font-family:${arabicFont};font-size:28px;color:#334155;margin-bottom:16px;direction:rtl;unicode-bidi:isolate;letter-spacing:normal;word-spacing:normal;">شهادة إتمام المحاضرة</div>
           <p style="font-size:20px;margin:8px 0;">This certifies that</p>
-          <div style="font-size:38px;font-weight:700;color:#111827;margin:10px auto 20px;padding:0 42px 10px;border-bottom:3px solid #94a3b8;max-width:850px;">${studentName.trim().replace(/[&<>"']/g, '')}</div>
+          <div dir="auto" style="font-family:${arabicFont};font-size:38px;font-weight:700;color:#111827;margin:10px auto 20px;padding:0 42px 10px;border-bottom:3px solid #94a3b8;max-width:850px;unicode-bidi:plaintext;letter-spacing:normal;word-spacing:normal;">${safeStudentName}</div>
           <p style="font-size:22px;line-height:1.7;margin:4px 0;">has successfully completed <strong>Lecture ${lectureNumber}</strong></p>
-          <div style="font-size:28px;font-weight:700;color:#0f172a;margin:8px 0 18px;">AI Applications in Electrical Power Systems</div>
-          <div dir="rtl" style="font-size:22px;color:#334155;margin-bottom:18px;">تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
-          <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0 20px;">
+          <div style="font-size:28px;font-weight:700;color:#0f172a;margin:8px 0 10px;">AI Applications in Electrical Power Systems</div>
+          <div lang="ar" dir="rtl" style="font-family:${arabicFont};font-size:22px;color:#334155;margin-bottom:18px;direction:rtl;unicode-bidi:isolate;letter-spacing:normal;word-spacing:normal;">تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
+          <div style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0 12px;">
             <div style="min-width:210px;padding:12px 18px;border-radius:12px;background:#ecfdf5;border:1px solid #86efac;font-size:24px;font-weight:700;color:#15803d;">Score: ${stored.percent}%</div>
-            <div style="min-width:210px;padding:12px 18px;border-radius:12px;background:#eff6ff;border:1px solid #93c5fd;font-size:24px;font-weight:700;color:#1d4ed8;">${levelEn} | ${levelAr}</div>
+            <div style="min-width:210px;padding:12px 18px;border-radius:12px;background:#eff6ff;border:1px solid #93c5fd;font-size:24px;font-weight:700;color:#1d4ed8;">${levelEn}</div>
+          </div>
+          <div lang="ar" dir="rtl" style="font-family:${arabicFont};font-size:22px;font-weight:700;color:#15803d;margin:4px 0 12px;direction:rtl;unicode-bidi:isolate;letter-spacing:normal;word-spacing:normal;">
+            <span>النتيجة:</span>
+            <span dir="ltr" style="display:inline-block;unicode-bidi:isolate;">${stored.percent}%</span>
+            <span>— ${levelAr}</span>
           </div>
           <div style="font-size:18px;color:#475569;margin-top:8px;">Completion Date: ${completedDate}</div>
           <div style="margin-top:30px;font-size:21px;font-weight:700;color:#0f172a;">Dr.-Ing. Aouss Gabash</div>
@@ -194,11 +201,15 @@
         </div>`;
       document.body.appendChild(certificate);
 
+      if (document.fonts?.ready) await document.fonts.ready;
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
       const canvas = await window.html2canvas(certificate, {
         scale: 2,
         backgroundColor: '#f8fbff',
         useCORS: true,
-        logging: false
+        logging: false,
+        letterRendering: true
       });
 
       const { jsPDF } = window.jspdf;
