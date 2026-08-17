@@ -1,0 +1,126 @@
+name: Audit course page styles
+
+on:
+  push:
+    paths:
+      - '.github/workflows/audit-course-styles.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit-styles:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Analyze inline styles
+        shell: python
+        run: |
+          from pathlib import Path
+          from collections import defaultdict, Counter
+          import hashlib
+          import re
+
+          files = []
+          for prefix in ('lecture', 'lab'):
+              for number in range(1, 21):
+                  path = Path(f'{prefix}{number:02d}.html')
+                  if path.exists():
+                      files.append(path)
+
+          groups = defaultdict(list)
+          records = []
+          selector_counts = Counter()
+
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              blocks = re.findall(r'<style\b[^>]*>(.*?)</style>', text, flags=re.S | re.I)
+              css = '\n'.join(blocks)
+              normalized = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+              normalized = re.sub(r'\s+', ' ', normalized).strip()
+              digest = hashlib.sha256(normalized.encode('utf-8')).hexdigest()[:12] if normalized else 'none'
+              groups[digest].append(path.name)
+
+              selectors = re.findall(r'(?:^|\})([^@{}][^{}]*)\{', css, flags=re.S)
+              clean_selectors = []
+              for selector_group in selectors:
+                  for selector in selector_group.split(','):
+                      selector = re.sub(r'\s+', ' ', selector).strip()
+                      if selector:
+                          clean_selectors.append(selector)
+                          selector_counts[selector] += 1
+
+              records.append({
+                  'file': path.name,
+                  'style_blocks': len(blocks),
+                  'css_chars': len(css),
+                  'hash': digest,
+                  'selectors': len(set(clean_selectors)),
+                  'common_css': 'yes' if 'course-common.css' in text else 'no',
+                  'navigation_js': 'yes' if 'course-navigation.js' in text else 'no',
+              })
+
+          lines = []
+          lines.append('# Course Style Audit')
+          lines.append('')
+          lines.append('Automatically generated audit for Lecture 01–20 and Lab 01–20.')
+          lines.append('')
+          lines.append('## Summary')
+          lines.append('')
+          lines.append(f'- Pages found: **{len(files)}**')
+          lines.append(f'- Unique inline CSS groups: **{len(groups)}**')
+          lines.append(f'- Pages linked to `course-common.css`: **{sum(r["common_css"] == "yes" for r in records)}**')
+          lines.append(f'- Pages linked to `course-navigation.js`: **{sum(r["navigation_js"] == "yes" for r in records)}**')
+          lines.append('')
+
+          lines.append('## Identical inline CSS groups')
+          lines.append('')
+          for digest, names in sorted(groups.items(), key=lambda item: (-len(item[1]), item[0])):
+              lines.append(f'### `{digest}` — {len(names)} page(s)')
+              lines.append('')
+              lines.append(', '.join(f'`{name}`' for name in names))
+              lines.append('')
+
+          lines.append('## Page details')
+          lines.append('')
+          lines.append('| Page | Style blocks | CSS characters | Unique selectors | CSS hash | Common CSS | Navigation JS |')
+          lines.append('|---|---:|---:|---:|---|:---:|:---:|')
+          for r in records:
+              lines.append(
+                  f'| `{r["file"]}` | {r["style_blocks"]} | {r["css_chars"]} | '
+                  f'{r["selectors"]} | `{r["hash"]}` | {r["common_css"]} | {r["navigation_js"]} |'
+              )
+
+          lines.append('')
+          lines.append('## Most repeated selectors')
+          lines.append('')
+          lines.append('| Selector | Pages/style blocks containing it |')
+          lines.append('|---|---:|')
+          for selector, count in selector_counts.most_common(80):
+              escaped = selector.replace('|', '\\|').replace('`', '\\`')
+              lines.append(f'| `{escaped}` | {count} |')
+
+          lines.append('')
+          lines.append('## Safe migration rule')
+          lines.append('')
+          lines.append('Only identical or verified-equivalent declarations should be moved to the shared stylesheet. Page-specific rules remain inline until visual testing confirms that moving them is safe.')
+          lines.append('')
+
+          report = Path('STYLE-AUDIT.md')
+          report.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          print(report.read_text(encoding='utf-8'))
+
+      - name: Commit audit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add STYLE-AUDIT.md
+          if git diff --cached --quiet; then
+            echo "Style audit report is already current."
+          else
+            git commit -m "Generate course style audit report"
+            git push
+          fi
