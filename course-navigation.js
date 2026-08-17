@@ -55,26 +55,36 @@
   metadata.className = 'course-metadata-bar';
   metadata.setAttribute('aria-label', 'Course page information');
   metadata.innerHTML = `
-    <span class="course-meta-item">${type === 'lecture' ? '📖' : '🧪'} ${label.en} ${num} | ${label.ar} ${num}</span>
+    <span class="course-meta-item course-meta-primary">${type === 'lecture' ? '📖' : '🧪'} ${label.en} ${num} | ${label.ar} ${num}</span>
     <span class="course-meta-item">⏱ ${duration} min | ${duration} دقيقة</span>
     <span class="course-meta-item">📊 ${difficulty[0]} | ${difficulty[1]}</span>
     <a class="course-meta-item course-meta-link" href="${relatedType}${num}.html">${relatedLabel}</a>
-    ${type === 'lecture' ? `<a class="course-meta-item course-meta-link" href="#quiz">📝 Quiz | الاختبار</a>` : ''}
   `;
 
   const hero = document.querySelector('.hero');
   const main = document.querySelector('main');
-  if (hero?.parentNode) {
-    hero.insertAdjacentElement('afterend', metadata);
-  } else if (main) {
-    main.prepend(metadata);
-  } else {
-    document.body.insertBefore(metadata, document.body.firstChild);
-  }
+  if (hero?.parentNode) hero.insertAdjacentElement('afterend', metadata);
+  else if (main) main.prepend(metadata);
+  else document.body.insertBefore(metadata, document.body.firstChild);
 
-  const quiz = document.querySelector('[data-course-quiz]');
-  if (quiz) quiz.id = quiz.id || 'quiz';
-  else metadata.querySelector('a[href="#quiz"]')?.classList.add('unavailable');
+  // Quiz data is rendered by another deferred script. Wait until all deferred
+  // scripts have finished, then show the link only when a real quiz exists.
+  setTimeout(() => {
+    const quiz = document.querySelector('[data-course-quiz]');
+    if (!quiz || type !== 'lecture') return;
+
+    quiz.id = quiz.id || 'quiz';
+    const quizLink = document.createElement('a');
+    quizLink.className = 'course-meta-item course-meta-link course-meta-quiz';
+    quizLink.href = '#quiz';
+    quizLink.textContent = '📝 Quiz | الاختبار';
+    quizLink.addEventListener('click', event => {
+      event.preventDefault();
+      quiz.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(null, '', '#quiz');
+    });
+    metadata.appendChild(quizLink);
+  }, 0);
 
   const nav = document.createElement('nav');
   nav.className = 'course-page-navigation';
@@ -90,9 +100,7 @@
 
   if (number > 1) {
     nav.appendChild(makeLink(
-      'course-nav-link previous',
-      fileName(number - 1),
-      '← Previous | السابق',
+      'course-nav-link previous', fileName(number - 1), '← Previous | السابق',
       `${label.en} ${String(number - 1).padStart(2, '0')} | ${label.ar} ${String(number - 1).padStart(2, '0')}`
     ));
   } else {
@@ -109,9 +117,7 @@
 
   if (number < maxNumber) {
     nav.appendChild(makeLink(
-      'course-nav-link next',
-      fileName(number + 1),
-      'Next | التالي →',
+      'course-nav-link next', fileName(number + 1), 'Next | التالي →',
       `${label.en} ${String(number + 1).padStart(2, '0')} | ${label.ar} ${String(number + 1).padStart(2, '0')}`
     ));
   } else {
