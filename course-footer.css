@@ -1,10 +1,81 @@
-/* Shared site footer */
-.site-footer{margin-top:38px;border-top:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,#081523,#06101c);color:#b8c7d9;text-align:center;padding:34px 18px}
-.site-footer-inner{width:min(1000px,92%);margin:auto;display:flex;flex-direction:column;align-items:center;gap:7px}
-.site-footer strong{color:#f4f8fc;font-size:1.08rem}
-.site-footer-ar{direction:rtl;color:#e5edf6;font-size:1rem}
-.site-footer-tagline{color:#9fb2c5;font-size:.92rem}
-.site-footer-version{display:inline-flex;margin-top:5px;padding:5px 10px;border-radius:999px;border:1px solid rgba(56,189,248,.35);background:rgba(56,189,248,.09);color:#dff7ff;font-size:.82rem;font-weight:700}
-.site-footer-copy{margin-top:5px;color:#93a8bb;font-size:.88rem}
-@media(max-width:620px){.site-footer{padding:28px 14px}.site-footer strong{font-size:1rem}.site-footer-ar{font-size:.94rem}.site-footer-tagline{font-size:.84rem}}
-@media print{.site-footer{display:none!important}}
+/* Compact shared site footer */
+.site-footer,
+.course-footer{
+  margin-top:44px;
+  padding:22px 16px;
+  border-top:1px solid rgba(255,255,255,.09);
+  background:linear-gradient(180deg,rgba(8,21,35,.96),rgba(6,16,28,.98));
+  color:#9fb2c5;
+  text-align:center;
+}
+
+.site-footer-inner{
+  width:min(920px,92%);
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+}
+
+.footer-title{
+  color:#f4f8fc;
+  font-size:1rem;
+  font-weight:700;
+  line-height:1.35;
+}
+
+.footer-subtitle{
+  color:#8fc7ff;
+  font-size:.92rem;
+  line-height:1.45;
+}
+
+.footer-info{
+  margin-top:4px;
+  color:#8296aa;
+  font-size:.8rem;
+  letter-spacing:.01em;
+}
+
+.footer-copy{
+  margin-top:2px;
+  color:#71869a;
+  font-size:.76rem;
+}
+
+@media(max-width:620px){
+  .site-footer,
+  .course-footer{
+    margin-top:34px;
+    padding:18px 12px;
+  }
+
+  .site-footer-inner{
+    width:min(100%,460px);
+    gap:4px;
+  }
+
+  .footer-title{
+    font-size:.92rem;
+  }
+
+  .footer-subtitle{
+    font-size:.86rem;
+  }
+
+  .footer-info{
+    font-size:.74rem;
+  }
+
+  .footer-copy{
+    font-size:.7rem;
+  }
+}
+
+@media print{
+  .site-footer,
+  .course-footer{
+    display:none!important;
+  }
+}
