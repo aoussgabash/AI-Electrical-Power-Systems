@@ -10,6 +10,74 @@
   const maxNumber = 20;
   const num = String(number).padStart(2, '0');
 
+  const sharedStyle = document.createElement('style');
+  sharedStyle.textContent = `
+    .course-action-panel{
+      display:grid!important;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px!important;
+      align-items:stretch!important;
+    }
+    .course-action-card{
+      min-height:128px;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:13px;
+      padding:16px;
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:15px;
+      background:linear-gradient(145deg,#102d48,#0a1d31);
+      color:#f8fbff!important;
+      text-decoration:none!important;
+      text-align:left;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+      transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+      cursor:pointer;
+    }
+    .course-action-card:hover,.course-action-card:focus-visible{
+      transform:translateY(-3px);
+      border-color:rgba(56,189,248,.65);
+      box-shadow:0 16px 32px rgba(0,0,0,.28);
+      outline:none;
+    }
+    .course-action-current{cursor:default;border-color:rgba(56,189,248,.38)}
+    .course-action-current:hover{transform:none}
+    .course-action-icon{font-size:2rem;line-height:1}
+    .course-action-content{display:flex;flex-direction:column;min-width:0}
+    .course-action-content strong{font-size:1.08rem;color:#fff;line-height:1.35}
+    .course-action-subtitle{direction:rtl;text-align:left;color:#dceaf6;font-size:.94rem;line-height:1.5}
+    .course-action-meta{color:#9fb7ca;font-size:.78rem;line-height:1.45;margin-top:5px}
+    .course-action-arrow{font-size:1.3rem;color:#fde047}
+    .course-action-related{border-color:rgba(250,204,21,.35)}
+    .course-action-quiz{border-color:rgba(34,197,94,.4)}
+    .course-action-download{border-color:rgba(56,189,248,.5);background:linear-gradient(145deg,#0d4770,#0a2944)}
+    @media(max-width:620px){
+      .course-action-panel{grid-template-columns:1fr!important}
+      .course-action-card{min-height:108px}
+    }
+    @page{size:A4 portrait;margin:14mm}
+    @media print{
+      html,body{background:#fff!important;color:#000!important;font-family:Arial,Tahoma,sans-serif!important}
+      header,.course-action-panel,.course-page-navigation,#reading-progress-track,
+      [data-course-quiz],footer,.site-footer,.course-footer,.back,.to-top{display:none!important}
+      main,.container{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+      .hero{padding:0 0 8mm!important;margin:0!important;border-bottom:1px solid #888!important}
+      h1,h2,h3,strong{color:#000!important}
+      p,li,.subtitle,.hero-ar,.ar,.en{color:#000!important}
+      section{background:#fff!important;color:#000!important;border:1px solid #aaa!important;box-shadow:none!important;margin:7mm 0!important;padding:7mm!important;break-inside:auto}
+      .mini-card,.highlight,.note,.warning,.research,.task,.formula,pre,.svg-wrap{
+        background:#fff!important;color:#000!important;border:1px solid #aaa!important;box-shadow:none!important;break-inside:avoid
+      }
+      .ar{direction:rtl!important;text-align:right!important}
+      .en{direction:ltr!important;text-align:left!important}
+      a{color:#000!important;text-decoration:none!important}
+      table{break-inside:avoid}
+      img,svg{max-width:100%!important;page-break-inside:avoid}
+    }
+  `;
+  document.head.appendChild(sharedStyle);
+
   const track = document.createElement('div');
   track.id = 'reading-progress-track';
   track.setAttribute('aria-hidden', 'true');
@@ -49,6 +117,7 @@
     const element = document.createElement(tag);
     element.className = `course-action-card ${className}`.trim();
     if (href) element.href = href;
+    if (tag === 'button') element.type = 'button';
     element.innerHTML = `
       <span class="course-action-icon" aria-hidden="true">${icon}</span>
       <span class="course-action-content">
@@ -56,7 +125,7 @@
         <span class="course-action-subtitle">${subtitle}</span>
         ${meta ? `<span class="course-action-meta">${meta}</span>` : ''}
       </span>
-      ${tag === 'a' ? '<span class="course-action-arrow" aria-hidden="true">→</span>' : ''}
+      ${tag !== 'div' ? '<span class="course-action-arrow" aria-hidden="true">→</span>' : ''}
     `;
     return element;
   };
@@ -82,6 +151,24 @@
     subtitle: type === 'lecture' ? `فتح المخبر ${num}` : `فتح المحاضرة ${num}`,
     meta: type === 'lecture' ? 'Programming Exercise | تمرين برمجي' : 'Read Lesson | قراءة المحاضرة'
   }));
+
+  if (type === 'lecture') {
+    const downloadButton = card({
+      tag: 'button',
+      className: 'course-action-download',
+      icon: '📥',
+      title: 'Download Lecture PDF',
+      subtitle: 'تحميل المحاضرة بصيغة PDF',
+      meta: 'Print / Save as PDF | طباعة / حفظ PDF'
+    });
+    downloadButton.addEventListener('click', () => {
+      const originalTitle = document.title;
+      document.title = `Lecture_${num}_AI_Power_Systems_Version_1.0`;
+      window.addEventListener('afterprint', () => { document.title = originalTitle; }, { once: true });
+      window.print();
+    });
+    actions.appendChild(downloadButton);
+  }
 
   const hero = document.querySelector('.hero');
   const main = document.querySelector('main');
