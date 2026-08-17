@@ -1,0 +1,119 @@
+name: Migrate identical modern course pages
+
+on:
+  push:
+    paths:
+      - '.github/workflows/migrate-modern-template-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Remove duplicated inline CSS from identical modern pages
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          targets = [
+              'lecture11.html','lecture12.html','lecture13.html','lecture14.html',
+              'lecture17.html','lecture20.html','lab11.html','lab12.html',
+              'lab13.html','lab14.html','lab17.html','lab20.html'
+          ]
+
+          changed = []
+          for name in targets:
+              path = Path(name)
+              if not path.exists():
+                  print(f'Skipping missing file: {name}')
+                  continue
+
+              text = path.read_text(encoding='utf-8')
+              original = text
+
+              # Remove only the first inline style block. The shared stylesheet remains linked.
+              text, count = re.subn(
+                  r'\s*<style\b[^>]*>.*?</style>\s*',
+                  '\n',
+                  text,
+                  count=1,
+                  flags=re.S | re.I
+              )
+
+              if count == 0:
+                  print(f'No inline style block found: {name}')
+
+              # Add the shared-template class to body without disturbing existing classes.
+              body_match = re.search(r'<body\b([^>]*)>', text, flags=re.I)
+              if body_match:
+                  attrs = body_match.group(1)
+                  class_match = re.search(r'class\s*=\s*(["\'])(.*?)\1', attrs, flags=re.I | re.S)
+                  if class_match:
+                      classes = class_match.group(2).split()
+                      if 'course-template-modern' not in classes:
+                          classes.append('course-template-modern')
+                      new_class = f'class={class_match.group(1)}{" ".join(classes)}{class_match.group(1)}'
+                      new_attrs = attrs[:class_match.start()] + new_class + attrs[class_match.end():]
+                      new_body = '<body' + new_attrs + '>'
+                  else:
+                      new_body = '<body class="course-template-modern"' + attrs + '>'
+
+                  text = text[:body_match.start()] + new_body + text[body_match.end():]
+              else:
+                  print(f'No body tag found: {name}')
+
+              # Verify required shared assets are still linked.
+              if 'course-common.css' not in text:
+                  raise RuntimeError(f'{name} is missing course-common.css')
+              if 'course-navigation.js' not in text:
+                  raise RuntimeError(f'{name} is missing course-navigation.js')
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  changed.append(name)
+
+          print('Migrated pages:')
+          for name in changed:
+              print(name)
+
+      - name: Validate migrated pages
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          targets = [
+              'lecture11.html','lecture12.html','lecture13.html','lecture14.html',
+              'lecture17.html','lecture20.html','lab11.html','lab12.html',
+              'lab13.html','lab14.html','lab17.html','lab20.html'
+          ]
+
+          for name in targets:
+              text = Path(name).read_text(encoding='utf-8')
+              assert 'class="course-template-modern"' in text or 'course-template-modern' in re.search(r'<body\b[^>]*>', text, flags=re.I).group(0)
+              assert not re.search(r'<style\b[^>]*>.*?</style>', text, flags=re.S | re.I), f'Inline CSS remains in {name}'
+              assert 'course-common.css' in text
+              assert 'course-navigation.js' in text
+              assert '<footer' in text.lower()
+              assert '</html>' in text.lower()
+              print(f'Validated: {name}')
+
+      - name: Commit template migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lecture11.html lecture12.html lecture13.html lecture14.html lecture17.html lecture20.html \
+                  lab11.html lab12.html lab13.html lab14.html lab17.html lab20.html
+          if git diff --cached --quiet; then
+            echo "Target pages are already migrated."
+          else
+            git commit -m "Migrate identical modern pages to shared CSS template"
+            git push
+          fi
