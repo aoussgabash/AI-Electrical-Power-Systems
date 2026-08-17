@@ -186,21 +186,23 @@
         () => Boolean(window.pdfMake)
       );
 
-      const fontFile = 'NotoNaskhArabic-Regular.ttf';
+      const fontFile = 'DejaVuSans.ttf';
+      const fontBoldFile = 'DejaVuSans-Bold.ttf';
+      window.pdfMake.vfs = window.pdfMake.vfs || {};
+
       if (!window.pdfMake.vfs?.[fontFile]) {
-        const fontBase64 = await fetchAsBase64(
-          'assets/fonts/NotoNaskhArabic-Regular.ttf'
-        );
-        window.pdfMake.vfs = window.pdfMake.vfs || {};
-        window.pdfMake.vfs[fontFile] = fontBase64;
+        window.pdfMake.vfs[fontFile] = await fetchAsBase64('assets/fonts/DejaVuSans.ttf');
+      }
+      if (!window.pdfMake.vfs?.[fontBoldFile]) {
+        window.pdfMake.vfs[fontBoldFile] = await fetchAsBase64('assets/fonts/DejaVuSans-Bold.ttf');
       }
 
       window.pdfMake.fonts = {
-        NotoNaskhArabic: {
+        DejaVuSans: {
           normal: fontFile,
-          bold: fontFile,
+          bold: fontBoldFile,
           italics: fontFile,
-          bolditalics: fontFile
+          bolditalics: fontBoldFile
         }
       };
 
@@ -216,7 +218,7 @@
         pageOrientation: 'landscape',
         pageMargins: [34, 30, 34, 28],
         defaultStyle: {
-          font: 'NotoNaskhArabic',
+          font: 'DejaVuSans',
           color: '#0f172a',
           fontSize: 12
         },
