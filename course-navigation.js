@@ -154,19 +154,14 @@
 
   if (type === 'lecture') {
     const downloadButton = card({
-      tag: 'button',
       className: 'course-action-download',
+      href: `pdf/lecture${num}.pdf`,
       icon: '📥',
       title: 'Download Lecture PDF',
       subtitle: 'تحميل المحاضرة بصيغة PDF',
-      meta: 'Print / Save as PDF | طباعة / حفظ PDF'
+      meta: 'Ready PDF | ملف PDF جاهز'
     });
-    downloadButton.addEventListener('click', () => {
-      const originalTitle = document.title;
-      document.title = `Lecture_${num}_AI_Power_Systems_Version_1.0`;
-      window.addEventListener('afterprint', () => { document.title = originalTitle; }, { once: true });
-      window.print();
-    });
+    downloadButton.setAttribute('download', `Lecture_${num}_AI_Power_Systems_Version_1.0.pdf`);
     actions.appendChild(downloadButton);
   }
 
