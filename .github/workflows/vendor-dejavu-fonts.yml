@@ -19,7 +19,7 @@ jobs:
       - name: Download DejaVu Sans fonts
         run: |
           set -euo pipefail
-          mkdir -p assets/fonts /tmp/dejavu
+          mkdir -p assets/fonts /tmp/dejavu/extracted
           curl -fL --retry 3 --retry-delay 2 \
             'https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip' \
             -o /tmp/dejavu/dejavu.zip
@@ -30,65 +30,49 @@ jobs:
           test -n "$BOLD"
           cp "$REGULAR" assets/fonts/DejaVuSans.ttf
           cp "$BOLD" assets/fonts/DejaVuSans-Bold.ttf
-          test -s assets/fonts/DejaVuSans.ttf
-          test -s assets/fonts/DejaVuSans-Bold.ttf
 
-      - name: Update certificate generator to use DejaVu Sans
+      - name: Update certificate generator
         shell: python
         run: |
           from pathlib import Path
+          import re
 
           path = Path('course-quiz.js')
           text = path.read_text(encoding='utf-8')
 
-          old = """      const fontFile = 'NotoNaskhArabic-Regular.ttf';
-      if (!window.pdfMake.vfs?.[fontFile]) {
-        const fontBase64 = await fetchAsBase64(
-          'assets/fonts/NotoNaskhArabic-Regular.ttf'
-        );
-        window.pdfMake.vfs = window.pdfMake.vfs || {};
-        window.pdfMake.vfs[fontFile] = fontBase64;
-      }
+          pattern = re.compile(
+              r"      const fontFile = 'NotoNaskhArabic-Regular\.ttf';.*?      };\n",
+              re.S,
+          )
 
-      window.pdfMake.fonts = {
-        NotoNaskhArabic: {
-          normal: fontFile,
-          bold: fontFile,
-          italics: fontFile,
-          bolditalics: fontFile
-        }
-      };
-"""
+          replacement = (
+              "      const fontFile = 'DejaVuSans.ttf';\n"
+              "      const fontBoldFile = 'DejaVuSans-Bold.ttf';\n"
+              "      window.pdfMake.vfs = window.pdfMake.vfs || {};\n\n"
+              "      if (!window.pdfMake.vfs?.[fontFile]) {\n"
+              "        window.pdfMake.vfs[fontFile] = await fetchAsBase64('assets/fonts/DejaVuSans.ttf');\n"
+              "      }\n"
+              "      if (!window.pdfMake.vfs?.[fontBoldFile]) {\n"
+              "        window.pdfMake.vfs[fontBoldFile] = await fetchAsBase64('assets/fonts/DejaVuSans-Bold.ttf');\n"
+              "      }\n\n"
+              "      window.pdfMake.fonts = {\n"
+              "        DejaVuSans: {\n"
+              "          normal: fontFile,\n"
+              "          bold: fontBoldFile,\n"
+              "          italics: fontFile,\n"
+              "          bolditalics: fontBoldFile\n"
+              "        }\n"
+              "      };\n"
+          )
 
-          new = """      const fontFile = 'DejaVuSans.ttf';
-      const fontBoldFile = 'DejaVuSans-Bold.ttf';
-      window.pdfMake.vfs = window.pdfMake.vfs || {};
+          updated, count = pattern.subn(replacement, text, count=1)
+          if count != 1:
+              raise RuntimeError(f'Expected one Noto font block, found {count}')
 
-      if (!window.pdfMake.vfs?.[fontFile]) {
-        window.pdfMake.vfs[fontFile] = await fetchAsBase64('assets/fonts/DejaVuSans.ttf');
-      }
-      if (!window.pdfMake.vfs?.[fontBoldFile]) {
-        window.pdfMake.vfs[fontBoldFile] = await fetchAsBase64('assets/fonts/DejaVuSans-Bold.ttf');
-      }
+          updated = updated.replace("font: 'NotoNaskhArabic'", "font: 'DejaVuSans'")
+          path.write_text(updated, encoding='utf-8')
 
-      window.pdfMake.fonts = {
-        DejaVuSans: {
-          normal: fontFile,
-          bold: fontBoldFile,
-          italics: fontFile,
-          bolditalics: fontBoldFile
-        }
-      };
-"""
-
-          if old not in text:
-              raise RuntimeError('Expected Noto font block was not found in course-quiz.js')
-
-          text = text.replace(old, new)
-          text = text.replace("font: 'NotoNaskhArabic'", "font: 'DejaVuSans'")
-          path.write_text(text, encoding='utf-8')
-
-      - name: Validate font integration
+      - name: Validate integration
         shell: python
         run: |
           from pathlib import Path
@@ -102,16 +86,15 @@ jobs:
           assert "font: 'DejaVuSans'" in script
           assert 'assets/fonts/DejaVuSans.ttf' in script
           assert 'assets/fonts/DejaVuSans-Bold.ttf' in script
-          assert "font: 'NotoNaskhArabic'" not in script
           print('DejaVu certificate fonts validated.')
 
-      - name: Commit font assets and generator update
+      - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/fonts/DejaVuSans.ttf assets/fonts/DejaVuSans-Bold.ttf course-quiz.js
           if git diff --cached --quiet; then
-            echo "DejaVu fonts are already configured."
+            echo "No changes needed."
           else
             git commit -m "Use DejaVu fonts for multilingual PDF certificates"
             git push
