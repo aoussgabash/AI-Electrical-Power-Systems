@@ -1,0 +1,27 @@
+/* Learning progress dashboard */
+.learning-dashboard{padding:52px 0}
+.progress-panel{background:linear-gradient(180deg,#0f2238,#0a1929);border:1px solid rgba(255,255,255,.11);border-radius:20px;padding:24px;box-shadow:0 18px 45px rgba(0,0,0,.18)}
+.progress-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.progress-stat{background:#091827;border:1px solid rgba(255,255,255,.09);border-radius:15px;padding:18px;text-align:center}
+.progress-stat strong{display:block;color:#38bdf8;font-size:1.8rem;line-height:1.2}
+.progress-stat span{color:#b8c7d9;font-size:.91rem}
+.progress-main{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+.progress-card{background:#091827;border:1px solid rgba(255,255,255,.09);border-radius:15px;padding:18px}
+.progress-card h3{margin:0 0 10px;color:#eef8ff}
+.progress-card .ar{direction:rtl;text-align:right;color:#dce7f1}
+.progress-track{height:14px;border-radius:999px;background:#06101d;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin:12px 0 8px}
+.progress-fill{width:0;height:100%;background:linear-gradient(90deg,#0284c7,#2563eb,#22c55e);border-radius:inherit;transition:width .45s ease}
+.progress-caption{display:flex;justify-content:space-between;gap:12px;color:#aebfd0;font-size:.88rem}
+.progress-list{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}
+.progress-item{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0b1b2c;color:#9fb2c5;font-size:.82rem;text-decoration:none}
+.progress-item.completed{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#bbf7d0}
+.progress-item.attempted{border-color:rgba(250,204,21,.45);background:rgba(250,204,21,.08);color:#fde68a}
+.progress-note{margin-top:14px;color:#9fb2c5;font-size:.88rem}
+.progress-reset{margin-top:14px;border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:9px 13px;background:#0b1b2c;color:#fff;cursor:pointer}
+.progress-reset:hover{border-color:rgba(56,189,248,.55)}
+.achievement{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:#0b1b2c;border:1px solid rgba(255,255,255,.08);margin:9px 0}
+.achievement-icon{font-size:1.55rem}.achievement strong{display:block;color:#fff}.achievement span{color:#aebfd0;font-size:.88rem}
+.achievement.locked{opacity:.45;filter:grayscale(.7)}
+@media(max-width:900px){.progress-summary{grid-template-columns:repeat(2,1fr)}.progress-main{grid-template-columns:1fr}}
+@media(max-width:620px){.progress-summary{grid-template-columns:1fr 1fr}.progress-list{grid-template-columns:repeat(4,1fr)}.progress-panel{padding:16px}}
+@media print{.learning-dashboard{display:none}}
