@@ -1,0 +1,69 @@
+name: Attach shared course navigation
+
+on:
+  push:
+    paths:
+      - '.github/workflows/attach-course-navigation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  attach-navigation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add shared script to all lecture and lab pages
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          script_tag = '<script src="course-navigation.js" defer></script>'
+          changed = []
+
+          for prefix in ('lecture', 'lab'):
+              for number in range(1, 21):
+                  path = Path(f'{prefix}{number:02d}.html')
+                  if not path.exists():
+                      print(f'Skipping missing file: {path}')
+                      continue
+
+                  text = path.read_text(encoding='utf-8')
+
+                  if 'course-navigation.js' in text:
+                      print(f'Already linked: {path}')
+                      continue
+
+                  if re.search(r'</body\s*>', text, flags=re.I):
+                      new_text = re.sub(
+                          r'</body\s*>',
+                          script_tag + '\n</body>',
+                          text,
+                          count=1,
+                          flags=re.I
+                      )
+                  else:
+                      new_text = text + '\n' + script_tag + '\n'
+
+                  path.write_text(new_text, encoding='utf-8')
+                  changed.append(str(path))
+
+          print('Changed files:')
+          for path in changed:
+              print(path)
+
+      - name: Commit navigation integration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lecture{01..20}.html lab{01..20}.html
+          if git diff --cached --quiet; then
+            echo "All pages already use the shared navigation script."
+          else
+            git commit -m "Add reading progress and previous-next navigation to course pages"
+            git push
+          fi
