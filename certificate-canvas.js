@@ -57,6 +57,16 @@
     }[char]));
   }
 
+  function containsArabic(value) {
+    return /[\u0600-\u06FF]/.test(String(value));
+  }
+
+  // html2canvas on some Android/Samsung browsers reverses Arabic word order.
+  // We prepare the visual sequence in advance and render it as a fixed LTR row.
+  function visualArabic(value) {
+    return String(value).trim().split(/\s+/).reverse().join(' ');
+  }
+
   async function ensureCertificateFonts() {
     if (!('FontFace' in window)) return;
     const fonts = [
@@ -100,7 +110,11 @@
       const [levelEn, levelAr] = performanceLevel(Number(stored.percent));
       const certificateId = makeCertificateId(studentName.trim(), lectureNumber, stored.completedAt);
       const verificationUrl = `https://aoussgabash.com/?certificate=${encodeURIComponent(certificateId)}`;
-      const safeStudentName = escapeHtml(studentName.trim());
+      const visualStudentName = containsArabic(studentName)
+        ? visualArabic(studentName.trim())
+        : studentName.trim();
+      const safeStudentName = escapeHtml(visualStudentName);
+      const fixedArabic = value => escapeHtml(visualArabic(value));
 
       certificate = document.createElement('div');
       certificate.setAttribute('aria-hidden', 'true');
@@ -114,31 +128,26 @@
         <main style="height:100%;background:#fff;border:8px double #0b4f91;box-shadow:inset 0 0 0 3px #60a5fa;padding:42px 68px;box-sizing:border-box;text-align:center;display:flex;flex-direction:column;align-items:center;">
           <div style="font-size:20px;font-weight:700;letter-spacing:7px;color:#075985;margin-top:2px;">AI POWER SYSTEMS</div>
           <div style="font-size:50px;font-weight:700;color:#083f77;line-height:1.15;margin-top:12px;">Certificate of Lecture Completion</div>
-          <div lang="ar" dir="rtl" style="font-size:40px;font-weight:700;color:#0b4f91;line-height:1.35;margin-top:14px;unicode-bidi:isolate;">شهادة إتمام محاضرة</div>
+          <div lang="ar" dir="ltr" style="font-size:40px;font-weight:700;color:#0b4f91;line-height:1.35;margin-top:14px;white-space:nowrap;">${fixedArabic('شهادة إتمام المحاضرة')}</div>
           <div style="width:520px;height:2px;background:#3978bf;margin:13px 0 18px;"></div>
 
           <div style="font-size:26px;line-height:1.3;">This certifies that</div>
-          <div lang="ar" dir="rtl" style="font-size:27px;line-height:1.4;unicode-bidi:isolate;">تشهد هذه الشهادة بأن</div>
-          <div dir="auto" style="font-size:52px;font-weight:700;color:#111827;line-height:1.25;margin:10px 0 4px;unicode-bidi:plaintext;">${safeStudentName}</div>
+          <div lang="ar" dir="ltr" style="font-size:27px;line-height:1.4;white-space:nowrap;">${fixedArabic('تشهد هذه الشهادة بأن')}</div>
+          <div dir="ltr" style="font-size:52px;font-weight:700;color:#111827;line-height:1.25;margin:10px 0 4px;white-space:nowrap;">${safeStudentName}</div>
           <div style="width:430px;height:2px;background:#93b9df;margin:2px 0 14px;"></div>
 
           <div style="font-size:25px;line-height:1.3;">has successfully completed Lecture ${lectureNumber}</div>
-          <div lang="ar" dir="rtl" style="font-size:27px;line-height:1.45;margin-top:4px;unicode-bidi:isolate;">قد أتم بنجاح المحاضرة رقم <bdi dir="ltr">${lectureNumber}</bdi></div>
+          <div lang="ar" dir="ltr" style="font-size:27px;line-height:1.45;margin-top:4px;white-space:nowrap;">${fixedArabic(`قد أتم بنجاح المحاضرة رقم ${lectureNumber}`)}</div>
 
           <div style="font-size:36px;font-weight:700;color:#0b3f79;line-height:1.25;margin-top:13px;">AI Applications in Electrical Power Systems</div>
-          <div lang="ar" dir="rtl" style="font-size:28px;font-weight:700;color:#0b4f91;line-height:1.45;margin-top:4px;unicode-bidi:isolate;">تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
+          <div lang="ar" dir="ltr" style="font-size:28px;font-weight:700;color:#0b4f91;line-height:1.45;margin-top:4px;white-space:nowrap;">${fixedArabic('تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية')}</div>
 
           <div style="display:flex;justify-content:center;gap:32px;margin-top:22px;">
             <div style="width:300px;padding:14px 18px;border:2px solid #34a853;border-radius:12px;background:#effcf3;color:#148436;font-size:32px;font-weight:700;box-sizing:border-box;">Score: ${stored.percent}%</div>
             <div style="width:300px;padding:14px 18px;border:2px solid #6ea8f7;border-radius:12px;background:#f3f7ff;color:#2458b8;font-size:32px;font-weight:700;box-sizing:border-box;">${levelEn}</div>
           </div>
 
-          <div lang="ar" dir="rtl" style="font-size:28px;font-weight:700;color:#148436;line-height:1.5;margin-top:12px;unicode-bidi:isolate;">
-            <span>${levelAr}</span>
-            <span> — </span>
-            <span>النتيجة</span>
-            <bdi dir="ltr">: ${stored.percent}%</bdi>
-          </div>
+          <div lang="ar" dir="ltr" style="font-size:28px;font-weight:700;color:#148436;line-height:1.5;margin-top:12px;white-space:nowrap;">${fixedArabic(`${levelAr} — النتيجة: ${stored.percent}%`)}</div>
 
           <div style="width:100%;display:grid;grid-template-columns:1fr 150px 1fr;align-items:end;gap:30px;margin-top:auto;padding:0 10px 10px;box-sizing:border-box;">
             <div style="text-align:left;line-height:1.45;">
