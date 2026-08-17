@@ -32,58 +32,81 @@
 
   const label = type === 'lecture'
     ? { en: 'Lecture', ar: 'المحاضرة' }
-    : { en: 'Lab', ar: 'المخبر' };
+    : { en: 'MATLAB Lab', ar: 'المخبر' };
 
   const fileName = n => `${type}${String(n).padStart(2, '0')}.html`;
-
   const difficulty = number <= 4
     ? ['Beginner', 'مبتدئ']
     : number <= 10
       ? ['Intermediate', 'متوسط']
       : ['Advanced', 'متقدم'];
-
   const duration = type === 'lecture'
     ? (number <= 8 ? 45 : number <= 16 ? 55 : 60)
     : (number <= 8 ? 60 : number <= 16 ? 75 : 90);
-
   const relatedType = type === 'lecture' ? 'lab' : 'lecture';
-  const relatedLabel = type === 'lecture'
-    ? `🧪 MATLAB Lab ${num} | المخبر ${num}`
-    : `📘 Lecture ${num} | المحاضرة ${num}`;
 
-  const metadata = document.createElement('div');
-  metadata.className = 'course-metadata-bar';
-  metadata.setAttribute('aria-label', 'Course page information');
-  metadata.innerHTML = `
-    <span class="course-meta-item course-meta-primary">${type === 'lecture' ? '📖' : '🧪'} ${label.en} ${num} | ${label.ar} ${num}</span>
-    <span class="course-meta-item">⏱ ${duration} min | ${duration} دقيقة</span>
-    <span class="course-meta-item">📊 ${difficulty[0]} | ${difficulty[1]}</span>
-    <a class="course-meta-item course-meta-link" href="${relatedType}${num}.html">${relatedLabel}</a>
-  `;
+  const card = ({ className = '', href = '', icon, title, subtitle, meta, tag = 'a' }) => {
+    const element = document.createElement(tag);
+    element.className = `course-action-card ${className}`.trim();
+    if (href) element.href = href;
+    element.innerHTML = `
+      <span class="course-action-icon" aria-hidden="true">${icon}</span>
+      <span class="course-action-content">
+        <strong>${title}</strong>
+        <span class="course-action-subtitle">${subtitle}</span>
+        ${meta ? `<span class="course-action-meta">${meta}</span>` : ''}
+      </span>
+      ${tag === 'a' ? '<span class="course-action-arrow" aria-hidden="true">→</span>' : ''}
+    `;
+    return element;
+  };
+
+  const actions = document.createElement('section');
+  actions.className = 'course-metadata-bar course-action-panel';
+  actions.setAttribute('aria-label', 'Course actions');
+
+  actions.appendChild(card({
+    tag: 'div',
+    className: 'course-action-current',
+    icon: type === 'lecture' ? '📖' : '🧪',
+    title: `${label.en} ${num}`,
+    subtitle: `${label.ar} ${num}`,
+    meta: `⏱ ${duration} min · 📊 ${difficulty[0]} | ${difficulty[1]}`
+  }));
+
+  actions.appendChild(card({
+    className: 'course-action-related',
+    href: `${relatedType}${num}.html`,
+    icon: type === 'lecture' ? '🧪' : '📖',
+    title: type === 'lecture' ? `MATLAB Lab ${num}` : `Lecture ${num}`,
+    subtitle: type === 'lecture' ? `فتح المخبر ${num}` : `فتح المحاضرة ${num}`,
+    meta: type === 'lecture' ? 'Programming Exercise | تمرين برمجي' : 'Read Lesson | قراءة المحاضرة'
+  }));
 
   const hero = document.querySelector('.hero');
   const main = document.querySelector('main');
-  if (hero?.parentNode) hero.insertAdjacentElement('afterend', metadata);
-  else if (main) main.prepend(metadata);
-  else document.body.insertBefore(metadata, document.body.firstChild);
+  if (hero?.parentNode) hero.insertAdjacentElement('afterend', actions);
+  else if (main) main.prepend(actions);
+  else document.body.insertBefore(actions, document.body.firstChild);
 
-  // Quiz data is rendered by another deferred script. Wait until all deferred
-  // scripts have finished, then show the link only when a real quiz exists.
   setTimeout(() => {
     const quiz = document.querySelector('[data-course-quiz]');
     if (!quiz || type !== 'lecture') return;
-
     quiz.id = quiz.id || 'quiz';
-    const quizLink = document.createElement('a');
-    quizLink.className = 'course-meta-item course-meta-link course-meta-quiz';
-    quizLink.href = '#quiz';
-    quizLink.textContent = '📝 Quiz | الاختبار';
+    const quizLink = card({
+      className: 'course-action-quiz',
+      href: '#quiz',
+      icon: '📝',
+      title: 'Quiz',
+      subtitle: 'ابدأ الاختبار',
+      meta: 'Start Assessment | بدء التقييم'
+    });
     quizLink.addEventListener('click', event => {
       event.preventDefault();
       quiz.scrollIntoView({ behavior: 'smooth', block: 'start' });
       history.replaceState(null, '', '#quiz');
     });
-    metadata.appendChild(quizLink);
+    actions.appendChild(quizLink);
   }, 0);
 
   const nav = document.createElement('nav');
