@@ -1,0 +1,79 @@
+name: Link lecture PDF downloads
+
+on:
+  push:
+    paths:
+      - '.github/workflows/link-lecture-pdfs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  link-pdfs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Replace print button with direct PDF link
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('course-navigation.js')
+          text = path.read_text(encoding='utf-8')
+
+          old = """    const downloadButton = card({
+      tag: 'button',
+      className: 'course-action-download',
+      icon: '📥',
+      title: 'Download Lecture PDF',
+      subtitle: 'تحميل المحاضرة بصيغة PDF',
+      meta: 'Print / Save as PDF | طباعة / حفظ PDF'
+    });
+    downloadButton.addEventListener('click', () => {
+      const originalTitle = document.title;
+      document.title = `Lecture_${num}_AI_Power_Systems_Version_1.0`;
+      window.addEventListener('afterprint', () => { document.title = originalTitle; }, { once: true });
+      window.print();
+    });
+    actions.appendChild(downloadButton);
+"""
+
+          new = """    const downloadButton = card({
+      className: 'course-action-download',
+      href: `pdf/lecture${num}.pdf`,
+      icon: '📥',
+      title: 'Download Lecture PDF',
+      subtitle: 'تحميل المحاضرة بصيغة PDF',
+      meta: 'Ready PDF | ملف PDF جاهز'
+    });
+    downloadButton.setAttribute('download', `Lecture_${num}_AI_Power_Systems_Version_1.0.pdf`);
+    actions.appendChild(downloadButton);
+"""
+
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif "href: `pdf/lecture${num}.pdf`" not in text:
+              raise RuntimeError('Expected lecture PDF button block was not found.')
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Validate direct links
+        run: |
+          grep -q 'href: `pdf/lecture${num}.pdf`' course-navigation.js
+          grep -q 'downloadButton.setAttribute' course-navigation.js
+          test -f pdf/lecture01.pdf
+
+      - name: Commit direct download links
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add course-navigation.js
+          if git diff --cached --quiet; then
+            echo "Direct PDF links are already configured."
+          else
+            git commit -m "Link lecture cards to downloadable PDF files"
+            git push
+          fi
