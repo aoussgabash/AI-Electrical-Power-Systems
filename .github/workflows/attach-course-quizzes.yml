@@ -1,0 +1,93 @@
+name: Attach interactive quizzes to lectures
+
+on:
+  push:
+    paths:
+      - '.github/workflows/attach-course-quizzes.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  attach-quizzes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Attach quiz CSS and scripts to all lecture pages
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          css_tag = '<link rel="stylesheet" href="course-quiz.css">'
+          data_script = '<script src="course-quiz-data.js" defer></script>'
+          engine_script = '<script src="course-quiz.js" defer></script>'
+          changed = []
+
+          for number in range(1, 21):
+              path = Path(f'lecture{number:02d}.html')
+              if not path.exists():
+                  print(f'Skipping missing file: {path}')
+                  continue
+
+              text = path.read_text(encoding='utf-8')
+              original = text
+
+              if 'course-quiz.css' not in text:
+                  if re.search(r'</head\s*>', text, flags=re.I):
+                      text = re.sub(r'</head\s*>', css_tag + '\n</head>', text, count=1, flags=re.I)
+                  else:
+                      text = css_tag + '\n' + text
+
+              # Keep data before engine so the quiz is rendered before grading is initialized.
+              scripts = []
+              if 'course-quiz-data.js' not in text:
+                  scripts.append(data_script)
+              if 'course-quiz.js' not in text:
+                  scripts.append(engine_script)
+
+              if scripts:
+                  block = '\n'.join(scripts)
+                  if re.search(r'</body\s*>', text, flags=re.I):
+                      text = re.sub(r'</body\s*>', block + '\n</body>', text, count=1, flags=re.I)
+                  else:
+                      text += '\n' + block + '\n'
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  changed.append(str(path))
+
+          print('Changed files:')
+          for path in changed:
+              print(path)
+
+      - name: Validate quiz integration
+        shell: python
+        run: |
+          from pathlib import Path
+
+          for number in range(1, 21):
+              path = Path(f'lecture{number:02d}.html')
+              if not path.exists():
+                  continue
+              text = path.read_text(encoding='utf-8')
+              assert 'course-quiz.css' in text, f'Missing quiz CSS in {path}'
+              assert 'course-quiz-data.js' in text, f'Missing quiz data script in {path}'
+              assert 'course-quiz.js' in text, f'Missing quiz engine in {path}'
+              assert text.index('course-quiz-data.js') < text.index('course-quiz.js'), f'Wrong script order in {path}'
+              print(f'Validated: {path}')
+
+      - name: Commit quiz integration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lecture{01..20}.html
+          if git diff --cached --quiet; then
+            echo "All lecture pages already use the quiz assets."
+          else
+            git commit -m "Attach interactive quiz system to lecture pages"
+            git push
+          fi
