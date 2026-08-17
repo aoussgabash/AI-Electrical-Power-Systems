@@ -9,80 +9,6 @@
   const number = Number(match[2]);
   const maxNumber = 20;
 
-  const style = document.createElement('style');
-  style.textContent = `
-    #reading-progress-track {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,.08);
-      z-index: 9999;
-      pointer-events: none;
-    }
-    #reading-progress-bar {
-      width: 0;
-      height: 100%;
-      background: linear-gradient(90deg,#38bdf8,#2563eb,#fbbf24);
-      box-shadow: 0 0 12px rgba(56,189,248,.55);
-      transition: width .08s linear;
-    }
-    .course-page-navigation {
-      width: min(1100px,92%);
-      margin: 28px auto 8px;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 12px;
-      align-items: center;
-    }
-    .course-nav-link,
-    .course-nav-home {
-      min-height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 10px 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      background: #0b1b2c;
-      color: #eef7ff;
-      text-decoration: none;
-      font-weight: 700;
-      text-align: center;
-      transition: transform .18s ease,border-color .18s ease;
-    }
-    .course-nav-link:hover,
-    .course-nav-home:hover {
-      transform: translateY(-2px);
-      border-color: rgba(56,189,248,.55);
-    }
-    .course-nav-link.next { justify-self: stretch; }
-    .course-nav-link.previous { justify-self: stretch; }
-    .course-nav-placeholder { min-height: 54px; }
-    .course-nav-small {
-      display: block;
-      color: #a9bfd2;
-      font-size: .74rem;
-      font-weight: 400;
-      line-height: 1.2;
-    }
-    @media (max-width: 680px) {
-      .course-page-navigation {
-        grid-template-columns: 1fr 1fr;
-      }
-      .course-nav-home {
-        grid-column: 1 / -1;
-        grid-row: 1;
-      }
-      .course-nav-link.previous { grid-column: 1; }
-      .course-nav-link.next { grid-column: 2; }
-      .course-nav-placeholder { display:none; }
-    }
-  `;
-  document.head.appendChild(style);
-
   const track = document.createElement('div');
   track.id = 'reading-progress-track';
   track.setAttribute('aria-hidden', 'true');
@@ -93,9 +19,12 @@
 
   const updateProgress = () => {
     const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-    const percent = scrollable > 0 ? Math.min(100, Math.max(0, window.scrollY / scrollable * 100)) : 100;
+    const percent = scrollable > 0
+      ? Math.min(100, Math.max(0, window.scrollY / scrollable * 100))
+      : 100;
     bar.style.width = `${percent}%`;
   };
+
   updateProgress();
   addEventListener('scroll', updateProgress, { passive: true });
   addEventListener('resize', updateProgress);
