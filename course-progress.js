@@ -15,12 +15,28 @@
   };
 
   const results = Array.from({ length: totalLectures }, (_, index) => getResult(index + 1));
-  const attempted = results.filter(Boolean);
-  const completed = results.filter(result => Number(result?.percent) >= passMark);
+  const attemptedEntries = results
+    .map((result, index) => ({ result, number: index + 1 }))
+    .filter(entry => entry.result);
+  const completedEntries = attemptedEntries.filter(entry => Number(entry.result.percent) >= passMark);
+  const attempted = attemptedEntries.map(entry => entry.result);
+  const completed = completedEntries.map(entry => entry.result);
   const average = attempted.length
     ? Math.round(attempted.reduce((sum, result) => sum + Number(result.percent || 0), 0) / attempted.length)
     : 0;
   const courseProgress = Math.round((completed.length / totalLectures) * 100);
+  const nextLectureNumber = results.findIndex(result => Number(result?.percent || 0) < passMark) + 1 || totalLectures;
+  const nextLecture = String(nextLectureNumber).padStart(2, '0');
+  const bestEntry = attemptedEntries.length
+    ? [...attemptedEntries].sort((a, b) => Number(b.result.percent || 0) - Number(a.result.percent || 0))[0]
+    : null;
+  const latestEntry = attemptedEntries.length
+    ? [...attemptedEntries].sort((a, b) => {
+        const aDate = new Date(a.result.lastAttemptAt || a.result.completedAt || 0).getTime();
+        const bDate = new Date(b.result.lastAttemptAt || b.result.completedAt || 0).getTime();
+        return bDate - aDate;
+      })[0]
+    : null;
 
   const dashboard = document.querySelector('[data-learning-dashboard]');
   if (dashboard) {
@@ -57,6 +73,38 @@
       }).join('');
     }
 
+    let smartPanel = dashboard.querySelector('.continue-learning-panel');
+    if (!smartPanel) {
+      smartPanel = document.createElement('div');
+      smartPanel.className = 'continue-learning-panel';
+      const progressPanel = dashboard.querySelector('.progress-panel');
+      progressPanel?.prepend(smartPanel);
+    }
+
+    if (smartPanel) {
+      const bestText = bestEntry
+        ? `Lecture ${String(bestEntry.number).padStart(2, '0')} — ${Number(bestEntry.result.percent)}%`
+        : 'No result yet | لا توجد نتيجة بعد';
+      const latestText = latestEntry
+        ? `Lecture ${String(latestEntry.number).padStart(2, '0')} — ${Number(latestEntry.result.percent)}%`
+        : 'No attempt yet | لا توجد محاولة بعد';
+      const allDone = completed.length === totalLectures;
+
+      smartPanel.innerHTML = `
+        <div class="continue-learning-copy">
+          <span class="continue-eyebrow">${allDone ? '🏆 Course Completed' : '▶ Continue Learning'} | ${allDone ? 'اكتمل المقرر' : 'تابع التعلم'}</span>
+          <h3>${allDone ? 'You completed all 20 lectures.' : `Continue with Lecture ${nextLecture}`}</h3>
+          <p>${allDone ? 'Review any lecture or print your lecture certificates.' : `المحاضرة التالية المقترحة: ${nextLecture}`}</p>
+        </div>
+        <a class="continue-learning-button" href="lecture${allDone ? '01' : nextLecture}.html">
+          ${allDone ? 'Review Course | مراجعة المقرر' : `Open Lecture ${nextLecture} | فتح المحاضرة ${nextLecture}`}
+        </a>
+        <div class="continue-learning-details">
+          <span><strong>Best Result | أفضل نتيجة</strong>${bestText}</span>
+          <span><strong>Latest Attempt | آخر محاولة</strong>${latestText}</span>
+        </div>`;
+    }
+
     const achievements = [
       { selector: '[data-achievement-first]', unlocked: completed.length >= 1 },
       { selector: '[data-achievement-five]', unlocked: completed.length >= 5 },
@@ -80,7 +128,6 @@
     });
   }
 
-  // Add progress state to each lecture card on the homepage.
   document.querySelectorAll('.course-card[data-type="lecture"]').forEach(card => {
     const href = card.getAttribute('href') || '';
     const match = href.match(/lecture(\d{2})\.html/i);
