@@ -1,0 +1,113 @@
+name: Apply author archive layout
+
+on:
+  push:
+    paths:
+      - .github/author-archive-trigger.txt
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Remove footer links and add Archive author card
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          archive_url = "https://archive.org/details/@aouss_gabash"
+          orcid_url = "https://orcid.org/0000-0002-3720-7203"
+          researchgate_url = "https://www.researchgate.net/profile/Aouss-Gabash"
+
+          # 1) Remove the complete links row from the shared footer.
+          footer_path = Path("course-footer.js")
+          footer = footer_path.read_text(encoding="utf-8")
+          footer, footer_count = re.subn(
+              r'\n\s*<div class="footer-links">.*?</div>',
+              '',
+              footer,
+              count=1,
+              flags=re.DOTALL,
+          )
+          if footer_count != 1:
+              raise SystemExit("The footer links row was not found exactly once.")
+          footer_path.write_text(footer, encoding="utf-8")
+
+          # 2) Rebuild the author area so all three equal-size cards span the full row.
+          index_path = Path("index.html")
+          index = index_path.read_text(encoding="utf-8")
+
+          author_section = f'''<section id="author">
+<div class="section-title"><h2>Prepared by</h2><div class="ar">إعداد</div></div>
+<div class="author-box">
+  <div>
+    <h3>Dr.-Ing. Aouss Gabash</h3>
+    <p>IEEE Senior Member (SM'22)</p>
+    <span class="version-pill">Version 1.0</span>
+  </div>
+  <div>
+    <p>Research and teaching interests include electrical power systems, smart and sustainable energy systems, optimization, control, battery storage, renewable-energy integration, and artificial intelligence.</p>
+    <p class="ar">تشمل الاهتمامات البحثية والتعليمية أنظمة القدرة الكهربائية والطاقة الذكية والمستدامة والتحسين والتحكم وتخزين الطاقة ودمج المصادر المتجددة والذكاء الاصطناعي.</p>
+  </div>
+  <div class="academic-profile-links" aria-label="Academic profiles">
+    <a class="academic-profile-link orcid" href="{orcid_url}" target="_blank" rel="me noopener noreferrer" aria-label="Open ORCID profile">
+      <span class="profile-mark" aria-hidden="true">iD</span>
+      <span><strong>ORCID</strong><small>0000-0002-3720-7203</small></span>
+    </a>
+    <a class="academic-profile-link researchgate" href="{researchgate_url}" target="_blank" rel="me noopener noreferrer" aria-label="Open ResearchGate profile">
+      <span class="profile-mark" aria-hidden="true">RG</span>
+      <span><strong>ResearchGate</strong><small>Aouss Gabash</small></span>
+    </a>
+    <a class="academic-profile-link archive" href="{archive_url}" target="_blank" rel="noopener noreferrer" aria-label="Open Internet Archive profile">
+      <span class="profile-mark" aria-hidden="true">🏛</span>
+      <span><strong>Archive</strong><small>Digital Library</small></span>
+    </a>
+  </div>
+</div>
+</section>'''
+
+          index, author_count = re.subn(
+              r'<section id="author">.*?</section>',
+              author_section,
+              index,
+              count=1,
+              flags=re.DOTALL,
+          )
+          if author_count != 1:
+              raise SystemExit("The author section was not found exactly once.")
+
+          layout_css = '''
+/* Academic profile cards: equal size across the full author row. */
+.author-box>.academic-profile-links{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,230px));gap:11px;margin-top:0;align-items:stretch}
+.author-box>.academic-profile-links .academic-profile-link{width:100%;min-width:0;min-height:64px}
+.academic-profile-link.archive .profile-mark{background:#f59e0b;color:#fff;font-size:1rem}
+@media(max-width:820px){.author-box>.academic-profile-links{grid-template-columns:repeat(2,minmax(0,230px))}}
+@media(max-width:560px){.author-box>.academic-profile-links{grid-template-columns:1fr}.author-box>.academic-profile-links .academic-profile-link{max-width:none}}
+'''
+          css_marker = '/* Academic profile cards: equal size across the full author row. */'
+          if css_marker not in index:
+              index = index.replace('</style>', layout_css + '</style>', 1)
+
+          index_path.write_text(index, encoding="utf-8")
+          PY
+
+      - name: Commit updated website files
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes were necessary."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html course-footer.js
+          git commit -m "Move Archive link to author cards and remove footer links"
+          git push
