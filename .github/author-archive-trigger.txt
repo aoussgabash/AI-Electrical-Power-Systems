@@ -1,0 +1,1 @@
+Apply the author archive layout and remove the footer link row.
