@@ -61,11 +61,18 @@
   top:0;
   left:0;
   z-index:2;
-  width:132px;
-  height:132px;
+  box-sizing:content-box;
+  width:120px;
+  height:120px;
+  padding:6px;
   border:4px solid rgba(56,189,248,.88);
   border-radius:50%;
-  background:#d9dde1 url("assets/aouss-gabash-photo.svg") center/116% no-repeat;
+  background-image:url("assets/aouss-gabash-photo.svg");
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-origin:content-box;
+  background-clip:content-box;
   box-shadow:0 12px 28px rgba(0,0,0,.30),0 0 0 7px rgba(56,189,248,.10);
   pointer-events:none;
 }
@@ -239,8 +246,9 @@ header .navlinks a:focus-visible{
   }
 
   #author .author-box > div:first-child::before{
-    width:118px;
-    height:118px;
+    width:106px;
+    height:106px;
+    padding:6px;
   }
 
   #author .author-box > div:first-child{
