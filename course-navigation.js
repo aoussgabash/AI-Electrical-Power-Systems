@@ -9,9 +9,30 @@
   const number = Number(match[2]);
   const maxNumber = 20;
   const num = String(number).padStart(2, '0');
+  const authorName = 'Dr.-Ing. Aouss Gabash';
 
   const sharedStyle = document.createElement('style');
   sharedStyle.textContent = `
+    .course-author-signature{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:7px;
+      width:fit-content;
+      max-width:100%;
+      margin:20px auto 0;
+      padding:8px 14px;
+      border:1px solid rgba(56,189,248,.28);
+      border-radius:999px;
+      background:rgba(8,31,51,.72);
+      color:#eaf7ff;
+      font-size:.9rem;
+      line-height:1.4;
+      box-shadow:0 8px 22px rgba(0,0,0,.16);
+    }
+    .course-author-label{color:#9fc7df;font-weight:600}
+    .course-author-name{color:#fff;font-weight:800;letter-spacing:.01em}
     .course-action-panel{
       display:grid!important;
       grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -53,16 +74,27 @@
     .course-action-quiz{border-color:rgba(34,197,94,.4)}
     .course-action-download{border-color:rgba(56,189,248,.5);background:linear-gradient(145deg,#0d4770,#0a2944)}
     @media(max-width:620px){
+      .course-author-signature{border-radius:13px;text-align:center;padding:9px 12px}
       .course-action-panel{grid-template-columns:1fr!important}
       .course-action-card{min-height:108px}
     }
-    @page{size:A4 portrait;margin:14mm}
+    @page{size:A4 portrait;margin:14mm 14mm 18mm}
     @media print{
       html,body{background:#fff!important;color:#000!important;font-family:Arial,Tahoma,sans-serif!important}
       header,.course-action-panel,.course-page-navigation,#reading-progress-track,
       [data-course-quiz],footer,.site-footer,.course-footer,.back,.to-top{display:none!important}
       main,.container{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
       .hero{padding:0 0 8mm!important;margin:0!important;border-bottom:1px solid #888!important}
+      .course-author-signature{
+        display:flex!important;
+        margin:5mm auto 0!important;
+        padding:2.5mm 4mm!important;
+        border:1px solid #777!important;
+        background:#fff!important;
+        color:#000!important;
+        box-shadow:none!important;
+      }
+      .course-author-label,.course-author-name{color:#000!important}
       h1,h2,h3,strong{color:#000!important}
       p,li,.subtitle,.hero-ar,.ar,.en{color:#000!important}
       section{background:#fff!important;color:#000!important;border:1px solid #aaa!important;box-shadow:none!important;margin:7mm 0!important;padding:7mm!important;break-inside:auto}
@@ -130,6 +162,19 @@
     return element;
   };
 
+  const hero = document.querySelector('.hero');
+  const main = document.querySelector('main');
+
+  if (hero && !hero.querySelector('.course-author-signature')) {
+    const author = document.createElement('div');
+    author.className = 'course-author-signature';
+    author.setAttribute('aria-label', `Prepared by ${authorName}`);
+    author.innerHTML = `
+      <span class="course-author-label">Prepared by | إعداد:</span>
+      <span class="course-author-name">${authorName}</span>`;
+    hero.appendChild(author);
+  }
+
   const actions = document.createElement('section');
   actions.className = 'course-metadata-bar course-action-panel';
   actions.setAttribute('aria-label', 'Course actions');
@@ -152,21 +197,20 @@
     meta: type === 'lecture' ? 'Programming Exercise | تمرين برمجي' : 'Read Lesson | قراءة المحاضرة'
   }));
 
-  if (type === 'lecture') {
-    const downloadButton = card({
-      className: 'course-action-download',
-      href: `pdf/lecture${num}.pdf`,
-      icon: '📥',
-      title: 'Download Lecture PDF',
-      subtitle: 'تحميل المحاضرة بصيغة PDF',
-      meta: 'Ready PDF | ملف PDF جاهز'
-    });
-    downloadButton.setAttribute('download', `Lecture_${num}_AI_Power_Systems_Version_1.0.pdf`);
-    actions.appendChild(downloadButton);
-  }
+  const downloadButton = card({
+    className: 'course-action-download',
+    href: `pdf/${type}${num}.pdf`,
+    icon: '📥',
+    title: type === 'lecture' ? 'Download Lecture PDF' : 'Download Lab PDF',
+    subtitle: type === 'lecture' ? 'تحميل المحاضرة بصيغة PDF' : 'تحميل المخبر بصيغة PDF',
+    meta: `Prepared by ${authorName}`
+  });
+  downloadButton.setAttribute(
+    'download',
+    `${type === 'lecture' ? 'Lecture' : 'MATLAB_Lab'}_${num}_AI_Power_Systems_Aouss_Gabash.pdf`
+  );
+  actions.appendChild(downloadButton);
 
-  const hero = document.querySelector('.hero');
-  const main = document.querySelector('main');
   if (hero?.parentNode) hero.insertAdjacentElement('afterend', actions);
   else if (main) main.prepend(actions);
   else document.body.insertBefore(actions, document.body.firstChild);
