@@ -33,7 +33,7 @@
     ['x_i(k+1)=Σ_j w_ij x_j(k)', String.raw`x_i(k+1)=\sum_j w_{ij}x_j(k)`],
     ['w_global = Σ_k (n_k/N) w_k', String.raw`w_{\mathrm{global}}=\sum_k\frac{n_k}{N}w_k`],
     ['J_total = J_data + λ_pf J_power-flow + λ_dyn J_dynamics + λ_limits J_limits', String.raw`J_{\mathrm{total}}=J_{\mathrm{data}}+\lambda_{\mathrm{pf}}J_{\mathrm{power\text{-}flow}}+\lambda_{\mathrm{dyn}}J_{\mathrm{dynamics}}+\lambda_{\mathrm{limits}}J_{\mathrm{limits}}`],
-    ['Risk = E[Cost] + β·CVaR_α(Cost)', String.raw`\mathrm{Risk}=\mathbb{E}[\mathrm{Cost}]+\beta\,\mathrm{CVaR}_{\alpha}(\mathrm{Cost})`],
+    ['Risk = E[Cost] + β·CVaR_α(Cost)', String.raw`\mathrm{Risk}=\mathbb{E}[\mathrm{Cost}]+\beta\,\mathrm{CVaR}_{\alpha}(\mathrm{Cost})`]
   ]);
 
   const subscriptChars = {
@@ -119,7 +119,6 @@
   const initMathRendering = () => {
     const formulas = [...document.querySelectorAll('.formula, .equation')]
       .filter(element => !element.dataset.mathProcessed);
-
     if (!formulas.length) return;
 
     formulas.forEach(element => {
@@ -204,14 +203,10 @@
           align-items:stretch;
         }
         #author .author-box > .academic-profile-links .academic-profile-link{
-          width:100%;
-          min-width:0;
-          min-height:64px;
+          width:100%;min-width:0;min-height:64px;
         }
         .academic-profile-link.archive .profile-mark{
-          background:#f59e0b;
-          color:#fff;
-          font-size:1rem;
+          background:#f59e0b;color:#fff;font-size:1rem;
         }
         @media(max-width:820px){
           #author .author-box > .academic-profile-links{
@@ -219,12 +214,127 @@
           }
         }
         @media(max-width:560px){
-          #author .author-box > .academic-profile-links{
-            grid-template-columns:1fr;
-          }
+          #author .author-box > .academic-profile-links{grid-template-columns:1fr;}
         }`;
       document.head.appendChild(style);
     }
+  };
+
+  const initMobileNavigation = () => {
+    const nav = document.querySelector('header nav');
+    const links = nav?.querySelector('.navlinks');
+    if (!nav || !links || nav.querySelector('.mobile-menu-toggle')) return;
+
+    if (!links.id) links.id = 'main-navigation';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mobile-menu-toggle';
+    button.setAttribute('aria-controls', links.id);
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-label', 'Open navigation menu');
+    button.innerHTML = '<span aria-hidden="true">☰</span>';
+    nav.insertBefore(button, links);
+
+    const closeMenu = () => {
+      links.classList.remove('is-open');
+      button.classList.remove('is-open');
+      button.setAttribute('aria-expanded', 'false');
+      button.setAttribute('aria-label', 'Open navigation menu');
+      button.innerHTML = '<span aria-hidden="true">☰</span>';
+    };
+
+    const openMenu = () => {
+      links.classList.add('is-open');
+      button.classList.add('is-open');
+      button.setAttribute('aria-expanded', 'true');
+      button.setAttribute('aria-label', 'Close navigation menu');
+      button.innerHTML = '<span aria-hidden="true">✕</span>';
+    };
+
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      links.classList.contains('is-open') ? closeMenu() : openMenu();
+    });
+
+    links.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+
+    document.addEventListener('click', event => {
+      if (!nav.contains(event.target)) closeMenu();
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeMenu();
+        button.focus();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) closeMenu();
+    }, { passive: true });
+
+    const style = document.createElement('style');
+    style.id = 'mobile-navigation-style';
+    style.textContent = `
+      .mobile-menu-toggle{
+        display:none;
+        align-items:center;
+        justify-content:center;
+        width:44px;
+        height:44px;
+        border:1px solid rgba(255,255,255,.16);
+        border-radius:10px;
+        background:#0b2135;
+        color:#fff;
+        font-size:1.55rem;
+        line-height:1;
+        cursor:pointer;
+      }
+      .mobile-menu-toggle:hover,
+      .mobile-menu-toggle:focus-visible{
+        border-color:#38bdf8;
+        outline:2px solid rgba(56,189,248,.28);
+        outline-offset:2px;
+      }
+      @media(max-width:900px){
+        header nav{position:relative;}
+        .mobile-menu-toggle{display:inline-flex;flex:0 0 auto;}
+        header .navlinks{
+          display:none!important;
+          position:absolute;
+          top:calc(100% + 1px);
+          left:0;
+          right:0;
+          z-index:100;
+          flex-direction:column;
+          gap:4px;
+          padding:10px;
+          border:1px solid rgba(255,255,255,.12);
+          border-top:0;
+          border-radius:0 0 14px 14px;
+          background:rgba(7,17,31,.98);
+          box-shadow:0 18px 36px rgba(0,0,0,.35);
+          backdrop-filter:blur(14px);
+        }
+        header .navlinks.is-open{display:flex!important;}
+        header .navlinks a{
+          display:block;
+          width:100%;
+          padding:11px 13px;
+          border-radius:9px;
+          color:#dceaf5;
+          text-align:left;
+        }
+        header .navlinks a:hover,
+        header .navlinks a:focus-visible{
+          color:#fff;
+          background:rgba(56,189,248,.12);
+          outline:none;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   };
 
   let pageInfo = 'Version 1.0';
@@ -241,6 +351,7 @@
     document.querySelectorAll('[data-archive-link],[data-archive-button]')
       .forEach(element => element.remove());
     addArchiveProfileCard();
+    initMobileNavigation();
   }
 
   const footer = document.createElement('footer');
