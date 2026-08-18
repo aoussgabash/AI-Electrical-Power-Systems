@@ -2,6 +2,8 @@
   'use strict';
 
   const archiveUrl = 'https://archive.org/details/@aouss_gabash';
+  const orcidUrl = 'https://orcid.org/0000-0002-3720-7203';
+  const researchGateUrl = 'https://www.researchgate.net/profile/Aouss-Gabash';
   const startYear = 2026;
   const currentYear = new Date().getFullYear();
   const yearText = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
@@ -286,6 +288,8 @@
         <a href="index.html">Website</a>
         <a href="https://github.com/aoussgabash/AI-Electrical-Power-Systems" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer">Internet Archive</a>
+        <a href="${orcidUrl}" target="_blank" rel="me noopener noreferrer">ORCID</a>
+        <a href="${researchGateUrl}" target="_blank" rel="me noopener noreferrer">ResearchGate</a>
       </div>
       <div class="footer-info">${pageInfo}</div>
       <div class="footer-copy">© ${yearText} Aouss Gabash. All Rights Reserved.</div>
