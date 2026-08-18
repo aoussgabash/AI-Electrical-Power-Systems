@@ -33,8 +33,12 @@ for (const type of ['lecture', 'lab']) {
       displayHeaderFooter: true,
       headerTemplate: '<div></div>',
       footerTemplate: `
-        <div style="width:100%;font-size:8px;color:#666;padding:0 12mm;display:flex;justify-content:space-between;align-items:center;">
-          <span>Dr.-Ing. Aouss Gabash</span>
+        <div style="width:100%;font-size:8px;color:#666;padding:0 12mm;display:flex;justify-content:space-between;align-items:center;font-family:Arial,Tahoma,sans-serif;">
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span>Dr.-Ing. Aouss Gabash</span>
+            <span style="color:#999;">|</span>
+            <span dir="rtl" style="font-family:Tahoma,Arial,sans-serif;">د. م. أوس غباش</span>
+          </span>
           <span>AI Applications in Electrical Power Systems</span>
           <span><span class="pageNumber"></span>/<span class="totalPages"></span></span>
         </div>`,
