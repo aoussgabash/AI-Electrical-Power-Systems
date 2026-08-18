@@ -19,3 +19,144 @@
 }
 
 .footer-title{
+  color:#f4f8fc;
+  font-size:1rem;
+  font-weight:700;
+  line-height:1.35;
+}
+
+.footer-subtitle{
+  color:#8fc7ff;
+  font-size:.92rem;
+  line-height:1.45;
+}
+
+.footer-info{
+  margin-top:4px;
+  color:#8296aa;
+  font-size:.8rem;
+  letter-spacing:.01em;
+}
+
+.footer-copy{
+  margin-top:2px;
+  color:#71869a;
+  font-size:.76rem;
+}
+
+/* Remove the standalone Digital Library section and its old page links. */
+#digital-library,
+[data-archive-link],
+[data-archive-button]{
+  display:none!important;
+}
+
+/* Hamburger navigation on desktop and mobile. */
+header nav{
+  position:relative;
+}
+
+.mobile-menu-toggle{
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  margin-left:auto;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:10px;
+  background:#0b2135;
+  color:#fff;
+  font-size:1.55rem;
+  line-height:1;
+  cursor:pointer;
+}
+
+.mobile-menu-toggle:hover,
+.mobile-menu-toggle:focus-visible{
+  border-color:#38bdf8;
+  outline:2px solid rgba(56,189,248,.28);
+  outline-offset:2px;
+}
+
+header .navlinks{
+  display:none!important;
+  position:absolute;
+  top:calc(100% + 1px);
+  right:0;
+  z-index:100;
+  width:min(340px,92vw);
+  flex-direction:column;
+  gap:4px;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:0 0 14px 14px;
+  background:rgba(7,17,31,.98);
+  box-shadow:0 18px 36px rgba(0,0,0,.35);
+  backdrop-filter:blur(14px);
+}
+
+header .navlinks.is-open{
+  display:flex!important;
+}
+
+header .navlinks a{
+  display:block;
+  width:100%;
+  padding:11px 13px;
+  border-radius:9px;
+  color:#dceaf5;
+  text-align:left;
+  text-decoration:none;
+}
+
+header .navlinks a:hover,
+header .navlinks a:focus-visible{
+  color:#fff;
+  background:rgba(56,189,248,.12);
+  outline:none;
+}
+
+@media(max-width:620px){
+  .site-footer,
+  .course-footer{
+    margin-top:34px;
+    padding:18px 12px;
+  }
+
+  .site-footer-inner{
+    width:min(100%,460px);
+    gap:4px;
+  }
+
+  .footer-title{
+    font-size:.92rem;
+  }
+
+  .footer-subtitle{
+    font-size:.86rem;
+  }
+
+  .footer-info{
+    font-size:.74rem;
+  }
+
+  .footer-copy{
+    font-size:.7rem;
+  }
+
+  header .navlinks{
+    left:0;
+    right:0;
+    width:auto;
+  }
+}
+
+@media print{
+  .site-footer,
+  .course-footer,
+  .mobile-menu-toggle,
+  header .navlinks{
+    display:none!important;
+  }
+}
