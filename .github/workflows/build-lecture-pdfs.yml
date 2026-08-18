@@ -1,11 +1,14 @@
-name: Build downloadable lecture PDFs
+name: Build downloadable course PDFs
 
 on:
   workflow_dispatch:
   push:
     paths:
       - 'lecture*.html'
+      - 'lab*.html'
       - 'course-common.css'
+      - 'course-footer.css'
+      - 'course-footer.js'
       - 'course-navigation.js'
       - 'scripts/build-lecture-pdfs.mjs'
       - '.github/workflows/build-lecture-pdfs.yml'
@@ -37,16 +40,18 @@ jobs:
           python3 -m http.server 8000 > /tmp/course-http.log 2>&1 &
           sleep 3
 
-      - name: Generate lecture PDFs
+      - name: Generate lecture and lab PDFs
         run: |
           mkdir -p pdf
           node scripts/build-lecture-pdfs.mjs
 
       - name: Validate generated files
         run: |
-          count=$(find pdf -maxdepth 1 -type f -name 'lecture*.pdf' | wc -l)
-          test "$count" -gt 0
-          echo "Generated $count PDF files."
+          lecture_count=$(find pdf -maxdepth 1 -type f -name 'lecture*.pdf' | wc -l)
+          lab_count=$(find pdf -maxdepth 1 -type f -name 'lab*.pdf' | wc -l)
+          test "$lecture_count" -eq 20
+          test "$lab_count" -eq 20
+          echo "Generated $lecture_count lecture PDFs and $lab_count lab PDFs."
 
       - name: Commit generated PDFs
         run: |
@@ -54,8 +59,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add pdf/
           if git diff --cached --quiet; then
-            echo "Lecture PDFs are already up to date."
+            echo "Course PDFs are already up to date."
           else
-            git commit -m "Build downloadable lecture PDFs"
+            git commit -m "Build downloadable lecture and lab PDFs"
             git push
           fi
