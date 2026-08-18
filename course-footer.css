@@ -49,6 +49,20 @@
   display:none!important;
 }
 
+/* Arabic terminology for the Modern AI section. */
+#structure .part:nth-child(2) .ar{
+  font-size:0;
+}
+
+#structure .part:nth-child(2) .ar::after{
+  content:"التقنيات الحديثة: التعلم العميق، والمحوّلات، والشبكات العصبية للرسوم البيانية، والتعلم المعزز، والذكاء الاصطناعي القابل للتفسير، والذكاء الاصطناعي التوليدي، والأنظمة متعددة الوكلاء، والتوائم الرقمية.";
+  display:block;
+  font-size:1rem;
+  line-height:1.9;
+  direction:rtl;
+  text-align:right;
+}
+
 /* Remove the standalone Digital Library section and its old page links. */
 #digital-library,
 [data-archive-link],
