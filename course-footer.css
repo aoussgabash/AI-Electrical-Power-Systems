@@ -44,6 +44,13 @@
   font-size:.76rem;
 }
 
+/* Remove the standalone Digital Library section and its page links. */
+#digital-library,
+[data-archive-link],
+[data-archive-button]{
+  display:none!important;
+}
+
 @media(max-width:620px){
   .site-footer,
   .course-footer{
