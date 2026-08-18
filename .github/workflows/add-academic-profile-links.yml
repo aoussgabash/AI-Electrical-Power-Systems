@@ -1,0 +1,128 @@
+name: Add academic profile links
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/add-academic-profile-links.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-profile-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add ORCID and ResearchGate links
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          orcid_url = "https://orcid.org/0000-0002-3720-7203"
+          researchgate_url = "https://www.researchgate.net/profile/Aouss-Gabash"
+
+          index_path = Path("index.html")
+          index = index_path.read_text(encoding="utf-8")
+
+          # Add academic identity URLs to structured data.
+          old_provider = '"provider":{"@type":"Person","name":"Dr.-Ing. Aouss Gabash"}'
+          new_provider = (
+              '"provider":{"@type":"Person","name":"Dr.-Ing. Aouss Gabash",'
+              f'"sameAs":["{orcid_url}","{researchgate_url}"]}}'
+          )
+          if old_provider in index and '"sameAs"' not in index:
+              index = index.replace(old_provider, new_provider, 1)
+
+          # Make the existing navigation label describe the expanded author section.
+          index = index.replace(
+              '<a href="#author">Author</a>',
+              '<a href="#author">Author &amp; Profiles</a>',
+              1,
+          )
+
+          # Add responsive styles once.
+          style_marker = '.academic-profile-links{'
+          profile_styles = (
+              '.academic-profile-links{display:flex;flex-wrap:wrap;gap:11px;margin-top:18px}'
+              '.academic-profile-link{display:inline-flex;align-items:center;gap:10px;min-width:210px;'
+              'padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:#081827;'
+              'color:#fff;text-decoration:none;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}'
+              '.academic-profile-link:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.6);'
+              'box-shadow:0 12px 26px rgba(0,0,0,.2)}'
+              '.academic-profile-link .profile-mark{display:inline-flex;align-items:center;justify-content:center;'
+              'width:36px;height:36px;border-radius:50%;font-weight:800;background:#fff;color:#07111f}'
+              '.academic-profile-link strong,.academic-profile-link small{display:block;line-height:1.25}'
+              '.academic-profile-link small{margin-top:3px;color:var(--muted);font-size:.76rem}'
+              '.academic-profile-link.orcid .profile-mark{background:#a6ce39;color:#fff}'
+              '.academic-profile-link.researchgate .profile-mark{background:#00ccbb;color:#fff;font-size:.8rem}'
+              '@media(max-width:620px){.academic-profile-links{display:grid}.academic-profile-link{width:100%;min-width:0}}'
+          )
+          if style_marker not in index:
+              index = index.replace('</style>', profile_styles + '\n</style>', 1)
+
+          # Add visible academic profile cards to the author section.
+          profile_block = f'''<div class="academic-profile-links" aria-label="Academic profiles">
+          <a class="academic-profile-link orcid" href="{orcid_url}" target="_blank" rel="me noopener noreferrer" aria-label="Open ORCID profile">
+            <span class="profile-mark" aria-hidden="true">iD</span>
+            <span><strong>ORCID</strong><small>0000-0002-3720-7203</small></span>
+          </a>
+          <a class="academic-profile-link researchgate" href="{researchgate_url}" target="_blank" rel="me noopener noreferrer" aria-label="Open ResearchGate profile">
+            <span class="profile-mark" aria-hidden="true">RG</span>
+            <span><strong>ResearchGate</strong><small>Aouss Gabash</small></span>
+          </a>
+          </div>'''
+
+          author_marker = '<span class="version-pill">Version 1.0</span></div>'
+          if 'class="academic-profile-links"' not in index and author_marker in index:
+              index = index.replace(
+                  author_marker,
+                  '<span class="version-pill">Version 1.0</span>' + profile_block + '</div>',
+                  1,
+              )
+
+          index_path.write_text(index, encoding="utf-8")
+
+          # Add the same links to the shared footer on every lecture and lab page.
+          footer_path = Path("course-footer.js")
+          footer = footer_path.read_text(encoding="utf-8")
+
+          archive_constant = "  const archiveUrl = 'https://archive.org/details/@aouss_gabash';"
+          profile_constants = (
+              archive_constant
+              + "\n  const orcidUrl = 'https://orcid.org/0000-0002-3720-7203';"
+              + "\n  const researchGateUrl = 'https://www.researchgate.net/profile/Aouss-Gabash';"
+          )
+          if "const orcidUrl" not in footer:
+              footer = footer.replace(archive_constant, profile_constants, 1)
+
+          archive_footer_link = (
+              '        <a href="${archiveUrl}" target="_blank" '
+              'rel="noopener noreferrer">Internet Archive</a>'
+          )
+          expanded_footer_links = (
+              archive_footer_link
+              + '\n        <a href="${orcidUrl}" target="_blank" rel="me noopener noreferrer">ORCID</a>'
+              + '\n        <a href="${researchGateUrl}" target="_blank" rel="me noopener noreferrer">ResearchGate</a>'
+          )
+          if '>ORCID</a>' not in footer:
+              footer = footer.replace(archive_footer_link, expanded_footer_links, 1)
+
+          footer_path.write_text(footer, encoding="utf-8")
+          PY
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes were necessary."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html course-footer.js
+          git commit -m "Add ORCID and ResearchGate profile links"
+          git push
