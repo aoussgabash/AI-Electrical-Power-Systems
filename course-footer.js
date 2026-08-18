@@ -237,59 +237,9 @@
   }
 
   if (isHomePage) {
-    const navLinks = document.querySelector('.navlinks');
-    if (navLinks && !navLinks.querySelector('[data-archive-link]')) {
-      const navArchive = document.createElement('a');
-      navArchive.href = '#digital-library';
-      navArchive.dataset.archiveLink = 'true';
-      navArchive.textContent = '📚 Digital Library';
-      navLinks.appendChild(navArchive);
-    }
-
-    const heroButtons = document.querySelector('.hero .buttons');
-    if (heroButtons && !heroButtons.querySelector('[data-archive-button]')) {
-      const heroArchive = document.createElement('a');
-      heroArchive.className = 'btn archive-button';
-      heroArchive.href = '#digital-library';
-      heroArchive.dataset.archiveButton = 'true';
-      heroArchive.innerHTML = '📚 Digital Library & Archive';
-      heroButtons.appendChild(heroArchive);
-    }
-
-    if (!document.getElementById('digital-library')) {
-      const archiveSection = document.createElement('section');
-      archiveSection.id = 'digital-library';
-      archiveSection.className = 'digital-library-section';
-      archiveSection.innerHTML = `
-        <div class="section-title">
-          <h2>Digital Library & Publications</h2>
-          <div class="ar" lang="ar" dir="rtl">المكتبة الرقمية والمنشورات</div>
-          <p>Open academic resources preserved and shared through Internet Archive.</p>
-        </div>
-        <div class="digital-library-card">
-          <div class="digital-library-content">
-            <span class="library-badge">📚 Open Academic Repository</span>
-            <h3>Aouss Gabash Digital Library</h3>
-            <p>Access books, lecture notes, research materials, archived publications, and educational resources related to artificial intelligence and electrical power systems.</p>
-            <p class="library-ar" lang="ar" dir="rtl">الوصول إلى الكتب والملاحظات التعليمية والمواد البحثية والمنشورات المؤرشفة والمصادر العلمية المتعلقة بالذكاء الاصطناعي وأنظمة الطاقة الكهربائية.</p>
-            <div class="library-resources" aria-label="Digital library resources">
-              <span>📘 Books</span><span>📄 Lecture Notes</span><span>🧮 Engineering Resources</span><span>🌐 Open Access</span>
-            </div>
-          </div>
-          <div class="digital-library-action">
-            <div class="library-symbol" aria-hidden="true">🏛️</div>
-            <strong>Internet Archive Collection</strong>
-            <span>External academic repository</span>
-            <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer">Open Digital Library ↗</a>
-          </div>
-        </div>`;
-
-      const authorSection = document.getElementById('author');
-      const container = document.querySelector('main > .container');
-      if (authorSection?.parentNode) authorSection.parentNode.insertBefore(archiveSection, authorSection);
-      else if (container) container.appendChild(archiveSection);
-    }
-
+    document.getElementById('digital-library')?.remove();
+    document.querySelectorAll('[data-archive-link],[data-archive-button]')
+      .forEach(element => element.remove());
     addArchiveProfileCard();
   }
 
