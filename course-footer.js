@@ -2,8 +2,6 @@
   'use strict';
 
   const archiveUrl = 'https://archive.org/details/@aouss_gabash';
-  const orcidUrl = 'https://orcid.org/0000-0002-3720-7203';
-  const researchGateUrl = 'https://www.researchgate.net/profile/Aouss-Gabash';
   const startYear = 2026;
   const currentYear = new Date().getFullYear();
   const yearText = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
@@ -39,45 +37,35 @@
   ]);
 
   const subscriptChars = {
-    '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
-    '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
-    '₊': '+', '₋': '-', '₌': '=', '₍': '(', '₎': ')',
-    'ₐ': 'a', 'ₑ': 'e', 'ₕ': 'h', 'ᵢ': 'i', 'ⱼ': 'j', 'ₖ': 'k',
-    'ₗ': 'l', 'ₘ': 'm', 'ₙ': 'n', 'ₒ': 'o', 'ₚ': 'p', 'ᵣ': 'r',
-    'ₛ': 's', 'ₜ': 't', 'ᵤ': 'u', 'ᵥ': 'v', 'ₓ': 'x',
+    '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9',
+    '₊':'+','₋':'-','₌':'=','₍':'(','₎':')','ₐ':'a','ₑ':'e','ₕ':'h','ᵢ':'i','ⱼ':'j',
+    'ₖ':'k','ₗ':'l','ₘ':'m','ₙ':'n','ₒ':'o','ₚ':'p','ᵣ':'r','ₛ':'s','ₜ':'t','ᵤ':'u','ᵥ':'v','ₓ':'x'
   };
 
   const superscriptChars = {
-    '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
-    '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
-    '⁺': '+', '⁻': '-', '⁼': '=', '⁽': '(', '⁾': ')',
-    'ᵃ': 'a', 'ᵇ': 'b', 'ᶜ': 'c', 'ᵈ': 'd', 'ᵉ': 'e', 'ᶠ': 'f',
-    'ᵍ': 'g', 'ʰ': 'h', 'ⁱ': 'i', 'ʲ': 'j', 'ᵏ': 'k', 'ˡ': 'l',
-    'ᵐ': 'm', 'ⁿ': 'n', 'ᵒ': 'o', 'ᵖ': 'p', 'ʳ': 'r', 'ˢ': 's',
-    'ᵗ': 't', 'ᵘ': 'u', 'ᵛ': 'v', 'ʷ': 'w', 'ˣ': 'x', 'ʸ': 'y', 'ᶻ': 'z',
+    '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9',
+    '⁺':'+','⁻':'-','⁼':'=','⁽':'(','⁾':')','ᵃ':'a','ᵇ':'b','ᶜ':'c','ᵈ':'d','ᵉ':'e',
+    'ᶠ':'f','ᵍ':'g','ʰ':'h','ⁱ':'i','ʲ':'j','ᵏ':'k','ˡ':'l','ᵐ':'m','ⁿ':'n','ᵒ':'o',
+    'ᵖ':'p','ʳ':'r','ˢ':'s','ᵗ':'t','ᵘ':'u','ᵛ':'v','ʷ':'w','ˣ':'x','ʸ':'y','ᶻ':'z'
   };
 
   const mapUnicodeScripts = (value, map, marker) => {
     const chars = Object.keys(map).join('');
-    if (!chars) return value;
     const regex = new RegExp(`[${chars}]+`, 'g');
-    return value.replace(regex, (run) => `${marker}{${[...run].map((char) => map[char]).join('')}}`);
+    return value.replace(regex, run => `${marker}{${[...run].map(char => map[char]).join('')}}`);
   };
 
-  const formatArrowFlow = (value) => {
-    const parts = value.split(/\s*→\s*/).map((part) => part.trim()).filter(Boolean);
-    if (parts.length < 2) return null;
-    return parts
-      .map((part) => String.raw`\text{${part.replace(/([{}])/g, '\\$1')}}`)
-      .join(String.raw`\;\longrightarrow\;`);
-  };
+  const formulaToTex = raw => {
+    const exact = exactFormulaMap.get(raw.trim());
+    if (exact) return exact;
 
-  const genericFormulaToTex = (raw) => {
-    const arrowFlow = raw.includes('→') && /[A-Za-z]{4,}/.test(raw) ? formatArrowFlow(raw) : null;
-    if (arrowFlow) return arrowFlow;
+    if (raw.includes('→') && /[A-Za-z]{4,}/.test(raw)) {
+      return raw.split(/\s*→\s*/)
+        .map(part => String.raw`\text{${part.trim().replace(/([{}])/g, '\\$1')}}`)
+        .join(String.raw`\;\longrightarrow\;`);
+    }
 
-    let value = raw
-      .normalize('NFC')
+    let value = raw.normalize('NFC')
       .replace(/x̂/g, String.raw`\hat{x}`)
       .replace(/ŷ/g, String.raw`\hat{y}`)
       .replace(/θ̂/g, String.raw`\hat{\theta}`);
@@ -85,7 +73,7 @@
     value = mapUnicodeScripts(value, subscriptChars, '_');
     value = mapUnicodeScripts(value, superscriptChars, '^');
 
-    value = value
+    return value
       .replace(/\.\.\./g, String.raw`\ldots`)
       .replace(/[Σ∑]/g, String.raw`\sum`)
       .replace(/∞/g, String.raw`\infty`)
@@ -126,19 +114,15 @@
       .replace(/\band\b/gi, String.raw`\quad\text{and}\quad`)
       .replace(/\s+/g, ' ')
       .trim();
-
-    return value;
   };
-
-  const formulaToTex = (raw) => exactFormulaMap.get(raw.trim()) || genericFormulaToTex(raw.trim());
 
   const initMathRendering = () => {
     const formulas = [...document.querySelectorAll('.formula, .equation')]
-      .filter((element) => !element.dataset.mathProcessed);
+      .filter(element => !element.dataset.mathProcessed);
 
     if (!formulas.length) return;
 
-    formulas.forEach((element) => {
+    formulas.forEach(element => {
       const original = element.textContent.trim();
       if (!original) return;
       element.dataset.mathOriginal = original;
@@ -153,51 +137,94 @@
       tex: {
         inlineMath: [['\\(', '\\)']],
         displayMath: [['\\[', '\\]']],
-        processEscapes: true,
+        processEscapes: true
       },
-      chtml: {
-        scale: 1.02,
-      },
-      options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-      },
-      startup: {
-        typeset: false,
-      },
+      chtml: { scale: 1.02 },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] },
+      startup: { typeset: false }
     };
 
-    const mathJaxScript = document.createElement('script');
-    mathJaxScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js';
-    mathJaxScript.defer = true;
-    mathJaxScript.dataset.courseMathJax = 'true';
-
-    mathJaxScript.addEventListener('load', () => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js';
+    script.defer = true;
+    script.addEventListener('load', () => {
       const ready = window.MathJax?.startup?.promise || Promise.resolve();
-      ready
-        .then(() => window.MathJax.typesetPromise(formulas))
-        .then(() => {
-          formulas.forEach((element) => {
-            element.dataset.mathProcessed = 'true';
-            element.classList.add('math-rendered');
-          });
-          document.documentElement.classList.add('mathjax-ready');
-        })
-        .catch(() => {
-          formulas.forEach((element) => {
-            element.textContent = element.dataset.mathOriginal || element.textContent;
-            element.dataset.mathProcessed = 'failed';
-          });
+      ready.then(() => window.MathJax.typesetPromise(formulas)).then(() => {
+        formulas.forEach(element => {
+          element.dataset.mathProcessed = 'true';
+          element.classList.add('math-rendered');
         });
+      }).catch(() => {
+        formulas.forEach(element => {
+          element.textContent = element.dataset.mathOriginal || element.textContent;
+          element.dataset.mathProcessed = 'failed';
+        });
+      });
     });
-
-    mathJaxScript.addEventListener('error', () => {
-      formulas.forEach((element) => {
+    script.addEventListener('error', () => {
+      formulas.forEach(element => {
         element.textContent = element.dataset.mathOriginal || element.textContent;
         element.dataset.mathProcessed = 'failed';
       });
     });
+    document.head.appendChild(script);
+  };
 
-    document.head.appendChild(mathJaxScript);
+  const addArchiveProfileCard = () => {
+    const authorBox = document.querySelector('#author .author-box');
+    const profileLinks = authorBox?.querySelector('.academic-profile-links');
+    if (!authorBox || !profileLinks) return;
+
+    if (!profileLinks.querySelector('[data-archive-profile]')) {
+      const archiveLink = document.createElement('a');
+      archiveLink.className = 'academic-profile-link archive';
+      archiveLink.href = archiveUrl;
+      archiveLink.target = '_blank';
+      archiveLink.rel = 'noopener noreferrer';
+      archiveLink.dataset.archiveProfile = 'true';
+      archiveLink.setAttribute('aria-label', 'Open Internet Archive profile');
+      archiveLink.innerHTML = `
+        <span class="profile-mark" aria-hidden="true">🏛</span>
+        <span><strong>Archive</strong><small>Digital Library</small></span>`;
+      profileLinks.appendChild(archiveLink);
+    }
+
+    authorBox.appendChild(profileLinks);
+
+    if (!document.getElementById('academic-profile-layout')) {
+      const style = document.createElement('style');
+      style.id = 'academic-profile-layout';
+      style.textContent = `
+        #author .author-box > .academic-profile-links{
+          grid-column:1/-1;
+          display:grid;
+          grid-template-columns:repeat(3,minmax(0,230px));
+          gap:11px;
+          margin-top:0;
+          align-items:stretch;
+        }
+        #author .author-box > .academic-profile-links .academic-profile-link{
+          width:100%;
+          min-width:0;
+          min-height:64px;
+        }
+        .academic-profile-link.archive .profile-mark{
+          background:#f59e0b;
+          color:#fff;
+          font-size:1rem;
+        }
+        @media(max-width:820px){
+          #author .author-box > .academic-profile-links{
+            grid-template-columns:repeat(2,minmax(0,230px));
+          }
+        }
+        @media(max-width:560px){
+          #author .author-box > .academic-profile-links{
+            grid-template-columns:1fr;
+          }
+        }`;
+      document.head.appendChild(style);
+    }
   };
 
   let pageInfo = 'Version 1.0';
@@ -243,39 +270,27 @@
           <div class="digital-library-content">
             <span class="library-badge">📚 Open Academic Repository</span>
             <h3>Aouss Gabash Digital Library</h3>
-            <p>
-              Access books, lecture notes, research materials, archived publications,
-              and educational resources related to artificial intelligence and electrical power systems.
-            </p>
-            <p class="library-ar" lang="ar" dir="rtl">
-              الوصول إلى الكتب والملاحظات التعليمية والمواد البحثية والمنشورات المؤرشفة
-              والمصادر العلمية المتعلقة بالذكاء الاصطناعي وأنظمة الطاقة الكهربائية.
-            </p>
+            <p>Access books, lecture notes, research materials, archived publications, and educational resources related to artificial intelligence and electrical power systems.</p>
+            <p class="library-ar" lang="ar" dir="rtl">الوصول إلى الكتب والملاحظات التعليمية والمواد البحثية والمنشورات المؤرشفة والمصادر العلمية المتعلقة بالذكاء الاصطناعي وأنظمة الطاقة الكهربائية.</p>
             <div class="library-resources" aria-label="Digital library resources">
-              <span>📘 Books</span>
-              <span>📄 Lecture Notes</span>
-              <span>🧮 Engineering Resources</span>
-              <span>🌐 Open Access</span>
+              <span>📘 Books</span><span>📄 Lecture Notes</span><span>🧮 Engineering Resources</span><span>🌐 Open Access</span>
             </div>
           </div>
           <div class="digital-library-action">
             <div class="library-symbol" aria-hidden="true">🏛️</div>
             <strong>Internet Archive Collection</strong>
             <span>External academic repository</span>
-            <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer">
-              Open Digital Library ↗
-            </a>
+            <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer">Open Digital Library ↗</a>
           </div>
         </div>`;
 
       const authorSection = document.getElementById('author');
       const container = document.querySelector('main > .container');
-      if (authorSection && authorSection.parentNode) {
-        authorSection.parentNode.insertBefore(archiveSection, authorSection);
-      } else if (container) {
-        container.appendChild(archiveSection);
-      }
+      if (authorSection?.parentNode) authorSection.parentNode.insertBefore(archiveSection, authorSection);
+      else if (container) container.appendChild(archiveSection);
     }
+
+    addArchiveProfileCard();
   }
 
   const footer = document.createElement('footer');
@@ -284,19 +299,12 @@
     <div class="site-footer-inner">
       <div class="footer-title">AI Applications in Electrical Power Systems</div>
       <div class="footer-subtitle" lang="ar" dir="rtl">تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
-      <div class="footer-links">
-        <a href="index.html">Website</a>
-        <a href="https://github.com/aoussgabash/AI-Electrical-Power-Systems" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer">Internet Archive</a>
-        <a href="${orcidUrl}" target="_blank" rel="me noopener noreferrer">ORCID</a>
-        <a href="${researchGateUrl}" target="_blank" rel="me noopener noreferrer">ResearchGate</a>
-      </div>
       <div class="footer-info">${pageInfo}</div>
       <div class="footer-copy">© ${yearText} Aouss Gabash. All Rights Reserved.</div>
     </div>`;
 
-  const existing = document.querySelector('footer');
-  if (existing) existing.replaceWith(footer);
+  const existingFooter = document.querySelector('footer');
+  if (existingFooter) existingFooter.replaceWith(footer);
   else document.body.appendChild(footer);
 
   initMathRendering();
