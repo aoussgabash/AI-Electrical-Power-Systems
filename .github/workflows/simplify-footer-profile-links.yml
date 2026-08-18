@@ -1,0 +1,59 @@
+name: Simplify footer profile links
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/simplify-footer-profile-links.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-footer-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Keep only ResearchGate and Archive in footer
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('course-footer.js')
+          text = path.read_text(encoding='utf-8')
+
+          replacement = '''<div class="footer-links">
+        <a href="${researchGateUrl}" target="_blank" rel="me noopener noreferrer">ResearchGate</a>
+        <a href="${archiveUrl}" target="_blank" rel="noopener noreferrer">Archive</a>
+      </div>'''
+
+          updated, count = re.subn(
+              r'<div class="footer-links">.*?</div>',
+              replacement,
+              text,
+              count=1,
+              flags=re.DOTALL,
+          )
+
+          if count != 1:
+              raise SystemExit('The shared footer-links block was not found exactly once.')
+
+          path.write_text(updated, encoding='utf-8')
+          PY
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes were necessary."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add course-footer.js
+          git commit -m "Keep only ResearchGate and Archive footer links"
+          git push
