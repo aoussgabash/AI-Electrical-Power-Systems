@@ -44,6 +44,11 @@
   font-size:.76rem;
 }
 
+/* Remove the Version 1.0 badge from the author section only. */
+#author .version-pill{
+  display:none!important;
+}
+
 /* Remove the standalone Digital Library section and its old page links. */
 #digital-library,
 [data-archive-link],
