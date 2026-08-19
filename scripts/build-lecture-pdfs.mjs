@@ -20,7 +20,7 @@ for (const type of ['lecture', 'lab']) {
     await page.emulateMedia({ media: 'print' });
     await page.evaluate(async () => {
       const style = document.createElement('style');
-      style.id = 'pdf-arabic-rtl-fix';
+      style.id = 'pdf-print-fix';
       style.textContent = `
         @font-face {
           font-family: 'Course Arabic PDF';
@@ -77,35 +77,20 @@ for (const type of ['lecture', 'lab']) {
 
           h1, h2, h3, h4, strong, b,
           section h1, section h2, section h3,
-          .mini-card strong, .flow-box strong {
-            color: #111827 !important;
-          }
+          .mini-card strong, .flow-box strong { color: #111827 !important; }
 
           p, li, td, th, span, div,
-          .en p, .en li, .ar p, .ar li {
-            color: #1f2937 !important;
-          }
+          .en p, .en li, .ar p, .ar li { color: #1f2937 !important; }
 
-          .mini-card,
-          .flow-box,
-          .highlight,
-          .note,
-          .good,
-          .warning,
-          .research,
-          .task,
-          .svg-wrap,
-          .toc a,
-          .course-meta-item {
+          .mini-card, .flow-box, .highlight, .note, .good, .warning,
+          .research, .task, .svg-wrap, .toc a, .course-meta-item {
             background: #f8fafc !important;
             color: #111827 !important;
             border: 1px solid #94a3b8 !important;
             box-shadow: none !important;
           }
 
-          .highlight, .note {
-            border-left: 4px solid #0284c7 !important;
-          }
+          .highlight, .note { border-left: 4px solid #0284c7 !important; }
           .ar .highlight, .ar .note {
             border-left: 1px solid #94a3b8 !important;
             border-right: 4px solid #0284c7 !important;
@@ -114,52 +99,54 @@ for (const type of ['lecture', 'lab']) {
           .warning { background: #fff1f2 !important; border-color: #fda4af !important; }
           .research { background: #faf5ff !important; border-color: #d8b4fe !important; }
           .task { background: #fffbeb !important; border-color: #fcd34d !important; }
-
-          .flow-box {
-            background: #e0f2fe !important;
-            border-color: #38bdf8 !important;
-          }
+          .flow-box { background: #e0f2fe !important; border-color: #38bdf8 !important; }
           .arrow { color: #0369a1 !important; }
 
-          table {
+          table { background: #ffffff !important; }
+          th { background: #e2e8f0 !important; color: #111827 !important; border-color: #94a3b8 !important; }
+          td { background: #ffffff !important; color: #1f2937 !important; border-color: #cbd5e1 !important; }
+
+          pre, code { background: #f8fafc !important; color: #111827 !important; border-color: #94a3b8 !important; }
+          .formula { background: #f1f5f9 !important; color: #111827 !important; border: 1px solid #94a3b8 !important; }
+          .formula *, pre *, code * { color: #111827 !important; }
+
+          .svg-wrap, .svg-box {
             background: #ffffff !important;
-          }
-          th {
-            background: #e2e8f0 !important;
-            color: #111827 !important;
             border-color: #94a3b8 !important;
           }
-          td {
+          svg {
             background: #ffffff !important;
-            color: #1f2937 !important;
-            border-color: #cbd5e1 !important;
-          }
-
-          pre, code {
-            background: #f8fafc !important;
-            color: #111827 !important;
-            border-color: #94a3b8 !important;
-          }
-          .formula {
-            background: #f1f5f9 !important;
-            color: #111827 !important;
-            border: 1px solid #94a3b8 !important;
-          }
-          .formula *, pre *, code * {
             color: #111827 !important;
           }
-
-          svg text {
+          svg text, svg tspan, svg .svgtext, svg .label {
             fill: #111827 !important;
+            color: #111827 !important;
+            font-weight: 600 !important;
           }
-          svg .node, svg .edge, svg rect, svg circle, svg ellipse, svg polygon {
+          svg line, svg polyline, svg path, svg .edge, svg .axis {
             stroke: #475569 !important;
           }
-
-          a {
-            color: #0f4c81 !important;
-            text-decoration: none !important;
+          svg marker path { fill: #475569 !important; stroke: #475569 !important; }
+          svg rect:not([data-pdf-background]),
+          svg circle, svg ellipse, svg polygon,
+          svg .node, svg .inputnode, svg .outputnode {
+            stroke: #475569 !important;
+            stroke-width: 1.5 !important;
           }
+          svg .node, svg circle.node, svg rect.node,
+          svg .inputnode, svg .outputnode {
+            fill: #dbeafe !important;
+          }
+          svg .goal, svg .good, svg .success {
+            fill: #dcfce7 !important;
+            stroke: #16a34a !important;
+          }
+          svg .warning, svg .danger, svg .bad {
+            fill: #ffe4e6 !important;
+            stroke: #e11d48 !important;
+          }
+
+          a { color: #0f4c81 !important; text-decoration: none !important; }
         }
       `;
       document.head.appendChild(style);
@@ -183,10 +170,56 @@ for (const type of ['lecture', 'lab']) {
         }
       });
 
+      // Convert inline SVG diagrams to a paper-friendly palette.
+      document.querySelectorAll('svg').forEach((svg) => {
+        svg.style.background = '#ffffff';
+        svg.style.color = '#111827';
+
+        let viewWidth = 0;
+        let viewHeight = 0;
+        const viewBox = svg.viewBox?.baseVal;
+        if (viewBox) {
+          viewWidth = viewBox.width;
+          viewHeight = viewBox.height;
+        }
+
+        svg.querySelectorAll('rect').forEach((shape) => {
+          const width = Number(shape.getAttribute('width')) || 0;
+          const height = Number(shape.getAttribute('height')) || 0;
+          const isBackground = viewWidth > 0 && viewHeight > 0 && width >= viewWidth * 0.75 && height >= viewHeight * 0.75;
+          if (isBackground) {
+            shape.setAttribute('data-pdf-background', 'true');
+            shape.setAttribute('fill', '#ffffff');
+            shape.setAttribute('stroke', '#cbd5e1');
+          } else if (!shape.closest('defs')) {
+            shape.setAttribute('fill', '#e0f2fe');
+            shape.setAttribute('stroke', '#475569');
+          }
+        });
+
+        svg.querySelectorAll('circle, ellipse, polygon').forEach((shape) => {
+          if (shape.closest('defs')) return;
+          const classes = (shape.getAttribute('class') || '').toLowerCase();
+          const isGoal = /goal|success|good/.test(classes);
+          shape.setAttribute('fill', isGoal ? '#dcfce7' : '#dbeafe');
+          shape.setAttribute('stroke', isGoal ? '#16a34a' : '#475569');
+        });
+
+        svg.querySelectorAll('line, polyline, path').forEach((shape) => {
+          if (shape.closest('defs')) return;
+          shape.setAttribute('stroke', '#475569');
+          const fill = (shape.getAttribute('fill') || '').toLowerCase();
+          if (fill && fill !== 'none' && fill !== 'transparent') shape.setAttribute('fill', '#e0f2fe');
+        });
+
+        svg.querySelectorAll('text, tspan').forEach((text) => {
+          text.setAttribute('fill', '#111827');
+          text.style.fontWeight = '600';
+        });
+      });
+
       await document.fonts?.ready;
-      if (window.MathJax?.startup?.promise) {
-        await window.MathJax.startup.promise;
-      }
+      if (window.MathJax?.startup?.promise) await window.MathJax.startup.promise;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     });
 
@@ -203,19 +236,11 @@ for (const type of ['lecture', 'lab']) {
           <span>AI Applications in Electrical Power Systems</span>
           <span><span class="pageNumber"></span>/<span class="totalPages"></span></span>
         </div>`,
-      margin: {
-        top: '14mm',
-        right: '14mm',
-        bottom: '18mm',
-        left: '14mm'
-      }
+      margin: { top: '14mm', right: '14mm', bottom: '18mm', left: '14mm' }
     });
 
     const size = fs.statSync(pdf).size;
-    if (size < 10000) {
-      throw new Error(`Generated PDF for ${html} is unexpectedly small.`);
-    }
-
+    if (size < 10000) throw new Error(`Generated PDF for ${html} is unexpectedly small.`);
     console.log(`Generated ${pdf} (${size} bytes)`);
   }
 }
