@@ -16,6 +16,7 @@ on:
 permissions:
   contents: write
 
+# Updated to trigger regeneration after expanding Lectures/Labs 15, 16, 18, and 19.
 jobs:
   build-pdfs:
     runs-on: ubuntu-latest
