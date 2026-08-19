@@ -102,6 +102,19 @@ button, [data-progress-reset], [data-learning-dashboard] {
   text-align: center !important;
 }
 
+/* The second cover title contains English and Arabic in one element separated by BR. */
+.hero .subtitle,
+.hero .subtitle[lang="ar"],
+.hero .subtitle[dir="rtl"] {
+  display: block !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  text-align: center !important;
+}
+
 .en, [lang="en"], [dir="ltr"] {
   direction: ltr !important;
   text-align: left !important;
