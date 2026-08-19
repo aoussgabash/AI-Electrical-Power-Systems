@@ -1,0 +1,321 @@
+@page {
+  size: A4;
+  margin: 15mm 15mm 18mm;
+
+  @top-left {
+    content: "AI Applications in Electrical Power Systems";
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #64748b;
+  }
+
+  @top-right {
+    content: "Version 1.0 · 2026";
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #64748b;
+  }
+
+  @bottom-left {
+    content: "aoussgabash.com";
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #475569;
+  }
+
+  @bottom-center {
+    content: "Dr.-Ing. Aouss Gabash";
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #64748b;
+  }
+
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #475569;
+  }
+}
+
+html,
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+  color: #172033 !important;
+  font-size: 10.5pt !important;
+  line-height: 1.55 !important;
+  widows: 3;
+  orphans: 3;
+}
+
+main,
+.container {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.hero {
+  padding: 8mm 0 6mm !important;
+  margin: 0 !important;
+  text-align: center !important;
+  break-after: avoid-page;
+}
+
+.hero h1,
+.hero > h1 {
+  margin: 2.5mm auto 2mm !important;
+  max-width: 175mm;
+  font-size: 25pt !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.02em;
+  color: #0f172a !important;
+}
+
+.lecture-number,
+.lab-number {
+  margin: 0 0 2mm !important;
+  font-size: 9pt !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  color: #334155 !important;
+}
+
+.hero-ar,
+.subtitle-ar,
+.pdf-ar-table {
+  color: #172033 !important;
+}
+
+.hero-ar {
+  margin-top: 3mm !important;
+  margin-bottom: 4mm !important;
+  font-size: 16pt !important;
+}
+
+.subtitle-en {
+  margin: 0 auto 2.5mm !important;
+  font-size: 10.5pt !important;
+  color: #334155 !important;
+}
+
+.subtitle-ar {
+  margin: 1.5mm auto 4mm !important;
+  font-size: 12pt !important;
+  color: #334155 !important;
+}
+
+section {
+  margin: 4mm 0 !important;
+  padding: 5mm !important;
+  border: 0.35mm solid #d5dde8 !important;
+  border-radius: 3mm !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  break-inside: auto;
+}
+
+section:first-of-type {
+  margin-top: 3mm !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  break-after: avoid-page;
+  page-break-after: avoid;
+  color: #0f172a !important;
+}
+
+h2 {
+  margin: 0 0 3mm !important;
+  font-size: 17pt !important;
+  line-height: 1.25 !important;
+}
+
+h3 {
+  margin: 4mm 0 2mm !important;
+  font-size: 13pt !important;
+}
+
+p {
+  margin: 0 0 2.5mm !important;
+}
+
+p:last-child,
+li:last-child {
+  margin-bottom: 0 !important;
+}
+
+ul,
+ol {
+  margin-top: 1.5mm !important;
+  margin-bottom: 2.5mm !important;
+}
+
+li {
+  margin-bottom: 1mm !important;
+}
+
+:is(p, div, span):empty {
+  display: none !important;
+}
+
+br + br {
+  display: none !important;
+}
+
+.mini-card,
+.highlight,
+.note,
+.good,
+.warning,
+.research,
+.task,
+.flow-box,
+.formula,
+pre,
+table,
+.svg-wrap,
+.svg-box,
+figure,
+img,
+svg {
+  break-inside: avoid-page;
+  page-break-inside: avoid;
+}
+
+.grid {
+  gap: 3mm !important;
+}
+
+.mini-card,
+.highlight,
+.note,
+.good,
+.warning,
+.research,
+.task,
+.flow-box {
+  margin: 2.5mm 0 !important;
+  padding: 3.5mm !important;
+  border-radius: 2mm !important;
+}
+
+.formula,
+pre {
+  margin: 3mm 0 !important;
+  padding: 3.5mm !important;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap !important;
+}
+
+table {
+  width: 100% !important;
+  margin: 3mm 0 !important;
+  border-collapse: collapse !important;
+  font-size: 9.2pt !important;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tr {
+  break-inside: avoid-page;
+}
+
+th,
+td {
+  padding: 2.2mm 2.5mm !important;
+  border: 0.25mm solid #cbd5e1 !important;
+}
+
+img,
+svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.publication-endmatter {
+  break-before: page;
+  page-break-before: always;
+  margin: 0 !important;
+  padding: 22mm 16mm 14mm !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  color: #172033 !important;
+}
+
+.publication-endmatter::before {
+  content: "";
+  display: block;
+  width: 26mm;
+  height: 1.2mm;
+  margin-bottom: 8mm;
+  background: #0284c7;
+}
+
+.publication-endmatter h2 {
+  margin: 0 0 5mm !important;
+  font-size: 20pt !important;
+  color: #0f172a !important;
+}
+
+.publication-endmatter .publication-ar-title {
+  margin: -2mm 0 7mm !important;
+  font-family: "Course Arabic PDF", "Noto Naskh Arabic", Tahoma, Arial, sans-serif !important;
+  direction: rtl !important;
+  text-align: right !important;
+  font-size: 15pt !important;
+  color: #334155 !important;
+}
+
+.publication-table {
+  width: 100%;
+  margin: 0 0 8mm !important;
+  border-collapse: collapse;
+  font-size: 10pt !important;
+}
+
+.publication-table th {
+  width: 34%;
+  background: #eef4f8 !important;
+  color: #0f172a !important;
+  text-align: left !important;
+}
+
+.publication-table td {
+  background: #ffffff !important;
+}
+
+.publication-reference {
+  margin-top: 7mm !important;
+  padding-top: 5mm !important;
+  border-top: 0.35mm solid #cbd5e1 !important;
+  color: #475569 !important;
+  font-size: 9.5pt !important;
+}
+
+.publication-reference strong {
+  color: #0f172a !important;
+}
+
+.publication-reference-ar {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: "Course Arabic PDF", "Noto Naskh Arabic", Tahoma, Arial, sans-serif !important;
+}
+
+@media print {
+  a[href^="http"]::after {
+    content: "";
+  }
+}
