@@ -1,51 +1,32 @@
-<!DOCTYPE html><html><head><meta charset="utf-8">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Lecture 19 - AI Cybersecurity for Power Systems</title>
-<style>
-body{font-family:Arial;margin:40px;background:#0b1220;color:#eef;line-height:1.7}
-h1,h2{color:#7dd3fc}.ar{direction:rtl;text-align:right}
-pre{background:#111827;padding:10px}
-</style><link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-quiz.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body>
-<h1>Lecture 19 – AI Cybersecurity for Power Systems</h1>
-<p><b>المحاضرة 19 – الأمن السيبراني المدعوم بالذكاء الاصطناعي لأنظمة القدرة</b></p>
-
-<h2>Topics</h2>
-<ul>
-<li>Threat landscape for smart grids</li>
-<li>False Data Injection Attacks (FDIA)</li>
-<li>Intrusion Detection Systems using AI</li>
-<li>Graph Neural Networks for anomaly detection</li>
-<li>Adversarial Machine Learning</li>
-<li>Zero-Trust Architecture</li>
-<li>IEC 62351 and NIST guidance</li>
-<li>Resilient AI and secure deployment</li>
-</ul>
-
-<h2>Key Equations</h2>
-<pre>
-Residual = || z - h(x) ||
-CrossEntropy = -Σ y log(p)
-</pre>
-
-<div class="ar">
-<h2>المحتوى</h2>
-<p>تتناول المحاضرة حماية الشبكات الذكية باستخدام الذكاء الاصطناعي، وكشف الهجمات، والدفاع ضد التلاعب بالنماذج، وأفضل الممارسات لتأمين تطبيقات الذكاء الاصطناعي في أنظمة القدرة.</p>
-</div>
-
-<h2>Research Corner</h2>
-<p>Current research focuses on trustworthy AI, cyber-physical security, graph-based intrusion detection, and autonomous resilient grid operation.</p>
-<footer>
-AI Applications in Electrical Power Systems
-<br>
-تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
-<br><br>
-Lecture 19 | المحاضرة 19
-</footer>
-<script src="course-navigation.js" defer></script>
-<script src="course-quiz-data.js" defer></script>
-<script src="course-quiz.js" defer></script>
-<script src="certificate-canvas.js?v=20260817-2" defer></script>
-<script src="course-footer.js" defer></script>
+<link rel="stylesheet" href="course-common.css"><link rel="stylesheet" href="course-quiz.css"><link rel="stylesheet" href="course-footer.css">
+</head>
+<body class="course-template-modern">
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
+<main class="container">
+<div class="hero"><div class="lecture-number">LECTURE 19 | المحاضرة 19</div><h1>AI Cybersecurity for Power Systems</h1><div class="hero-ar">الأمن السيبراني المدعوم بالذكاء الاصطناعي لأنظمة القدرة</div><div class="subtitle">Threat detection, false-data attacks, adversarial learning, and resilient operation<br>كشف التهديدات وهجمات البيانات الكاذبة والتعلم الخصومي والتشغيل المرن</div></div>
+<section><div class="en"><h2>🎯 Learning Objectives</h2><ul><li>Explain the cyber-physical attack surface of modern power systems.</li><li>Model false-data injection and measurement residuals.</li><li>Design AI-based intrusion and anomaly detection systems.</li><li>Evaluate classifiers using confusion matrices, precision, recall, F1, and ROC-AUC.</li><li>Understand adversarial examples, poisoning, evasion, and model extraction.</li><li>Explain zero-trust principles, resilient control, and secure AI deployment.</li></ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>شرح سطح الهجوم السيبراني الفيزيائي في أنظمة القدرة الحديثة.</li><li>نمذجة حقن البيانات الكاذبة وبواقي القياس.</li><li>تصميم أنظمة كشف اختراق وشذوذ بالذكاء الاصطناعي.</li><li>تقييم المصنفات باستخدام مصفوفة الالتباس والدقة والاستدعاء وF1 وROC-AUC.</li><li>فهم الأمثلة الخصومية والتسميم والمراوغة واستخراج النماذج.</li><li>شرح الثقة الصفرية والتحكم المرن والنشر الآمن للذكاء الاصطناعي.</li></ul></div></section>
+<section><div class="en"><h2>1. Cyber-Physical Security</h2><p>Modern grids combine physical assets, sensors, communication networks, control software, cloud services, and AI models. An attack on information can therefore create physical consequences.</p><div class="flow"><div class="flow-box">Physical process</div><div class="arrow">↔</div><div class="flow-box">Sensors & networks</div><div class="arrow">↔</div><div class="flow-box">SCADA / EMS / DMS</div><div class="arrow">↔</div><div class="flow-box">AI analytics</div></div></div><div class="ar"><h2>1. الأمن السيبراني الفيزيائي</h2><p>تربط الشبكات الحديثة المعدات الفيزيائية بالحساسات والاتصالات وأنظمة التحكم والذكاء الاصطناعي، لذلك قد يؤدي التلاعب بالمعلومات إلى أثر مادي مباشر.</p></div></section>
+<section><div class="en"><h2>2. Threat Landscape</h2><div class="table-wrap"><table><tr><th>Layer</th><th>Examples</th><th>Impact</th></tr><tr><td>Field devices</td><td>Compromised IED, relay, inverter</td><td>Wrong switching or control</td></tr><tr><td>Communication</td><td>Replay, spoofing, denial of service</td><td>Delayed or false data</td></tr><tr><td>Control center</td><td>Credential theft, malware</td><td>Unauthorized commands</td></tr><tr><td>AI pipeline</td><td>Poisoning, evasion, model theft</td><td>Wrong predictions or hidden backdoors</td></tr></table></div></div><div class="ar"><h2>2. مشهد التهديدات</h2><p>قد تستهدف الهجمات أجهزة الحقل أو شبكات الاتصال أو مركز التحكم أو بيانات ونماذج الذكاء الاصطناعي.</p></div></section>
+<section><div class="en"><h2>3. False-Data Injection Attack</h2><div class="formula">z=h(x)+e</div><p>An attacker changes measurements by adding an attack vector:</p><div class="formula">z_a=z+a</div><p>In a linear state-estimation model <b>z=Hx+e</b>, a stealthy attack may use:</p><div class="formula">a=Hc</div><p>Then the corrupted data are consistent with the shifted state <b>x+c</b>, which may bypass a simple residual detector.</p></div><div class="ar"><h2>3. هجوم حقن البيانات الكاذبة</h2><p>يضيف المهاجم متجهًا إلى القياسات. وإذا اختير بما يتوافق مع نموذج القياس فقد يبدو التلاعب كأنه حالة صحيحة جديدة ويتجاوز كاشف البواقي البسيط.</p></div></section>
+<section><div class="en"><h2>4. Residual-Based Detection</h2><div class="formula">r=z-h(\hat{x})</div><div class="formula">J=r^TR^{-1}r</div><p>An alarm is raised when <b>J</b> exceeds a threshold. This works well for random bad data but may fail against carefully structured attacks.</p></div><div class="ar"><h2>4. الكشف المعتمد على البواقي</h2><p>تقارن بواقي القياس بحد إحصائي. تنجح الطريقة مع الأخطاء العشوائية، لكنها قد تفشل أمام هجمات مصممة باستخدام نموذج الشبكة.</p></div></section>
+<section><div class="en"><h2>5. AI-Based Intrusion Detection</h2><div class="grid3"><div class="mini-card"><strong>Supervised</strong><p>Train on labeled normal and attack examples.</p></div><div class="mini-card"><strong>Unsupervised</strong><p>Learn normal structure and detect outliers.</p></div><div class="mini-card"><strong>Hybrid</strong><p>Combine rules, physics, and machine learning.</p></div></div><p>Features may include voltage, current, frequency, phase angle, packet timing, command sequences, residuals, and topology information.</p></div><div class="ar"><h2>5. كشف الاختراق بالذكاء الاصطناعي</h2><p>يمكن استخدام التعلم الموجّه أو غير الموجّه أو الهجين، مع ميزات كهربائية وشبكية وزمنية وتشغيلية.</p></div></section>
+<section><div class="en"><h2>6. Classification Metrics</h2><div class="formula">Precision=\frac{TP}{TP+FP},\quad Recall=\frac{TP}{TP+FN}</div><div class="formula">F1=2\frac{Precision\cdot Recall}{Precision+Recall}</div><div class="warning">Accuracy alone is misleading when attacks are rare. Missing a critical attack can be more costly than a false alarm.</div></div><div class="ar"><h2>6. مؤشرات التصنيف</h2><p>لا تكفي الدقة العامة عندما تكون الهجمات نادرة. يجب تقييم Precision وRecall وF1 وموازنة الإنذارات الكاذبة مع الهجمات الفائتة.</p></div></section>
+<section><div class="en"><h2>7. Time-Series and Sequence Models</h2><p>Many attacks are visible only across time. Recurrent networks, temporal convolution, transformers, and change-point detectors can learn sequential patterns.</p><div class="formula">P(y_t\mid x_{t-L+1:t})</div></div><div class="ar"><h2>7. نماذج السلاسل الزمنية</h2><p>تظهر بعض الهجمات من خلال التسلسل الزمني لا من عينة منفردة، لذلك تستخدم نماذج زمنية ونقاط تغير وتحليل نوافذ متتابعة.</p></div></section>
+<section><div class="en"><h2>8. Graph-Based Detection</h2><p>The power grid is naturally a graph. Graph Neural Networks can combine measurements with network connectivity.</p><div class="formula">h_i^{(l+1)}=\sigma\left(W_0h_i^{(l)}+\sum_{j\in\mathcal N_i}W_1h_j^{(l)}\right)</div><p>Graph-based methods can detect spatially inconsistent measurements and localize suspicious buses or devices.</p></div><div class="ar"><h2>8. الكشف المعتمد على الرسم البياني</h2><p>تستخدم الشبكات العصبية البيانية ترابط العقد والخطوط لاكتشاف القياسات غير المتسقة مكانيًا وتحديد موقع الخلل.</p></div></section>
+<section><div class="en"><h2>9. Adversarial Machine Learning</h2><div class="table-wrap"><table><tr><th>Attack</th><th>Stage</th><th>Goal</th></tr><tr><td>Poisoning</td><td>Training</td><td>Corrupt learned behavior</td></tr><tr><td>Backdoor</td><td>Training</td><td>Trigger hidden malicious behavior</td></tr><tr><td>Evasion</td><td>Inference</td><td>Make an attack appear normal</td></tr><tr><td>Model extraction</td><td>Inference/API</td><td>Copy model behavior</td></tr></table></div><div class="formula">x_{adv}=x+\delta,\qquad \|\delta\|\le\epsilon</div></div><div class="ar"><h2>9. التعلم الآلي الخصومي</h2><p>قد يهاجم الخصم بيانات التدريب أو يضيف بابًا خلفيًا أو يعدل المدخلات أثناء التشغيل أو يحاول نسخ النموذج.</p></div></section>
+<section><div class="en"><h2>10. Physics-Informed Defense</h2><p>AI decisions can be checked against power-system laws and operational limits.</p><div class="formula">P_i^{inj}=\sum_j V_iV_j(G_{ij}\cos\theta_{ij}+B_{ij}\sin\theta_{ij})</div><div class="highlight">A detection system is stronger when statistical evidence, cyber logs, and physical consistency agree.</div></div><div class="ar"><h2>10. الدفاع المعتمد على الفيزياء</h2><p>تُفحص نتائج الذكاء الاصطناعي باستخدام معادلات تدفق القدرة وحدود الجهد والتيار والتوازن، بدل الاعتماد على المصنف وحده.</p></div></section>
+<section><div class="en"><h2>11. Zero-Trust Architecture</h2><ul><li>Verify every user, device, service, and model request.</li><li>Apply least privilege and network segmentation.</li><li>Use strong identity, authentication, and device attestation.</li><li>Continuously monitor behavior and revoke access when risk changes.</li><li>Protect model files, data pipelines, APIs, and update channels.</li></ul></div><div class="ar"><h2>11. بنية الثقة الصفرية</h2><p>لا تفترض الثقة تلقائيًا لأي مستخدم أو جهاز، بل تتحقق باستمرار وتطبق أقل صلاحية وتقسيم الشبكة وحماية قنوات التحديث.</p></div></section>
+<section><div class="en"><h2>12. Resilient Control</h2><p>Detection is not sufficient. The system must continue operating safely during communication loss or suspected compromise.</p><ul><li>Local fallback controllers.</li><li>Redundant sensing and communication paths.</li><li>Graceful degradation.</li><li>Isolation of compromised zones.</li><li>Human confirmation for high-impact actions.</li></ul></div><div class="ar"><h2>12. التحكم المرن</h2><p>يجب أن يستمر النظام بأمان أثناء الهجوم باستخدام متحكمات محلية ومسارات بديلة وعزل المناطق المشبوهة وتأكيد بشري للقرارات الحرجة.</p></div></section>
+<section><div class="en"><h2>13. Secure AI Lifecycle</h2><div class="flow"><div class="flow-box">Trusted data</div><div class="arrow">→</div><div class="flow-box">Secure training</div><div class="arrow">→</div><div class="flow-box">Validation</div><div class="arrow">→</div><div class="flow-box">Signed deployment</div><div class="arrow">→</div><div class="flow-box">Monitoring</div></div><ol><li>Track data and model provenance.</li><li>Scan data for poisoning and leakage.</li><li>Test adversarial robustness and distribution shift.</li><li>Version and cryptographically sign models.</li><li>Monitor drift, attacks, and unexpected outputs.</li><li>Maintain rollback and incident-response procedures.</li></ol></div><div class="ar"><h2>13. دورة حياة آمنة للذكاء الاصطناعي</h2><p>تبدأ بمصادر بيانات موثوقة وتنتهي بالمراقبة والتراجع الآمن، مع تتبع الإصدارات واختبار الهجمات وتوقيع النماذج.</p></div></section>
+<section><div class="en"><h2>14. Worked Example</h2><p>A detector observes 10,000 samples: 200 are attacks. It detects 170 attacks and raises 90 false alarms.</p><div class="formula">TP=170,\ FN=30,\ FP=90,\ TN=9710</div><div class="formula">Precision=170/260=65.4\%</div><div class="formula">Recall=170/200=85\%</div><p>The high recall is useful, but operators must manage the false-alarm burden.</p></div><div class="ar"><h2>14. مثال محلول</h2><p>اكتشف النظام 170 هجومًا من أصل 200 وأصدر 90 إنذارًا كاذبًا. يكون الاستدعاء 85%، لكن الدقة الإيجابية نحو 65.4%، ما يوضح أهمية تقييم عبء الإنذارات.</p></div></section>
+<section><div class="en"><h2>15. Key Takeaways</h2><ul><li>Power-system cybersecurity is cyber-physical, not purely digital.</li><li>Stealthy false-data attacks can defeat simple residual tests.</li><li>AI improves detection but creates new adversarial risks.</li><li>Physics, cyber telemetry, and learning models should be combined.</li><li>Secure deployment requires zero trust, lifecycle controls, monitoring, and fallback operation.</li></ul></div><div class="ar"><h2>15. الخلاصة</h2><ul><li>أمن أنظمة القدرة سيبراني فيزيائي.</li><li>قد تتجاوز هجمات البيانات المصممة كواشف البواقي البسيطة.</li><li>يحسن الذكاء الاصطناعي الكشف لكنه يضيف مخاطر خصومية.</li><li>يجب دمج الفيزياء وسجلات الشبكة والتعلم الآلي.</li><li>يتطلب النشر الآمن مراقبة وثقة صفرية وتشغيلًا احتياطيًا.</li></ul></div></section>
+<section><div class="en"><h2>🧠 Review Questions</h2><ol><li>How can a cyberattack create physical grid consequences?</li><li>Why can an attack vector a=Hc bypass a residual detector?</li><li>Why is accuracy insufficient for rare attacks?</li><li>How can GNNs support attack localization?</li><li>What is the difference between poisoning and evasion?</li><li>How does physics-informed detection improve trust?</li><li>What does zero trust mean in a control environment?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>كيف يؤدي الهجوم السيبراني إلى أثر فيزيائي؟</li><li>لماذا قد يتجاوز الهجوم a=Hc كاشف البواقي؟</li><li>لماذا لا تكفي الدقة العامة للهجمات النادرة؟</li><li>كيف تساعد GNN في تحديد موقع الهجوم؟</li><li>ما الفرق بين التسميم والمراوغة؟</li><li>كيف يزيد التحقق الفيزيائي موثوقية الكشف؟</li><li>ما معنى الثقة الصفرية في بيئة التحكم؟</li></ol></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems<br>تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية<br><br>Lecture 19 | المحاضرة 19</footer>
+<script src="course-navigation.js" defer></script><script src="course-quiz-data.js" defer></script><script src="course-quiz.js" defer></script><script src="certificate-canvas.js?v=20260817-2" defer></script><script src="course-footer.js" defer></script>
 </body></html>
