@@ -86,27 +86,48 @@ button, [data-progress-reset], [data-learning-dashboard] {
 .subtitle-en,
 .subtitle-ar {
   display: block !important;
+  box-sizing: border-box !important;
   width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   margin-left: auto !important;
   margin-right: auto !important;
   text-align: center !important;
 }
 
+.hero-ar {
+  margin-top: 14px !important;
+  margin-bottom: 18px !important;
+}
+
 .subtitle-en {
   direction: ltr !important;
   unicode-bidi: isolate !important;
+  margin-top: 0 !important;
+  margin-bottom: 12px !important;
 }
 
 .subtitle-ar {
   direction: rtl !important;
   unicode-bidi: isolate !important;
   font-family: "Course Arabic PDF", "Noto Naskh Arabic", Tahoma, Arial, sans-serif !important;
-  line-height: 1.85 !important;
+  font-size: 1.08em !important;
+  line-height: 1.9 !important;
+  margin-top: 8px !important;
+  margin-bottom: 18px !important;
 }
 
 .hero .subtitle {
-  display: block !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: center !important;
   width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 0 !important;
   text-align: center !important;
 }
 
@@ -203,6 +224,18 @@ for (const type of ['lecture', 'lab']) {
 
       const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
 
+      document.querySelectorAll('.hero-ar').forEach(element => {
+        element.style.setProperty('display', 'block', 'important');
+        element.style.setProperty('box-sizing', 'border-box', 'important');
+        element.style.setProperty('width', '100%', 'important');
+        element.style.setProperty('max-width', '100%', 'important');
+        element.style.setProperty('margin', '14px auto 18px', 'important');
+        element.style.setProperty('padding', '0', 'important');
+        element.style.setProperty('text-align', 'center', 'important');
+        element.style.setProperty('direction', 'rtl', 'important');
+        element.style.setProperty('unicode-bidi', 'isolate', 'important');
+      });
+
       document.querySelectorAll('.hero .subtitle').forEach(subtitle => {
         const parts = [];
         let current = '';
@@ -220,6 +253,16 @@ for (const type of ['lecture', 'lab']) {
         if (parts.length < 2) return;
 
         subtitle.replaceChildren();
+        subtitle.style.setProperty('display', 'flex', 'important');
+        subtitle.style.setProperty('flex-direction', 'column', 'important');
+        subtitle.style.setProperty('align-items', 'stretch', 'important');
+        subtitle.style.setProperty('justify-content', 'center', 'important');
+        subtitle.style.setProperty('width', '100%', 'important');
+        subtitle.style.setProperty('max-width', '100%', 'important');
+        subtitle.style.setProperty('margin', '0 auto', 'important');
+        subtitle.style.setProperty('padding', '0', 'important');
+        subtitle.style.setProperty('text-align', 'center', 'important');
+
         parts.forEach(text => {
           const line = document.createElement('div');
           const isArabic = arabicPattern.test(text);
@@ -227,6 +270,20 @@ for (const type of ['lecture', 'lab']) {
           line.setAttribute('lang', isArabic ? 'ar' : 'en');
           line.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
           line.textContent = text;
+          line.style.setProperty('display', 'block', 'important');
+          line.style.setProperty('box-sizing', 'border-box', 'important');
+          line.style.setProperty('width', '100%', 'important');
+          line.style.setProperty('max-width', '100%', 'important');
+          line.style.setProperty('padding', '0', 'important');
+          line.style.setProperty('text-align', 'center', 'important');
+          line.style.setProperty('direction', isArabic ? 'rtl' : 'ltr', 'important');
+          line.style.setProperty('unicode-bidi', 'isolate', 'important');
+          line.style.setProperty('margin', isArabic ? '8px auto 18px' : '0 auto 12px', 'important');
+          if (isArabic) {
+            line.style.setProperty('font-family', 'Course Arabic PDF, Noto Naskh Arabic, Tahoma, Arial, sans-serif', 'important');
+            line.style.setProperty('font-size', '1.08em', 'important');
+            line.style.setProperty('line-height', '1.9', 'important');
+          }
           subtitle.appendChild(line);
         });
       });
