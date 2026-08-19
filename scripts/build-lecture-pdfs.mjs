@@ -35,17 +35,27 @@ for (const type of ['lecture', 'lab']) {
           direction: rtl !important;
           text-align: right !important;
           unicode-bidi: isolate !important;
-          letter-spacing: normal !important;
-          word-spacing: normal !important;
+          white-space: normal !important;
+          letter-spacing: 0 !important;
+          word-spacing: .08em !important;
+          word-break: normal !important;
+          overflow-wrap: normal !important;
+          font-kerning: normal !important;
+          font-variant-ligatures: contextual common-ligatures !important;
           text-rendering: optimizeLegibility !important;
         }
 
-        .ar p, .ar li, .ar h1, .ar h2, .ar h3,
+        .ar p, .ar li, .ar h1, .ar h2, .ar h3, .ar h4,
+        .ar td, .ar th, .ar blockquote,
         [lang='ar'] p, [lang='ar'] li, [lang='ar'] h1,
-        [lang='ar'] h2, [lang='ar'] h3 {
+        [lang='ar'] h2, [lang='ar'] h3, [lang='ar'] h4,
+        [lang='ar'] td, [lang='ar'] th, [lang='ar'] blockquote {
           direction: rtl !important;
           unicode-bidi: plaintext !important;
           text-align: right !important;
+          white-space: normal !important;
+          letter-spacing: 0 !important;
+          word-spacing: .08em !important;
         }
 
         .ar pre, .ar code, .ar .formula,
@@ -53,6 +63,7 @@ for (const type of ['lecture', 'lab']) {
           direction: ltr !important;
           unicode-bidi: isolate !important;
           text-align: left !important;
+          word-spacing: normal !important;
           font-family: Consolas, 'Courier New', monospace !important;
         }
 
@@ -110,41 +121,23 @@ for (const type of ['lecture', 'lab']) {
           .formula { background: #f1f5f9 !important; color: #111827 !important; border: 1px solid #94a3b8 !important; }
           .formula *, pre *, code * { color: #111827 !important; }
 
-          .svg-wrap, .svg-box {
-            background: #ffffff !important;
-            border-color: #94a3b8 !important;
-          }
-          svg {
-            background: #ffffff !important;
-            color: #111827 !important;
-          }
+          .svg-wrap, .svg-box { background: #ffffff !important; border-color: #94a3b8 !important; }
+          svg { background: #ffffff !important; color: #111827 !important; }
           svg text, svg tspan, svg .svgtext, svg .label {
             fill: #111827 !important;
             color: #111827 !important;
             font-weight: 600 !important;
           }
-          svg line, svg polyline, svg path, svg .edge, svg .axis {
-            stroke: #475569 !important;
-          }
+          svg line, svg polyline, svg path, svg .edge, svg .axis { stroke: #475569 !important; }
           svg marker path { fill: #475569 !important; stroke: #475569 !important; }
-          svg rect:not([data-pdf-background]),
-          svg circle, svg ellipse, svg polygon,
+          svg rect:not([data-pdf-background]), svg circle, svg ellipse, svg polygon,
           svg .node, svg .inputnode, svg .outputnode {
             stroke: #475569 !important;
             stroke-width: 1.5 !important;
           }
-          svg .node, svg circle.node, svg rect.node,
-          svg .inputnode, svg .outputnode {
-            fill: #dbeafe !important;
-          }
-          svg .goal, svg .good, svg .success {
-            fill: #dcfce7 !important;
-            stroke: #16a34a !important;
-          }
-          svg .warning, svg .danger, svg .bad {
-            fill: #ffe4e6 !important;
-            stroke: #e11d48 !important;
-          }
+          svg .node, svg circle.node, svg rect.node, svg .inputnode, svg .outputnode { fill: #dbeafe !important; }
+          svg .goal, svg .good, svg .success { fill: #dcfce7 !important; stroke: #16a34a !important; }
+          svg .warning, svg .danger, svg .bad { fill: #ffe4e6 !important; stroke: #e11d48 !important; }
 
           a { color: #0f4c81 !important; text-decoration: none !important; }
         }
@@ -157,9 +150,9 @@ for (const type of ['lecture', 'lab']) {
       });
 
       const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/g;
-      const candidates = document.querySelectorAll('p, li, h1, h2, h3, td, th, div, span');
-      candidates.forEach((element) => {
-        if (element.closest('pre, code, .formula')) return;
+      const textBlocks = document.querySelectorAll('p, li, h1, h2, h3, h4, td, th, blockquote, figcaption');
+      textBlocks.forEach((element) => {
+        if (element.closest('pre, code, .formula, .MathJax, mjx-container')) return;
         const text = (element.textContent || '').trim();
         if (!text) return;
         const arabicCount = (text.match(arabicPattern) || []).length;
@@ -167,10 +160,12 @@ for (const type of ['lecture', 'lab']) {
         if (letterCount > 0 && arabicCount / letterCount >= 0.55) {
           element.setAttribute('lang', 'ar');
           element.setAttribute('dir', 'rtl');
+          element.style.whiteSpace = 'normal';
+          element.style.letterSpacing = '0';
+          element.style.wordSpacing = '.08em';
         }
       });
 
-      // Convert inline SVG diagrams to a paper-friendly palette.
       document.querySelectorAll('svg').forEach((svg) => {
         svg.style.background = '#ffffff';
         svg.style.color = '#111827';
