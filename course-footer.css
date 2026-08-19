@@ -246,6 +246,33 @@ header .navlinks a:focus-visible{
   outline:none;
 }
 
+/* Custom electrical-power laboratory icon across the site. */
+a[href^="lab"] .icon,
+.course-action-related[href^="lab"] .course-action-icon,
+body:has(.course-action-related[href^="lecture"]) .course-action-current .course-action-icon{
+  position:relative;
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  width:58px;
+  height:58px;
+  overflow:hidden;
+  color:transparent!important;
+  font-size:0!important;
+  line-height:0!important;
+  background-image:url("assets/icons/electrical-power-lab.svg");
+  background-position:center;
+  background-size:contain;
+  background-repeat:no-repeat;
+}
+
+.course-action-related[href^="lab"] .course-action-icon,
+body:has(.course-action-related[href^="lecture"]) .course-action-current .course-action-icon{
+  width:48px;
+  height:48px;
+  flex:0 0 48px;
+}
+
 @media(max-width:900px){
   #author .author-box > div:first-child{
     padding-top:154px;
@@ -312,6 +339,11 @@ header .navlinks a:focus-visible{
     left:0;
     right:0;
     width:auto;
+  }
+
+  a[href^="lab"] .icon{
+    width:52px;
+    height:52px;
   }
 }
 
