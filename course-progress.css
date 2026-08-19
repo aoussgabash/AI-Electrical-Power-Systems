@@ -66,9 +66,43 @@
 .progress-fill{width:0;height:100%;background:linear-gradient(90deg,#0284c7,#2563eb,#22c55e);border-radius:inherit;transition:width .45s ease}
 .progress-caption{display:flex;justify-content:space-between;gap:12px;color:#aebfd0;font-size:.88rem}
 .progress-list{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}
-.progress-item{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0b1b2c;color:#9fb2c5;font-size:.82rem;text-decoration:none}
-.progress-item.completed{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.1);color:#bbf7d0}
-.progress-item.attempted{border-color:rgba(250,204,21,.45);background:rgba(250,204,21,.08);color:#fde68a}
+.progress-item{display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:10px;border:1px solid rgba(56,189,248,.42);background:#0b1b2c;color:#7dd3fc;font-size:.82rem;font-weight:700;text-decoration:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+
+/* Strong state colors for lecture progress tiles. */
+.learning-dashboard .progress-list .progress-item.completed,
+.learning-dashboard .progress-list .progress-item.completed:link,
+.learning-dashboard .progress-list .progress-item.completed:visited{
+  border-color:#22c55e!important;
+  background:linear-gradient(135deg,rgba(34,197,94,.34),rgba(21,128,61,.28))!important;
+  color:#dcfce7!important;
+  box-shadow:0 0 0 1px rgba(34,197,94,.22),0 8px 18px rgba(22,163,74,.12)!important;
+}
+
+.learning-dashboard .progress-list .progress-item.attempted,
+.learning-dashboard .progress-list .progress-item.attempted:link,
+.learning-dashboard .progress-list .progress-item.attempted:visited{
+  border-color:#facc15!important;
+  background:linear-gradient(135deg,rgba(250,204,21,.30),rgba(202,138,4,.24))!important;
+  color:#fef3c7!important;
+  box-shadow:0 0 0 1px rgba(250,204,21,.18),0 8px 18px rgba(202,138,4,.10)!important;
+}
+
+.learning-dashboard .progress-list .progress-item:not(.completed):not(.attempted),
+.learning-dashboard .progress-list .progress-item:not(.completed):not(.attempted):link,
+.learning-dashboard .progress-list .progress-item:not(.completed):not(.attempted):visited{
+  border-color:rgba(56,189,248,.48)!important;
+  background:linear-gradient(180deg,#10283f,#0c2135)!important;
+  color:#7dd3fc!important;
+}
+
+.learning-dashboard .progress-list .progress-item:hover,
+.learning-dashboard .progress-list .progress-item:focus-visible{
+  transform:translateY(-2px);
+  filter:brightness(1.12);
+  outline:2px solid rgba(125,211,252,.35);
+  outline-offset:2px;
+}
+
 .progress-note{margin-top:14px;color:#9fb2c5;font-size:.88rem}
 .progress-reset{margin-top:14px;border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:9px 13px;background:#0b1b2c;color:#fff;cursor:pointer}
 .progress-reset:hover{border-color:rgba(56,189,248,.55)}
@@ -76,5 +110,5 @@
 .achievement-icon{font-size:1.55rem}.achievement strong{display:block;color:#fff}.achievement span{color:#aebfd0;font-size:.88rem}
 .achievement.locked{opacity:.45;filter:grayscale(.7)}
 @media(max-width:900px){.progress-summary{grid-template-columns:repeat(2,1fr)}.progress-main{grid-template-columns:1fr}}
-@media(max-width:620px){.progress-summary{grid-template-columns:1fr 1fr}.progress-list{grid-template-columns:repeat(4,1fr)}.progress-panel{padding:16px}.progress-card a,.continue-learning-button{width:100%!important;justify-content:center!important;text-align:center!important}}
+@media(max-width:620px){.progress-summary{grid-template-columns:1fr 1fr}.progress-list{grid-template-columns:repeat(4,1fr)}.progress-panel{padding:16px}.progress-card a,.continue-learning-button{width:100%!important;justify-content:center!important;text-align:center!important}.progress-item{min-height:56px;font-size:1rem}}
 @media print{.learning-dashboard{display:none}}
