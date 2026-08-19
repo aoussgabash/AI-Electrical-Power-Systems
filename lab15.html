@@ -2,59 +2,137 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Lab 15 - Multi-Agent Energy Management</title>
-<style>
-body{font-family:Arial;margin:40px;line-height:1.7;background:#0b1220;color:#eef}
-h1,h2{color:#86efac}
-pre{background:#111827;padding:10px;overflow:auto}
-.ar{direction:rtl;text-align:right;border-top:1px solid #456;margin-top:20px;padding-top:15px}
-</style>
 <link rel="stylesheet" href="course-common.css">
 <link rel="stylesheet" href="course-footer.css">
 </head>
-<body>
-<h1>Lab 15 – Multi-Agent Energy Management</h1>
-<p><b>المخبر 15 – إدارة الطاقة متعددة الوكلاء</b></p>
+<body class="course-template-modern">
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
+<main class="container">
+<div class="hero">
+<div class="lecture-number">MATLAB LAB 15 | مختبر MATLAB 15</div>
+<h1>Multi-Agent Energy Management</h1>
+<div class="hero-ar">إدارة الطاقة متعددة الوكلاء</div>
+<div class="subtitle">Consensus, communication topology, convergence, and resilient coordination<br>الإجماع وبنية الاتصال والتقارب والتنسيق المرن</div>
+</div>
+<section><div class="en"><h2>🎯 Objectives</h2><ul><li>Model agents and communication links.</li><li>Implement average consensus in MATLAB.</li><li>Visualize convergence of all agents.</li><li>Study the effect of topology and step size.</li><li>Simulate a communication-link failure.</li><li>Extend consensus to distributed battery-power coordination.</li></ul></div><div class="ar"><h2>🎯 الأهداف</h2><ul><li>نمذجة الوكلاء وروابط الاتصال.</li><li>تنفيذ إجماع المتوسط في MATLAB.</li><li>إظهار تقارب حالات جميع الوكلاء.</li><li>دراسة تأثير بنية الاتصال وخطوة التحديث.</li><li>محاكاة انقطاع رابط اتصال.</li><li>توسيع الخوارزمية لتنسيق قدرة البطاريات.</li></ul></div></section>
+<section><div class="en"><h2>1. Mathematical Model</h2><div class="formula">x(k+1)=Wx(k)</div><p>For average consensus, W should be compatible with the graph, nonnegative, and preferably doubly stochastic.</p><div class="formula">\sum_j w_{ij}=1, \qquad \sum_i w_{ij}=1</div></div><div class="ar"><h2>1. النموذج الرياضي</h2><p>تُحدّث حالات الوكلاء بضرب متجه الحالات في مصفوفة الأوزان. وللوصول إلى متوسط القيم الابتدائية ينبغي أن تكون المصفوفة متوافقة مع شبكة الاتصال وتحافظ على المجموع.</p></div></section>
+<section><div class="en"><h2>2. Complete MATLAB Program</h2><pre><code>clear; clc; close all;
 
-<h2>Objectives</h2>
-<ul>
-<li>Create three cooperative agents.</li>
-<li>Exchange information.</li>
-<li>Reach a consensus on battery power.</li>
-</ul>
+%% Initial agent proposals (kW)
+x0 = [10; 20; 30];
+n  = numel(x0);
+K  = 30;
 
-<h2>MATLAB Example</h2>
-<pre>
-P = [10;20;30];
-W = [0.5 0.25 0.25;
-     0.25 0.5 0.25;
-     0.25 0.25 0.5];
+%% Communication-weight matrix
+W = [0.50 0.25 0.25;
+     0.25 0.50 0.25;
+     0.25 0.25 0.50];
 
-for k=1:20
-    P = W*P;
+%% Validation
+rowError = max(abs(sum(W,2)-1));
+colError = max(abs(sum(W,1)-1));
+assert(rowError &lt; 1e-12,'Rows of W must sum to one.');
+assert(colError &lt; 1e-12,'Columns of W must sum to one.');
+
+%% Consensus simulation
+X = zeros(n,K+1);
+X(:,1) = x0;
+for k = 1:K
+    X(:,k+1) = W*X(:,k);
 end
 
-disp(P)
-</pre>
+%% Results
+xAverage = mean(x0);
+fprintf('Initial average = %.4f kW\n',xAverage);
+fprintf('Final states:\n');
+disp(X(:,end));
 
-<div class="ar">
-<h2>تجارب إضافية</h2>
-<ul>
-<li>غيّر عدد الوكلاء إلى 10.</li>
-<li>أضف انقطاع اتصال بين وكيلين.</li>
-<li>قارن سرعة التقارب.</li>
-</ul>
-</div>
+%% Plot convergence
+figure;
+plot(0:K,X','LineWidth',1.6);
+yline(xAverage,'--','Average');
+grid on;
+xlabel('Iteration k');
+ylabel('Agent proposal (kW)');
+title('Average Consensus of Three Energy Agents');
+legend('Agent 1','Agent 2','Agent 3','Location','best');
 
-<h2>Mini Project</h2>
-<p>Develop a distributed controller for several microgrids coordinating battery storage and photovoltaic generation.</p>
-<footer>
-AI Applications in Electrical Power Systems
-<br>
-تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
-<br><br>
-MATLAB Lab 15 | مختبر MATLAB 15
-</footer>
+%% Consensus error
+errorNorm = vecnorm(X-xAverage,2,1);
+figure;
+semilogy(0:K,errorNorm,'LineWidth',1.6);
+grid on;
+xlabel('Iteration k');
+ylabel('||x(k)-x_{avg}1||_2');
+title('Consensus Error');</code></pre></div><div class="ar"><h2>2. البرنامج الكامل</h2><p>يحفظ البرنامج جميع الحالات عبر الزمن، ويتحقق من صحة مصفوفة الأوزان، ثم يرسم تقارب الوكلاء وخطأ الإجماع بمقياس لوغاريتمي.</p></div></section>
+<section><div class="en"><h2>3. Expected Result</h2><p>The initial average is 20 kW. Therefore, all three agents should converge to:</p><div class="formula">x(\infty)=[20\;20\;20]^T\text{ kW}</div><div class="highlight">The average is preserved at every iteration because W is doubly stochastic.</div></div><div class="ar"><h2>3. النتيجة المتوقعة</h2><p>متوسط القيم الابتدائية يساوي 20 كيلوواط، ولذلك تتقارب حالات الوكلاء الثلاثة نحو هذه القيمة.</p></div></section>
+<section><div class="en"><h2>4. Experiment A: Ring Topology</h2><pre><code>Wring = [0.50 0.50 0.00;
+         0.00 0.50 0.50;
+         0.50 0.00 0.50];
+
+Xring = zeros(n,K+1);
+Xring(:,1) = x0;
+for k = 1:K
+    Xring(:,k+1) = Wring*Xring(:,k);
+end
+
+figure;
+plot(0:K,Xring','LineWidth',1.6);
+grid on;
+xlabel('Iteration k'); ylabel('State');
+title('Consensus with Ring Communication');</code></pre><p>Compare its convergence rate with the fully connected case.</p></div><div class="ar"><h2>4. التجربة A: بنية الحلقة</h2><p>استبدل مصفوفة الاتصال ببنية حلقية وقارن عدد التكرارات اللازمة للوصول إلى الإجماع.</p></div></section>
+<section><div class="en"><h2>5. Experiment B: Link Failure</h2><pre><code>Wfailed = [0.70 0.30 0.00;
+           0.30 0.40 0.30;
+           0.00 0.30 0.70];
+
+Xf = zeros(n,K+1);
+Xf(:,1) = x0;
+for k = 1:K
+    if k == 10
+        % Disconnect agents 2 and 3, then renormalize rows
+        Wfailed(2,3) = 0;
+        Wfailed(3,2) = 0;
+        Wfailed = Wfailed./sum(Wfailed,2);
+    end
+    Xf(:,k+1) = Wfailed*Xf(:,k);
+end
+
+figure;
+plot(0:K,Xf','LineWidth',1.6);
+xline(10,'--','Link failure');
+grid on;
+xlabel('Iteration k'); ylabel('State');
+title('Consensus under a Communication Failure');</code></pre><div class="warning">After row normalization, consensus may still occur, but the limiting value may no longer equal the original average if W is not doubly stochastic.</div></div><div class="ar"><h2>5. التجربة B: انقطاع رابط</h2><p>اقطع رابطًا بعد التكرار العاشر. لاحظ أن النظام قد يستمر في التقارب، لكن القيمة النهائية قد لا تبقى مساوية للمتوسط الأصلي.</p></div></section>
+<section><div class="en"><h2>6. Distributed Battery-Power Coordination</h2><p>Assume each agent represents a battery with a preferred power command and physical limits.</p><pre><code>Ppref = [15; -5; 35];
+Pmin  = [-20; -10;  0];
+Pmax  = [ 30;  25; 40];
+P = Ppref;
+Phist = zeros(n,K+1);
+Phist(:,1) = P;
+
+for k = 1:K
+    P = W*P;
+    P = min(max(P,Pmin),Pmax); % projection onto limits
+    Phist(:,k+1) = P;
+end
+
+figure;
+plot(0:K,Phist','LineWidth',1.6);
+grid on;
+xlabel('Iteration k'); ylabel('Battery power (kW)');
+title('Consensus with Battery Power Limits');</code></pre><div class="note">Simple projection can disturb exact average preservation. Constrained distributed optimization is required for rigorous dispatch with unequal limits and costs.</div></div><div class="ar"><h2>6. تنسيق قدرة البطاريات</h2><p>يمثل كل وكيل بطارية ذات قدرة مفضلة وحدود دنيا وعليا. تُسقط القيم بعد كل تحديث ضمن الحدود الفيزيائية، لكن ذلك قد يغير المتوسط، ولذلك يحتاج التوزيع الاقتصادي الدقيق إلى تحسين موزع مقيد.</p></div></section>
+<section><div class="en"><h2>7. Performance Indicators</h2><pre><code>tol = 1e-3;
+err = vecnorm(X-mean(x0),2,1);
+kConv = find(err &lt; tol,1,'first')-1;
+
+fprintf('Convergence iteration = %d\n',kConv);
+fprintf('Final consensus error = %.3e\n',err(end));</code></pre><ul><li>Convergence iteration.</li><li>Final consensus error.</li><li>Communication messages.</li><li>Sensitivity to topology changes.</li></ul></div><div class="ar"><h2>7. مؤشرات الأداء</h2><p>قيّم عدد تكرارات التقارب والخطأ النهائي وعدد الرسائل وحساسية الخوارزمية لتغير شبكة الاتصال.</p></div></section>
+<section><div class="en"><h2>8. Tasks</h2><ol><li>Increase the number of agents to 10.</li><li>Generate a connected random graph and construct W.</li><li>Compare complete, ring, and line topologies.</li><li>Add random packet loss with probability 0.1.</li><li>Investigate a malicious agent that reports a false value.</li><li>Design a robust rule using median neighbor information.</li><li>Replace identical agents with quadratic cost functions.</li></ol></div><div class="ar"><h2>8. المهام</h2><ol><li>ارفع عدد الوكلاء إلى 10.</li><li>أنشئ رسم اتصال عشوائيًا مترابطًا.</li><li>قارن البنية الكاملة والحلقية والخطية.</li><li>أضف فقدان حزم عشوائيًا باحتمال 0.1.</li><li>حاكي وكيلًا خبيثًا يرسل قيمة خاطئة.</li><li>استخدم وسيط قيم الجيران لزيادة المتانة.</li><li>أضف دوال تكلفة تربيعية مختلفة.</li></ol></div></section>
+<section><div class="en"><h2>9. Mini Project</h2><p>Develop a distributed controller for three interconnected microgrids. Each microgrid contains PV generation, a battery, and a load. The agents must exchange only neighbor information and coordinate battery power to reduce power imbalance while respecting SOC and power limits.</p></div><div class="ar"><h2>9. المشروع المصغر</h2><p>طوّر متحكمًا موزعًا لثلاث شبكات مصغرة مترابطة، تحتوي كل منها على توليد شمسي وبطارية وحمل. يجب تنسيق قدرة البطاريات باستخدام معلومات الجيران فقط مع احترام حدود القدرة وحالة الشحن.</p></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems<br>تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية<br><br>MATLAB Lab 15 | مختبر MATLAB 15</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
 </body>
