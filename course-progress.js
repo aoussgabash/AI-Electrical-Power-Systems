@@ -69,7 +69,14 @@
         const title = result
           ? `Lecture ${num}: ${percent}%`
           : `Lecture ${num}: not attempted`;
-        return `<a class="progress-item ${state}" href="lecture${num}.html" title="${title}">${symbol}</a>`;
+
+        const style = state === 'completed'
+          ? 'border-color:#22c55e!important;background:linear-gradient(135deg,rgba(34,197,94,.42),rgba(21,128,61,.34))!important;color:#dcfce7!important;box-shadow:0 0 0 1px rgba(34,197,94,.25),0 8px 18px rgba(22,163,74,.16)!important;'
+          : state === 'attempted'
+            ? 'border-color:#facc15!important;background:linear-gradient(135deg,rgba(250,204,21,.34),rgba(202,138,4,.28))!important;color:#fef3c7!important;box-shadow:0 0 0 1px rgba(250,204,21,.22),0 8px 18px rgba(202,138,4,.12)!important;'
+            : 'border-color:rgba(56,189,248,.48)!important;background:linear-gradient(180deg,#10283f,#0c2135)!important;color:#7dd3fc!important;';
+
+        return `<a class="progress-item ${state}" style="${style}" href="lecture${num}.html" title="${title}">${symbol}</a>`;
       }).join('');
     }
 
