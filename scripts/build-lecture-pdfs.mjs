@@ -82,18 +82,8 @@ button, [data-progress-reset], [data-learning-dashboard] {
   unicode-bidi: plaintext !important;
 }
 
-/* Keep normal Arabic content right-aligned, but center Arabic cover titles. */
 .hero-ar,
-.hero .ar,
-.hero [lang="ar"],
-.cover .ar,
-.cover [lang="ar"],
-.title-page .ar,
-.title-page [lang="ar"],
-.course-hero .ar,
-.course-hero [lang="ar"],
-.hero-subtitle.ar,
-.hero-subtitle[lang="ar"],
+.subtitle-en,
 .subtitle-ar {
   display: block !important;
   width: 100% !important;
@@ -102,16 +92,21 @@ button, [data-progress-reset], [data-learning-dashboard] {
   text-align: center !important;
 }
 
-/* The second cover title contains English and Arabic in one element separated by BR. */
-.hero .subtitle,
-.hero .subtitle[lang="ar"],
-.hero .subtitle[dir="rtl"] {
+.subtitle-en {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+}
+
+.subtitle-ar {
+  direction: rtl !important;
+  unicode-bidi: isolate !important;
+  font-family: "Course Arabic PDF", "Noto Naskh Arabic", Tahoma, Arial, sans-serif !important;
+  line-height: 1.85 !important;
+}
+
+.hero .subtitle {
   display: block !important;
   width: 100% !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  direction: ltr !important;
-  unicode-bidi: plaintext !important;
   text-align: center !important;
 }
 
@@ -206,7 +201,37 @@ for (const type of ['lecture', 'lab']) {
 
       document.documentElement.setAttribute('lang', 'en');
 
-      document.querySelectorAll('.ar, .hero-ar, [dir="rtl"]').forEach(element => {
+      const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+
+      document.querySelectorAll('.hero .subtitle').forEach(subtitle => {
+        const parts = [];
+        let current = '';
+
+        subtitle.childNodes.forEach(node => {
+          if (node.nodeName === 'BR') {
+            if (current.trim()) parts.push(current.trim());
+            current = '';
+            return;
+          }
+          current += node.textContent || '';
+        });
+        if (current.trim()) parts.push(current.trim());
+
+        if (parts.length < 2) return;
+
+        subtitle.replaceChildren();
+        parts.forEach(text => {
+          const line = document.createElement('div');
+          const isArabic = arabicPattern.test(text);
+          line.className = isArabic ? 'subtitle-ar' : 'subtitle-en';
+          line.setAttribute('lang', isArabic ? 'ar' : 'en');
+          line.setAttribute('dir', isArabic ? 'rtl' : 'ltr');
+          line.textContent = text;
+          subtitle.appendChild(line);
+        });
+      });
+
+      document.querySelectorAll('.ar, .hero-ar, .subtitle-ar, [dir="rtl"]').forEach(element => {
         element.setAttribute('lang', 'ar');
         element.setAttribute('dir', 'rtl');
       });
