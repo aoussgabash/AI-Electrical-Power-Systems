@@ -60,7 +60,7 @@ for (const type of ['lecture', 'lab']) {
           .en { direction: ltr !important; unicode-bidi: isolate !important; text-align: left !important; }
           .ar { direction: rtl !important; unicode-bidi: isolate !important; text-align: right !important; }
           section { break-inside: auto !important; }
-          section > .en, section > .ar { break-inside: avoid-page !important; }
+          section > .en, section > .ar { break-inside: auto !important; }
         }
       `;
       document.head.appendChild(style);
@@ -99,18 +99,8 @@ for (const type of ['lecture', 'lab']) {
       displayHeaderFooter: true,
       headerTemplate: '<div></div>',
       footerTemplate: `
-        <style>
-          @font-face {
-            font-family: 'Course Arabic PDF';
-            src: url('http://127.0.0.1:8000/assets/fonts/NotoNaskhArabic-Regular.ttf') format('truetype');
-          }
-        </style>
         <div style="width:100%;font-size:8px;color:#666;padding:0 12mm;display:flex;justify-content:space-between;align-items:center;font-family:Arial,Tahoma,sans-serif;">
-          <span style="display:flex;align-items:center;gap:6px;">
-            <span>Dr.-Ing. Aouss Gabash</span>
-            <span style="color:#999;">|</span>
-            <span lang="ar" dir="rtl" style="display:inline-block;font-family:'Course Arabic PDF','Noto Naskh Arabic',Tahoma,Arial,sans-serif;direction:rtl;unicode-bidi:isolate;letter-spacing:normal;word-spacing:normal;">د. م. أوس غباش</span>
-          </span>
+          <span>Dr.-Ing. Aouss Gabash</span>
           <span>AI Applications in Electrical Power Systems</span>
           <span><span class="pageNumber"></span>/<span class="totalPages"></span></span>
         </div>`,
