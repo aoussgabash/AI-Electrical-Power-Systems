@@ -193,8 +193,16 @@ for (const type of ['lecture', 'lab']) {
       const endMatter = document.createElement('section');
       endMatter.className = 'publication-endmatter';
       endMatter.innerHTML = `
-        <h2>Publication Information</h2>
-        <div class="publication-ar-title" lang="ar" dir="rtl">معلومات النشر والمرجع</div>
+        <h2>References | المراجع</h2>
+        <div class="publication-ar-title" lang="ar" dir="rtl">المراجع العامة المستخدمة في هذا المقرر</div>
+        <div class="publication-reference-list">
+          <p><strong>[1]</strong> A. Gabash, <em>Flexible Optimal Operations of Energy Supply Networks with Renewable Energy Generation and Battery Storage</em>. Saarbrücken, Germany: Südwestdeutscher Verlag für Hochschulschriften, 2014.</p>
+          <p><strong>[2]</strong> S. J. Russell and P. Norvig, <em>Artificial Intelligence: A Modern Approach</em>, 4th Global ed. Harlow, U.K.: Pearson Education Limited, 2022.</p>
+          <p><strong>[3]</strong> A. Gabash, “Energy Market Transition and Climate Change: A Review of TSOs-DSOs C+++ Framework from 1800 to Present,” <em>Energies</em>, vol. 16, no. 17, Art. no. 6139, 2023, doi: 10.3390/en16176139.</p>
+          <p><strong>[4]</strong> A. Gabash, <em>AI Applications in Electrical Power Systems</em>, Version ${version}, ${currentYear}. [Online]. Available: ${website}</p>
+        </div>
+
+        <h2>Publication Information | معلومات النشر</h2>
         <table class="publication-table">
           <tbody>
             <tr><th>Document</th><td>${kind} ${num} · ${title}</td></tr>
@@ -203,6 +211,7 @@ for (const type of ['lecture', 'lab']) {
             <tr><th>Version</th><td>${version}</td></tr>
             <tr><th>Publication year</th><td>${currentYear}</td></tr>
             <tr><th>Official website</th><td>${website}</td></tr>
+            <tr><th>Citation style</th><td>IEEE</td></tr>
           </tbody>
         </table>
         <p class="publication-reference"><strong>Recommended citation:</strong><br>${citation}</p>
