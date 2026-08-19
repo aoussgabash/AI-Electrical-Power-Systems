@@ -1,4 +1,4 @@
-name: Use custom electrical power laboratory icon
+name: Fix homepage electrical laboratory icon
 
 on:
   workflow_dispatch:
@@ -10,58 +10,79 @@ permissions:
   contents: write
 
 jobs:
-  replace-icon:
+  fix-home-icon:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Apply custom laboratory icon
+      - name: Fix homepage laboratory icon CSS
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          home_icon = '<img src="assets/icons/electrical-power-lab.svg" class="electrical-lab-icon" alt="Electrical power laboratory" style="width:58px;height:58px;display:block;object-fit:contain">'
-          nav_icon = '<img src="assets/icons/electrical-power-lab.svg" class="electrical-lab-icon" alt="Electrical power laboratory" style="width:42px;height:42px;display:block;object-fit:contain">'
+          path = Path('course-footer.css')
+          css = path.read_text(encoding='utf-8')
 
-          index_path = Path('index.html')
-          index = index_path.read_text(encoding='utf-8')
-          old_home = '<span class="icon">⚡</span>'
-          count = index.count(old_home)
-          index = index.replace(old_home, f'<span class="icon">{home_icon}</span>')
-          index_path.write_text(index, encoding='utf-8')
-          print(f'Homepage icons replaced: {count}')
+          css = css.replace('a[href^="lab"] .icon', 'a[href*="lab"] .icon')
 
-          nav_path = Path('course-navigation.js')
-          nav = nav_path.read_text(encoding='utf-8')
-          anchor = "const authorName = 'Dr.-Ing. Aouss Gabash';"
-          declaration = f"const labIcon = '{nav_icon}';"
-          if 'const labIcon =' not in nav:
-              nav = nav.replace(anchor, anchor + '\n  ' + declaration)
+          override = r'''
 
-          nav = nav.replace("icon: type === 'lecture' ? '📖' : '⚡'", "icon: type === 'lecture' ? '📖' : labIcon")
-          nav = nav.replace("icon: type === 'lecture' ? '⚡' : '📖'", "icon: type === 'lecture' ? labIcon : '📖'")
-          nav = nav.replace(
-              '.course-action-icon{font-size:2rem;line-height:1}',
-              '.course-action-icon{font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center}.course-action-icon img{max-width:48px;max-height:48px}'
-          )
-          nav_path.write_text(nav, encoding='utf-8')
+/* Final homepage laboratory-icon override. */
+a.course-card[href*="lab"] .icon,
+.course-card[href*="lab"] .card-top .icon,
+a[href*="lab"] .card-top .icon{
+  position:relative!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:58px!important;
+  height:58px!important;
+  min-width:58px!important;
+  overflow:hidden!important;
+  text-indent:-9999px!important;
+  white-space:nowrap!important;
+  font-size:0!important;
+  line-height:0!important;
+  color:transparent!important;
+  background:none!important;
+}
 
-          if 'assets/icons/electrical-power-lab.svg' not in index:
-              raise SystemExit('Custom icon was not inserted into index.html')
-          if 'assets/icons/electrical-power-lab.svg' not in nav:
-              raise SystemExit('Custom icon was not inserted into course-navigation.js')
+a.course-card[href*="lab"] .icon::before,
+.course-card[href*="lab"] .card-top .icon::before,
+a[href*="lab"] .card-top .icon::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  background:url("assets/icons/electrical-power-lab.svg") center/contain no-repeat!important;
+}
+
+@media(max-width:620px){
+  a.course-card[href*="lab"] .icon,
+  .course-card[href*="lab"] .card-top .icon,
+  a[href*="lab"] .card-top .icon{
+    width:52px!important;
+    height:52px!important;
+    min-width:52px!important;
+  }
+}
+'''
+
+          if 'Final homepage laboratory-icon override' not in css:
+              css += override
+
+          path.write_text(css, encoding='utf-8')
           PY
 
-      - name: Commit icon update
+      - name: Commit homepage icon fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html course-navigation.js
+          git add course-footer.css
           if git diff --cached --quiet; then
-            echo "Custom laboratory icons are already active."
+            echo "Homepage laboratory icon is already fixed."
           else
-            git commit -m "Use custom electrical power icon for laboratories"
+            git commit -m "Fix electrical laboratory icon on homepage cards"
             git push
           fi
