@@ -3,6 +3,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const outputDir = path.resolve('build/pdf-html');
+const currentYear = new Date().getFullYear();
+const version = '1.0';
+const website = 'https://aoussgabash.com';
+const publishingCss = fs
+  .readFileSync(path.resolve('scripts/pdf-publishing.css'), 'utf8')
+  .replaceAll('2026', String(currentYear));
+
 fs.rmSync(outputDir, { recursive: true, force: true });
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -16,14 +23,6 @@ const printCss = `
   src:url("http://127.0.0.1:8000/assets/fonts/NotoNaskhArabic-Regular.ttf") format("truetype");
   font-weight:400;
   font-style:normal;
-}
-
-@page {
-  size:A4;
-  margin:14mm 14mm 18mm;
-  @bottom-left { content:"Dr.-Ing. Aouss Gabash"; font:8px Arial,sans-serif; color:#666; }
-  @bottom-center { content:"AI Applications in Electrical Power Systems"; font:8px Arial,sans-serif; color:#666; }
-  @bottom-right { content:counter(page) "/" counter(pages); font:8px Arial,sans-serif; color:#666; }
 }
 
 html,body{background:#fff!important;color:#111827!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
@@ -41,28 +40,18 @@ header,nav,.mobile-menu-toggle,.navlinks,.back-to-top,.course-footer,.site-foote
   direction:rtl!important;text-align:right!important;unicode-bidi:plaintext!important;
 }
 
-/* The wrapper owns page positioning; the table owns Arabic direction and shrink-to-fit width. */
 .hero-ar,.subtitle-ar{
   display:block!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;
   margin-left:auto!important;margin-right:auto!important;padding:0!important;
   direction:ltr!important;unicode-bidi:isolate!important;text-align:left!important;
 }
-.hero-ar{margin-top:14px!important;margin-bottom:18px!important}
-.subtitle-ar{margin-top:8px!important;margin-bottom:18px!important;font-size:1.08em!important;line-height:1.9!important}
 
 .pdf-ar-table{
-  display:table!important;
-  width:auto!important;
-  max-width:100%!important;
-  margin-left:auto!important;
-  margin-right:auto!important;
-  padding:0!important;
-  direction:rtl!important;
-  unicode-bidi:isolate!important;
-  text-align:right!important;
+  display:table!important;width:auto!important;max-width:100%!important;
+  margin-left:auto!important;margin-right:auto!important;padding:0!important;
+  direction:rtl!important;unicode-bidi:isolate!important;text-align:right!important;
   font-family:"Course Arabic PDF","Noto Naskh Arabic",Tahoma,Arial,sans-serif!important;
-  white-space:normal!important;
-  line-height:1.85!important;
+  white-space:normal!important;line-height:1.85!important;
 }
 
 .subtitle-en{
@@ -112,49 +101,37 @@ for (const type of ['lecture', 'lab']) {
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     });
 
-    await page.evaluate(({ css }) => {
+    await page.evaluate(({ css, publishingCss, version, currentYear, website, type, num }) => {
       document.querySelectorAll('script').forEach(node => node.remove());
 
-      const base = document.createElement('base');
-      base.dataset.pdfBase = 'true';
-      base.href = 'http://127.0.0.1:8000/';
-      document.head.prepend(base);
+      let base = document.head.querySelector('base[data-pdf-base]');
+      if (!base) {
+        base = document.createElement('base');
+        base.dataset.pdfBase = 'true';
+        base.href = 'http://127.0.0.1:8000/';
+        document.head.prepend(base);
+      }
 
       const style = document.createElement('style');
       style.id = 'weasyprint-course-pdf';
-      style.textContent = css;
+      style.textContent = `${css}\n${publishingCss}`;
       document.head.appendChild(style);
       document.documentElement.setAttribute('lang', 'en');
 
       const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
-
       const centerArabic = (container, text) => {
         container.replaceChildren();
         container.setAttribute('lang', 'en');
         container.setAttribute('dir', 'ltr');
-        container.style.setProperty('display', 'block', 'important');
-        container.style.setProperty('width', '100%', 'important');
-        container.style.setProperty('direction', 'ltr', 'important');
-        container.style.setProperty('text-align', 'left', 'important');
-
         const block = document.createElement('div');
         block.className = 'pdf-ar-table';
         block.setAttribute('lang', 'ar');
         block.setAttribute('dir', 'rtl');
         block.textContent = text.trim();
-        block.style.setProperty('display', 'table', 'important');
-        block.style.setProperty('width', 'auto', 'important');
-        block.style.setProperty('margin-left', 'auto', 'important');
-        block.style.setProperty('margin-right', 'auto', 'important');
-        block.style.setProperty('direction', 'rtl', 'important');
-        block.style.setProperty('text-align', 'right', 'important');
         container.appendChild(block);
       };
 
-      document.querySelectorAll('.hero-ar').forEach(element => {
-        centerArabic(element, element.textContent || '');
-        element.style.setProperty('margin', '14px auto 18px', 'important');
-      });
+      document.querySelectorAll('.hero-ar').forEach(element => centerArabic(element, element.textContent || ''));
 
       document.querySelectorAll('.hero .subtitle').forEach(subtitle => {
         const parts = [];
@@ -171,22 +148,15 @@ for (const type of ['lecture', 'lab']) {
         subtitle.replaceChildren();
         subtitle.setAttribute('lang', 'en');
         subtitle.setAttribute('dir', 'ltr');
-
         parts.forEach(text => {
           const line = document.createElement('div');
           const isArabic = arabicPattern.test(text);
           line.className = isArabic ? 'subtitle-ar' : 'subtitle-en';
-          if (isArabic) {
-            centerArabic(line, text);
-            line.style.setProperty('margin', '8px auto 18px', 'important');
-          } else {
+          if (isArabic) centerArabic(line, text);
+          else {
             line.setAttribute('lang', 'en');
             line.setAttribute('dir', 'ltr');
             line.textContent = text;
-            line.style.setProperty('display', 'block', 'important');
-            line.style.setProperty('width', '100%', 'important');
-            line.style.setProperty('text-align', 'center', 'important');
-            line.style.setProperty('margin', '0 auto 12px', 'important');
           }
           subtitle.appendChild(line);
         });
@@ -210,10 +180,41 @@ for (const type of ['lecture', 'lab']) {
           element.setAttribute('dir', 'rtl');
         }
       });
-    }, { css: printCss });
+
+      document.querySelectorAll('p, div, span').forEach(element => {
+        if (!element.children.length && !element.textContent.trim()) element.remove();
+      });
+
+      const title = document.querySelector('.hero h1, main h1, h1')?.textContent?.trim() || `${type} ${num}`;
+      const kind = type === 'lecture' ? 'Lecture' : 'Laboratory';
+      const kindAr = type === 'lecture' ? 'محاضرة' : 'مخبر';
+      const citation = `Gabash, A. (${currentYear}). ${title}. AI Applications in Electrical Power Systems, ${kind} ${num}, Version ${version}. ${website}`;
+
+      const endMatter = document.createElement('section');
+      endMatter.className = 'publication-endmatter';
+      endMatter.innerHTML = `
+        <h2>Publication Information</h2>
+        <div class="publication-ar-title" lang="ar" dir="rtl">معلومات النشر والمرجع</div>
+        <table class="publication-table">
+          <tbody>
+            <tr><th>Document</th><td>${kind} ${num} · ${title}</td></tr>
+            <tr><th>Course</th><td>AI Applications in Electrical Power Systems</td></tr>
+            <tr><th>Author</th><td>Dr.-Ing. Aouss Gabash</td></tr>
+            <tr><th>Version</th><td>${version}</td></tr>
+            <tr><th>Publication year</th><td>${currentYear}</td></tr>
+            <tr><th>Official website</th><td>${website}</td></tr>
+          </tbody>
+        </table>
+        <p class="publication-reference"><strong>Recommended citation:</strong><br>${citation}</p>
+        <p class="publication-reference publication-reference-ar" lang="ar" dir="rtl"><strong>المرجع المقترح:</strong><br>أوس غباش، ${currentYear}، ${kindAr} ${num}، تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية، الإصدار ${version}، ${website}</p>
+        <p class="publication-reference">© ${currentYear} Dr.-Ing. Aouss Gabash. Educational use with attribution to the author and official website.</p>`;
+
+      const main = document.querySelector('main') || document.body;
+      main.appendChild(endMatter);
+    }, { css: printCss, publishingCss, version, currentYear, website, type, num });
 
     fs.writeFileSync(path.join(outputDir, `${type}${num}.html`), '<!doctype html>\n' + await page.content(), 'utf8');
-    console.log(`Prepared build/pdf-html/${type}${num}.html`);
+    console.log(`Prepared publication HTML: ${type}${num}`);
   }
 }
 
