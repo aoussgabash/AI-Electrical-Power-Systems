@@ -24,24 +24,35 @@ jobs:
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
 
-          replacements = {
-              '<a href="#structure">Structure</a>': '<a href="#structure">Structure | الهيكل</a>',
-              '<a href="#progress">Progress</a>': '<a href="#progress">Progress | التقدم</a>',
-              '<a href="#courses">Lectures &amp; Labs</a>': '<a href="#courses">Lectures &amp; Labs | المحاضرات والمخابر</a>',
-              '<a href="#features">Features</a>': '<a href="#features">Features | الميزات</a>',
-              '<a href="#author">Author &amp; Profiles</a>': '<a href="#author">Author &amp; Profiles | المؤلف والملفات الأكاديمية</a>',
-          }
+          replacements = [
+              ('<a href="#structure">Structure</a>', '<a href="#structure">Structure | الهيكل</a>'),
+              ('<a href="#progress">Progress</a>', '<a href="#progress">Progress | التقدم</a>'),
+              ('<a href="#courses">Lectures & Labs</a>', '<a href="#courses">Lectures &amp; Labs | المحاضرات والمخابر</a>'),
+              ('<a href="#courses">Lectures &amp; Labs</a>', '<a href="#courses">Lectures &amp; Labs | المحاضرات والمخابر</a>'),
+              ('<a href="#features">Features</a>', '<a href="#features">Features | الميزات</a>'),
+              ('<a href="#author">Author &amp; Profiles</a>', '<a href="#author">Author &amp; Profiles | المؤلف والملفات الأكاديمية</a>'),
+              ('<a href="#author">Author & Profiles</a>', '<a href="#author">Author &amp; Profiles | المؤلف والملفات الأكاديمية</a>'),
+          ]
 
-          missing = []
-          for old, new in replacements.items():
-              if old not in text and new not in text:
-                  missing.append(old)
-              text = text.replace(old, new)
+          changed = False
+          for old, new in replacements:
+              if old in text:
+                  text = text.replace(old, new)
+                  changed = True
 
+          required = [
+              'Structure | الهيكل',
+              'Progress | التقدم',
+              'Lectures &amp; Labs | المحاضرات والمخابر',
+              'Features | الميزات',
+              'Author &amp; Profiles | المؤلف والملفات الأكاديمية',
+          ]
+          missing = [label for label in required if label not in text]
           if missing:
-              raise SystemExit('Could not find expected navigation labels: ' + ', '.join(missing))
+              raise SystemExit('Bilingual labels still missing: ' + ', '.join(missing))
 
-          path.write_text(text, encoding='utf-8')
+          if changed:
+              path.write_text(text, encoding='utf-8')
           PY
 
       - name: Commit homepage update
