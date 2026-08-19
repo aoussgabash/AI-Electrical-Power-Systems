@@ -1,29 +1,241 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Lab 16 - Simple Digital Twin</title>
-<style>body{font-family:Arial;background:#0b1220;color:#eef;margin:40px;line-height:1.7}h1,h2{color:#86efac}.ar{direction:rtl;text-align:right;border-top:1px solid #456;padding-top:15px;margin-top:20px}pre{background:#111827;padding:10px}</style><link rel="stylesheet" href="course-common.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lab 16 - Building a Simple Digital Twin</title>
+<link rel="stylesheet" href="course-common.css">
 <link rel="stylesheet" href="course-footer.css">
 </head>
-<body>
-<h1>Lab 16 – Building a Simple Digital Twin</h1>
-<p><b>المخبر 16 – بناء توأم رقمي مبسط</b></p>
-<h2>Objectives</h2>
-<ul><li>Simulate streaming measurements.</li><li>Update the digital twin every second.</li><li>Detect abnormal behavior.</li></ul>
-<h2>MATLAB</h2>
-<pre>
-t=0:0.1:100;
-P=100+10*sin(0.2*t)+randn(size(t));
-threshold=115;
-alarm=P>threshold;
-plot(t,P); hold on;
-yline(threshold,'r--');
-</pre>
-<div class="ar"><h2>تمارين</h2><ul><li>أضف قياسات جهد.</li><li>استخدم متوسطاً متحركاً.</li><li>أضف كشف شذوذ بالذكاء الاصطناعي.</li></ul></div>
-<footer>
-AI Applications in Electrical Power Systems
-<br>
-تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
-<br><br>
-MATLAB Lab 16 | مختبر MATLAB 16
-</footer>
+<body class="course-template-modern">
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
+<main class="container">
+<div class="hero">
+<div class="lecture-number">MATLAB LAB 16 | مختبر MATLAB 16</div>
+<h1>Building a Simple Digital Twin</h1>
+<div class="hero-ar">بناء توأم رقمي مبسط</div>
+<div class="subtitle">Streaming measurements, model updating, anomaly detection, and prediction<br>القياسات المتدفقة وتحديث النموذج وكشف الشذوذ والتنبؤ</div>
+</div>
+
+<section><div class="en"><h2>🎯 Objectives</h2><ul>
+<li>Simulate streaming power-system measurements.</li>
+<li>Build a simple physical process model.</li>
+<li>Synchronize the digital state with noisy measurements.</li>
+<li>Apply moving-average filtering and residual analysis.</li>
+<li>Detect abnormal behavior automatically.</li>
+<li>Evaluate model accuracy using RMSE and alarm statistics.</li>
+</ul></div><div class="ar"><h2>🎯 الأهداف</h2><ul>
+<li>محاكاة قياسات متدفقة من نظام قدرة.</li>
+<li>بناء نموذج فيزيائي مبسط.</li>
+<li>مزامنة الحالة الرقمية مع القياسات المشوشة.</li>
+<li>استخدام المتوسط المتحرك وتحليل البواقي.</li>
+<li>كشف السلوك غير الطبيعي تلقائيًا.</li>
+<li>تقييم الدقة باستخدام RMSE وإحصاءات الإنذار.</li>
+</ul></div></section>
+
+<section><div class="en"><h2>1. Laboratory Scenario</h2>
+<p>We model the active power of a feeder. The physical process changes smoothly with load demand, while the measurement contains noise. At a selected time, an abnormal increase is introduced.</p>
+<div class="formula">P_{true}(k)=P_0+A\sin(\omega t_k)+d(k)</div>
+<div class="formula">P_{meas}(k)=P_{true}(k)+v(k)</div>
+<p>The digital twin predicts the next value and corrects it using the measurement.</p></div><div class="ar"><h2>1. سيناريو المختبر</h2><p>نمثل القدرة الفعالة لمغذٍ كهربائي. تتغير القدرة الحقيقية بسلاسة، بينما تحتوي القياسات على ضوضاء، ثم نضيف حالة غير طبيعية لقياس قدرة التوأم على اكتشافها.</p></div></section>
+
+<section><div class="en"><h2>2. Complete MATLAB Program</h2><pre><code>clear; clc; close all;
+rng(16);
+
+%% Simulation settings
+Ts = 0.1;                 % Sampling time [s]
+t  = 0:Ts:100;
+N  = numel(t);
+
+%% Physical-system signal
+P0 = 100;                 % Base power [kW]
+A  = 10;                  % Oscillation amplitude [kW]
+Ptrue = P0 + A*sin(0.2*t);
+
+%% Introduce an abnormal event
+attackStart = 650;
+attackEnd   = 760;
+Ptrue(attackStart:attackEnd) = ...
+    Ptrue(attackStart:attackEnd) + 18;
+
+%% Noisy measurements
+sigmaNoise = 1.5;
+Pmeas = Ptrue + sigmaNoise*randn(size(t));
+
+%% Digital-twin state update
+Ptwin = zeros(size(t));
+Ptwin(1) = Pmeas(1);
+alpha = 0.18;             % Measurement correction gain
+
+for k = 2:N
+    % Simple model prediction
+    Ppred = Ptwin(k-1);
+
+    % Measurement correction
+    Ptwin(k) = Ppred + alpha*(Pmeas(k)-Ppred);
+end
+
+%% Residual and adaptive threshold
+residual = Pmeas - Ptwin;
+normalIndex = 1:500;
+muR = mean(residual(normalIndex));
+sigmaR = std(residual(normalIndex));
+threshold = abs(muR) + 3*sigmaR;
+alarm = abs(residual) &gt; threshold;
+
+%% Accuracy indicators
+rmseMeas = sqrt(mean((Pmeas-Ptrue).^2));
+rmseTwin = sqrt(mean((Ptwin-Ptrue).^2));
+
+fprintf('Measurement RMSE = %.3f kW\n',rmseMeas);
+fprintf('Twin RMSE        = %.3f kW\n',rmseTwin);
+fprintf('Alarm samples    = %d\n',sum(alarm));
+
+%% Main plot
+figure;
+plot(t,Ptrue,'LineWidth',1.6); hold on;
+plot(t,Pmeas,'LineWidth',0.8);
+plot(t,Ptwin,'LineWidth',1.6);
+grid on;
+xlabel('Time (s)');
+ylabel('Active power (kW)');
+title('Physical Feeder and Digital Twin');
+legend('True power','Measurement','Digital twin',...
+       'Location','best');
+
+%% Residual plot
+figure;
+plot(t,residual,'LineWidth',1.2); hold on;
+yline(threshold,'--');
+yline(-threshold,'--');
+scatter(t(alarm),residual(alarm),20,'filled');
+grid on;
+xlabel('Time (s)');
+ylabel('Residual (kW)');
+title('Residual-based Anomaly Detection');
+legend('Residual','Upper threshold','Lower threshold','Alarm');</code></pre></div><div class="ar"><h2>2. البرنامج الكامل</h2><p>ينشئ البرنامج إشارة قدرة حقيقية وقياسات مشوشة، ثم يحدث حالة التوأم الرقمي في كل عينة، ويحسب البواقي ويولد إنذارًا عندما تتجاوز البواقي حدًا تكيفيًا.</p></div></section>
+
+<section><div class="en"><h2>3. Interpretation</h2><ul>
+<li><b>Ptrue:</b> hidden physical-system state.</li>
+<li><b>Pmeas:</b> noisy sensor stream.</li>
+<li><b>Ptwin:</b> synchronized digital estimate.</li>
+<li><b>Residual:</b> difference between measurement and twin.</li>
+<li><b>Alarm:</b> samples that exceed the statistical threshold.</li>
+</ul><div class="highlight">A useful digital twin does not only visualize data; it continuously estimates, compares, predicts, and supports decisions.</div></div><div class="ar"><h2>3. تفسير النتائج</h2><p>تمثل الإشارة الحقيقية النظام الفيزيائي، وتمثل القياسات بيانات الحساس، بينما تمثل Ptwin الحالة الرقمية المقدرة. ويشير تجاوز البواقي للحد إلى احتمال وجود شذوذ أو خطأ في النموذج.</p></div></section>
+
+<section><div class="en"><h2>4. Experiment A: Moving-Average Filter</h2><pre><code>window = 15;
+Pfiltered = movmean(Pmeas,window);
+
+figure;
+plot(t,Pmeas,'LineWidth',0.7); hold on;
+plot(t,Pfiltered,'LineWidth',1.7);
+plot(t,Ptrue,'--','LineWidth',1.4);
+grid on;
+xlabel('Time (s)');
+ylabel('Power (kW)');
+title('Moving-Average Measurement Filter');
+legend('Raw measurement','Filtered measurement','True signal');</code></pre><p>Repeat the experiment using window sizes 5, 15, and 40. Larger windows reduce noise but increase delay.</p></div><div class="ar"><h2>4. التجربة A: المتوسط المتحرك</h2><p>قارن نوافذ بأطوال مختلفة. تؤدي النافذة الكبيرة إلى تنعيم أفضل، لكنها تزيد التأخير وتضعف الاستجابة للتغيرات السريعة.</p></div></section>
+
+<section><div class="en"><h2>5. Experiment B: One-Step Prediction</h2><pre><code>Pforecast = zeros(size(t));
+Pforecast(1:2) = Ptwin(1:2);
+
+for k = 3:N
+    slope = Ptwin(k-1)-Ptwin(k-2);
+    Pforecast(k) = Ptwin(k-1)+slope;
+end
+
+forecastRMSE = sqrt(mean((Pforecast(3:end)-Ptrue(3:end)).^2));
+fprintf('Forecast RMSE = %.3f kW\n',forecastRMSE);
+
+figure;
+plot(t,Ptrue,'LineWidth',1.5); hold on;
+plot(t,Pforecast,'LineWidth',1.2);
+grid on;
+xlabel('Time (s)');
+ylabel('Power (kW)');
+title('One-Step Digital-Twin Forecast');
+legend('True power','Forecast');</code></pre></div><div class="ar"><h2>5. التجربة B: التنبؤ بخطوة واحدة</h2><p>يستخدم التنبؤ اتجاه آخر عينتين من حالة التوأم لتقدير العينة التالية. قارن خطأ التنبؤ قبل الحالة غير الطبيعية وأثناءها.</p></div></section>
+
+<section><div class="en"><h2>6. Experiment C: Voltage Channel</h2><pre><code>Vtrue = 1.00 - 0.0015*(Ptrue-P0);
+Vmeas = Vtrue + 0.003*randn(size(t));
+Vtwin = zeros(size(t));
+Vtwin(1) = Vmeas(1);
+
+for k = 2:N
+    Vtwin(k) = Vtwin(k-1) + 0.25*(Vmeas(k)-Vtwin(k-1));
+end
+
+figure;
+plot(t,Vtrue,'LineWidth',1.5); hold on;
+plot(t,Vmeas,'LineWidth',0.7);
+plot(t,Vtwin,'LineWidth',1.5);
+yline(0.95,'--','Lower limit');
+grid on;
+xlabel('Time (s)');
+ylabel('Voltage (p.u.)');
+title('Voltage Channel of the Digital Twin');
+legend('True voltage','Measured voltage','Twin estimate');</code></pre></div><div class="ar"><h2>6. التجربة C: قناة الجهد</h2><p>أضف قناة جهد مرتبطة بقدرة الحمل، ثم راقب قدرة التوأم على تقدير الجهد واكتشاف الاقتراب من الحد الأدنى.</p></div></section>
+
+<section><div class="en"><h2>7. Experiment D: Missing Measurements</h2><pre><code>Pmissing = Pmeas;
+Pmissing(400:450) = NaN;
+PtwinMissing = zeros(size(t));
+PtwinMissing(1) = Pmissing(1);
+
+for k = 2:N
+    prediction = PtwinMissing(k-1);
+    if isnan(Pmissing(k))
+        PtwinMissing(k) = prediction;
+    else
+        PtwinMissing(k) = prediction + ...
+            alpha*(Pmissing(k)-prediction);
+    end
+end
+
+figure;
+plot(t,Ptrue,'LineWidth',1.5); hold on;
+plot(t,PtwinMissing,'LineWidth',1.5);
+xline(t(400),'--','Data loss starts');
+xline(t(450),'--','Data returns');
+grid on;
+xlabel('Time (s)');
+ylabel('Power (kW)');
+title('Twin Operation during Missing Measurements');</code></pre><div class="warning">During data loss, the twin relies only on its model. A weak model will drift if the outage is long.</div></div><div class="ar"><h2>7. التجربة D: فقدان القياسات</h2><p>عند فقدان البيانات يعتمد التوأم على التنبؤ فقط. كلما طال الانقطاع، ازدادت أهمية جودة النموذج الفيزيائي.</p></div></section>
+
+<section><div class="en"><h2>8. Performance Metrics</h2><div class="formula">RMSE=\sqrt{\frac{1}{N}\sum_{k=1}^{N}(y_k-\hat{y}_k)^2}</div><div class="formula">Precision=\frac{TP}{TP+FP},\qquad Recall=\frac{TP}{TP+FN}</div><pre><code>trueAttack = false(size(t));
+trueAttack(attackStart:attackEnd) = true;
+
+TP = sum(alarm &amp; trueAttack);
+FP = sum(alarm &amp; ~trueAttack);
+FN = sum(~alarm &amp; trueAttack);
+
+precision = TP/max(TP+FP,1);
+recall    = TP/max(TP+FN,1);
+
+fprintf('Precision = %.3f\n',precision);
+fprintf('Recall    = %.3f\n',recall);</code></pre></div><div class="ar"><h2>8. مؤشرات الأداء</h2><p>استخدم RMSE لتقييم دقة التقدير، والدقة والاستدعاء لتقييم جودة كشف الحالات غير الطبيعية.</p></div></section>
+
+<section><div class="en"><h2>9. Tasks</h2><ol>
+<li>Change the correction gain α and explain the trade-off between speed and noise.</li>
+<li>Use an adaptive threshold based on a moving standard deviation.</li>
+<li>Add frequency and transformer-temperature channels.</li>
+<li>Simulate sensor bias, drift, spikes, and packet loss.</li>
+<li>Compare residual detection with an Isolation Forest or one-class SVM.</li>
+<li>Estimate a model parameter online.</li>
+<li>Create a dashboard showing current value, alarm state, RMSE, and forecast.</li>
+</ol></div><div class="ar"><h2>9. المهام</h2><ol>
+<li>غيّر معامل التصحيح وناقش السرعة والضوضاء.</li>
+<li>استخدم حدًا تكيفيًا يعتمد على انحراف معياري متحرك.</li>
+<li>أضف قنوات التردد وحرارة المحول.</li>
+<li>حاكي انحياز الحساس والانجراف والنبضات وفقدان الحزم.</li>
+<li>قارن تحليل البواقي بخوارزمية تعلم آلي لكشف الشذوذ.</li>
+<li>قدّر إحدى معلمات النموذج أثناء التشغيل.</li>
+<li>أنشئ لوحة تعرض الحالة والإنذار والخطأ والتنبؤ.</li>
+</ol></div></section>
+
+<section><div class="en"><h2>10. Mini Project</h2><p>Develop a digital twin for a distribution transformer. Use current, ambient temperature, and a first-order thermal model to estimate winding temperature. Add an AI residual-correction model, detect overheating, and estimate the time remaining before a thermal limit is reached.</p></div><div class="ar"><h2>10. المشروع المصغر</h2><p>طوّر توأمًا رقميًا لمحول توزيع باستخدام التيار ودرجة حرارة الجو ونموذج حراري من الدرجة الأولى. أضف تصحيحًا بالذكاء الاصطناعي وكشفًا لارتفاع الحرارة وتقديرًا للزمن المتبقي قبل بلوغ الحد الحراري.</p></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems<br>تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية<br><br>MATLAB Lab 16 | مختبر MATLAB 16</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
