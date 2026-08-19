@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title desc">
+  <title id="title">Electrical Power Laboratory</title>
+  <desc id="desc">Monitor with electrical waveform, power-network nodes, and lightning bolt</desc>
+  <g fill="none" stroke="#f6c84a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="20" y="22" width="92" height="68" rx="8"/>
+    <path d="M35 57c10-28 20 28 31 0s21 28 31 0" stroke="#9ed0ff"/>
+    <path d="M66 90v22M42 112h48"/>
+    <path d="M66 112v18M38 130v13M66 130v13M94 130v13"/>
+    <rect x="28" y="143" width="20" height="20" rx="3"/>
+    <rect x="56" y="143" width="20" height="20" rx="3"/>
+    <rect x="84" y="143" width="20" height="20" rx="3"/>
+    <path d="M139 27l-18 42h20l-12 42 31-51h-20l17-33z"/>
+  </g>
+</svg>
