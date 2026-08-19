@@ -1,10 +1,11 @@
-name: Replace lab icon with electrical power symbol
+name: Use custom electrical power laboratory icon
 
 on:
   workflow_dispatch:
   push:
     paths:
       - '.github/workflows/replace-lab-icon.yml'
+      - 'assets/icons/electrical-power-lab.svg'
 
 permissions:
   contents: write
@@ -16,24 +17,86 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Replace lab icons
+      - name: Apply custom laboratory icon
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
-          files = [Path('index.html'), Path('course-navigation.js')]
-          total = 0
+          icon_html = (
+              '<img src="assets/icons/electrical-power-lab.svg" '
+              'class="electrical-lab-icon" alt="Electrical power laboratory" '
+              'style="width:58px;height:58px;display:block;object-fit:contain">'
+          )
 
-          for path in files:
-              text = path.read_text(encoding='utf-8')
-              count = text.count('🧪')
-              text = text.replace('🧪', '⚡')
-              path.write_text(text, encoding='utf-8')
-              total += count
-              print(f'{path}: replaced {count} icon(s)')
+          # Update laboratory cards on the homepage.
+          index_path = Path('index.html')
+          index = index_path.read_text(encoding='utf-8')
 
-          if total == 0:
-              print('No chemistry lab icons remained; files may already be updated.')
+          card_pattern = re.compile(
+              r'(<a\b[^>]*href=["\']lab\d{2}\.html["\'][^>]*>.*?'
+              r'<span\s+class=["\']icon["\']>)(.*?)(</span>)',
+              re.IGNORECASE | re.DOTALL,
+          )
+
+          index, card_count = card_pattern.subn(
+              lambda match: match.group(1) + icon_html + match.group(3),
+              index,
+          )
+
+          # Support pages already changed from the test-tube emoji to a lightning emoji.
+          if card_count == 0:
+              generic_pattern = re.compile(
+                  r'(<a\b[^>]*href=["\']lab\d{2}\.html["\'][^>]*>.*?'
+                  r'<span\s+class=["\']icon["\']>)(?:🧪|⚡)(</span>)',
+                  re.IGNORECASE | re.DOTALL,
+              )
+              index, card_count = generic_pattern.subn(
+                  lambda match: match.group(1) + icon_html + match.group(2),
+                  index,
+              )
+
+          index_path.write_text(index, encoding='utf-8')
+          print(f'index.html: updated {card_count} laboratory card icon(s)')
+
+          # Update action cards used on all lecture and lab pages.
+          nav_path = Path('course-navigation.js')
+          nav = nav_path.read_text(encoding='utf-8')
+
+          lab_icon_constant = "const labIcon = '<img src=\"assets/icons/electrical-power-lab.svg\" class=\"electrical-lab-icon\" alt=\"Electrical power laboratory\" style=\"width:42px;height:42px;display:block;object-fit:contain\">';"
+
+          if 'const labIcon =' not in nav:
+              nav = nav.replace(
+                  "const authorName = 'Dr.-Ing. Aouss Gabash';",
+                  "const authorName = 'Dr.-Ing. Aouss Gabash';\n  " + lab_icon_constant,
+              )
+
+          nav = re.sub(
+              r"icon:\s*type\s*===\s*'lecture'\s*\?\s*'📖'\s*:\s*'(?:🧪|⚡)'",
+              "icon: type === 'lecture' ? '📖' : labIcon",
+              nav,
+          )
+          nav = re.sub(
+              r"icon:\s*type\s*===\s*'lecture'\s*\?\s*'(?:🧪|⚡)'\s*:\s*'📖'",
+              "icon: type === 'lecture' ? labIcon : '📖'",
+              nav,
+          )
+
+          # Make image icons align correctly inside action cards.
+          if '.course-action-icon img{' not in nav:
+              nav = nav.replace(
+                  '.course-action-icon{font-size:2rem;line-height:1}',
+                  '.course-action-icon{font-size:2rem;line-height:1;display:flex;align-items:center;justify-content:center}.course-action-icon img{max-width:48px;max-height:48px}',
+              )
+
+          nav_path.write_text(nav, encoding='utf-8')
+
+          if '🧪' in index or '🧪' in nav:
+              raise SystemExit('The chemistry laboratory icon still exists in updated files.')
+          if 'assets/icons/electrical-power-lab.svg' not in index:
+              raise SystemExit('Homepage laboratory cards were not connected to the custom icon.')
+          if 'assets/icons/electrical-power-lab.svg' not in nav:
+              raise SystemExit('Course navigation was not connected to the custom icon.')
           PY
 
       - name: Commit icon update
@@ -42,8 +105,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html course-navigation.js
           if git diff --cached --quiet; then
-            echo "Lab icons are already updated."
+            echo "Custom electrical laboratory icons are already active."
           else
-            git commit -m "Use electrical power icon for laboratories"
+            git commit -m "Use custom electrical power icon for laboratories"
             git push
           fi
