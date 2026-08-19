@@ -182,7 +182,7 @@
   actions.appendChild(card({
     tag: 'div',
     className: 'course-action-current',
-    icon: type === 'lecture' ? '📖' : '🧪',
+    icon: type === 'lecture' ? '📖' : '⚡',
     title: `${label.en} ${num}`,
     subtitle: `${label.ar} ${num}`,
     meta: `⏱ ${duration} min · 📊 ${difficulty[0]} | ${difficulty[1]}`
@@ -191,7 +191,7 @@
   actions.appendChild(card({
     className: 'course-action-related',
     href: `${relatedType}${num}.html`,
-    icon: type === 'lecture' ? '🧪' : '📖',
+    icon: type === 'lecture' ? '⚡' : '📖',
     title: type === 'lecture' ? `MATLAB Lab ${num}` : `Lecture ${num}`,
     subtitle: type === 'lecture' ? `فتح المخبر ${num}` : `فتح المحاضرة ${num}`,
     meta: type === 'lecture' ? 'Programming Exercise | تمرين برمجي' : 'Read Lesson | قراءة المحاضرة'
