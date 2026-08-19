@@ -82,6 +82,26 @@ button, [data-progress-reset], [data-learning-dashboard] {
   unicode-bidi: plaintext !important;
 }
 
+/* Keep normal Arabic content right-aligned, but center Arabic cover titles. */
+.hero-ar,
+.hero .ar,
+.hero [lang="ar"],
+.cover .ar,
+.cover [lang="ar"],
+.title-page .ar,
+.title-page [lang="ar"],
+.course-hero .ar,
+.course-hero [lang="ar"],
+.hero-subtitle.ar,
+.hero-subtitle[lang="ar"],
+.subtitle-ar {
+  display: block !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+}
+
 .en, [lang="en"], [dir="ltr"] {
   direction: ltr !important;
   text-align: left !important;
