@@ -1,36 +1,216 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Lecture 18</title>
-<style>body{font-family:Arial;margin:40px;background:#0b1220;color:#eef;line-height:1.7}h1,h2{color:#7dd3fc}.ar{direction:rtl;text-align:right}</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lecture 18 - Federated Learning for Smart Grids</title>
 <link rel="stylesheet" href="course-common.css">
 <link rel="stylesheet" href="course-quiz.css">
 <link rel="stylesheet" href="course-footer.css">
-</head><body>
-<h1>Lecture 18 – Federated Learning for Smart Grids</h1>
-<p><b>المحاضرة 18 – التعلم الاتحادي للشبكات الذكية</b></p>
-<h2>Topics</h2><ul>
-<li>Centralized vs Federated Learning</li>
-<li>FedAvg algorithm</li>
-<li>Privacy-preserving AI</li>
-<li>Communication efficiency</li>
-<li>Non-IID data</li>
-<li>Secure aggregation</li>
-<li>Applications: DSOs, smart meters, EV fleets</li>
-</ul>
-<h2>Equation</h2>
-<p>w(t+1)=Σ(n_k/N) w_k</p>
-<div class="ar">
-<h2>المحتوى</h2>
-<p>تشرح المحاضرة كيفية تدريب نموذج عالمي دون نقل البيانات الخام، مع التركيز على الخصوصية والتطبيقات في أنظمة القدرة.</p>
+</head>
+<body class="course-template-modern">
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
+<main class="container">
+<div class="hero">
+<div class="lecture-number">LECTURE 18 | المحاضرة 18</div>
+<h1>Federated Learning for Smart Grids</h1>
+<div class="hero-ar">التعلم الاتحادي للشبكات الذكية</div>
+<div class="subtitle">Collaborative AI without centralizing raw operational data<br>ذكاء اصطناعي تعاوني دون تجميع البيانات التشغيلية الخام</div>
 </div>
-<footer>
-AI Applications in Electrical Power Systems
-<br>
-تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية
-<br><br>
-Lecture 18 | المحاضرة 18
-</footer>
+
+<section><div class="en"><h2>🎯 Learning Objectives</h2><ul>
+<li>Compare centralized, local, and federated machine learning.</li>
+<li>Derive the Federated Averaging (FedAvg) update.</li>
+<li>Explain client selection, local training, aggregation, and communication rounds.</li>
+<li>Understand non-IID data, client drift, and system heterogeneity.</li>
+<li>Distinguish privacy from security and explain secure aggregation and differential privacy.</li>
+<li>Evaluate communication cost, convergence, fairness, robustness, and deployment risks.</li>
+<li>Apply federated learning to smart meters, substations, EV fleets, and distributed energy resources.</li>
+</ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><ul>
+<li>المقارنة بين التعلم المركزي والمحلي والاتحادي.</li>
+<li>اشتقاق تحديث متوسط النماذج الاتحادي FedAvg.</li>
+<li>شرح اختيار العملاء والتدريب المحلي والدمج وجولات الاتصال.</li>
+<li>فهم البيانات غير المتجانسة وانجراف العملاء واختلاف الأجهزة.</li>
+<li>التمييز بين الخصوصية والأمان وشرح التجميع الآمن والخصوصية التفاضلية.</li>
+<li>تقييم كلفة الاتصال والتقارب والعدالة والمتانة ومخاطر النشر.</li>
+<li>تطبيق التعلم الاتحادي على العدادات الذكية والمحطات والمركبات الكهربائية ومصادر الطاقة الموزعة.</li>
+</ul></div></section>
+
+<section><div class="en"><h2>1. Why Federated Learning?</h2>
+<p>Power-system data are naturally distributed among utilities, substations, buildings, smart meters, microgrids, and EV fleets. Moving all raw data to one server may be costly, legally restricted, operationally sensitive, or undesirable for privacy.</p>
+<div class="highlight">Federated Learning (FL) moves the model to the data, not the raw data to the model.</div>
+<div class="flow"><div class="flow-box">Global model</div><div class="arrow">→</div><div class="flow-box">Local clients</div><div class="arrow">→</div><div class="flow-box">Local training</div><div class="arrow">→</div><div class="flow-box">Model updates</div><div class="arrow">→</div><div class="flow-box">Aggregation</div></div></div>
+<div class="ar"><h2>1. لماذا التعلم الاتحادي؟</h2><p>تتوزع بيانات أنظمة القدرة بين جهات وأجهزة كثيرة. يسمح التعلم الاتحادي بتدريب نموذج مشترك مع إبقاء البيانات الخام محليًا وإرسال تحديثات النموذج فقط.</p></div></section>
+
+<section><div class="en"><h2>2. Centralized, Local, and Federated Learning</h2>
+<div class="table-wrap"><table>
+<tr><th>Approach</th><th>Data location</th><th>Strength</th><th>Limitation</th></tr>
+<tr><td>Centralized</td><td>All data on one server</td><td>Simple global optimization</td><td>Privacy, bandwidth, ownership, single-point risk</td></tr>
+<tr><td>Local only</td><td>Each client trains independently</td><td>No data sharing</td><td>Limited data diversity and weak generalization</td></tr>
+<tr><td>Federated</td><td>Raw data remain local</td><td>Collaborative learning with reduced data movement</td><td>Communication, heterogeneity, privacy leakage from updates</td></tr>
+</table></div></div>
+<div class="ar"><h2>2. التعلم المركزي والمحلي والاتحادي</h2><p>يجمع التعلم المركزي البيانات في خادم واحد، بينما يدرب التعلم المحلي نموذجًا منفصلًا لكل عميل. أما التعلم الاتحادي فيدمج تحديثات النماذج دون نقل البيانات الخام.</p></div></section>
+
+<section><div class="en"><h2>3. Global Optimization Objective</h2>
+<p>Assume client <b>k</b> has <b>n<sub>k</sub></b> samples and local objective <b>F<sub>k</sub>(w)</b>. The global objective is:</p>
+<div class="formula">\min_w F(w)=\sum_{k=1}^{K}\frac{n_k}{N}F_k(w),\qquad N=\sum_{k=1}^{K}n_k</div>
+<p>The sample-weighted formulation gives more influence to clients containing more training examples.</p></div>
+<div class="ar"><h2>3. دالة الهدف العامة</h2><p>تُكتب دالة الهدف العامة كمجموع موزون لدوال الهدف المحلية، وتتناسب أوزان العملاء عادةً مع عدد العينات لديهم.</p></div></section>
+
+<section><div class="en"><h2>4. Federated Averaging (FedAvg)</h2>
+<ol><li>The server initializes a global model <b>w<sup>0</sup></b>.</li><li>A subset of clients receives the current model.</li><li>Each client performs several local optimization steps.</li><li>Clients return updated parameters or parameter differences.</li><li>The server computes a weighted average.</li></ol>
+<div class="formula">w_k^{t+1}=\operatorname{LocalTrain}(w^t,D_k,E,\eta)</div>
+<div class="formula">w^{t+1}=\sum_{k\in S_t}\frac{n_k}{\sum_{j\in S_t}n_j}w_k^{t+1}</div>
+<p>Here, <b>E</b> is the number of local epochs and <b>η</b> is the local learning rate.</p></div>
+<div class="ar"><h2>4. خوارزمية FedAvg</h2><p>يرسل الخادم النموذج العام إلى مجموعة من العملاء، ويدرب كل عميل النموذج محليًا، ثم يعيد المعلمات المحدّثة ليحسب الخادم متوسطًا موزونًا ويبدأ جولة جديدة.</p></div></section>
+
+<section><div class="en"><h2>5. One Communication Round</h2>
+<div class="flow"><div class="flow-box">Select clients</div><div class="arrow">→</div><div class="flow-box">Broadcast wᵗ</div><div class="arrow">→</div><div class="flow-box">Local SGD</div><div class="arrow">→</div><div class="flow-box">Upload updates</div><div class="arrow">→</div><div class="flow-box">Aggregate wᵗ⁺¹</div></div>
+<div class="formula">w_{k,e+1}=w_{k,e}-\eta\nabla F_k(w_{k,e})</div>
+<div class="note">More local epochs reduce communication frequency but can increase client drift when local data distributions differ strongly.</div></div>
+<div class="ar"><h2>5. جولة اتصال واحدة</h2><p>تتضمن الجولة اختيار العملاء وإرسال النموذج والتدريب المحلي ورفع التحديثات والدمج. تقلل زيادة التدريب المحلي عدد الرسائل لكنها قد تزيد اختلاف النماذج المحلية.</p></div></section>
+
+<section><div class="en"><h2>6. Non-IID Data</h2>
+<p>Smart-grid clients rarely have identically distributed data. One feeder may contain industrial loads, another residential PV, and another a fleet of EV chargers.</p>
+<div class="formula">P_k(x,y)\neq P_j(x,y)</div>
+<div class="grid3"><div class="mini-card"><strong>Feature shift</strong><p>Different weather, voltage, load, or device ranges.</p></div><div class="mini-card"><strong>Label shift</strong><p>Different event or fault frequencies.</p></div><div class="mini-card"><strong>Concept shift</strong><p>Different relationship between measurements and targets.</p></div></div>
+<div class="warning">A high global accuracy can hide poor performance for smaller or unusual clients.</div></div>
+<div class="ar"><h2>6. البيانات غير المتجانسة</h2><p>لا تتبع بيانات العملاء عادةً التوزيع نفسه. تختلف طبيعة الأحمال والطقس والأعطال والأجهزة، وقد يؤدي ذلك إلى بطء التقارب أو ضعف الأداء لدى بعض العملاء.</p></div></section>
+
+<section><div class="en"><h2>7. Client Drift and Stabilization</h2>
+<p>When clients perform several local steps on different objectives, their models move in different directions.</p>
+<div class="formula">\|\nabla F_k(w)-\nabla F(w)\|>0</div>
+<p>Common mitigation approaches include fewer local epochs, smaller learning rates, proximal regularization, control variates, clustering, and personalized models.</p>
+<div class="formula">F_k^{prox}(w)=F_k(w)+\frac{\mu}{2}\|w-w^t\|^2</div></div>
+<div class="ar"><h2>7. انجراف العملاء وتثبيت التدريب</h2><p>تتحرك النماذج المحلية في اتجاهات مختلفة عندما تختلف البيانات. يمكن تقليل ذلك بتقليل العصور المحلية أو إضافة حد يبقي النموذج المحلي قريبًا من النموذج العام.</p></div></section>
+
+<section><div class="en"><h2>8. System Heterogeneity</h2>
+<p>Clients differ in processor speed, memory, battery level, network quality, and availability. Slow or disconnected clients create the straggler problem.</p>
+<div class="grid3"><div class="mini-card"><strong>Synchronous FL</strong><p>The server waits for selected clients before aggregating.</p></div><div class="mini-card"><strong>Asynchronous FL</strong><p>The server updates when client results arrive.</p></div><div class="mini-card"><strong>Partial participation</strong><p>Only a fraction of clients join each round.</p></div></div></div>
+<div class="ar"><h2>8. اختلاف الأنظمة والأجهزة</h2><p>تختلف قدرة العملاء الحاسوبية وجودة الاتصال والتوافر. لذلك قد يستخدم النظام مشاركة جزئية أو تحديثًا غير متزامن بدل انتظار جميع الأجهزة.</p></div></section>
+
+<section><div class="en"><h2>9. Communication Efficiency</h2>
+<p>Communication often dominates the cost of federated learning.</p>
+<div class="formula">C_{comm}\approx R\times M\times B</div>
+<p>where <b>R</b> is the number of rounds, <b>M</b> the participating clients per round, and <b>B</b> the transmitted model size.</p>
+<ul><li>Model quantization.</li><li>Sparse updates.</li><li>Periodic communication.</li><li>Smaller models or knowledge distillation.</li><li>Client selection based on channel and energy conditions.</li></ul></div>
+<div class="ar"><h2>9. كفاءة الاتصال</h2><p>قد تكون كلفة الاتصال أكبر من كلفة الحساب. تُخفض باستخدام ضغط النموذج والتحديثات المتناثرة وتقليل عدد الجولات واختيار العملاء بكفاءة.</p></div></section>
+
+<section><div class="en"><h2>10. Privacy Is Not Automatic</h2>
+<p>Keeping raw data local improves privacy, but gradients and parameters may still reveal information through reconstruction, membership inference, or property inference.</p>
+<div class="warning">Federated learning is a training architecture, not a complete privacy guarantee.</div></div>
+<div class="ar"><h2>10. الخصوصية ليست تلقائية</h2><p>عدم إرسال البيانات الخام لا يمنع جميع أشكال التسرب، فقد تكشف تحديثات النموذج معلومات عن العينات أو خصائص العملاء.</p></div></section>
+
+<section><div class="en"><h2>11. Secure Aggregation</h2>
+<p>Secure aggregation allows the server to learn only the sum of client updates, not each individual update.</p>
+<div class="formula">\text{Server obtains }\sum_k \Delta w_k\text{ but not individual }\Delta w_k</div>
+<p>Cryptographic masking and secret sharing can protect individual contributions, but increase protocol and dropout-handling complexity.</p></div>
+<div class="ar"><h2>11. التجميع الآمن</h2><p>يتيح التجميع الآمن للخادم معرفة مجموع التحديثات فقط دون الاطلاع على تحديث كل عميل منفردًا، باستخدام تقنيات تشفير وإخفاء مناسبة.</p></div></section>
+
+<section><div class="en"><h2>12. Differential Privacy</h2>
+<p>Differential privacy limits how much the output changes when one data record is added or removed.</p>
+<div class="formula">\tilde{g}=\operatorname{clip}(g,C)+\mathcal{N}(0,\sigma^2C^2I)</div>
+<p>Gradients are clipped and noise is added. Stronger privacy generally reduces model utility.</p>
+<div class="formula">P[M(D)\in S]\le e^{\varepsilon}P[M(D')\in S]+\delta</div></div>
+<div class="ar"><h2>12. الخصوصية التفاضلية</h2><p>تُحدّ التدرجات ثم تضاف ضوضاء محسوبة للحد من تأثير أي عينة واحدة. توجد مفاضلة بين مستوى الخصوصية ودقة النموذج.</p></div></section>
+
+<section><div class="en"><h2>13. Security Threats</h2>
+<div class="table-wrap"><table>
+<tr><th>Threat</th><th>Effect</th><th>Possible defense</th></tr>
+<tr><td>Data poisoning</td><td>Corrupt local training data</td><td>Validation, reputation, robust training</td></tr>
+<tr><td>Model poisoning</td><td>Malicious parameter updates</td><td>Clipping, robust aggregation, anomaly detection</td></tr>
+<tr><td>Backdoor attack</td><td>Hidden malicious behavior on trigger inputs</td><td>Testing, pruning, update inspection</td></tr>
+<tr><td>Sybil attack</td><td>One attacker controls many fake clients</td><td>Authentication and enrollment controls</td></tr>
+<tr><td>Inference attack</td><td>Extract private information from updates</td><td>Secure aggregation and differential privacy</td></tr>
+</table></div></div>
+<div class="ar"><h2>13. التهديدات الأمنية</h2><p>تشمل تسميم البيانات والنموذج والأبواب الخلفية والعملاء الوهميين وهجمات الاستدلال. تتطلب الدفاعات مصادقة العملاء ودمجًا متينًا وفحصًا للتحديثات.</p></div></section>
+
+<section><div class="en"><h2>14. Robust Aggregation</h2>
+<p>Simple averaging is sensitive to extreme malicious updates. Robust alternatives include coordinate-wise median, trimmed mean, norm clipping, and similarity-based filtering.</p>
+<div class="formula">w_j^{t+1}=\operatorname{median}\{w_{1j},w_{2j},\dots,w_{Kj}\}</div>
+<div class="note">Robust aggregation can also reject legitimate but unusual clients, so security and fairness must be evaluated together.</div></div>
+<div class="ar"><h2>14. الدمج المتين</h2><p>قد يتأثر المتوسط البسيط بالتحديثات الخبيثة. يمكن استخدام الوسيط أو المتوسط المشذب أو قص معيار التحديث، مع الانتباه إلى عدم استبعاد العملاء المختلفين بصورة مشروعة.</p></div></section>
+
+<section><div class="en"><h2>15. Personalization</h2>
+<p>A single global model may not serve every feeder or device equally well. Personalized FL adapts part or all of the model to each client.</p>
+<div class="formula">w_k^{personal}=\alpha w^{global}+(1-\alpha)w_k^{local}</div>
+<ul><li>Fine-tune the global model locally.</li><li>Share common layers and keep a private output head.</li><li>Cluster clients with similar behavior.</li><li>Use meta-learning for fast adaptation.</li></ul></div>
+<div class="ar"><h2>15. تخصيص النماذج</h2><p>قد لا يناسب نموذج عالمي واحد جميع العملاء. يمكن تخصيصه بالتدريب المحلي أو بمشاركة طبقات عامة والإبقاء على طبقات خاصة لكل عميل.</p></div></section>
+
+<section><div class="en"><h2>16. Smart-Grid Applications</h2>
+<div class="table-wrap"><table>
+<tr><th>Application</th><th>Client</th><th>Prediction task</th><th>Why FL?</th></tr>
+<tr><td>Load forecasting</td><td>Home, building, feeder</td><td>Future demand</td><td>Consumption privacy</td></tr>
+<tr><td>PV forecasting</td><td>Plant or inverter</td><td>Solar generation</td><td>Distributed weather and production data</td></tr>
+<tr><td>EV charging</td><td>Vehicle or charging station</td><td>Arrival, demand, flexibility</td><td>Mobility and user privacy</td></tr>
+<tr><td>Fault detection</td><td>Substation or relay</td><td>Event classification</td><td>Sensitive disturbance records</td></tr>
+<tr><td>Asset health</td><td>Transformer or wind turbine</td><td>Failure risk and RUL</td><td>Cross-owner collaboration</td></tr>
+</table></div></div>
+<div class="ar"><h2>16. تطبيقات الشبكات الذكية</h2><p>تشمل التنبؤ بالأحمال والطاقة الشمسية وشحن المركبات وكشف الأعطال وصحة المعدات، خصوصًا عندما تكون البيانات حساسة وموزعة بين جهات مختلفة.</p></div></section>
+
+<section><div class="en"><h2>17. Worked Example</h2>
+<p>Three distribution operators train local linear load-forecast models using 1000, 2000, and 7000 samples.</p>
+<div class="formula">n=[1000,2000,7000],\qquad N=10000</div>
+<div class="formula">w^{t+1}=0.1w_1^{t+1}+0.2w_2^{t+1}+0.7w_3^{t+1}</div>
+<p>The third client receives the largest weight because it contributes most of the training samples. This does not necessarily guarantee fairness across operators.</p></div>
+<div class="ar"><h2>17. مثال محلول</h2><p>عند امتلاك ثلاثة مشغلين 1000 و2000 و7000 عينة، تصبح أوزان الدمج 0.1 و0.2 و0.7. لكن الوزن القائم على حجم البيانات لا يضمن العدالة بين العملاء.</p></div></section>
+
+<section><div class="en"><h2>18. Evaluation Metrics</h2><ul>
+<li>Global validation loss and accuracy.</li>
+<li>Per-client performance and worst-client performance.</li>
+<li>Rounds to target accuracy.</li>
+<li>Total transmitted bytes and energy use.</li>
+<li>Participation and dropout rates.</li>
+<li>Privacy budget and attack success rate.</li>
+<li>Robustness under malicious or unreliable clients.</li>
+</ul><div class="formula">\text{Worst-client metric}=\min_k\operatorname{Performance}_k</div></div>
+<div class="ar"><h2>18. مؤشرات التقييم</h2><p>لا يكفي تقييم الدقة العامة، بل يجب فحص أداء كل عميل وأسوأ عميل وكلفة الاتصال والانسحاب والخصوصية والمتانة ضد الهجمات.</p></div></section>
+
+<section><div class="en"><h2>19. Deployment Workflow</h2>
+<div class="flow"><div class="flow-box">Define task</div><div class="arrow">→</div><div class="flow-box">Enroll clients</div><div class="arrow">→</div><div class="flow-box">Train & aggregate</div><div class="arrow">→</div><div class="flow-box">Validate</div><div class="arrow">→</div><div class="flow-box">Monitor</div></div>
+<ol><li>Define the prediction task and operational risk.</li><li>Specify client identity, data boundaries, and governance.</li><li>Choose model, aggregation, and participation policy.</li><li>Add authentication, secure aggregation, and privacy controls.</li><li>Validate global and per-client performance.</li><li>Test dropouts, attacks, communication limits, and distribution shift.</li><li>Monitor models and retrain under controlled versioning.</li></ol></div>
+<div class="ar"><h2>19. خطوات النشر</h2><p>يبدأ النشر بتحديد المهمة والجهات المشاركة وحدود البيانات، ثم اختيار النموذج وسياسة الدمج والحماية، وبعدها التحقق من الأداء ومراقبة الانحراف والهجمات والتحديثات.</p></div></section>
+
+<section><div class="en"><h2>20. Key Takeaways</h2><ul>
+<li>Federated learning enables collaborative training while keeping raw data local.</li>
+<li>FedAvg combines locally trained models using sample-based weights.</li>
+<li>Non-IID data and unequal client capabilities are central challenges.</li>
+<li>FL alone does not guarantee privacy or security.</li>
+<li>Secure aggregation, differential privacy, authentication, and robust aggregation address different risks.</li>
+<li>Smart-grid deployment must evaluate communication, fairness, robustness, governance, and operational safety.</li>
+</ul></div><div class="ar"><h2>20. الخلاصة</h2><ul>
+<li>يتيح التعلم الاتحادي تدريبًا تعاونيًا مع إبقاء البيانات الخام محليًا.</li>
+<li>تدمج FedAvg النماذج المحلية بأوزان تعتمد غالبًا على حجم البيانات.</li>
+<li>تعد البيانات غير المتجانسة واختلاف قدرات العملاء من أهم التحديات.</li>
+<li>لا يضمن التعلم الاتحادي الخصوصية أو الأمان تلقائيًا.</li>
+<li>يعالج كل من التجميع الآمن والخصوصية التفاضلية والدمج المتين خطرًا مختلفًا.</li>
+</ul></div></section>
+
+<section><div class="en"><h2>🧠 Review Questions</h2><ol>
+<li>How does federated learning differ from centralized learning?</li>
+<li>Derive the sample-weighted FedAvg update.</li>
+<li>Why can many local epochs cause client drift?</li>
+<li>What is non-IID data in a smart-grid context?</li>
+<li>Why does federated learning not automatically guarantee privacy?</li>
+<li>What is the difference between secure aggregation and differential privacy?</li>
+<li>How can malicious clients influence the global model?</li>
+<li>Why should worst-client performance be reported?</li>
+</ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol>
+<li>ما الفرق بين التعلم الاتحادي والتعلم المركزي؟</li>
+<li>اشتق تحديث FedAvg الموزون بعدد العينات.</li>
+<li>لماذا تسبب العصور المحلية الكثيرة انجراف العملاء؟</li>
+<li>ما معنى البيانات غير المتجانسة في الشبكات الذكية؟</li>
+<li>لماذا لا يضمن التعلم الاتحادي الخصوصية تلقائيًا؟</li>
+<li>ما الفرق بين التجميع الآمن والخصوصية التفاضلية؟</li>
+<li>كيف يؤثر العميل الخبيث في النموذج العام؟</li>
+<li>لماذا يجب إظهار أداء أسوأ عميل؟</li>
+</ol></div></section>
+</main>
+<footer>AI Applications in Electrical Power Systems<br>تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية<br><br>Lecture 18 | المحاضرة 18</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-quiz-data.js" defer></script>
 <script src="course-quiz.js" defer></script>
 <script src="certificate-canvas.js?v=20260817-2" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
