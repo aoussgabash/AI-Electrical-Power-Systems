@@ -16,10 +16,10 @@ on:
 permissions:
   contents: write
 
-# Updated to trigger regeneration after expanding Lectures/Labs 15, 16, 18, and 19.
 jobs:
   build-pdfs:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
@@ -31,10 +31,13 @@ jobs:
           node-version: '20'
 
       - name: Install Playwright
+        timeout-minutes: 8
+        env:
+          PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT: '120000'
         run: |
           npm init -y
-          npm install playwright@1.55.0
-          npx playwright install --with-deps chromium
+          npm install --no-audit --no-fund playwright@1.55.0
+          npx playwright install chromium
 
       - name: Start local website
         run: |
@@ -42,6 +45,7 @@ jobs:
           sleep 3
 
       - name: Generate lecture and lab PDFs
+        timeout-minutes: 8
         run: |
           mkdir -p pdf
           node scripts/build-lecture-pdfs.mjs
