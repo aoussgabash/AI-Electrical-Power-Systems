@@ -57,3 +57,11 @@ body.course-template-modern footer{text-align:center;color:var(--muted);padding:
 @media(max-width:680px){.course-metadata-bar{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px}.course-meta-item{width:100%;font-size:.9rem;padding:9px 8px}.course-meta-primary{grid-column:1/-1}.course-page-navigation{grid-template-columns:1fr 1fr}.course-nav-home{grid-column:1/-1;grid-row:1}.course-nav-link.previous{grid-column:1}.course-nav-link.next{grid-column:2}.course-nav-placeholder{display:none}}
 @media(max-width:430px){.course-metadata-bar{grid-template-columns:1fr}.course-meta-primary{grid-column:auto}}
 @media print{header,.course-page-navigation,.course-metadata-bar,#reading-progress-track,.back,.to-top{display:none!important}body{background:#fff!important;color:#000!important}section,.mini-card,.highlight,.note,.warning,.research,pre,.formula{break-inside:avoid;box-shadow:none!important}a{color:#000!important;text-decoration:none!important}}
+
+/* Official AGAI logo on the learning-platform homepage. */
+body > header .brand img,
+.hero-logo img{
+  content:url("assets/brand/AGAI.svg");
+  object-fit:contain;
+  background:#07111f;
+}
