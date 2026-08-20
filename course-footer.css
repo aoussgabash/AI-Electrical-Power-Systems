@@ -273,6 +273,14 @@ body:has(.course-action-related[href^="lecture"]) .course-action-current .course
   flex:0 0 48px;
 }
 
+/* Official AGAI identity on the learning-platform home page. */
+body > header .brand img,
+.hero-logo img{
+  content:url("assets/brand/AGAI.svg");
+  object-fit:contain;
+  background:#07111f;
+}
+
 @media(max-width:900px){
   #author .author-box > div:first-child{
     padding-top:154px;
