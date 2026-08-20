@@ -15,47 +15,48 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Patch PDF snapshot generator
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          path = Path('scripts/build-lecture-pdfs.mjs')
-          text = path.read_text(encoding='utf-8')
+          path = Path("scripts/build-lecture-pdfs.mjs")
+          text = path.read_text(encoding="utf-8")
 
-          old_css = '''svg{background:#fff!important;color:#111827!important}
-          svg text,svg tspan{fill:#111827!important;color:#111827!important}
-          svg line,svg polyline,svg path{stroke:#475569!important}
-          a{color:#0f4c81!important;text-decoration:none!important}'''.replace('          ', '')
+          old_css = (
+              'svg{background:#fff!important;color:#111827!important}\n'
+              'svg text,svg tspan{fill:#111827!important;color:#111827!important}\n'
+              'svg line,svg polyline,svg path{stroke:#475569!important}\n'
+              'a{color:#0f4c81!important;text-decoration:none!important}'
+          )
+          new_css = (
+              'svg{background:#fff!important}\n'
+              'a{color:#0f4c81!important;text-decoration:none!important}'
+          )
 
-          new_css = '''svg{background:#fff!important}
-          a{color:#0f4c81!important;text-decoration:none!important}'''.replace('          ', '')
+          if old_css in text:
+              text = text.replace(old_css, new_css, 1)
+          elif 'svg text,svg tspan{fill:#111827!important;color:#111827!important}' in text:
+              raise SystemExit('SVG print rules were found in an unexpected form.')
 
-          if old_css not in text:
-              raise SystemExit('Expected SVG print CSS block was not found.')
-          text = text.replace(old_css, new_css, 1)
-
-          marker = '''      const style = document.createElement('style');
-          style.id = 'weasyprint-course-pdf';'''.replace('          ', '')
-
-          snapshot = '''      // Preserve the exact SVG appearance computed by Chromium before
-      // applying the light print stylesheet. WeasyPrint then receives
-      // explicit inline presentation values instead of unresolved CSS classes.
+          marker = "      const style = document.createElement('style');\n      style.id = 'weasyprint-course-pdf';"
+          snapshot = """      // Freeze Chromium-computed SVG presentation before print CSS is added.
+      // This preserves node fills, connecting lines, labels, and semantic colors in WeasyPrint.
       document.querySelectorAll('svg').forEach(svg => {
         svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         svg.querySelectorAll('*').forEach(element => {
           const computed = getComputedStyle(element);
-          const properties = [
+          [
             'fill', 'fill-opacity', 'fill-rule',
             'stroke', 'stroke-width', 'stroke-opacity',
             'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray',
             'opacity', 'color',
             'font-family', 'font-size', 'font-style', 'font-weight',
             'text-anchor', 'dominant-baseline'
-          ];
-
-          properties.forEach(property => {
+          ].forEach(property => {
             const value = computed.getPropertyValue(property);
             if (value && value !== 'normal') {
               element.style.setProperty(property, value, 'important');
@@ -65,18 +66,29 @@ jobs:
       });
 
       const style = document.createElement('style');
-      style.id = 'weasyprint-course-pdf';'''
+      style.id = 'weasyprint-course-pdf';"""
 
-          if marker not in text:
-              raise SystemExit('Expected style insertion marker was not found.')
-          text = text.replace(marker, snapshot, 1)
-          path.write_text(text, encoding='utf-8')
+          if 'Freeze Chromium-computed SVG presentation' not in text:
+              if marker not in text:
+                  raise SystemExit('Could not locate the PDF style insertion point.')
+              text = text.replace(marker, snapshot, 1)
+
+          path.write_text(text, encoding="utf-8")
+          print('Patched scripts/build-lecture-pdfs.mjs successfully.')
           PY
+
+      - name: Verify JavaScript syntax
+        run: node --check scripts/build-lecture-pdfs.mjs
 
       - name: Commit generator fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add scripts/build-lecture-pdfs.mjs
+          if git diff --cached --quiet; then
+            echo "Generator already contains the SVG fix."
+            exit 0
+          fi
           git commit -m "Preserve computed SVG styles in PDF snapshots"
-          git push
+          git pull --rebase origin main
+          git push origin main
