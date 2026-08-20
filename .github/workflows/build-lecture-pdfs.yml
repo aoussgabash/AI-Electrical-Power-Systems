@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -108,9 +110,28 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add pdf/
+
           if git diff --cached --quiet; then
             echo "Course PDFs are already up to date."
-          else
-            git commit -m "Publish professional course PDFs v1.0"
-            git push
+            exit 0
           fi
+
+          git commit -m "Publish professional course PDFs v1.0"
+
+          # The main branch may receive another commit while PDFs are rendering.
+          # Rebase the generated-PDF commit onto the newest main before pushing.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+
+            if git push origin HEAD:main; then
+              echo "Generated PDFs published successfully."
+              exit 0
+            fi
+
+            echo "Push attempt $attempt failed because main changed; retrying..."
+            sleep $((attempt * 3))
+          done
+
+          echo "Unable to publish generated PDFs after three attempts."
+          exit 1
