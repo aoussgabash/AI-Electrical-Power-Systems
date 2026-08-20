@@ -82,9 +82,7 @@ p,li,td,th,span,div{color:#1f2937!important}
 th{background:#e2e8f0!important;color:#111827!important}
 td{background:#fff!important;color:#1f2937!important}
 pre,code,.formula{background:#f8fafc!important;color:#111827!important;border-color:#94a3b8!important}
-svg{background:#fff!important;color:#111827!important}
-svg text,svg tspan{fill:#111827!important;color:#111827!important}
-svg line,svg polyline,svg path{stroke:#475569!important}
+svg{background:#fff!important}
 a{color:#0f4c81!important;text-decoration:none!important}
 `;
 
@@ -111,6 +109,31 @@ for (const type of ['lecture', 'lab']) {
         base.href = 'http://127.0.0.1:8000/';
         document.head.prepend(base);
       }
+
+      // Freeze the SVG appearance exactly as Chromium computed it before the
+      // light print stylesheet is applied. This prevents WeasyPrint from
+      // losing class-based fills, strokes, node labels, and connecting lines.
+      document.querySelectorAll('svg').forEach(svg => {
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        svg.querySelectorAll('*').forEach(element => {
+          const computed = getComputedStyle(element);
+          const properties = [
+            'fill', 'fill-opacity', 'fill-rule',
+            'stroke', 'stroke-width', 'stroke-opacity',
+            'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray',
+            'opacity', 'color',
+            'font-family', 'font-size', 'font-style', 'font-weight',
+            'text-anchor', 'dominant-baseline'
+          ];
+
+          properties.forEach(property => {
+            const value = computed.getPropertyValue(property);
+            if (value && value !== 'normal') {
+              element.style.setProperty(property, value, 'important');
+            }
+          });
+        });
+      });
 
       const style = document.createElement('style');
       style.id = 'weasyprint-course-pdf';
