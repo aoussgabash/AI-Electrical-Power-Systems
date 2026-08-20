@@ -1,0 +1,264 @@
+@page {
+  size: 170mm 240mm;
+  margin: 20mm 18mm 22mm 22mm;
+
+  @top-left {
+    content: string(book-title);
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #64748b;
+  }
+
+  @top-right {
+    content: string(chapter-title);
+    font-family: Arial, sans-serif;
+    font-size: 7.5pt;
+    color: #64748b;
+  }
+
+  @bottom-center {
+    content: counter(page);
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    color: #475569;
+  }
+}
+
+@page:first {
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-center { content: none; }
+}
+
+@font-face {
+  font-family: "Book Arabic";
+  src: url("../assets/fonts/NotoNaskhArabic-Regular.ttf") format("truetype");
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #172033;
+  font-family: Arial, Tahoma, sans-serif;
+  font-size: 10.2pt;
+  line-height: 1.55;
+  widows: 3;
+  orphans: 3;
+}
+
+.book-title-string {
+  string-set: book-title content();
+  height: 0;
+  overflow: hidden;
+}
+
+.book-cover {
+  page: cover;
+  min-height: 190mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  break-after: page;
+}
+
+.book-cover::before {
+  content: "";
+  display: block;
+  width: 42mm;
+  height: 1.5mm;
+  margin: 0 auto 14mm;
+  background: #0284c7;
+}
+
+.book-cover h1 {
+  margin: 0 0 7mm;
+  font-size: 27pt;
+  line-height: 1.15;
+  color: #0f172a;
+}
+
+.book-cover .title-ar {
+  margin: 0 0 14mm;
+  font-family: "Book Arabic", Tahoma, Arial, sans-serif;
+  direction: rtl;
+  text-align: center;
+  font-size: 20pt;
+  line-height: 1.55;
+  color: #0f172a;
+}
+
+.book-cover .author {
+  margin-top: 8mm;
+  font-size: 13pt;
+  font-weight: 700;
+  color: #334155;
+}
+
+.book-cover .edition {
+  margin-top: 4mm;
+  font-size: 10pt;
+  color: #64748b;
+}
+
+.front-matter {
+  break-after: page;
+}
+
+.front-matter h1,
+.toc h1 {
+  margin: 0 0 8mm;
+  font-size: 22pt;
+  color: #0f172a;
+}
+
+.front-matter .ar,
+.toc .ar {
+  font-family: "Book Arabic", Tahoma, Arial, sans-serif;
+  direction: rtl;
+  text-align: right;
+  line-height: 1.85;
+}
+
+.toc {
+  break-after: page;
+}
+
+.toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toc li {
+  margin: 0 0 4mm;
+  padding-bottom: 2mm;
+  border-bottom: 0.25mm solid #e2e8f0;
+}
+
+.toc a {
+  display: block;
+  color: #0f172a;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.toc .toc-ar {
+  display: block;
+  margin-top: 1mm;
+  font-family: "Book Arabic", Tahoma, Arial, sans-serif;
+  direction: rtl;
+  text-align: right;
+  font-weight: 400;
+  color: #475569;
+}
+
+.book-chapter {
+  break-before: page;
+}
+
+.book-chapter > .chapter-heading {
+  margin: 0 0 9mm;
+  padding-bottom: 5mm;
+  border-bottom: 0.7mm solid #0284c7;
+}
+
+.chapter-heading h1 {
+  string-set: chapter-title content();
+  margin: 0 0 2.5mm;
+  font-size: 23pt;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.chapter-heading .chapter-ar {
+  font-family: "Book Arabic", Tahoma, Arial, sans-serif;
+  direction: rtl;
+  text-align: right;
+  font-size: 17pt;
+  line-height: 1.65;
+  color: #334155;
+}
+
+.book-chapter .hero {
+  display: none !important;
+}
+
+.book-chapter section {
+  margin: 3mm 0;
+  padding: 4mm;
+  border: 0.3mm solid #d5dde8;
+  border-radius: 2mm;
+  background: #ffffff;
+  box-shadow: none;
+  break-inside: auto;
+}
+
+.book-chapter h2,
+.book-chapter h3,
+.book-chapter h4 {
+  color: #0f172a;
+  break-after: avoid-page;
+}
+
+.book-chapter h2 {
+  margin: 0 0 2.5mm;
+  font-size: 16pt;
+}
+
+.book-chapter .ar,
+.book-chapter [lang="ar"],
+.book-chapter [dir="rtl"] {
+  font-family: "Book Arabic", Tahoma, Arial, sans-serif;
+  direction: rtl;
+  text-align: right;
+  line-height: 1.85;
+}
+
+.book-chapter p {
+  margin: 0 0 2.2mm;
+}
+
+.book-chapter .svg-box,
+.book-chapter .svg-wrap,
+.book-chapter figure,
+.book-chapter table,
+.book-chapter pre,
+.book-chapter .formula {
+  break-inside: avoid-page;
+  page-break-inside: avoid;
+}
+
+.book-chapter svg,
+.book-chapter img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.book-chapter table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.book-chapter th,
+.book-chapter td {
+  padding: 2mm;
+  border: 0.25mm solid #cbd5e1;
+}
+
+.book-chapter th {
+  background: #eef4f8;
+}
+
+.prototype-note {
+  margin-top: 10mm;
+  padding: 4mm;
+  border-left: 1mm solid #0284c7;
+  background: #f0f9ff;
+  color: #334155;
+}
