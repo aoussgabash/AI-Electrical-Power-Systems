@@ -109,8 +109,8 @@ main,
 }
 
 section {
-  margin: 4mm 0 !important;
-  padding: 5mm !important;
+  margin: 3mm 0 !important;
+  padding: 4mm !important;
   border: 0.35mm solid #d5dde8 !important;
   border-radius: 3mm !important;
   background: #ffffff !important;
@@ -134,7 +134,7 @@ h6 {
 }
 
 h2 {
-  margin: 0 0 3mm !important;
+  margin: 0 0 2.5mm !important;
   font-size: 17pt !important;
   line-height: 1.25 !important;
 }
@@ -145,7 +145,13 @@ h3 {
 }
 
 p {
-  margin: 0 0 2.5mm !important;
+  margin: 0 0 2.2mm !important;
+}
+
+h2 + p,
+h3 + p {
+  break-after: avoid-page;
+  page-break-after: avoid;
 }
 
 p:last-child,
@@ -241,6 +247,28 @@ img,
 svg {
   max-width: 100% !important;
   height: auto !important;
+}
+
+.svg-wrap,
+.svg-box,
+figure {
+  margin: 2mm 0 !important;
+  padding: 2.5mm !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+  break-before: avoid-page;
+  page-break-before: avoid;
+}
+
+.svg-wrap svg,
+.svg-box svg,
+figure svg {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 92mm !important;
+  margin: 0 auto !important;
 }
 
 .publication-endmatter {
