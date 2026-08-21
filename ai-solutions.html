@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Complete AI Solutions Map | الصورة الشاملة لحلول الذكاء الاصطناعي</title>
-  <meta name="description" content="A bilingual map showing where AI applications in electrical power systems lie between AI technologies and measurable engineering value.">
+  <meta name="description" content="A bilingual map showing the relationship between AI purpose, core AI technologies, cross-cutting technological enablers, power-system applications, and measurable engineering value.">
   <meta name="author" content="Dr.-Ing. Aouss Gabash">
   <meta name="theme-color" content="#06101c">
   <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+
   <style>
     :root{
       --bg:#06101c;
@@ -29,6 +30,7 @@
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
+
     body{
       margin:0;
       min-width:320px;
@@ -47,9 +49,9 @@
       position:sticky;
       top:0;
       z-index:50;
+      border-bottom:1px solid var(--line);
       background:rgba(6,16,28,.9);
       backdrop-filter:blur(15px);
-      border-bottom:1px solid var(--line);
     }
 
     nav{
@@ -109,7 +111,7 @@
     }
 
     .hero h1 .ar{display:inline-block;direction:rtl}
-    .hero p{max-width:950px;margin:0 auto;color:var(--muted);font-size:1.03rem}
+    .hero p{max-width:980px;margin:0 auto;color:var(--muted);font-size:1.03rem}
 
     .purpose-framework,
     .overview{
@@ -164,10 +166,10 @@
       align-items:center;
       justify-content:center;
       padding:23px 15px 18px;
-      text-align:center;
       border:1px solid var(--line);
       border-radius:18px;
       background:rgba(255,255,255,.035);
+      text-align:center;
     }
 
     .purpose-step::before{
@@ -294,16 +296,16 @@
       background:linear-gradient(145deg,rgba(13,32,52,.86),rgba(7,20,36,.78));
     }
 
-    .architecture-title{text-align:center;margin:0 0 20px}
-    .architecture-title h2{margin:0;font-size:clamp(1.55rem,3vw,2.35rem)}
-    .architecture-title span{display:block;margin-top:4px;direction:rtl;color:#e8f6ff;font-size:1rem}
+    .architecture-title,.distinction-title{text-align:center;margin:0 0 20px}
+    .architecture-title h2,.distinction-title h2{margin:0;font-size:clamp(1.55rem,3vw,2.35rem)}
+    .architecture-title span,.distinction-title span{display:block;margin-top:4px;direction:rtl;color:#e8f6ff;font-size:1rem}
 
     .architecture-flow{
       display:grid;
       grid-template-columns:1fr auto 1fr auto 1.35fr auto 1fr;
       align-items:stretch;
       gap:12px;
-      margin-bottom:26px;
+      margin-bottom:34px;
     }
 
     .architecture-box{
@@ -349,51 +351,162 @@
       font-weight:900;
     }
 
-    .enablers{
+    .distinction{
       position:relative;
-      padding:24px;
-      border:1px solid rgba(56,189,248,.38);
-      border-radius:26px;
+      margin:0 0 26px;
+      padding:27px;
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:28px;
       background:
-        radial-gradient(circle at center,rgba(56,189,248,.08),transparent 55%),
-        linear-gradient(180deg,rgba(8,31,51,.95),rgba(6,22,38,.96));
+        radial-gradient(circle at 24% 20%,rgba(79,124,255,.10),transparent 32%),
+        radial-gradient(circle at 78% 20%,rgba(52,211,153,.10),transparent 32%),
+        linear-gradient(145deg,rgba(10,31,51,.96),rgba(6,21,37,.96));
     }
 
-    .enablers h2,.application-layer h2{text-align:center;margin:0 0 18px;font-size:clamp(1.45rem,2.5vw,2.15rem)}
-    .enablers h2 span,.application-layer h2 span{display:block;margin-top:3px;direction:rtl;color:#eaf8ff;font-size:.8em}
-    .enabler-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .distinction-intro{
+      max-width:1030px;
+      margin:-4px auto 22px;
+      text-align:center;
+      color:#c4d5e1;
+    }
 
-    .enabler{
-      min-height:125px;
+    .distinction-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .classification-panel{
+      position:relative;
+      padding:22px;
+      border-radius:23px;
+      overflow:hidden;
+    }
+
+    .technology-panel{
+      border:2px solid rgba(79,124,255,.58);
+      background:linear-gradient(145deg,rgba(79,124,255,.14),rgba(8,27,48,.93));
+      box-shadow:0 0 30px rgba(79,124,255,.10);
+    }
+
+    .enabler-panel{
+      border:2px solid rgba(52,211,153,.52);
+      background:linear-gradient(145deg,rgba(52,211,153,.12),rgba(8,30,43,.93));
+      box-shadow:0 0 30px rgba(52,211,153,.09);
+    }
+
+    .classification-head{
+      display:flex;
+      align-items:flex-start;
+      gap:13px;
+      margin-bottom:16px;
+    }
+
+    .classification-icon{
+      width:58px;
+      height:58px;
+      flex:0 0 58px;
+      display:grid;
+      place-items:center;
+      border-radius:17px;
+      font-size:1.05rem;
+      font-weight:900;
+    }
+
+    .technology-panel .classification-icon{border:1px solid rgba(147,171,255,.55);background:rgba(79,124,255,.13);color:#c9d5ff}
+    .enabler-panel .classification-icon{border:1px solid rgba(110,231,183,.52);background:rgba(52,211,153,.12);color:#b9f6dc}
+    .classification-head h3{margin:0;font-size:1.35rem;line-height:1.2}
+    .classification-head h3 span{display:block;margin-top:4px;direction:rtl;font-size:.83em}
+    .classification-head p{margin:7px 0 0;color:#b8c9d7;font-size:.88rem}
+
+    .question-pill{
+      display:inline-flex;
+      margin-bottom:15px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:.72rem;
+      font-weight:900;
+      letter-spacing:.035em;
+    }
+
+    .technology-panel .question-pill{border:1px solid rgba(147,171,255,.4);background:rgba(79,124,255,.12);color:#d6deff}
+    .enabler-panel .question-pill{border:1px solid rgba(110,231,183,.4);background:rgba(52,211,153,.10);color:#c7f8e5}
+
+    .classification-items{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+
+    .classification-item{
+      min-height:92px;
       display:flex;
       flex-direction:column;
-      align-items:center;
       justify-content:center;
-      padding:15px;
-      border:1px solid rgba(56,189,248,.24);
-      border-radius:18px;
-      background:rgba(255,255,255,.025);
+      padding:12px;
+      border:1px solid rgba(255,255,255,.11);
+      border-radius:15px;
+      background:rgba(255,255,255,.028);
+    }
+
+    .classification-item b{font-size:.9rem;line-height:1.25}
+    .classification-item span{margin-top:4px;direction:rtl;color:#dce8f3;font-size:.84rem;line-height:1.3}
+    .classification-item small{margin-top:5px;color:#91a8bb;font-size:.72rem}
+
+    .definition-box{
+      margin-top:15px;
+      padding:13px 14px;
+      border-radius:15px;
+      font-size:.87rem;
+    }
+
+    .technology-panel .definition-box{border:1px solid rgba(147,171,255,.32);background:rgba(79,124,255,.075);color:#dce3ff}
+    .enabler-panel .definition-box{border:1px solid rgba(110,231,183,.3);background:rgba(52,211,153,.07);color:#d8faed}
+    .definition-box p{margin:0}
+    .definition-box p+p{margin-top:7px;direction:rtl;text-align:right}
+
+    .relationship-band{
+      position:relative;
+      margin-top:20px;
+      padding:18px;
+      border:1px solid rgba(34,211,238,.35);
+      border-radius:19px;
+      background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(255,255,255,.025));
       text-align:center;
     }
 
-    .enabler .symbol{
-      width:48px;
-      height:48px;
-      display:grid;
-      place-items:center;
-      margin-bottom:9px;
-      border:1px solid rgba(34,211,238,.55);
-      border-radius:50%;
-      background:#09233a;
-      color:var(--cyan2);
-      font-size:1rem;
-      font-weight:800;
+    .relationship-formula{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:9px;
+      font-weight:900;
+      color:#e7fbff;
     }
 
-    .enabler b{font-size:.94rem}
-    .enabler span{margin-top:3px;direction:rtl;color:#d7edf6;font-size:.86rem}
-    .core{border-color:rgba(56,189,248,.62);background:radial-gradient(circle at 50% 38%,rgba(79,124,255,.28),transparent 35%),radial-gradient(circle,#102d54,#07182c 68%);box-shadow:0 0 24px rgba(56,189,248,.18)}
-    .core .symbol{width:64px;height:64px;font-size:1.35rem}
+    .relationship-formula .box{
+      padding:8px 11px;
+      border-radius:11px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.04);
+    }
+
+    .relationship-formula .technology{border-color:rgba(147,171,255,.4);color:#d6deff}
+    .relationship-formula .enabler{border-color:rgba(110,231,183,.4);color:#c7f8e5}
+    .relationship-formula .application{border-color:rgba(34,211,238,.55);color:#dffcff;background:rgba(34,211,238,.09)}
+    .relationship-band p{max-width:1050px;margin:11px auto 0;color:#b9cbd8;font-size:.88rem}
+    .relationship-band p span{direction:rtl}
+
+    .support-note{
+      margin-top:13px;
+      padding:12px 14px;
+      border:1px dashed rgba(52,211,153,.38);
+      border-radius:15px;
+      background:rgba(52,211,153,.045);
+      color:#d7f8eb;
+      text-align:center;
+      font-size:.86rem;
+    }
+
+    .support-note span{direction:rtl}
 
     .down-connector{
       display:flex;
@@ -437,7 +550,9 @@
       font-weight:900;
     }
 
-    .application-layer .explanation{max-width:920px;margin:-7px auto 20px;color:#cce8ef;text-align:center}
+    .application-layer h2{text-align:center;margin:0 0 18px;font-size:clamp(1.45rem,2.5vw,2.15rem)}
+    .application-layer h2 span{display:block;margin-top:3px;direction:rtl;color:#eaf8ff;font-size:.8em}
+    .application-layer .explanation{max-width:940px;margin:-7px auto 20px;color:#cce8ef;text-align:center}
     .application-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
 
     .power-app{
@@ -550,7 +665,7 @@
     }
 
     .takeaway strong{font-size:1.08rem;color:#dffcff}
-    .takeaway p{max-width:960px;margin:8px auto 0;color:var(--muted)}
+    .takeaway p{max-width:980px;margin:8px auto 0;color:var(--muted)}
 
     footer{padding:34px 0 42px;border-top:1px solid var(--line);color:var(--muted);text-align:center}
     footer strong{color:#fff}
@@ -559,17 +674,17 @@
       .purpose-chain,.architecture-flow{grid-template-columns:1fr}
       .purpose-arrow,.architecture-arrow{min-height:24px;transform:rotate(90deg)}
       .application-step{transform:none}
-      .concept-grid,.types{grid-template-columns:1fr}
-      .enabler-grid,.application-grid{grid-template-columns:repeat(2,1fr)}
+      .concept-grid,.types,.distinction-grid{grid-template-columns:1fr}
+      .classification-items,.application-grid{grid-template-columns:repeat(2,1fr)}
     }
 
     @media(max-width:640px){
-      .purpose-framework,.overview{padding:15px;border-radius:22px}
+      .purpose-framework,.overview,.distinction{padding:15px;border-radius:22px}
       .purpose-framework::before{font-size:.72rem;padding:7px 11px}
       .purpose-intro{margin-top:44px}
       .application-layer{padding:20px 14px}
-      .enablers{padding:15px}
-      .enabler-grid,.application-grid{grid-template-columns:1fr}
+      .classification-panel{padding:16px}
+      .classification-items,.application-grid{grid-template-columns:1fr}
       .hero h1 .ar{display:block;margin-top:7px;font-size:.76em}
       .brand span{font-size:.88rem}
       .back span{display:none}
@@ -600,8 +715,8 @@
           <span class="ar" lang="ar">الصورة الشاملة لحلول الذكاء الاصطناعي</span>
         </h1>
         <p>
-          A connected view showing exactly where AI applications in electrical power systems lie between AI technology and engineering value.<br>
-          <span lang="ar" dir="rtl">رؤية مترابطة توضّح بدقة موقع تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية بين تقنية الذكاء الاصطناعي والقيمة الهندسية المتحققة.</span>
+          A connected view of purpose, core AI technologies, cross-cutting technological enablers, power-system applications, and measurable engineering value.<br>
+          <span lang="ar" dir="rtl">رؤية مترابطة للهدف وتقنيات الذكاء الاصطناعي الأساسية والمُمكّنات التقنية الداعمة وتطبيقات نظم الطاقة والقيمة الهندسية القابلة للقياس.</span>
         </p>
       </section>
 
@@ -612,8 +727,8 @@
             <span lang="ar">من مشكلة حقيقية إلى قيمة قابلة للقياس</span>
           </h2>
           <p>
-            AI with Purpose begins with the engineering need, defines the objective, selects the appropriate AI application and technology, and ends with measurable value.<br>
-            <span lang="ar" dir="rtl">يبدأ الذكاء الاصطناعي الهادف بالحاجة الهندسية، ثم يحدد الهدف، ويختار تطبيق وتقنية الذكاء الاصطناعي المناسبين، وينتهي بقيمة قابلة للقياس.</span>
+            AI with Purpose begins with an engineering need, defines the objective, selects the appropriate AI application and technologies, and ends with measurable value.<br>
+            <span lang="ar" dir="rtl">يبدأ الذكاء الاصطناعي الهادف بالحاجة الهندسية، ثم يحدد الهدف، ويختار التطبيق وتقنيات الذكاء الاصطناعي المناسبة، وينتهي بقيمة قابلة للقياس.</span>
           </p>
         </div>
 
@@ -634,7 +749,7 @@
             <div class="stage-badge">APPLICATION STAGE | مرحلة التطبيق</div>
             <strong>AI Application in Electrical Power Systems</strong>
             <span lang="ar">تطبيق الذكاء الاصطناعي في نظم الطاقة الكهربائية</span>
-            <small>The bridge that converts AI technology into an engineering solution</small>
+            <small>The engineering bridge between AI methods and the real power system</small>
           </div>
           <div class="purpose-arrow" aria-hidden="true">→</div>
           <div class="purpose-step" data-number="4">
@@ -648,22 +763,22 @@
           <article class="concept-card">
             <div class="concept-label">WHAT IS USED?</div>
             <h3>AI Technology<span lang="ar">تقنية الذكاء الاصطناعي</span></h3>
-            <p>The computational method: deep learning, reinforcement learning, causal AI, NLP, foundation models, and related techniques.</p>
-            <p class="ar" lang="ar">الطريقة الحسابية المستخدمة، مثل التعلم العميق والتعلم المعزز والذكاء السببي ومعالجة اللغة الطبيعية والنماذج التأسيسية.</p>
+            <p>The algorithmic method that learns, reasons, predicts, generates, or optimizes.</p>
+            <p class="ar" lang="ar">الطريقة الخوارزمية التي تتعلم أو تستدل أو تتنبأ أو تولّد أو تحسّن.</p>
           </article>
 
           <article class="concept-card application">
             <div class="concept-label">WHERE IS IT APPLIED?</div>
             <h3>AI Application in Power Systems<span lang="ar">تطبيق الذكاء الاصطناعي في نظم الطاقة</span></h3>
-            <p>The engineering layer where AI methods are connected to measurements, equipment, grids, operators, and control objectives.</p>
-            <p class="ar" lang="ar">الطبقة الهندسية التي تُربط فيها طرق الذكاء الاصطناعي بالقياسات والمعدات والشبكات والمشغلين وأهداف التحكم.</p>
+            <p>The engineering layer connecting AI methods to measurements, equipment, physical constraints, operators, and control objectives.</p>
+            <p class="ar" lang="ar">الطبقة الهندسية التي تربط طرق الذكاء الاصطناعي بالقياسات والمعدات والقيود الفيزيائية والمشغلين وأهداف التحكم.</p>
           </article>
 
           <article class="concept-card purpose">
             <div class="concept-label">WHY IS IT USED?</div>
             <h3>AI with Purpose<span lang="ar">الذكاء الاصطناعي الهادف</span></h3>
-            <p>The reason and objective that justify selecting a specific application and the technologies supporting it.</p>
-            <p class="ar" lang="ar">السبب والهدف اللذان يبرران اختيار تطبيق محدد والتقنيات التي تدعمه.</p>
+            <p>The reason and objective that justify selecting the application and the technologies supporting it.</p>
+            <p class="ar" lang="ar">السبب والهدف اللذان يبرران اختيار التطبيق والتقنيات التي تدعمه.</p>
           </article>
         </div>
 
@@ -687,9 +802,9 @@
           </div>
           <div class="architecture-arrow">→</div>
           <div class="architecture-box">
-            <strong>AI Technologies &amp; Models</strong>
-            <span lang="ar">تقنيات ونماذج الذكاء الاصطناعي</span>
-            <small>Learning, reasoning, prediction and optimization methods</small>
+            <strong>AI Technologies Supported by Enablers</strong>
+            <span lang="ar">تقنيات الذكاء الاصطناعي المدعومة بالمُمكّنات</span>
+            <small>Algorithms plus the infrastructure and safeguards needed for deployment</small>
           </div>
           <div class="architecture-arrow">→</div>
           <div class="architecture-box application-architecture">
@@ -705,31 +820,104 @@
           </div>
         </div>
 
-        <div class="enablers">
-          <h2>AI Technologies and Technological Enablers<span lang="ar">تقنيات الذكاء الاصطناعي والمُمكّنات التقنية</span></h2>
-          <div class="enabler-grid">
-            <div class="enabler core"><div class="symbol">AI</div><b>Deep Learning</b><span lang="ar">التعلّم العميق</span></div>
-            <div class="enabler"><div class="symbol">↗</div><b>Causal AI</b><span lang="ar">الذكاء الاصطناعي السببي</span></div>
-            <div class="enabler"><div class="symbol">?</div><b>Explainable AI</b><span lang="ar">الذكاء الاصطناعي القابل للتفسير</span></div>
-            <div class="enabler"><div class="symbol">⚛</div><b>Physics-informed AI</b><span lang="ar">الذكاء الاصطناعي المدعوم بالفيزياء</span></div>
-            <div class="enabler"><div class="symbol">RL</div><b>Reinforcement Learning</b><span lang="ar">التعلّم المعزّز</span></div>
-            <div class="enabler"><div class="symbol">NLP</div><b>Natural Language Processing</b><span lang="ar">معالجة اللغة الطبيعية</span></div>
-            <div class="enabler"><div class="symbol">FM</div><b>Foundation Models</b><span lang="ar">النماذج التأسيسية</span></div>
-            <div class="enabler"><div class="symbol">ML</div><b>Machine Learning</b><span lang="ar">التعلّم الآلي</span></div>
+        <section class="distinction" aria-labelledby="distinction-title">
+          <div class="distinction-title">
+            <h2 id="distinction-title">AI Technologies vs. Technological Enablers</h2>
+            <span lang="ar">الفرق بين تقنيات الذكاء الاصطناعي والمُمكّنات التقنية</span>
           </div>
-        </div>
+
+          <p class="distinction-intro">
+            AI technologies perform the intelligent task. Technological enablers make those technologies deployable, reliable, explainable, secure, and compatible with a real engineering system.<br>
+            <span lang="ar" dir="rtl">تقنيات الذكاء الاصطناعي تنفّذ المهمة الذكية، أما المُمكّنات التقنية فتجعل هذه التقنيات قابلة للتطبيق وموثوقة وقابلة للتفسير وآمنة ومتوافقة مع النظام الهندسي الحقيقي.</span>
+          </p>
+
+          <div class="distinction-grid">
+            <article class="classification-panel technology-panel">
+              <div class="classification-head">
+                <div class="classification-icon">AI</div>
+                <div>
+                  <h3>Core AI Technologies<span lang="ar">تقنيات الذكاء الاصطناعي الأساسية</span></h3>
+                  <p>Algorithms and models that learn from data and perform prediction, generation, reasoning, or control.</p>
+                </div>
+              </div>
+
+              <div class="question-pill">WHAT MODEL OR ALGORITHM PERFORMS THE TASK?</div>
+
+              <div class="classification-items">
+                <div class="classification-item"><b>Machine Learning</b><span lang="ar">التعلّم الآلي</span><small>Learning patterns from data</small></div>
+                <div class="classification-item"><b>Deep Learning</b><span lang="ar">التعلّم العميق</span><small>Multi-layer neural representation</small></div>
+                <div class="classification-item"><b>Reinforcement Learning</b><span lang="ar">التعلّم المعزّز</span><small>Learning decisions through rewards</small></div>
+                <div class="classification-item"><b>Natural Language Processing</b><span lang="ar">معالجة اللغة الطبيعية</span><small>Understanding and generating language</small></div>
+                <div class="classification-item"><b>Computer Vision</b><span lang="ar">الرؤية الحاسوبية</span><small>Understanding images and visual signals</small></div>
+                <div class="classification-item"><b>Foundation Models</b><span lang="ar">النماذج التأسيسية</span><small>General models adaptable to many tasks</small></div>
+              </div>
+
+              <div class="definition-box">
+                <p><strong>Student rule:</strong> A technology is the computational engine that directly performs the intelligent function.</p>
+                <p lang="ar"><strong>قاعدة للطالب:</strong> التقنية هي المحرك الحسابي الذي ينفّذ الوظيفة الذكية مباشرة.</p>
+              </div>
+            </article>
+
+            <article class="classification-panel enabler-panel">
+              <div class="classification-head">
+                <div class="classification-icon">+</div>
+                <div>
+                  <h3>Cross-cutting Technological Enablers<span lang="ar">المُمكّنات التقنية الداعمة والمشتركة</span></h3>
+                  <p>Methods, infrastructure, safeguards, and engineering support that allow AI to work correctly in practice.</p>
+                </div>
+              </div>
+
+              <div class="question-pill">WHAT MAKES THE AI SOLUTION TRUSTWORTHY AND DEPLOYABLE?</div>
+
+              <div class="classification-items">
+                <div class="classification-item"><b>Explainable AI</b><span lang="ar">الذكاء الاصطناعي القابل للتفسير</span><small>Why did the model decide?</small></div>
+                <div class="classification-item"><b>Physics-informed AI</b><span lang="ar">الذكاء الاصطناعي المدعوم بالفيزياء</span><small>Consistency with physical laws</small></div>
+                <div class="classification-item"><b>Causal AI</b><span lang="ar">الذكاء الاصطناعي السببي</span><small>Cause-and-effect understanding</small></div>
+                <div class="classification-item"><b>Digital Twins</b><span lang="ar">التوائم الرقمية</span><small>Safe virtual representation and testing</small></div>
+                <div class="classification-item"><b>SCADA, Sensors &amp; IoT</b><span lang="ar">سكادا والحساسات وإنترنت الأشياء</span><small>Reliable real-time data acquisition</small></div>
+                <div class="classification-item"><b>Edge, Cloud &amp; HPC</b><span lang="ar">الحوسبة الطرفية والسحابية وعالية الأداء</span><small>Computation at the required speed and scale</small></div>
+                <div class="classification-item"><b>MLOps &amp; Model Monitoring</b><span lang="ar">تشغيل النماذج ومراقبتها</span><small>Deployment, updates, drift and lifecycle</small></div>
+                <div class="classification-item"><b>Cybersecurity &amp; Governance</b><span lang="ar">الأمن السيبراني والحوكمة</span><small>Protection, accountability and safe use</small></div>
+              </div>
+
+              <div class="definition-box">
+                <p><strong>Student rule:</strong> An enabler does not usually perform the main task alone; it makes the AI solution usable, safe, reliable, and scalable.</p>
+                <p lang="ar"><strong>قاعدة للطالب:</strong> المُمكّن لا ينفّذ المهمة الأساسية غالبًا بمفرده، بل يجعل حل الذكاء الاصطناعي قابلًا للاستخدام وآمنًا وموثوقًا وقابلًا للتوسع.</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="relationship-band">
+            <div class="relationship-formula">
+              <span class="box technology">Core AI Technology</span>
+              <span>+</span>
+              <span class="box enabler">Technological Enablers</span>
+              <span>→</span>
+              <span class="box application">Deployable Power-System Application</span>
+            </div>
+            <p>
+              The technology performs intelligence; the enablers surround and support both the model and the application throughout development, deployment, and operation.<br>
+              <span lang="ar" dir="rtl">التقنية تنفّذ الذكاء، بينما تحيط المُمكّنات بالنموذج والتطبيق وتدعمهما خلال التطوير والنشر والتشغيل.</span>
+            </p>
+          </div>
+
+          <div class="support-note">
+            Technological enablers are not always a separate linear stage. They are cross-cutting supports that act before, during, and after the application stage.<br>
+            <span lang="ar" dir="rtl">المُمكّنات التقنية ليست دائمًا مرحلة خطية مستقلة، بل عناصر دعم مشتركة تعمل قبل مرحلة التطبيق وأثناءها وبعدها.</span>
+          </div>
+        </section>
 
         <div class="down-connector" aria-hidden="true">
           <div class="line"></div>
           <div class="arrow">▼</div>
-          <span>تتحول التقنية هنا إلى تطبيق هندسي</span>
+          <span>تتحول التقنية المدعومة بالمُمكّنات هنا إلى تطبيق هندسي</span>
         </div>
 
         <section class="application-layer" aria-labelledby="application-layer-title">
           <h2 id="application-layer-title">AI Applications in Electrical Power Systems<span lang="ar">تطبيقات الذكاء الاصطناعي في نظم الطاقة الكهربائية</span></h2>
           <p class="explanation">
-            This is the application layer: AI models are connected to power-system objectives, physical laws, operational constraints, equipment, and real engineering decisions.<br>
-            <span lang="ar" dir="rtl">هذه هي طبقة التطبيق: تُربط نماذج الذكاء الاصطناعي بأهداف نظام الطاقة والقوانين الفيزيائية والقيود التشغيلية والمعدات والقرارات الهندسية الحقيقية.</span>
+            This is the application layer: core AI technologies are combined with technological enablers and connected to power-system objectives, physical laws, operational constraints, equipment, and real engineering decisions.<br>
+            <span lang="ar" dir="rtl">هذه هي طبقة التطبيق: تُدمج تقنيات الذكاء الاصطناعي الأساسية مع المُمكّنات التقنية، ثم تُربط بأهداف نظام الطاقة والقوانين الفيزيائية والقيود التشغيلية والمعدات والقرارات الهندسية الحقيقية.</span>
           </p>
 
           <div class="application-grid">
@@ -744,8 +932,8 @@
           </div>
 
           <div class="branch-note">
-            Each power-system application can use one or more AI solution types: analytical, generative, or autonomy-enabling AI.<br>
-            <span lang="ar" dir="rtl">يمكن لكل تطبيق في نظم الطاقة استخدام نوع واحد أو أكثر من الحلول: الذكاء التحليلي أو التوليدي أو المُمكّن للاستقلالية.</span>
+            Each application may combine several core AI technologies and several technological enablers, depending on the engineering objective and deployment conditions.<br>
+            <span lang="ar" dir="rtl">قد يجمع كل تطبيق بين عدة تقنيات أساسية وعدة مُمكّنات تقنية وفقًا للهدف الهندسي وظروف التشغيل والنشر.</span>
           </div>
         </section>
 
@@ -819,10 +1007,10 @@
         </div>
 
         <div class="takeaway">
-          <strong>Purpose → AI Technology → Power-System Application → Engineering Decision or Control → Measurable Value</strong>
+          <strong>Purpose → Core AI Technology + Technological Enablers → Power-System Application → Engineering Decision or Control → Measurable Value</strong>
           <p>
-            The application layer is not the AI algorithm itself. It is the engineering bridge that adapts the algorithm to electrical-power data, physical constraints, operational objectives, and real equipment.<br>
-            <span lang="ar" dir="rtl">طبقة التطبيق ليست خوارزمية الذكاء الاصطناعي نفسها، بل هي الجسر الهندسي الذي يكيّف الخوارزمية مع بيانات الطاقة الكهربائية والقيود الفيزيائية والأهداف التشغيلية والمعدات الحقيقية.</span>
+            The AI technology is the intelligent engine. The technological enablers make it trustworthy and deployable. The application layer adapts both to electrical-power data, physics, constraints, equipment, and operational objectives.<br>
+            <span lang="ar" dir="rtl">تقنية الذكاء الاصطناعي هي المحرك الذكي، والمُمكّنات التقنية تجعلها موثوقة وقابلة للنشر، وطبقة التطبيق تكيّفهما مع بيانات الطاقة الكهربائية والفيزياء والقيود والمعدات والأهداف التشغيلية.</span>
           </p>
         </div>
       </section>
