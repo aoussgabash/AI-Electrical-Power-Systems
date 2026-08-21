@@ -1,0 +1,56 @@
+name: Link A-R-OPF example
+
+on:
+  push:
+    paths:
+      - '.github/workflows/link-ar-opf-example.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  link-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make OPF application card clickable
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('ai-solutions.html')
+          text = path.read_text(encoding='utf-8')
+
+          old = '<div class="power-app"><div class="app-icon">◎</div><strong>Optimal Power Flow &amp; Energy Management</strong><span lang="ar">تدفق القدرة الأمثل وإدارة الطاقة</span></div>'
+          new = '<a class="power-app power-app-link" href="ar-opf-ai.html" aria-label="Open the AI-assisted A-R-OPF educational example"><div class="app-icon">◎</div><strong>Optimal Power Flow &amp; Energy Management</strong><span lang="ar">تدفق القدرة الأمثل وإدارة الطاقة</span><small>Open AI-assisted A-R-OPF example | افتح المثال التعليمي</small></a>'
+
+          if old not in text and 'href="ar-opf-ai.html"' not in text:
+              raise SystemExit('Target OPF card not found')
+
+          if old in text:
+              text = text.replace(old, new, 1)
+
+          css_marker = '.power-app:hover{transform:translateY(-3px);border-color:#67e8f9;box-shadow:0 13px 28px rgba(0,0,0,.22)}'
+          css_extra = '.power-app-link{position:relative;color:inherit;text-decoration:none;cursor:pointer}.power-app-link::after{content:"↗";position:absolute;top:10px;right:12px;color:#a5f3fc;font-weight:900}.power-app-link small{display:block;margin-top:8px;color:#9feaf2;font-size:.72rem;font-weight:800}.power-app-link:hover{background:linear-gradient(145deg,rgba(34,211,238,.17),rgba(255,255,255,.04))}'
+
+          if '.power-app-link{' not in text:
+              if css_marker not in text:
+                  raise SystemExit('CSS marker not found')
+              text = text.replace(css_marker, css_marker + css_extra, 1)
+
+          path.write_text(text, encoding='utf-8')
+
+          workflow = Path('.github/workflows/link-ar-opf-example.yml')
+          if workflow.exists():
+              workflow.unlink()
+          PY
+
+      - name: Commit linked example
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Open A-R-OPF AI example from OPF application card"
+          git push
