@@ -1,0 +1,210 @@
+name: Professionalize A-R-OPF equations
+
+on:
+  push:
+    paths:
+      - '.github/workflows/professionalize-ar-opf-equations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-equations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replace plain-text formulas with semantic MathML
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('ar-opf-ai.html')
+          text = path.read_text(encoding='utf-8')
+
+          math_css = r'''
+.math-display{
+  direction:ltr;
+  display:grid;
+  place-items:center;
+  width:100%;
+  margin:16px 0;
+  padding:18px;
+  overflow-x:auto;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#06101d;
+  text-align:center;
+}
+.math-display math{
+  display:block;
+  min-width:max-content;
+  color:#f7fbff;
+  font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;
+  font-size:1.38rem;
+  line-height:1.35;
+}
+.objective .math-display math{color:#fff0b8}
+.constraint.math-display{
+  margin:0;
+  padding:13px 15px;
+  border-color:rgba(34,211,238,.24);
+  background:rgba(34,211,238,.045);
+}
+.constraint.math-display math{color:#dffcff;font-size:1.14rem}
+.matrix.math-display{margin-top:16px;background:#071827}
+.matrix.math-display math{font-size:1.16rem;color:#eef6fa}
+.loss .math-display{background:#061b20}
+.loss .math-display math{color:#c7f8e5}
+.penalty .math-mini{display:block;margin-top:8px;overflow-x:auto}
+.penalty .math-mini math{color:#d9faed;font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:1rem}
+.metric .math-mini{display:block;margin-top:8px;overflow-x:auto}
+.metric .math-mini math{color:#eef1ff;font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:.92rem}
+@media(max-width:720px){.math-display{padding:13px}.math-display math{font-size:1.13rem}.constraint.math-display math{font-size:1rem}}
+'''
+
+          if '.math-display{' not in text:
+              text = text.replace('.grid{', math_css + '.grid{', 1)
+
+          objective = r'''<div class="math-display" aria-label="A-R-OPF objective function">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+  <mrow>
+    <mi>J</mi><mo>=</mo>
+    <msub><mi>w</mi><mn>1</mn></msub><msub><mi>P</mi><mtext>loss</mtext></msub>
+    <mo>+</mo><msub><mi>w</mi><mn>2</mn></msub><msub><mi>C</mi><mtext>operation</mtext></msub>
+    <mo>+</mo><msub><mi>w</mi><mn>3</mn></msub>
+    <munder><mo>∑</mo><mi>i</mi></munder>
+    <msup><mrow><mo>(</mo><msub><mi>V</mi><mi>i</mi></msub><mo>−</mo><mn>1</mn><mo>)</mo></mrow><mn>2</mn></msup>
+    <mo>+</mo><msub><mi>w</mi><mn>4</mn></msub><msub><mi>P</mi><mtext>curtailment</mtext></msub>
+  </mrow>
+</math>
+</div>'''
+          text, n = re.subn(r'<div class="eq">J = .*?</div>', objective, text, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Objective equation was not found exactly once')
+
+          constraints = {
+              r'<div class="constraint">Pᵢ\(min\) ≤ Pᵢ ≤ Pᵢ\(max\)</div>': r'''<div class="constraint math-display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>P</mi><mi>i</mi><mtext>min</mtext></msubsup><mo>≤</mo><msub><mi>P</mi><mi>i</mi></msub><mo>≤</mo><msubsup><mi>P</mi><mi>i</mi><mtext>max</mtext></msubsup></mrow></math></div>''',
+              r'<div class="constraint">Qᵢ\(min\) ≤ Qᵢ ≤ Qᵢ\(max\)</div>': r'''<div class="constraint math-display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>Q</mi><mi>i</mi><mtext>min</mtext></msubsup><mo>≤</mo><msub><mi>Q</mi><mi>i</mi></msub><mo>≤</mo><msubsup><mi>Q</mi><mi>i</mi><mtext>max</mtext></msubsup></mrow></math></div>''',
+              r'<div class="constraint">Vᵢ\(min\) ≤ Vᵢ ≤ Vᵢ\(max\)</div>': r'''<div class="constraint math-display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msubsup><mi>V</mi><mi>i</mi><mtext>min</mtext></msubsup><mo>≤</mo><msub><mi>V</mi><mi>i</mi></msub><mo>≤</mo><msubsup><mi>V</mi><mi>i</mi><mtext>max</mtext></msubsup></mrow></math></div>''',
+              r'<div class="constraint">\|Iᵢⱼ\| ≤ Iᵢⱼ\(max\)</div>': r'''<div class="constraint math-display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>|</mo><msub><mi>I</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>|</mo><mo>≤</mo><msubsup><mi>I</mi><mrow><mi>i</mi><mi>j</mi></mrow><mtext>max</mtext></msubsup></mrow></math></div>''',
+              r'<div class="constraint">SOC\(min\) ≤ SOC ≤ SOC\(max\)</div>': r'''<div class="constraint math-display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>SOC</mi><mtext>min</mtext></msup><mo>≤</mo><mi>SOC</mi><mo>≤</mo><msup><mi>SOC</mi><mtext>max</mtext></msup></mrow></math></div>''',
+              r'<div class="constraint">Power-flow balance equations</div>': r'''<div class="constraint math-display"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>g</mi><mi>P</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>u</mi><mo>)</mo><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="1em"/><msub><mi>g</mi><mi>Q</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>u</mi><mo>)</mo><mo>=</mo><mn>0</mn></mrow></math></div>'''
+          }
+          for pattern, replacement in constraints.items():
+              text, n = re.subn(pattern, replacement, text, count=1)
+              if n != 1:
+                  raise SystemExit(f'Constraint replacement failed: {pattern}')
+
+          learning_equation = r'''<div class="math-display" aria-label="Learning relationship between A-R-OPF and the AI model">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+  <mrow>
+    <msub><mi mathvariant="bold">x</mi><mi>k</mi></msub>
+    <mover><mo>⟶</mo><mtext>A-R-OPF</mtext></mover>
+    <msubsup><mi mathvariant="bold">u</mi><mi>k</mi><mo>∗</mo></msubsup>
+    <mspace width="1.5em"/><mtext>and</mtext><mspace width="1.5em"/>
+    <msub><mover accent="true"><mi mathvariant="bold">u</mi><mo>^</mo></mover><mi>k</mi></msub>
+    <mo>=</mo><msub><mi>f</mi><mi>θ</mi></msub><mo>(</mo><msub><mi mathvariant="bold">x</mi><mi>k</mi></msub><mo>)</mo>
+    <mo>≈</mo><msubsup><mi mathvariant="bold">u</mi><mi>k</mi><mo>∗</mo></msubsup>
+  </mrow>
+</math>
+</div>'''
+          text, n = re.subn(r'<div class="formula"><span class="box">xₖ</span>.*?</div>', learning_equation, text, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Learning equation was not found')
+
+          input_matrix = r'''<div class="matrix math-display" aria-label="AI input vector">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+  <mrow><mi mathvariant="bold">x</mi><mo>=</mo>
+    <msup><mfenced open="[" close="]"><mtable>
+      <mtr><mtd><msub><mi>P</mi><mi>L</mi></msub></mtd></mtr>
+      <mtr><mtd><msub><mi>Q</mi><mi>L</mi></msub></mtd></mtr>
+      <mtr><mtd><msub><mi>P</mi><mtext>PV</mtext></msub></mtd></mtr>
+      <mtr><mtd><msub><mi>P</mi><mtext>wind</mtext></msub></mtd></mtr>
+      <mtr><mtd><mi>SOC</mi></mtd></mtr>
+      <mtr><mtd><mi>V</mi></mtd></mtr>
+      <mtr><mtd><mi>c</mi></mtd></mtr>
+      <mtr><mtd><mi>τ</mi></mtd></mtr>
+    </mtable></mfenced><mi>T</mi></msup>
+  </mrow>
+</math>
+</div>'''
+          text, n = re.subn(r'<div class="matrix">x = .*?</div>', input_matrix, text, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Input vector was not found')
+
+          output_matrix = r'''<div class="matrix math-display" aria-label="AI output vector">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+  <mrow><mi mathvariant="bold">u</mi><mo>=</mo>
+    <msup><mfenced open="[" close="]"><mtable>
+      <mtr><mtd><msub><mi>P</mi><mtext>BSS</mtext></msub></mtd></mtr>
+      <mtr><mtd><msub><mi>Q</mi><mtext>BSS</mtext></msub></mtd></mtr>
+      <mtr><mtd><msub><mi>Q</mi><mtext>PV</mtext></msub></mtd></mtr>
+      <mtr><mtd><msub><mi>P</mi><mtext>curt</mtext></msub></mtd></mtr>
+      <mtr><mtd><msub><mi>V</mi><mtext>ref</mtext></msub></mtd></mtr>
+      <mtr><mtd><mi>Tap</mi></mtd></mtr>
+    </mtable></mfenced><mi>T</mi></msup>
+  </mrow>
+</math>
+</div>'''
+          text, n = re.subn(r'<div class="matrix">u = .*?</div>', output_matrix, text, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Output vector was not found')
+
+          loss_equation = r'''<div class="math-display" aria-label="Physics-informed training loss">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+  <mrow>
+    <mi>ℒ</mi><mo>=</mo><msub><mi>ℒ</mi><mtext>data</mtext></msub>
+    <mo>+</mo><msub><mi>λ</mi><mi>V</mi></msub><msub><mi>ℒ</mi><mtext>voltage</mtext></msub>
+    <mo>+</mo><msub><mi>λ</mi><mi>I</mi></msub><msub><mi>ℒ</mi><mtext>current</mtext></msub>
+    <mo>+</mo><msub><mi>λ</mi><mi>B</mi></msub><msub><mi>ℒ</mi><mtext>balance</mtext></msub>
+  </mrow>
+</math>
+</div>'''
+          text, n = re.subn(r'<div class="eq">L = L_data .*?</div>', loss_equation, text, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Loss equation was not found')
+
+          penalty_blocks = {
+              '<div class="penalty"><b>Data Loss</b><br>||u* − û||²</div>': '''<div class="penalty"><b>Data Loss</b><span class="math-mini"><math xmlns="http://www.w3.org/1998/Math/MathML"><msubsup><mrow><mo>∥</mo><msup><mi mathvariant="bold">u</mi><mo>∗</mo></msup><mo>−</mo><mover accent="true"><mi mathvariant="bold">u</mi><mo>^</mo></mover><mo>∥</mo></mrow><mn>2</mn><mn>2</mn></msubsup></math></span></div>''',
+              '<div class="penalty"><b>Voltage Penalty</b><br>Vmin ≤ V(û) ≤ Vmax</div>': '''<div class="penalty"><b>Voltage Penalty</b><span class="math-mini"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>V</mi><mtext>min</mtext></msup><mo>≤</mo><mi>V</mi><mo>(</mo><mover accent="true"><mi mathvariant="bold">u</mi><mo>^</mo></mover><mo>)</mo><mo>≤</mo><msup><mi>V</mi><mtext>max</mtext></msup></mrow></math></span></div>''',
+              '<div class="penalty"><b>Current &amp; Balance</b><br>|I(û)| ≤ Imax and ΔP,Q ≈ 0</div>': '''<div class="penalty"><b>Current &amp; Balance</b><span class="math-mini"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo>|</mo><msub><mi>I</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>(</mo><mover accent="true"><mi mathvariant="bold">u</mi><mo>^</mo></mover><mo>)</mo><mo>|</mo><mo>≤</mo><msubsup><mi>I</mi><mrow><mi>i</mi><mi>j</mi></mrow><mtext>max</mtext></msubsup><mo>,</mo><mspace width=".7em"/><mi>ΔP</mi><mo>≈</mo><mn>0</mn><mo>,</mo><mspace width=".7em"/><mi>ΔQ</mi><mo>≈</mo><mn>0</mn></mrow></math></span></div>'''
+          }
+          for old, new in penalty_blocks.items():
+              if old not in text:
+                  raise SystemExit(f'Penalty block not found: {old[:45]}')
+              text = text.replace(old, new, 1)
+
+          metrics = {
+              '<code>MAE = mean(|u* − û|)</code>': '''<span class="math-mini"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>MAE</mi><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msub><mrow><mo>∥</mo><msubsup><mi mathvariant="bold">u</mi><mi>k</mi><mo>∗</mo></msubsup><mo>−</mo><msub><mover accent="true"><mi mathvariant="bold">u</mi><mo>^</mo></mover><mi>k</mi></msub><mo>∥</mo></mrow><mn>1</mn></msub></mrow></math></span>''',
+              '<code>[J(û)−J(u*)]/J(u*) ×100%</code>': '''<span class="math-mini"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Gap</mtext><mo>=</mo><mfrac><mrow><mi>J</mi><mo>(</mo><mover accent="true"><mi mathvariant="bold">u</mi><mo>^</mo></mover><mo>)</mo><mo>−</mo><mi>J</mi><mo>(</mo><msup><mi mathvariant="bold">u</mi><mo>∗</mo></msup><mo>)</mo></mrow><mrow><mi>J</mi><mo>(</mo><msup><mi mathvariant="bold">u</mi><mo>∗</mo></msup><mo>)</mo></mrow></mfrac><mo>×</mo><mn>100</mn><mo>%</mo></mrow></math></span>''',
+              '<code>Nfeasible / Ntest ×100%</code>': '''<span class="math-mini"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Feasibility</mtext><mo>=</mo><mfrac><msub><mi>N</mi><mtext>feasible</mtext></msub><msub><mi>N</mi><mtext>test</mtext></msub></mfrac><mo>×</mo><mn>100</mn><mo>%</mo></mrow></math></span>''',
+              '<code>tA-R-OPF / tAI</code>': '''<span class="math-mini"><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mtext>Speedup</mtext><mo>=</mo><mfrac><msub><mi>t</mi><mtext>A-R-OPF</mtext></msub><msub><mi>t</mi><mtext>AI</mtext></msub></mfrac></mrow></math></span>'''
+          }
+          for old, new in metrics.items():
+              if old not in text:
+                  raise SystemExit(f'Metric not found: {old}')
+              text = text.replace(old, new, 1)
+
+          # Remove obsolete monospace styling from equation containers while retaining the surrounding visual design.
+          text = text.replace('font-family:"Courier New",monospace;color:#fff0b8;', 'color:#fff0b8;')
+          text = text.replace('font-family:"Courier New",monospace;text-align:center;color:#dffcff;', 'text-align:center;color:#dffcff;')
+          text = text.replace('font-family:"Courier New",monospace;text-align:center;color:#eef6fa;', 'text-align:center;color:#eef6fa;')
+          text = text.replace('font-family:"Courier New",monospace;text-align:center;color:#c7f8e5;', 'text-align:center;color:#c7f8e5;')
+
+          path.write_text(text, encoding='utf-8')
+
+          workflow = Path('.github/workflows/professionalize-ar-opf-equations.yml')
+          if workflow.exists():
+              workflow.unlink()
+          PY
+
+      - name: Commit the equation redesign
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Render A-R-OPF equations professionally with MathML"
+          git push
