@@ -91,7 +91,6 @@
     .good{margin:15px 0;padding:16px;border:1px solid rgba(34,197,94,.3);border-radius:12px;background:rgba(34,197,94,.08)}
     .warning{margin:15px 0;padding:16px;border:1px solid rgba(251,113,133,.3);border-radius:12px;background:rgba(251,113,133,.08)}
 
-    /* Same mathematical presentation used throughout the main course repository. */
     .formula{
       direction:ltr;
       text-align:center;
@@ -144,6 +143,36 @@
     .vector{font-weight:700;font-style:italic}
     .hat{position:relative;display:inline-block}
     .hat::before{content:"ˆ";position:absolute;left:50%;top:-.72em;transform:translateX(-50%);font-size:.75em}
+
+    .mapped-arrow{
+      display:inline-flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      vertical-align:middle;
+      min-width:5.4em;
+      margin:0 .5em;
+      color:var(--blue);
+      font-style:normal;
+      line-height:1;
+    }
+
+    .mapped-arrow-label{
+      display:block;
+      margin-bottom:-.16em;
+      font-family:Arial,Tahoma,sans-serif;
+      font-size:.56em;
+      font-weight:700;
+      letter-spacing:.02em;
+      white-space:nowrap;
+    }
+
+    .mapped-arrow-symbol{
+      display:block;
+      font-family:"Times New Roman",serif;
+      font-size:1.55em;
+      line-height:.82;
+    }
 
     .matrix-wrap{display:inline-flex;align-items:stretch;vertical-align:middle;margin:0 .25em}
     .matrix-bracket{font-size:3.35em;line-height:.82;font-weight:300}
@@ -316,12 +345,15 @@
 
       <div class="formula large violet">
         <span class="vector">x</span><sub>k</sub>
-        <span style="color:#38bdf8">&xrightarrow{	ext{A-R-OPF}}</span>
+        <span class="mapped-arrow" aria-label="mapped through A-R-OPF">
+          <span class="mapped-arrow-label">A-R-OPF</span>
+          <span class="mapped-arrow-symbol">⟶</span>
+        </span>
         <span class="vector">u</span><sub>k</sub><sup>*</sup>,
         &nbsp;&nbsp;
         <span class="hat"><span class="vector">u</span></span><sub>k</sub>
         = <i>f</i><sub>&theta;</sub>(<span class="vector">x</span><sub>k</sub>)
-        &asymp; <span class="vector">u</span><sub>k</sub><sup>*</sup>
+        ≈ <span class="vector">u</span><sub>k</sub><sup>*</sup>
       </div>
 
       <div class="ar">
