@@ -1,0 +1,123 @@
+name: Migrate to official AGAI logo
+
+on:
+  push:
+    paths:
+      - '.github/workflows/migrate-official-agai-logo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate-logo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Replace legacy logo references and remove old images
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+          official = 'assets/brand/AGAI.svg'
+          legacy_names = [
+              'ag-logo.png',
+              'favicon.ico',
+              'favicon-16x16.png',
+              'favicon-32x32.png',
+              'apple-touch-icon.png',
+              'android-chrome-192x192.png',
+              'android-chrome-512x512.png',
+          ]
+
+          text_suffixes = {
+              '.html', '.htm', '.css', '.js', '.json', '.webmanifest',
+              '.md', '.yml', '.yaml', '.xml', '.txt'
+          }
+
+          for path in root.rglob('*'):
+              if not path.is_file() or path.suffix.lower() not in text_suffixes:
+                  continue
+              if '.git' in path.parts:
+                  continue
+
+              text = path.read_text(encoding='utf-8', errors='strict')
+              original = text
+
+              text = text.replace('https://aoussgabash.com/ag-logo.png',
+                                  'https://ai.aoussgabash.com/assets/brand/AGAI.svg')
+              text = text.replace('https://ai.aoussgabash.com/ag-logo.png',
+                                  'https://ai.aoussgabash.com/assets/brand/AGAI.svg')
+
+              for old in legacy_names:
+                  text = text.replace(old, official)
+
+              if path.suffix.lower() in {'.html', '.htm'}:
+                  # Remove duplicated legacy favicon/touch-icon/manifest declarations.
+                  text = re.sub(
+                      r'\s*<link\b[^>]*\brel=["\'](?:icon|apple-touch-icon|manifest)["\'][^>]*>\s*',
+                      '\n',
+                      text,
+                      flags=re.IGNORECASE,
+                  )
+
+                  favicon = f'<link rel="icon" type="image/svg+xml" href="{official}">'
+                  if favicon not in text:
+                      theme = re.search(r'(<meta\s+name=["\']theme-color["\'][^>]*>)', text, re.IGNORECASE)
+                      if theme:
+                          pos = theme.end()
+                          text = text[:pos] + '\n' + favicon + text[pos:]
+                      else:
+                          viewport = re.search(r'(<meta\s+name=["\']viewport["\'][^>]*>)', text, re.IGNORECASE)
+                          if viewport:
+                              pos = viewport.end()
+                              text = text[:pos] + '\n' + favicon + text[pos:]
+                          else:
+                              text = text.replace('<head>', '<head>\n' + favicon, 1)
+
+                  text = text.replace('alt="AG logo"', 'alt="Official AGAI logo"')
+                  text = text.replace('alt="AG AI Power Systems logo"', 'alt="Official AGAI logo"')
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+
+          for old in legacy_names:
+              path = root / old
+              if path.exists():
+                  path.unlink()
+
+          # Verify that no text source still references a removed legacy image.
+          leftovers = []
+          for path in root.rglob('*'):
+              if not path.is_file() or path.suffix.lower() not in text_suffixes:
+                  continue
+              if '.git' in path.parts:
+                  continue
+              text = path.read_text(encoding='utf-8', errors='strict')
+              for old in legacy_names:
+                  if old in text:
+                      leftovers.append(f'{path}: {old}')
+
+          if leftovers:
+              raise SystemExit('Legacy logo references remain:\n' + '\n'.join(leftovers))
+
+          workflow = root / '.github/workflows/migrate-official-agai-logo.yml'
+          if workflow.exists():
+              workflow.unlink()
+          PY
+
+      - name: Commit official logo migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No logo migration changes were needed."
+          else
+            git commit -m "Use official AGAI logo across the site"
+            git push
+          fi
