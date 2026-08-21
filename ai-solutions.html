@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Types of AI Solutions | أنواع حلول الذكاء الاصطناعي</title>
+  <meta name="description" content="A bilingual interactive infographic presenting analytical, generative, and autonomy-enabling AI solutions and their technological enablers.">
+  <meta name="author" content="Dr.-Ing. Aouss Gabash">
+  <meta name="theme-color" content="#06101c">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <style>
+    :root{
+      --bg:#06101c;
+      --bg-2:#091827;
+      --panel:#0d2034;
+      --panel-2:#0a1929;
+      --text:#f4f8fc;
+      --muted:#aebfd0;
+      --cyan:#38bdf8;
+      --cyan-bright:#36e4ff;
+      --blue:#4f7cff;
+      --violet:#b76cff;
+      --orange:#f59e0b;
+      --gold:#fbbf24;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 26px 70px rgba(0,0,0,.34);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-width:320px;
+      color:var(--text);
+      font-family:Arial,Tahoma,"Segoe UI",sans-serif;
+      line-height:1.55;
+      background:
+        radial-gradient(circle at 14% 18%,rgba(56,189,248,.12),transparent 28%),
+        radial-gradient(circle at 86% 16%,rgba(183,108,255,.10),transparent 25%),
+        radial-gradient(circle at 50% 86%,rgba(79,124,255,.09),transparent 30%),
+        linear-gradient(180deg,var(--bg),var(--bg-2));
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+      background-size:42px 42px;
+      mask-image:linear-gradient(to bottom,black,transparent 88%);
+    }
+
+    .container{width:min(1480px,94%);margin:auto}
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      border-bottom:1px solid var(--line);
+      background:rgba(6,16,28,.86);
+      backdrop-filter:blur(16px);
+    }
+
+    nav{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .brand,.home-link{
+      display:inline-flex;
+      align-items:center;
+      gap:11px;
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+    }
+
+    .brand img{width:44px;height:44px;border-radius:50%}
+    .brand b{color:var(--cyan)}
+
+    .home-link{
+      padding:10px 14px;
+      border:1px solid var(--line);
+      border-radius:11px;
+      color:#dceaf5;
+      background:rgba(255,255,255,.035);
+      transition:.2s ease;
+    }
+
+    .home-link:hover,.home-link:focus-visible{
+      color:#fff;
+      border-color:rgba(56,189,248,.55);
+      transform:translateY(-1px);
+    }
+
+    main{padding:42px 0 58px}
+
+    .intro{text-align:center;margin:0 auto 26px;max-width:1020px}
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      padding:7px 13px;
+      border:1px solid rgba(56,189,248,.35);
+      border-radius:999px;
+      background:rgba(56,189,248,.08);
+      color:#dff7ff;
+      font-size:.9rem;
+      font-weight:700;
+    }
+
+    .intro h1{
+      margin:15px 0 6px;
+      font-size:clamp(2rem,4.3vw,4.15rem);
+      line-height:1.08;
+      letter-spacing:-.035em;
+    }
+
+    .intro h1 .en{
+      background:linear-gradient(90deg,var(--cyan),#7dd3fc,#fff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .intro h1 .divider{color:rgba(255,255,255,.34);font-weight:400}
+    .intro h1 .ar{display:inline-block;direction:rtl;color:#fff;letter-spacing:0}
+    .intro p{margin:9px auto 0;color:var(--muted);font-size:1.02rem;max-width:830px}
+
+    .map-shell{
+      position:relative;
+      padding:28px;
+      border:1px solid var(--line);
+      border-radius:30px;
+      overflow:hidden;
+      background:linear-gradient(145deg,rgba(13,32,52,.82),rgba(7,20,36,.74));
+      box-shadow:var(--shadow);
+      isolation:isolate;
+    }
+
+    .map-shell::before,.map-shell::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      filter:blur(5px);
+      z-index:-1;
+      pointer-events:none;
+    }
+
+    .map-shell::before{
+      width:460px;height:460px;left:-210px;top:170px;
+      background:radial-gradient(circle,rgba(54,228,255,.14),transparent 68%);
+    }
+    .map-shell::after{
+      width:460px;height:460px;right:-210px;top:100px;
+      background:radial-gradient(circle,rgba(183,108,255,.14),transparent 68%);
+    }
+
+    .solutions-map{
+      display:grid;
+      grid-template-columns:minmax(260px,.9fr) minmax(560px,1.55fr) minmax(280px,.95fr);
+      grid-template-areas:
+        "analytical hub autonomy"
+        "analytical generative autonomy";
+      gap:24px;
+      align-items:center;
+    }
+
+    .solution-card,.hub-card{
+      position:relative;
+      border-radius:24px;
+      background:linear-gradient(180deg,rgba(15,39,63,.90),rgba(7,23,40,.94));
+      border:1px solid var(--line);
+      overflow:hidden;
+    }
+
+    .solution-card{
+      padding:18px;
+      transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+    }
+
+    .solution-card:hover{transform:translateY(-4px)}
+
+    .analytical{
+      grid-area:analytical;
+      --accent:var(--cyan-bright);
+      border-color:rgba(54,228,255,.45);
+      box-shadow:0 0 38px rgba(54,228,255,.08);
+    }
+
+    .autonomy{
+      grid-area:autonomy;
+      --accent:var(--violet);
+      border-color:rgba(183,108,255,.48);
+      box-shadow:0 0 38px rgba(183,108,255,.08);
+    }
+
+    .generative{
+      grid-area:generative;
+      --accent:#7fa8ff;
+      border-color:rgba(79,124,255,.48);
+      box-shadow:0 0 38px rgba(79,124,255,.08);
+    }
+
+    .hub-card{
+      grid-area:hub;
+      min-height:620px;
+      padding:18px;
+      border-color:rgba(56,189,248,.46);
+      background:
+        radial-gradient(circle at center,rgba(56,189,248,.08),transparent 53%),
+        linear-gradient(180deg,rgba(9,31,51,.96),rgba(5,20,36,.96));
+    }
+
+    .card-heading{
+      display:flex;
+      align-items:center;
+      gap:13px;
+      margin-bottom:14px;
+    }
+
+    .icon-badge{
+      width:58px;height:58px;
+      flex:0 0 58px;
+      display:grid;
+      place-items:center;
+      border-radius:18px;
+      color:var(--accent);
+      border:1px solid color-mix(in srgb,var(--accent) 52%,transparent);
+      background:color-mix(in srgb,var(--accent) 9%,transparent);
+      box-shadow:inset 0 0 20px color-mix(in srgb,var(--accent) 8%,transparent);
+    }
+
+    svg{display:block}
+    .icon-badge svg,.topic-icon svg{width:30px;height:30px;stroke:currentColor}
+
+    .card-heading h2{margin:0;font-size:clamp(1.2rem,1.55vw,1.65rem);line-height:1.25}
+    .card-heading .ar-title{display:block;margin-top:3px;direction:rtl;font-size:.93em;color:#f4f8fc}
+
+    .topic-list{display:grid;gap:11px}
+    .topic{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-height:78px;
+      padding:12px;
+      border:1px solid color-mix(in srgb,var(--accent) 28%,var(--line));
+      border-radius:16px;
+      background:rgba(255,255,255,.025);
+    }
+
+    .topic-icon{
+      width:44px;height:44px;flex:0 0 44px;
+      display:grid;place-items:center;
+      border-radius:13px;
+      color:var(--accent);
+      background:color-mix(in srgb,var(--accent) 8%,transparent);
+    }
+
+    .topic strong{display:block;font-size:.97rem;line-height:1.25}
+    .topic span{display:block;margin-top:3px;direction:rtl;text-align:left;color:#dce8f3;font-size:.94rem;line-height:1.25}
+
+    .direction{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:13px 14px;
+      border-radius:16px;
+      color:#f8fdff;
+      border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);
+      background:linear-gradient(110deg,color-mix(in srgb,var(--accent) 14%,transparent),rgba(255,255,255,.025));
+    }
+
+    .direction .arrow{margin-left:auto;color:var(--accent);font-size:1.5rem}
+    .direction strong{display:block;font-size:.92rem}
+    .direction span{display:block;direction:rtl;text-align:left;color:#dfeefa;font-size:.87rem}
+
+    .hub-title{text-align:center;margin:2px 0 4px;font-size:1.25rem;color:#e8fbff}
+    .hub-title span{display:block;direction:rtl;font-size:.92em;margin-top:2px}
+
+    .hub{
+      position:relative;
+      width:min(570px,100%);
+      aspect-ratio:1;
+      margin:4px auto 0;
+    }
+
+    .orbit{
+      position:absolute;
+      inset:3%;
+      border:2px solid rgba(54,228,255,.58);
+      border-radius:50%;
+      box-shadow:0 0 28px rgba(54,228,255,.12),inset 0 0 40px rgba(54,228,255,.04);
+    }
+    .orbit::before,.orbit::after{
+      content:"";position:absolute;border-radius:50%;inset:13%;
+      border:1px dashed rgba(125,211,252,.34);
+    }
+    .orbit::after{inset:27%;border-style:solid;border-color:rgba(125,211,252,.18)}
+
+    .core{
+      position:absolute;
+      inset:33%;
+      z-index:4;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      border-radius:50%;
+      border:1px solid rgba(125,211,252,.76);
+      background:
+        radial-gradient(circle at 48% 38%,rgba(56,189,248,.26),transparent 35%),
+        radial-gradient(circle,#112c53 0,#07172b 67%);
+      box-shadow:0 0 30px rgba(56,189,248,.28),inset 0 0 30px rgba(79,124,255,.16);
+    }
+
+    .core::before{
+      content:"";position:absolute;inset:11%;border-radius:50%;opacity:.32;
+      background-image:
+        linear-gradient(35deg,transparent 46%,rgba(125,211,252,.55) 47% 49%,transparent 50%),
+        linear-gradient(145deg,transparent 46%,rgba(125,211,252,.45) 47% 49%,transparent 50%);
+      background-size:26px 26px;
+      mask-image:radial-gradient(circle,black 60%,transparent 74%);
+    }
+
+    .core strong{position:relative;font-size:clamp(1.15rem,1.7vw,1.75rem);line-height:1.12}
+    .core span{display:block;direction:rtl;margin-top:5px;font-size:.72em;color:#e6f8ff}
+
+    .enabler{
+      position:absolute;
+      z-index:5;
+      width:150px;
+      text-align:center;
+      transform:translate(-50%,-50%);
+    }
+
+    .enabler .enabler-icon{
+      width:51px;height:51px;
+      margin:0 auto 7px;
+      display:grid;place-items:center;
+      border-radius:50%;
+      color:var(--cyan-bright);
+      border:1px solid rgba(54,228,255,.6);
+      background:#09233a;
+      box-shadow:0 0 16px rgba(54,228,255,.12);
+    }
+    .enabler svg{width:25px;height:25px;stroke:currentColor}
+    .enabler b{display:block;font-size:.88rem;line-height:1.16}
+    .enabler span{display:block;margin-top:2px;direction:rtl;color:#d7edf6;font-size:.78rem;line-height:1.18}
+
+    .e1{left:50%;top:14%}.e2{left:78%;top:29%}.e3{left:79%;top:68%}
+    .e4{left:50%;top:86%}.e5{left:21%;top:68%}.e6{left:21%;top:29%}
+
+    .generative .topic-list{grid-template-columns:repeat(3,1fr)}
+    .generative .topic{align-items:flex-start;min-height:104px}
+    .outcomes{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px}
+    .outcome{
+      display:flex;align-items:center;gap:10px;
+      min-height:70px;padding:12px 13px;border-radius:15px;
+      border:1px solid rgba(127,168,255,.35);
+      background:rgba(79,124,255,.08);
+    }
+    .outcome.orange{border-color:rgba(245,158,11,.48);background:rgba(245,158,11,.09)}
+    .outcome-icon{font-size:1.45rem;color:#8db0ff}.outcome.orange .outcome-icon{color:var(--orange)}
+    .outcome strong{display:block;font-size:.88rem;line-height:1.2}
+    .outcome span{display:block;direction:rtl;text-align:left;color:#dce8f3;font-size:.82rem;line-height:1.2;margin-top:3px}
+
+    .caption{
+      text-align:center;
+      margin:20px 0 0;
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    @media (max-width:1180px){
+      .solutions-map{
+        grid-template-columns:1fr 1fr;
+        grid-template-areas:
+          "hub hub"
+          "analytical autonomy"
+          "generative generative";
+      }
+      .hub-card{min-height:610px}
+    }
+
+    @media (max-width:760px){
+      main{padding-top:28px}
+      .container{width:min(94%,680px)}
+      .map-shell{padding:16px;border-radius:22px}
+      .solutions-map{
+        grid-template-columns:1fr;
+        grid-template-areas:"hub" "analytical" "generative" "autonomy";
+        gap:16px;
+      }
+      .hub-card{min-height:auto;padding:16px 10px}
+      .hub{aspect-ratio:auto;display:grid;gap:9px;margin-top:14px}
+      .orbit,.core{display:none}
+      .enabler{
+        position:static;
+        width:auto;
+        transform:none;
+        display:grid;
+        grid-template-columns:43px 1fr;
+        align-items:center;
+        gap:10px;
+        text-align:left;
+        padding:10px;
+        border:1px solid rgba(56,189,248,.22);
+        border-radius:14px;
+        background:rgba(255,255,255,.025);
+      }
+      .enabler .enabler-icon{width:43px;height:43px;margin:0}
+      .enabler span{text-align:left}
+      .generative .topic-list,.outcomes{grid-template-columns:1fr}
+      .intro h1 .divider{display:none}
+      .intro h1 .ar{display:block;margin-top:7px;font-size:.75em}
+      .home-link span{display:none}
+    }
+
+    @media (max-width:460px){
+      .brand span{font-size:.88rem}
+      .solution-card{padding:14px}
+      .topic{padding:10px}
+      .card-heading h2{font-size:1.1rem}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *{scroll-behavior:auto!important;transition:none!important}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav aria-label="Primary navigation">
+        <a class="brand" href="index.html" aria-label="AI Power Systems home">
+          <img src="favicon-32x32.png" alt="AG logo">
+          <span><b>AI</b> Power Systems</span>
+        </a>
+        <a class="home-link" href="index.html"><span>← Home | الرئيسية</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow">AI with Purpose | ذكاء اصطناعي هادف</div>
+        <h1 id="page-title">
+          <span class="en">Types of AI Solutions</span>
+          <span class="divider"> | </span>
+          <span class="ar" lang="ar">أنواع حلول الذكاء الاصطناعي</span>
+        </h1>
+        <p>From data understanding to content generation and autonomous action — من فهم البيانات إلى توليد المحتوى واتخاذ القرار الذاتي.</p>
+      </section>
+
+      <section class="map-shell" aria-label="Bilingual map of AI solution types">
+        <div class="solutions-map">
+
+          <article class="solution-card analytical">
+            <div class="card-heading">
+              <div class="icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M7 12l2-2 2 2 4-4"/></svg>
+              </div>
+              <h2>Analytical AI<span class="ar-title" lang="ar">الذكاء الاصطناعي التحليلي</span></h2>
+            </div>
+            <div class="topic-list">
+              <div class="topic">
+                <div class="topic-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3M3 21h18"/><path d="m4 8 5-4 5 7 5-9"/></svg>
+                </div>
+                <div><strong>Monitoring &amp; Pattern Recognition</strong><span lang="ar">المراقبة والتعرّف على الأنماط</span></div>
+              </div>
+              <div class="topic">
+                <div class="topic-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H11v17H7.5A3.5 3.5 0 0 0 4 22zM20 5.5A3.5 3.5 0 0 0 16.5 2H13v17h3.5A3.5 3.5 0 0 1 20 22z"/></svg>
+                </div>
+                <div><strong>Knowledge Provision</strong><span lang="ar">توفير المعرفة</span></div>
+              </div>
+            </div>
+            <div class="direction">
+              <div>
+                <strong>Towards common-sense AI</strong>
+                <span lang="ar">نحو ذكاء اصطناعي بفهم عام</span>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+            </div>
+          </article>
+
+          <section class="hub-card" aria-labelledby="enablers-title">
+            <h2 class="hub-title" id="enablers-title">Technological Enablers<span lang="ar">المُمكّنات التقنية</span></h2>
+            <div class="hub">
+              <div class="orbit" aria-hidden="true"></div>
+              <div class="core">
+                <strong>Deep Learning<span lang="ar">التعلّم العميق</span></strong>
+              </div>
+
+              <div class="enabler e1">
+                <div class="enabler-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M11 7 6 16m7-9 5 9M7 18h10"/></svg></div>
+                <b>Causal AI</b><span lang="ar">الذكاء الاصطناعي السببي</span>
+              </div>
+              <div class="enabler e2">
+                <div class="enabler-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.2-4.2M8 11h6M11 8v6"/></svg></div>
+                <b>Explainable AI</b><span lang="ar">الذكاء الاصطناعي القابل للتفسير</span>
+              </div>
+              <div class="enabler e3">
+                <div class="enabler-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 12a8 8 0 0 1-8 8H6l-3 2 1-4a8 8 0 1 1 17-6Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></div>
+                <b>NLP</b><span lang="ar">معالجة اللغة الطبيعية</span>
+              </div>
+              <div class="enabler e4">
+                <div class="enabler-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="m12 3 8 4-8 4-8-4zM4 12l8 4 8-4M4 17l8 4 8-4"/></svg></div>
+                <b>Foundation Models</b><span lang="ar">النماذج التأسيسية</span>
+              </div>
+              <div class="enabler e5">
+                <div class="enabler-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 20V10m5 10v-6m5 6V7m5 13V4"/><path d="m4 9 5 4 5-7 5-3"/></svg></div>
+                <b>Reinforcement Learning</b><span lang="ar">التعلّم المعزّز</span>
+              </div>
+              <div class="enabler e6">
+                <div class="enabler-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(120 12 12)"/></svg></div>
+                <b>Physics-informed AI</b><span lang="ar">الذكاء الاصطناعي المدعوم بالفيزياء</span>
+              </div>
+            </div>
+          </section>
+
+          <article class="solution-card autonomy">
+            <div class="card-heading">
+              <div class="icon-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="5" y="7" width="14" height="11" rx="3"/><path d="M9 12h.01M15 12h.01M9 16h6M12 7V3m-2 0h4"/></svg>
+              </div>
+              <h2>Autonomy-enabling AI<span class="ar-title" lang="ar">الذكاء الاصطناعي المُمكّن للاستقلالية</span></h2>
+            </div>
+            <div class="topic-list">
+              <div class="topic"><div class="topic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></div><div><strong>Control Optimization</strong><span lang="ar">تحسين التحكم</span></div></div>
+              <div class="topic"><div class="topic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0M4 9H2m20 0h-2M3 9v5m18-5v5"/></svg></div><div><strong>Virtual Agents</strong><span lang="ar">الوكلاء الافتراضيون</span></div></div>
+              <div class="topic"><div class="topic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 21V10l6 3V8l6 3V4h6v17z"/><path d="M7 17h2m3 0h2m3 0h2"/></svg></div><div><strong>Physical Systems</strong><span lang="ar">الأنظمة الفيزيائية</span></div></div>
+              <div class="topic"><div class="topic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg></div><div><strong>Self-X Systems</strong><span lang="ar">الأنظمة الذاتية</span></div></div>
+            </div>
+          </article>
+
+          <article class="solution-card generative">
+            <div class="card-heading">
+              <div class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="m4 20 10-10M14 4l1 3 3 1-3 1-1 3-1-3-3-1 3-1zM19 14l.7 2.3L22 17l-2.3.7L19 20l-.7-2.3L16 17l2.3-.7z"/><path d="m3 21 2-6 4 4z"/></svg></div>
+              <h2>Generative AI<span class="ar-title" lang="ar">الذكاء الاصطناعي التوليدي</span></h2>
+            </div>
+            <div class="topic-list">
+              <div class="topic"><div class="topic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M5 3h10l4 4v8M5 3v18h8"/><path d="M15 3v5h5M14 18l5-5 2 2-5 5-3 1z"/></svg></div><div><strong>Content Creation</strong><span lang="ar">إنشاء المحتوى</span></div></div>
+              <div class="topic"><div class="topic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 11a7 7 0 0 1-7 7H8l-4 3 1-5a7 7 0 1 1 16-5Z"/><path d="M9 11h.01M13 11h.01M17 11h.01"/></svg></div><div><strong>Knowledge Interaction</strong><span lang="ar">التفاعل مع المعرفة</span></div></div>
+              <div class="topic"><div class="topic-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg></div><div><strong>Transformation</strong><span lang="ar">التحويل</span></div></div>
+            </div>
+            <div class="outcomes">
+              <div class="outcome"><div class="outcome-icon" aria-hidden="true">◆</div><div><strong>Towards full reliability</strong><span lang="ar">نحو موثوقية كاملة</span></div></div>
+              <div class="outcome orange"><div class="outcome-icon" aria-hidden="true">●●</div><div><strong>Perfect digital companions</strong><span lang="ar">مساعدون رقميون متكاملون</span></div></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <p class="caption">AI Applications in Electrical Power Systems · Dr.-Ing. Aouss Gabash</p>
+    </div>
+  </main>
+</body>
+</html>
