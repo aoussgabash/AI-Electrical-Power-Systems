@@ -1,0 +1,49 @@
+name: Fix A-R-OPF labeled arrow
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-ar-opf-labeled-arrow.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-arrow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replace unsupported LaTeX-like arrow with styled HTML
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('ar-opf-ai.html')
+          text = path.read_text(encoding='utf-8')
+
+          old = '<span style="color:#38bdf8">&xrightarrow{\\text{A-R-OPF}}</span>'
+          new = '''<span aria-label="A-R-OPF mapping" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;vertical-align:middle;margin:0 .48em;color:#38bdf8;line-height:1;font-style:normal">
+          <span style="font-family:Arial,Tahoma,sans-serif;font-size:.56em;font-weight:700;letter-spacing:.025em;margin-bottom:-.12em">A-R-OPF</span>
+          <span style="font-size:1.42em;line-height:.75">⟶</span>
+        </span>'''
+
+          if old not in text:
+              raise SystemExit('The unsupported arrow expression was not found.')
+
+          text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8')
+
+          workflow = Path('.github/workflows/fix-ar-opf-labeled-arrow.yml')
+          if workflow.exists():
+              workflow.unlink()
+          PY
+
+      - name: Commit corrected equation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Render the A-R-OPF mapping arrow correctly"
+          git push
