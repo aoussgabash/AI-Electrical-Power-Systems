@@ -109,6 +109,7 @@
 .achievement{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:#0b1b2c;border:1px solid rgba(255,255,255,.08);margin:9px 0}
 .achievement-icon{font-size:1.55rem}.achievement strong{display:block;color:#fff}.achievement span{color:#aebfd0;font-size:.88rem}
 .achievement.locked{opacity:.45;filter:grayscale(.7)}
+.ag-home-menu-link{margin-top:0!important;padding-top:11px!important;border-top:0!important}
 @media(max-width:900px){.progress-summary{grid-template-columns:repeat(2,1fr)}.progress-main{grid-template-columns:1fr}}
 @media(max-width:620px){.progress-summary{grid-template-columns:1fr 1fr}.progress-list{grid-template-columns:repeat(4,1fr)}.progress-panel{padding:16px}.progress-card a,.continue-learning-button{width:100%!important;justify-content:center!important;text-align:center!important}.progress-item{min-height:56px;font-size:1rem}}
 @media print{.learning-dashboard{display:none}}
