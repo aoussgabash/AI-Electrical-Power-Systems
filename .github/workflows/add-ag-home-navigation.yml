@@ -1,0 +1,71 @@
+name: Add unified AG home navigation
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-ag-home-navigation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-home-navigation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add home button and dropdown navigation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old_header = '''<header><div class="container"><nav><a class="brand" href="#top"><img src="assets/brand/AGAI.svg" alt="Official AGAI logo"><span><b style="color:#38bdf8">AI</b> Power Systems</span></a><div class="navlinks"><a href="#structure">Structure | الهيكل</a><a href="#progress">Progress | التقدم</a><a href="#courses">Lectures &amp; Labs | المحاضرات والمخابر</a><a href="#features">Features | الميزات</a><a href="#author">Author &amp; Profiles | المؤلف والملفات الأكاديمية</a></div></nav></div></header>'''
+
+          new_header = '''<header><div class="container"><nav><div class="ag-header-left"><a class="ag-home-button" href="https://aoussgabash.com" aria-label="AG Home | الموقع الأم" title="AG Home | الموقع الأم"><span aria-hidden="true">⌂</span></a><a class="brand" href="#top"><img src="assets/brand/AGAI.svg" alt="Official AGAI logo"><span><b style="color:#38bdf8">AI</b> Power Systems</span></a></div><button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">☰</button><div class="navlinks"><a href="#structure">Structure | الهيكل</a><a href="#progress">Progress | التقدم</a><a href="#courses">Lectures &amp; Labs | المحاضرات والمخابر</a><a href="#features">Features | الميزات</a><a href="#author">Author &amp; Profiles | المؤلف والملفات الأكاديمية</a><a class="ag-home-menu-link" href="https://aoussgabash.com">⌂ AG Home | الموقع الأم</a></div></nav></div></header>'''
+
+          if old_header in text:
+              text = text.replace(old_header, new_header, 1)
+          elif 'class="ag-home-button"' not in text:
+              raise SystemExit('Expected header block was not found; no changes made.')
+
+          css = '''
+.ag-header-left{display:flex;align-items:center;gap:10px}.ag-home-button{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;flex:0 0 46px;border:1px solid var(--line);border-radius:50%;background:#0b1d30;color:#eaf7ff;text-decoration:none;font-size:1.55rem;line-height:1;transition:.18s}.ag-home-button:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.65);background:#0d2943}.menu-toggle{display:block;width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:#0b1d30;color:#fff;font-size:1.45rem;cursor:pointer}.menu-toggle:hover,.menu-toggle[aria-expanded="true"]{border-color:rgba(56,189,248,.65);background:#0d2943}.navlinks{display:none;position:absolute;top:64px;right:0;width:min(380px,92vw);padding:14px;flex-direction:column;align-items:stretch;gap:6px;background:#081827;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 45px rgba(0,0,0,.42)}.navlinks.open{display:flex}.navlinks a{display:block;padding:11px 13px;border-radius:10px}.navlinks a:hover{background:rgba(56,189,248,.09)}.ag-home-menu-link{margin-top:5px;padding-top:13px!important;border-top:1px solid var(--line)}nav{position:relative}@media(max-width:620px){.ag-home-button{width:42px;height:42px;flex-basis:42px;font-size:1.35rem}.menu-toggle{width:44px;height:44px}.ag-header-left{gap:8px}.brand span{font-size:.86rem}.navlinks{top:60px}}
+'''
+          if '.ag-home-button{' not in text:
+              text = text.replace('</style>', css + '</style>', 1)
+
+          script = '''
+<script id="ag-unified-header-script">
+(() => {
+  const button = document.querySelector('.menu-toggle');
+  const menu = document.querySelector('.navlinks');
+  if (!button || !menu) return;
+  const close = () => { menu.classList.remove('open'); button.setAttribute('aria-expanded','false'); button.setAttribute('aria-label','Open navigation'); };
+  button.addEventListener('click', event => { event.stopPropagation(); const open = menu.classList.toggle('open'); button.setAttribute('aria-expanded', String(open)); button.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation'); });
+  menu.querySelectorAll('a').forEach(link => link.addEventListener('click', close));
+  document.addEventListener('click', event => { if (!menu.contains(event.target) && !button.contains(event.target)) close(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') { close(); button.focus(); } });
+})();
+</script>
+'''
+          if 'id="ag-unified-header-script"' not in text:
+              text = text.replace('</body>', script + '</body>', 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit updated navigation
+        run: |
+          if git diff --quiet; then
+            echo "No changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Add AG home button and dropdown navigation"
+          git push
