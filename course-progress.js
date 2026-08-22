@@ -1,6 +1,88 @@
 (() => {
   'use strict';
 
+  const AI_SITE_URL = 'https://ai.aoussgabash.com/';
+  const AI_SITE_TITLE = 'AI Applications in Electrical Power Systems | Dr.-Ing. Aouss Gabash';
+  const AI_SITE_DESCRIPTION = 'Bilingual educational platform with lectures, MATLAB laboratories, quizzes, and academic resources on artificial intelligence applications in electrical power systems.';
+  const AI_SITE_IMAGE = 'https://ai.aoussgabash.com/assets/brand/AGAI.svg';
+
+  const upsertMeta = (selector, attributes) => {
+    let element = document.head.querySelector(selector);
+    if (!element) {
+      element = document.createElement('meta');
+      document.head.appendChild(element);
+    }
+    Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+    return element;
+  };
+
+  const upsertLink = (selector, attributes) => {
+    let element = document.head.querySelector(selector);
+    if (!element) {
+      element = document.createElement('link');
+      document.head.appendChild(element);
+    }
+    Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+    return element;
+  };
+
+  document.title = AI_SITE_TITLE;
+  upsertMeta('meta[name="description"]', { name: 'description', content: AI_SITE_DESCRIPTION });
+  upsertMeta('meta[name="robots"]', { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' });
+  upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: 'AI Power Systems' });
+  upsertMeta('meta[property="og:title"]', { property: 'og:title', content: AI_SITE_TITLE });
+  upsertMeta('meta[property="og:description"]', { property: 'og:description', content: AI_SITE_DESCRIPTION });
+  upsertMeta('meta[property="og:url"]', { property: 'og:url', content: AI_SITE_URL });
+  upsertMeta('meta[property="og:image"]', { property: 'og:image', content: AI_SITE_IMAGE });
+  upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: 'AGAI – AI Applications in Electrical Power Systems' });
+  upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary' });
+  upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: AI_SITE_TITLE });
+  upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: AI_SITE_DESCRIPTION });
+  upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: AI_SITE_IMAGE });
+  upsertLink('link[rel="canonical"]', { rel: 'canonical', href: AI_SITE_URL });
+
+  const oldCourseSchema = [...document.querySelectorAll('script[type="application/ld+json"]')]
+    .find(script => script.textContent.includes('"@type":"Course"') || script.textContent.includes('"@type": "Course"'));
+  if (oldCourseSchema) oldCourseSchema.remove();
+
+  let aiSchema = document.querySelector('#agai-course-schema');
+  if (!aiSchema) {
+    aiSchema = document.createElement('script');
+    aiSchema.id = 'agai-course-schema';
+    aiSchema.type = 'application/ld+json';
+    document.head.appendChild(aiSchema);
+  }
+  aiSchema.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Course',
+        '@id': `${AI_SITE_URL}#course`,
+        name: 'AI Applications in Electrical Power Systems',
+        alternateName: 'تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية',
+        description: AI_SITE_DESCRIPTION,
+        url: AI_SITE_URL,
+        image: AI_SITE_IMAGE,
+        inLanguage: ['en', 'ar'],
+        provider: {
+          '@type': 'Person',
+          '@id': 'https://aoussgabash.com/#person',
+          name: 'Dr.-Ing. Aouss Gabash',
+          url: 'https://aoussgabash.com/'
+        }
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${AI_SITE_URL}#website`,
+        url: AI_SITE_URL,
+        name: 'AI Power Systems',
+        alternateName: 'منصة تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية',
+        description: AI_SITE_DESCRIPTION,
+        inLanguage: ['en', 'ar']
+      }
+    ]
+  });
+
   const totalLectures = 20;
   const passMark = 80;
 
