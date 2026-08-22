@@ -174,4 +174,41 @@
     badge.textContent = `${icon} ${label}`;
     badge.setAttribute('aria-label', label);
   });
+
+  const nav = document.querySelector('header nav');
+  const brand = nav?.querySelector('.brand');
+  const menu = nav?.querySelector('.navlinks');
+
+  if (nav && brand && !nav.querySelector('.ag-home-button')) {
+    const left = document.createElement('div');
+    left.className = 'ag-header-left';
+
+    const home = document.createElement('a');
+    home.className = 'ag-home-button';
+    home.href = 'https://aoussgabash.com';
+    home.setAttribute('aria-label', 'AG Home | الموقع الأم');
+    home.title = 'AG Home | الموقع الأم';
+    home.innerHTML = '<span aria-hidden="true">⌂</span>';
+
+    brand.before(left);
+    left.append(home, brand);
+  }
+
+  if (menu && !menu.querySelector('.ag-home-menu-link')) {
+    const homeLink = document.createElement('a');
+    homeLink.className = 'ag-home-menu-link';
+    homeLink.href = 'https://aoussgabash.com';
+    homeLink.innerHTML = '⌂ AG Home | الموقع الأم';
+    menu.appendChild(homeLink);
+  }
+
+  if (!document.getElementById('ag-ai-unified-header-style')) {
+    const style = document.createElement('style');
+    style.id = 'ag-ai-unified-header-style';
+    style.textContent = `
+      nav{position:relative}.ag-header-left{display:flex;align-items:center;gap:10px;min-width:0}.ag-home-button{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;flex:0 0 46px;border:1px solid rgba(255,255,255,.18);border-radius:50%;background:#0b1d30;color:#fff!important;text-decoration:none;font-size:1.55rem;line-height:1}.ag-home-button span{color:#fff!important;line-height:1}.ag-home-button:hover,.ag-home-button:focus-visible{border-color:rgba(56,189,248,.7);background:#0d2943;outline:none}.ag-home-menu-link{margin-top:5px;padding-top:13px!important;border-top:1px solid var(--line)}
+      @media(max-width:620px){.ag-header-left{gap:8px}.ag-home-button{width:42px;height:42px;flex-basis:42px;font-size:1.35rem}.brand img{width:42px!important;height:42px!important}.brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+    `;
+    document.head.appendChild(style);
+  }
 })();
