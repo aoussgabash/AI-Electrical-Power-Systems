@@ -395,3 +395,53 @@ body > header .brand::before{
     display:none!important;
   }
 }
+
+/* Canonical AG footer — direct visual override */
+.site-footer.course-footer{
+  margin-top:44px!important;
+  padding:42px 0!important;
+  border-top:1px solid rgba(255,255,255,.10)!important;
+  background:#06101c!important;
+  color:#aebfd0!important;
+  text-align:left!important;
+}
+
+.site-footer.course-footer .site-footer-inner{
+  width:min(1180px,92%)!important;
+  margin:auto!important;
+  display:block!important;
+  text-align:left!important;
+}
+
+.site-footer.course-footer .footer-title,
+.site-footer.course-footer .footer-subtitle,
+.site-footer.course-footer .footer-info,
+.site-footer.course-footer .footer-copy{
+  display:none!important;
+}
+
+.site-footer.course-footer .site-footer-inner::before{
+  content:"© 2026 Dr.-Ing. Aouss Gabash | الدكتور المهندس أوس غباش\A\A AG Academic Ecosystem | منظومة AG الأكاديمية\A\A Germany | ألمانيا • Syria | سوريا";
+  display:block;
+  white-space:pre-line;
+  color:#aebfd0;
+  font-family:inherit;
+  font-size:clamp(.92rem,2.7vw,1.08rem);
+  line-height:1.8;
+  unicode-bidi:plaintext;
+}
+
+@media(max-width:620px){
+  .site-footer.course-footer{
+    margin-top:34px!important;
+    padding:34px 0!important;
+  }
+
+  .site-footer.course-footer .site-footer-inner{
+    width:min(92%,460px)!important;
+  }
+
+  .site-footer.course-footer .site-footer-inner::before{
+    font-size:.92rem;
+  }
+}
