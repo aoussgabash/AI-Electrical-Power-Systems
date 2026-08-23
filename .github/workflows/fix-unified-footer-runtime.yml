@@ -55,7 +55,7 @@ jobs:
           grep -q 'AG Academic Ecosystem' course-footer.js
           grep -q 'Germany' course-footer.js
           grep -q 'Syria' course-footer.js
-          ! grep -q 'AI Applications in Electrical Power Systems</div>' course-footer.js
+          grep -q 'الدكتور المهندس أوس غباش' course-footer.js
           rm -f .github/workflows/fix-unified-footer-runtime.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
