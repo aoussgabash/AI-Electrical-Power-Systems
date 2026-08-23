@@ -56,23 +56,23 @@
   .site-footer.ag-canonical-footer,
   .site-footer.course-footer.ag-canonical-footer{
     padding:34px 0!important;
-    text-align:center!important;
+    text-align:left!important;
   }
   .site-footer.ag-canonical-footer .ag-footer-inner{
-    width:min(100% - 30px,680px)!important;
+    width:min(1120px,calc(100% - 32px))!important;
     margin-inline:auto!important;
     font-size:.92rem!important;
-    text-align:center!important;
+    text-align:left!important;
   }
   .site-footer.ag-canonical-footer .ag-footer-line{
     font-size:1em!important;
     line-height:1.8!important;
-    text-align:center!important;
+    text-align:left!important;
     white-space:normal!important;
     overflow-wrap:normal!important;
   }
   .site-footer.ag-canonical-footer .ag-footer-line+.ag-footer-line{
-    margin-top:8px!important;
+    margin-top:14px!important;
   }
 }
 @media print{
