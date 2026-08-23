@@ -1,4 +1,4 @@
-name: Fix shared runtime footer
+name: Synchronize canonical AI footer
 
 on:
   push:
@@ -10,55 +10,42 @@ permissions:
   contents: write
 
 jobs:
-  update:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Update shared footer generator and static pages
+      - name: Update the shared footer source
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
 
-          desired_inner = '''
+          path = Path('course-footer.js')
+          text = path.read_text(encoding='utf-8')
+          replacement = '''footer.innerHTML = `
     <div class="site-footer-inner ag-global-footer">
       <div class="footer-copy">© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></div>
       <div class="footer-copy">AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></div>
       <div class="footer-copy">Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></div>
-    </div>'''
+    </div>`;'''
 
-          js = Path('course-footer.js')
-          s = js.read_text(encoding='utf-8')
-          s2 = re.sub(r"footer\.innerHTML\s*=\s*`[\s\S]*?`;", "footer.innerHTML = `" + desired_inner + "`;", s, count=1)
-          if s2 == s:
-              raise SystemExit('Could not replace course-footer.js runtime footer')
-          js.write_text(s2, encoding='utf-8')
+          if 'class="site-footer-inner ag-global-footer"' not in text:
+              text, count = re.subn(
+                  r'footer\.innerHTML\s*=\s*`[\s\S]*?`;',
+                  replacement,
+                  text,
+                  count=1,
+              )
+              if count != 1:
+                  raise SystemExit('The shared footer block was not found in course-footer.js')
 
-          static_footer = '''<footer class="site-footer course-footer">
-  <div class="site-footer-inner ag-global-footer">
-    <div class="footer-copy">© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></div>
-    <div class="footer-copy">AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></div>
-    <div class="footer-copy">Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></div>
-  </div>
-</footer>'''
-
-          for p in Path('.').rglob('*.html'):
-              if '.git' in p.parts or '.github' in p.parts:
-                  continue
-              txt = p.read_text(encoding='utf-8', errors='ignore')
-              new = re.sub(r'<footer\b[^>]*>[\s\S]*?</footer>', static_footer, txt, flags=re.I)
-              if new != txt:
-                  p.write_text(new, encoding='utf-8')
+          path.write_text(text, encoding='utf-8')
           PY
-      - name: Validate and commit site files only
+      - name: Commit only the shared footer source
         run: |
-          grep -q 'AG Academic Ecosystem' course-footer.js
-          grep -q 'Germany' course-footer.js
-          grep -q 'Syria' course-footer.js
-          grep -q 'الدكتور المهندس أوس غباش' course-footer.js
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add course-footer.js '*.html'
+          git add course-footer.js
           git diff --cached --quiet && exit 0
-          git commit -m "Fix unified footer across all AI pages"
+          git commit -m "Use canonical AG footer across AI pages"
           git push
