@@ -1,6 +1,17 @@
 (() => {
   'use strict';
 
+  const ensureCanonicalStyles = () => {
+    document.querySelectorAll('link[href^="course-footer.css"]').forEach((link) => link.remove());
+    if (document.querySelector('link[data-canonical-footer]')) return;
+
+    const styles = document.createElement('link');
+    styles.rel = 'stylesheet';
+    styles.href = 'course-footer.css?v=20260823-4';
+    styles.dataset.canonicalFooter = 'true';
+    document.head.appendChild(styles);
+  };
+
   const renderCanonicalFooter = () => {
     const footer = document.createElement('footer');
     footer.className = 'site-footer course-footer ag-canonical-footer';
@@ -27,15 +38,22 @@
         </p>
       </div>`;
 
-    const existingFooter = document.querySelector('footer');
-    if (existingFooter) existingFooter.replaceWith(footer);
-    else document.body.appendChild(footer);
+    document.querySelectorAll('footer').forEach((oldFooter) => oldFooter.remove());
+    document.body.appendChild(footer);
   };
 
   const loadLegacyFeatures = () => {
+    ensureCanonicalStyles();
+
+    if (document.querySelector('script[data-course-legacy]')) {
+      renderCanonicalFooter();
+      return;
+    }
+
     const legacy = document.createElement('script');
-    legacy.src = 'course-footer-legacy.js?v=20260823-1';
+    legacy.src = 'course-footer-legacy.js?v=20260823-2';
     legacy.defer = true;
+    legacy.dataset.courseLegacy = 'true';
     legacy.addEventListener('load', () => {
       renderCanonicalFooter();
       requestAnimationFrame(renderCanonicalFooter);
