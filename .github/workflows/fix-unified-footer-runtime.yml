@@ -1,4 +1,4 @@
-name: Synchronize canonical AI footer
+name: Rebuild canonical AI footer
 
 on:
   push:
@@ -10,42 +10,106 @@ permissions:
   contents: write
 
 jobs:
-  sync:
+  rebuild:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Update the shared footer source
+
+      - name: Replace the shared footer markup and style
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
 
-          path = Path('course-footer.js')
-          text = path.read_text(encoding='utf-8')
-          replacement = '''footer.innerHTML = `
-    <div class="site-footer-inner ag-global-footer">
-      <div class="footer-copy">© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></div>
-      <div class="footer-copy">AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></div>
-      <div class="footer-copy">Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></div>
+          js_path = Path('course-footer.js')
+          js = js_path.read_text(encoding='utf-8')
+
+          old_block = '''footer.innerHTML = `
+    <div class="site-footer-inner">
+      <div class="footer-title">AI Applications in Electrical Power Systems</div>
+      <div class="footer-subtitle" lang="ar" dir="rtl">تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
+      <div class="footer-info">${pageInfo}</div>
+      <div class="footer-copy">© ${yearText} Aouss Gabash. All Rights Reserved.</div>
     </div>`;'''
 
-          if 'class="site-footer-inner ag-global-footer"' not in text:
-              text, count = re.subn(
-                  r'footer\.innerHTML\s*=\s*`[\s\S]*?`;',
-                  replacement,
-                  text,
-                  count=1,
-              )
-              if count != 1:
-                  raise SystemExit('The shared footer block was not found in course-footer.js')
+          new_block = '''footer.innerHTML = `
+    <div class="site-footer-inner ag-global-footer">
+      <p class="ag-footer-line">© 2026 Dr.-Ing. Aouss Gabash <span aria-hidden="true">|</span> <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></p>
+      <p class="ag-footer-line">AG Academic Ecosystem <span aria-hidden="true">|</span> <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></p>
+      <p class="ag-footer-line">Germany <span aria-hidden="true">|</span> <span lang="ar" dir="rtl">ألمانيا</span> <span aria-hidden="true">•</span> Syria <span aria-hidden="true">|</span> <span lang="ar" dir="rtl">سوريا</span></p>
+    </div>`;'''
 
-          path.write_text(text, encoding='utf-8')
+          if old_block in js:
+              js = js.replace(old_block, new_block, 1)
+          elif new_block not in js:
+              raise SystemExit('Expected footer block was not found in course-footer.js')
+
+          js_path.write_text(js, encoding='utf-8')
+
+          css_path = Path('course-footer.css')
+          css = css_path.read_text(encoding='utf-8')
+          start = '/* AG canonical footer override: start */'
+          end = '/* AG canonical footer override: end */'
+          css = re.sub(re.escape(start) + r'[\s\S]*?' + re.escape(end), '', css).rstrip()
+          override = r'''
+
+/* AG canonical footer override: start */
+.site-footer.course-footer{
+  margin-top:44px;
+  padding:42px 0;
+  border-top:1px solid rgba(255,255,255,.10);
+  background:#06101c;
+  color:#aebfd0;
+  text-align:left;
+}
+
+.site-footer.course-footer .site-footer-inner{
+  width:min(1180px,92%);
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:14px;
+  text-align:left;
+}
+
+.site-footer.course-footer .ag-footer-line{
+  margin:0;
+  color:#aebfd0;
+  font-size:clamp(.92rem,2.7vw,1.08rem);
+  line-height:1.8;
+}
+
+.site-footer.course-footer .ag-footer-line [lang="ar"]{
+  font-family:"Noto Naskh Arabic",Tahoma,Arial,sans-serif;
+  unicode-bidi:isolate;
+}
+
+@media(max-width:620px){
+  .site-footer.course-footer{
+    margin-top:34px;
+    padding:34px 0;
+  }
+
+  .site-footer.course-footer .site-footer-inner{
+    width:min(92%,460px);
+    gap:12px;
+  }
+
+  .site-footer.course-footer .ag-footer-line{
+    font-size:.92rem;
+  }
+}
+/* AG canonical footer override: end */
+'''
+          css_path.write_text(css + override, encoding='utf-8')
           PY
-      - name: Commit only the shared footer source
+
+      - name: Commit the shared AI footer files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add course-footer.js
+          git add course-footer.js course-footer.css
           git diff --cached --quiet && exit 0
-          git commit -m "Use canonical AG footer across AI pages"
+          git commit -m "Match AI footer with homepage"
           git push
