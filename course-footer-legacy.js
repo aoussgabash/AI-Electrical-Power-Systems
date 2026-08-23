@@ -1,0 +1,1 @@
+/* Legacy course features are preserved in the original blob and loaded by course-footer.js. */
