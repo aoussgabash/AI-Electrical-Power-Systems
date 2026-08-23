@@ -1,519 +1,98 @@
-/* Compact shared site footer */
-.site-footer,
-.course-footer{
-  margin-top:44px;
-  padding:22px 16px;
-  border-top:1px solid rgba(255,255,255,.09);
-  background:linear-gradient(180deg,rgba(8,21,35,.96),rgba(6,16,28,.98));
-  color:#9fb2c5;
-  text-align:center;
-}
-
-.site-footer-inner{
-  width:min(920px,92%);
-  margin:auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:5px;
-}
-
-.footer-title{
-  color:#f4f8fc;
-  font-size:1rem;
-  font-weight:700;
-  line-height:1.35;
-}
-
-.footer-subtitle{
-  color:#8fc7ff;
-  font-size:.92rem;
-  line-height:1.45;
-}
-
-.footer-info{
-  margin-top:4px;
-  color:#8296aa;
-  font-size:.8rem;
-  letter-spacing:.01em;
-}
-
-.footer-copy{
-  margin-top:2px;
-  color:#71869a;
-  font-size:.76rem;
-}
-
-/* Independent author portrait on the home page.
-   It is not part of the ResearchGate link. */
-#author .author-box{
-  position:relative;
-}
-
-#author .author-box > div:first-child{
-  position:relative;
-  padding-top:154px;
-}
-
-#author .author-box > div:first-child::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  z-index:2;
-  box-sizing:content-box;
-  width:120px;
-  height:120px;
-  padding:6px;
-  border:4px solid rgba(56,189,248,.88);
-  border-radius:50%;
-  background-image:url("assets/aouss-gabash-photo.svg");
-  background-position:center;
-  background-size:cover;
-  background-repeat:no-repeat;
-  background-origin:content-box;
-  background-clip:content-box;
-  box-shadow:0 12px 28px rgba(0,0,0,.30),0 0 0 7px rgba(56,189,248,.10);
-  pointer-events:none;
-}
-
-/* Arabic translations below the English author name and IEEE title. */
-#author .author-box > div:first-child h3{
-  margin-bottom:0;
-}
-
-#author .author-box > div:first-child h3::after{
-  content:"د. م. أوس غباش";
-  display:block;
-  width:fit-content;
-  max-width:100%;
-  margin-top:3px;
-  color:#dceaf6;
-  direction:rtl;
-  unicode-bidi:isolate;
-  text-align:right;
-  font-family:"Noto Naskh Arabic",Tahoma,Arial,sans-serif;
-  font-size:.94rem;
-  font-weight:700;
-  line-height:1.7;
-}
-
-#author .author-box > div:first-child > p:first-of-type{
-  margin-top:16px;
-}
-
-#author .author-box > div:first-child > p:first-of-type::after{
-  content:"عضو أقدم في معهد مهندسي الكهرباء والإلكترونيات (منذ 2022)";
-  display:block;
-  width:fit-content;
-  max-width:100%;
-  margin-top:2px;
-  color:#aebfd0;
-  direction:rtl;
-  unicode-bidi:isolate;
-  text-align:right;
-  font-family:"Noto Naskh Arabic",Tahoma,Arial,sans-serif;
-  font-size:.86rem;
-  line-height:1.7;
-}
-
-/* Remove the old portrait that was attached to ResearchGate. */
-#author .academic-profile-link.researchgate::before{
-  content:none!important;
-  display:none!important;
-}
-
-/* Elegant bilingual author credit on lectures and labs. */
-.course-author-name{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:0;
-}
-
-.course-author-name::after{
-  content:"د. م. أوس غباش";
-  display:inline-block;
-  margin-left:10px;
-  padding-left:10px;
-  border-left:1px solid rgba(143,199,255,.45);
-  color:#8fd3ff;
-  direction:rtl;
-  unicode-bidi:isolate;
-  font-family:"Noto Naskh Arabic",Tahoma,Arial,sans-serif;
-  font-weight:700;
-  white-space:nowrap;
-}
-
-.course-action-download .course-action-meta::after{
-  content:" | د. م. أوس غباش";
-  direction:rtl;
-  unicode-bidi:isolate;
-  color:#dceaf6;
-  font-family:"Noto Naskh Arabic",Tahoma,Arial,sans-serif;
-}
-
-/* Remove the Version 1.0 badge from the author section only. */
-#author .version-pill{
-  display:none!important;
-}
-
-/* Arabic terminology for the Modern AI section. */
-#structure .part:nth-child(2) .ar{
-  font-size:0;
-}
-
-#structure .part:nth-child(2) .ar::after{
-  content:"التقنيات الحديثة: التعلم العميق، والمحوّلات، والشبكات العصبية للرسوم البيانية، والتعلم المعزز، والذكاء الاصطناعي القابل للتفسير، والذكاء الاصطناعي التوليدي، والأنظمة متعددة الوكلاء، والتوائم الرقمية.";
-  display:block;
-  font-size:1rem;
-  line-height:1.9;
-  direction:rtl;
-  text-align:right;
-}
-
-/* Remove the standalone Digital Library section and its old page links. */
-#digital-library,
-[data-archive-link],
-[data-archive-button]{
-  display:none!important;
-}
-
-/* Hamburger navigation on desktop and mobile. */
-header nav{
-  position:relative;
-}
-
-.mobile-menu-toggle{
-  display:inline-flex!important;
-  align-items:center;
-  justify-content:center;
-  width:44px;
-  height:44px;
-  margin-left:auto;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:10px;
-  background:#0b2135;
-  color:#fff;
-  font-size:1.55rem;
-  line-height:1;
-  cursor:pointer;
-}
-
-.mobile-menu-toggle:hover,
-.mobile-menu-toggle:focus-visible{
-  border-color:#38bdf8;
-  outline:2px solid rgba(56,189,248,.28);
-  outline-offset:2px;
-}
-
-header .navlinks{
-  display:none!important;
-  position:absolute;
-  top:calc(100% + 1px);
-  right:0;
-  z-index:100;
-  width:min(340px,92vw);
-  flex-direction:column;
-  gap:4px;
-  padding:10px;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:0 0 14px 14px;
-  background:rgba(7,17,31,.98);
-  box-shadow:0 18px 36px rgba(0,0,0,.35);
-  backdrop-filter:blur(14px);
-}
-
-header .navlinks.is-open{
-  display:flex!important;
-}
-
-header .navlinks a{
-  display:block;
-  width:100%;
-  padding:11px 13px;
-  border-radius:9px;
-  color:#dceaf5;
-  text-align:left;
-  text-decoration:none;
-}
-
-header .navlinks a:hover,
-header .navlinks a:focus-visible{
-  color:#fff;
-  background:rgba(56,189,248,.12);
-  outline:none;
-}
-
-/* Custom electrical-power laboratory icon across the site. */
-a[href^="lab"] .icon,
-.course-action-related[href^="lab"] .course-action-icon,
-body:has(.course-action-related[href^="lecture"]) .course-action-current .course-action-icon{
-  position:relative;
-  display:inline-flex!important;
-  align-items:center;
-  justify-content:center;
-  width:58px;
-  height:58px;
-  overflow:hidden;
-  color:transparent!important;
-  font-size:0!important;
-  line-height:0!important;
-  background-image:url("assets/icons/electrical-power-lab.svg");
-  background-position:center;
-  background-size:contain;
-  background-repeat:no-repeat;
-}
-
-.course-action-related[href^="lab"] .course-action-icon,
-body:has(.course-action-related[href^="lecture"]) .course-action-current .course-action-icon{
-  width:48px;
-  height:48px;
-  flex:0 0 48px;
-}
-
-/* Force the official AGAI logo and completely hide legacy AG images. */
-body > header .brand img{
-  display:none!important;
-}
-
-body > header .brand::before{
-  content:"";
-  display:block;
-  width:46px;
-  height:46px;
-  flex:0 0 46px;
-  border-radius:11px;
-  background:url("assets/brand/AGAI.svg?v=20260820-3") center/contain no-repeat;
-  box-shadow:0 7px 18px rgba(56,189,248,.18);
-}
-
-.hero-logo img{
-  display:none!important;
-}
-
-.hero-logo::before{
-  content:"";
-  display:block;
-  width:min(390px,90vw);
-  aspect-ratio:1;
-  margin-inline:auto;
-  border-radius:36px;
-  background:url("assets/brand/AGAI.svg?v=20260820-3") center/contain no-repeat;
-  filter:drop-shadow(0 26px 60px rgba(0,0,0,.42));
-}
-
-@media(max-width:900px){
-  .hero-logo::before{
-    width:250px;
-  }
-
-  #author .author-box > div:first-child{
-    padding-top:154px;
-    text-align:left;
-  }
-
-  #author .author-box > div:first-child::before{
-    left:0;
-  }
-}
-
-@media(max-width:620px){
-  .site-footer,
-  .course-footer{
-    margin-top:34px;
-    padding:18px 12px;
-  }
-
-  .site-footer-inner{
-    width:min(100%,460px);
-    gap:4px;
-  }
-
-  .footer-title{
-    font-size:.92rem;
-  }
-
-  .footer-subtitle{
-    font-size:.86rem;
-  }
-
-  .footer-info{
-    font-size:.74rem;
-  }
-
-  .footer-copy{
-    font-size:.7rem;
-  }
-
-  #author .author-box > div:first-child::before{
-    width:106px;
-    height:106px;
-    padding:6px;
-  }
-
-  #author .author-box > div:first-child{
-    padding-top:140px;
-  }
-
-  #author .author-box > div:first-child h3::after{
-    font-size:.9rem;
-  }
-
-  #author .author-box > div:first-child > p:first-of-type::after{
-    font-size:.82rem;
-  }
-
-  .course-author-name::after{
-    margin-left:8px;
-    padding-left:8px;
-  }
-
-  header .navlinks{
-    left:0;
-    right:0;
-    width:auto;
-  }
-
-  a[href^="lab"] .icon{
-    width:52px;
-    height:52px;
-  }
-}
-
-@media print{
-  .course-author-name::after{
-    color:#000!important;
-    border-left-color:#777!important;
-  }
-
-  .site-footer,
-  .course-footer,
-  .mobile-menu-toggle,
-  header .navlinks{
-    display:none!important;
-  }
-}
-
-/* Canonical AG footer — matched to the personal homepage */
-.site-footer.course-footer{
+/* Canonical AG footer — identical structure across Homepage, AI and Press */
+.site-footer.ag-canonical-footer,
+.site-footer.course-footer.ag-canonical-footer{
   margin-top:44px!important;
   padding:42px 0!important;
   border-top:1px solid rgba(255,255,255,.10)!important;
   background:#06101c!important;
   color:#aebfd0!important;
   text-align:left!important;
+  direction:ltr!important;
 }
 
-.site-footer.course-footer .site-footer-inner{
-  width:min(1120px,calc(100% - 56px))!important;
+.site-footer.ag-canonical-footer .ag-footer-inner{
+  width:min(1120px,calc(100% - 32px))!important;
   margin:auto!important;
-  display:block!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:14px!important;
   text-align:left!important;
+  direction:ltr!important;
 }
 
-.site-footer.course-footer .footer-title,
-.site-footer.course-footer .footer-subtitle,
-.site-footer.course-footer .footer-info{
-  display:block!important;
+.site-footer.ag-canonical-footer .ag-footer-line{
+  display:flex!important;
+  align-items:baseline!important;
+  justify-content:flex-start!important;
+  flex-wrap:nowrap!important;
+  gap:0!important;
+  width:100%!important;
   margin:0!important;
   padding:0!important;
-  font-size:0!important;
-  line-height:1.8!important;
   color:#aebfd0!important;
+  font-family:Arial,Tahoma,sans-serif!important;
+  font-size:1rem!important;
   font-weight:400!important;
+  line-height:1.8!important;
   letter-spacing:0!important;
   text-align:left!important;
+  direction:ltr!important;
+  unicode-bidi:isolate!important;
+  white-space:nowrap!important;
 }
 
-.site-footer.course-footer .footer-title::before{
-  content:"© 2026 Dr.-Ing. Aouss Gabash | ";
-  color:#aebfd0;
-  font-family:Arial,Tahoma,sans-serif;
-  font-size:1rem;
-  font-weight:400;
+.site-footer.ag-canonical-footer .footer-en,
+.site-footer.ag-canonical-footer .footer-separator{
+  color:#aebfd0!important;
+  direction:ltr!important;
+  unicode-bidi:isolate!important;
+  font-weight:400!important;
 }
 
-.site-footer.course-footer .footer-title::after{
-  content:"الدكتور المهندس أوس غباش";
-  color:#fff;
-  direction:rtl;
-  unicode-bidi:isolate;
-  font-family:Tahoma,Arial,sans-serif;
-  font-size:1rem;
-  font-weight:400;
+.site-footer.ag-canonical-footer .footer-ar{
+  color:#fff!important;
+  direction:rtl!important;
+  unicode-bidi:isolate!important;
+  font-family:Tahoma,Arial,sans-serif!important;
+  font-weight:400!important;
+  white-space:nowrap!important;
 }
 
-.site-footer.course-footer .footer-subtitle{
-  margin-top:14px!important;
+.site-footer.ag-canonical-footer .footer-separator{
+  margin-inline:6px!important;
 }
 
-.site-footer.course-footer .footer-subtitle::before{
-  content:"AG Academic Ecosystem | ";
-  color:#aebfd0;
-  font-family:Arial,Tahoma,sans-serif;
-  font-size:1rem;
-  font-weight:400;
-}
-
-.site-footer.course-footer .footer-subtitle::after{
-  content:"منظومة AG الأكاديمية";
-  color:#fff;
-  direction:rtl;
-  unicode-bidi:isolate;
-  font-family:Tahoma,Arial,sans-serif;
-  font-size:1rem;
-  font-weight:400;
-}
-
-.site-footer.course-footer .footer-info{
-  margin-top:14px!important;
-}
-
-.site-footer.course-footer .footer-info::before{
-  content:"Germany | ";
-  color:#aebfd0;
-  font-family:Arial,Tahoma,sans-serif;
-  font-size:1rem;
-  font-weight:400;
-}
-
-.site-footer.course-footer .footer-info::after{
-  content:"ألمانيا • Syria | سوريا";
-  color:#fff;
-  direction:rtl;
-  unicode-bidi:isolate;
-  font-family:Tahoma,Arial,sans-serif;
-  font-size:1rem;
-  font-weight:400;
-}
-
-.site-footer.course-footer .footer-copy{
-  display:none!important;
-}
-
-.site-footer.course-footer .site-footer-inner::before{
-  content:none!important;
-  display:none!important;
+.site-footer.ag-canonical-footer .footer-dot{
+  margin-inline:8px!important;
 }
 
 @media(max-width:620px){
-  .site-footer.course-footer{
+  .site-footer.ag-canonical-footer,
+  .site-footer.course-footer.ag-canonical-footer{
     margin-top:34px!important;
     padding:34px 0!important;
   }
 
-  .site-footer.course-footer .site-footer-inner{
+  .site-footer.ag-canonical-footer .ag-footer-inner{
     width:calc(100% - 56px)!important;
   }
 
-  .site-footer.course-footer .footer-title::before,
-  .site-footer.course-footer .footer-title::after,
-  .site-footer.course-footer .footer-subtitle::before,
-  .site-footer.course-footer .footer-subtitle::after,
-  .site-footer.course-footer .footer-info::before,
-  .site-footer.course-footer .footer-info::after{
-    font-size:.92rem;
+  .site-footer.ag-canonical-footer .ag-footer-line{
+    font-size:.92rem!important;
+  }
+}
+
+@media(max-width:520px){
+  .site-footer.ag-canonical-footer .ag-footer-line{
+    flex-wrap:wrap!important;
+    white-space:normal!important;
+  }
+}
+
+@media print{
+  .site-footer.ag-canonical-footer,
+  .site-footer.course-footer.ag-canonical-footer{
+    display:none!important;
   }
 }
