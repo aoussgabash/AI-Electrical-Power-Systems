@@ -1,0 +1,64 @@
+name: Fix shared runtime footer
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-unified-footer-runtime.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update shared footer generator and static pages
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          desired_inner = '''
+    <div class="site-footer-inner ag-global-footer">
+      <div class="footer-copy">© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></div>
+      <div class="footer-copy">AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></div>
+      <div class="footer-copy">Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></div>
+    </div>'''
+
+          js = Path('course-footer.js')
+          s = js.read_text(encoding='utf-8')
+          s2 = re.sub(r"footer\.innerHTML\s*=\s*`[\s\S]*?`;", "footer.innerHTML = `" + desired_inner + "`;", s, count=1)
+          if s2 == s:
+              raise SystemExit('Could not replace course-footer.js runtime footer')
+          js.write_text(s2, encoding='utf-8')
+
+          static_footer = '''<footer class="site-footer course-footer">
+  <div class="site-footer-inner ag-global-footer">
+    <div class="footer-copy">© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></div>
+    <div class="footer-copy">AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></div>
+    <div class="footer-copy">Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></div>
+  </div>
+</footer>'''
+
+          for p in Path('.').rglob('*.html'):
+              if '.git' in p.parts or '.github' in p.parts:
+                  continue
+              txt = p.read_text(encoding='utf-8', errors='ignore')
+              new = re.sub(r'<footer\b[^>]*>[\s\S]*?</footer>', static_footer, txt, flags=re.I)
+              if new != txt:
+                  p.write_text(new, encoding='utf-8')
+          PY
+      - name: Validate and commit
+        run: |
+          grep -q 'AG Academic Ecosystem' course-footer.js
+          grep -q 'Germany' course-footer.js
+          grep -q 'Syria' course-footer.js
+          ! grep -q 'AI Applications in Electrical Power Systems</div>' course-footer.js
+          rm -f .github/workflows/fix-unified-footer-runtime.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Fix unified footer across all AI pages"
+          git push
