@@ -1,6 +1,5 @@
-/* Compatibility shim for older course pages.
-   Shared footer and header styles are managed centrally by AG Academic Ecosystem. */
-@import url('https://aoussgabash.com/assets/shared/ag-theme.css?v=20260824-3');
+/* Backward-compatible entry point used by existing lecture and lab pages. */
+@import url('course-theme.css?v=20260824-2');
 
 @media print{
   #ag-central-footer,
