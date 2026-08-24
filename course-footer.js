@@ -1,15 +1,28 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260824-1';
+  const COURSE_THEME_VERSION = '20260824-2';
+  const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
+
+  const removePilotInlineStyles = () => {
+    if (page !== 'lecture01.html') return;
+    document.head.querySelectorAll('style').forEach((style) => style.remove());
+    document.documentElement.dataset.courseThemeCentralized = 'true';
+  };
 
   const loadCourseTheme = () => {
-    if (document.querySelector('link[data-course-theme]')) return;
+    const existing = document.querySelector('link[data-course-theme]');
+    if (existing) {
+      if (existing.sheet) removePilotInlineStyles();
+      else existing.addEventListener('load', removePilotInlineStyles, { once: true });
+      return;
+    }
 
     const theme = document.createElement('link');
     theme.rel = 'stylesheet';
     theme.href = `course-theme.css?v=${COURSE_THEME_VERSION}`;
     theme.dataset.courseTheme = 'true';
+    theme.addEventListener('load', removePilotInlineStyles, { once: true });
     document.head.appendChild(theme);
   };
 
