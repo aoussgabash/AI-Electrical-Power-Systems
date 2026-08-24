@@ -129,7 +129,7 @@ ul,ol{padding-left:24px}
 
 .ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
 
-.warning,.good,.task{
+.warning,.good,.task,.research{
   padding:16px;
   margin:15px 0;
   border-radius:12px;
@@ -151,6 +151,12 @@ ul,ol{padding-left:24px}
   border:1px solid rgba(250,204,21,.28);
   background:rgba(250,204,21,.07);
   color:#fff7c2;
+}
+
+.research{
+  border:1px solid rgba(167,139,250,.32);
+  background:rgba(167,139,250,.08);
+  color:#ede9fe;
 }
 
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
