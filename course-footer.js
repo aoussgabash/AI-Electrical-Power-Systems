@@ -11,7 +11,10 @@
   };
 
   const loadCourseTheme = () => {
-    const existing = document.querySelector('link[data-course-theme]');
+    const existing = document.querySelector(
+      'link[data-course-theme], link[href^="course-theme.css"], link[href^="course-footer.css"]'
+    );
+
     if (existing) {
       if (existing.sheet) removePilotInlineStyles();
       else existing.addEventListener('load', removePilotInlineStyles, { once: true });
@@ -38,7 +41,6 @@
 
   const startCourseFeatures = () => {
     loadCourseTheme();
-    document.querySelectorAll('link[href^="course-footer.css"]').forEach((link) => link.remove());
 
     if (document.querySelector('script[data-course-legacy]')) {
       loadCentralComponents();
