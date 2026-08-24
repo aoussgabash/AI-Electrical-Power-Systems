@@ -3,299 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
   <title>Lecture 02 - Intelligent Agents and Search</title>
-
-  <style>
-    :root{
-      --bg:#07111f;
-      --card:#0f2238;
-      --card2:#0b1b2c;
-      --text:#f4f7fb;
-      --muted:#b8c7d9;
-      --blue:#38bdf8;
-      --green:#22c55e;
-      --yellow:#facc15;
-      --red:#fb7185;
-      --line:rgba(255,255,255,.10);
-    }
-
-    *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Arial, Tahoma, sans-serif;
-      background:linear-gradient(180deg,#07111f,#0a1728);
-      color:var(--text);
-      line-height:1.8;
-    }
-
-    .container{
-      width:min(1050px,92%);
-      margin:auto;
-    }
-
-    header{
-      background:rgba(7,17,31,.95);
-      border-bottom:1px solid var(--line);
-      position:sticky;
-      top:0;
-      z-index:10;
-    }
-
-    nav{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      padding:17px 0;
-    }
-
-    .logo{
-      font-weight:bold;
-    }
-
-    .logo span{
-      color:var(--blue);
-    }
-
-    .back{
-      color:white;
-      text-decoration:none;
-      border:1px solid var(--line);
-      border-radius:9px;
-      padding:8px 12px;
-    }
-
-    .hero{
-      text-align:center;
-      padding:60px 0 35px;
-    }
-
-    .lecture-number{
-      color:var(--blue);
-      font-weight:bold;
-      letter-spacing:1px;
-    }
-
-    h1{
-      font-size:clamp(2rem,6vw,3.6rem);
-      line-height:1.15;
-      margin:10px 0;
-    }
-
-    .hero-ar{
-      direction:rtl;
-      font-size:1.5rem;
-      color:#e4eef7;
-    }
-
-    .subtitle{
-      color:var(--muted);
-      margin-top:10px;
-    }
-
-    section{
-      margin:22px 0;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:22px;
-    }
-
-    h2{
-      margin-top:0;
-      color:#eaf7ff;
-    }
-
-    h3{
-      color:var(--blue);
-    }
-
-    p,li{
-      color:#d8e2ec;
-    }
-
-    .en{
-      direction:ltr;
-      text-align:left;
-    }
-
-    .ar{
-      direction:rtl;
-      text-align:right;
-      border-top:1px dashed var(--line);
-      padding-top:18px;
-      margin-top:18px;
-    }
-
-    .highlight{
-      background:var(--card2);
-      border-left:4px solid var(--blue);
-      border-radius:10px;
-      padding:15px;
-      margin:15px 0;
-    }
-
-    .ar .highlight{
-      border-left:none;
-      border-right:4px solid var(--blue);
-    }
-
-    .formula{
-      direction:ltr;
-      text-align:center;
-      background:#06101d;
-      border:1px solid var(--line);
-      padding:18px;
-      margin:16px 0;
-      border-radius:12px;
-      font-size:1.25rem;
-      font-family:"Times New Roman",serif;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:16px;
-    }
-
-    .mini-card{
-      background:var(--card2);
-      border:1px solid var(--line);
-      border-radius:13px;
-      padding:16px;
-    }
-
-    .mini-card strong{
-      color:white;
-    }
-
-    .flow{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      flex-wrap:wrap;
-      gap:10px;
-      margin:20px 0;
-    }
-
-    .flow-box{
-      background:#0b1b2c;
-      border:1px solid rgba(56,189,248,.3);
-      padding:14px 18px;
-      border-radius:12px;
-      text-align:center;
-      min-width:130px;
-    }
-
-    .arrow{
-      color:var(--blue);
-      font-size:1.5rem;
-      font-weight:bold;
-    }
-
-    .table-wrap{
-      overflow-x:auto;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin:15px 0;
-      min-width:600px;
-    }
-
-    th,td{
-      border:1px solid var(--line);
-      padding:11px;
-      text-align:center;
-    }
-
-    th{
-      background:#0b1b2c;
-      color:#eaf7ff;
-    }
-
-    .svg-box{
-      background:#081523;
-      border:1px solid var(--line);
-      border-radius:15px;
-      padding:10px;
-      overflow-x:auto;
-    }
-
-    svg{
-      width:100%;
-      min-width:620px;
-      height:auto;
-    }
-
-    .node{
-      fill:#10263d;
-      stroke:#38bdf8;
-      stroke-width:2;
-    }
-
-    .goal{
-      fill:#12351e;
-      stroke:#22c55e;
-      stroke-width:3;
-    }
-
-    .edge{
-      stroke:#6b7f93;
-      stroke-width:2;
-    }
-
-    .svgtext{
-      fill:white;
-      font-size:15px;
-      text-anchor:middle;
-      dominant-baseline:middle;
-    }
-
-    .cost{
-      fill:#facc15;
-      font-size:13px;
-      text-anchor:middle;
-    }
-
-    .warning{
-      background:rgba(250,204,21,.08);
-      border:1px solid rgba(250,204,21,.25);
-      border-radius:12px;
-      padding:15px;
-      color:#fff4b8;
-    }
-
-    code{
-      background:#071522;
-      color:#bdefff;
-      padding:2px 6px;
-      border-radius:5px;
-    }
-
-    footer{
-      text-align:center;
-      color:var(--muted);
-      padding:35px 0;
-    }
-
-    @media(max-width:750px){
-      .grid{
-        grid-template-columns:1fr;
-      }
-    }
-  </style>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-quiz.css">
-<link rel="stylesheet" href="course-footer.css">
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-quiz.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260824-7">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
-
 <body>
-
 <header>
   <div class="container">
     <nav>
@@ -306,30 +21,17 @@
 </header>
 
 <main class="container">
-
   <div class="hero">
     <div class="lecture-number">LECTURE 02 | المحاضرة 02</div>
-
-    <h1>Intelligent Agents & Search</h1>
-
-    <div class="hero-ar">
-      الوكلاء الأذكياء وخوارزميات البحث
-    </div>
-
-    <div class="subtitle">
-      From problem formulation to intelligent decision-making
-      <br>
-      من صياغة المسألة إلى اتخاذ القرار الذكي
-    </div>
+    <h1>Intelligent Agents &amp; Search</h1>
+    <div class="hero-ar">الوكلاء الأذكياء وخوارزميات البحث</div>
+    <div class="subtitle">From problem formulation to intelligent decision-making<br>من صياغة المسألة إلى اتخاذ القرار الذكي</div>
   </div>
-
 
   <section>
     <div class="en">
       <h2>🎯 Learning Objectives</h2>
-
       <p>By the end of this lecture, students should be able to:</p>
-
       <ul>
         <li>Explain the concept of an intelligent agent.</li>
         <li>Describe sensors, actuators, environment, and actions.</li>
@@ -340,12 +42,9 @@
         <li>Apply search concepts to a simple power-system problem.</li>
       </ul>
     </div>
-
     <div class="ar">
       <h2>🎯 أهداف التعلم</h2>
-
       <p>بعد الانتهاء من هذه المحاضرة يجب أن يكون الطالب قادرًا على:</p>
-
       <ul>
         <li>شرح مفهوم الوكيل الذكي.</li>
         <li>توضيح مفهوم الحساسات والمشغلات والبيئة والأفعال.</li>
@@ -358,894 +57,196 @@
     </div>
   </section>
 
-
   <section>
     <div class="en">
       <h2>1. What is an Intelligent Agent?</h2>
-
-      <p>
-        An intelligent agent is a system that observes its environment,
-        processes the available information, and chooses an action that helps
-        achieve a desired objective.
-      </p>
-
+      <p>An intelligent agent is a system that observes its environment, processes the available information, and chooses an action that helps achieve a desired objective.</p>
       <div class="flow">
-        <div class="flow-box">Environment</div>
-        <div class="arrow">→</div>
-        <div class="flow-box">Sensors</div>
-        <div class="arrow">→</div>
-        <div class="flow-box">Agent</div>
-        <div class="arrow">→</div>
-        <div class="flow-box">Actuators</div>
-        <div class="arrow">→</div>
+        <div class="flow-box">Environment</div><div class="arrow">→</div>
+        <div class="flow-box">Sensors</div><div class="arrow">→</div>
+        <div class="flow-box">Agent</div><div class="arrow">→</div>
+        <div class="flow-box">Actuators</div><div class="arrow">→</div>
         <div class="flow-box">Environment</div>
       </div>
-
-      <div class="highlight">
-        The key idea is simple: perceive → decide → act.
-      </div>
+      <div class="highlight">The key idea is simple: perceive → decide → act.</div>
     </div>
-
     <div class="ar">
       <h2>1. ما هو الوكيل الذكي؟</h2>
-
-      <p>
-        الوكيل الذكي هو نظام يراقب البيئة المحيطة، ويعالج المعلومات المتاحة،
-        ثم يختار فعلًا يساعد على الوصول إلى هدف محدد.
-      </p>
-
-      <div class="highlight">
-        الفكرة الأساسية بسيطة: استشعار ← اتخاذ قرار ← تنفيذ فعل.
-      </div>
+      <p>الوكيل الذكي هو نظام يراقب البيئة المحيطة، ويعالج المعلومات المتاحة، ثم يختار فعلًا يساعد على الوصول إلى هدف محدد.</p>
+      <div class="highlight">الفكرة الأساسية بسيطة: استشعار ← اتخاذ قرار ← تنفيذ فعل.</div>
     </div>
   </section>
-
 
   <section>
     <div class="en">
       <h2>2. Agent Components</h2>
-
       <div class="grid">
-
-        <div class="mini-card">
-          <strong>Environment</strong>
-          <p>The world in which the agent operates.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>Sensors</strong>
-          <p>Devices or data channels used to observe the environment.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>Agent</strong>
-          <p>The decision-making system.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>Actuators</strong>
-          <p>Mechanisms used to execute actions.</p>
-        </div>
-
+        <div class="mini-card"><strong>Environment</strong><p>The world in which the agent operates.</p></div>
+        <div class="mini-card"><strong>Sensors</strong><p>Devices or data channels used to observe the environment.</p></div>
+        <div class="mini-card"><strong>Agent</strong><p>The decision-making system.</p></div>
+        <div class="mini-card"><strong>Actuators</strong><p>Mechanisms used to execute actions.</p></div>
       </div>
     </div>
-
     <div class="ar">
       <h2>2. مكونات الوكيل الذكي</h2>
-
       <div class="grid">
-
-        <div class="mini-card">
-          <strong>البيئة</strong>
-          <p>العالم أو النظام الذي يعمل ضمنه الوكيل.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>الحساسات</strong>
-          <p>الوسائل المستخدمة للحصول على معلومات عن البيئة.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>الوكيل</strong>
-          <p>النظام المسؤول عن اتخاذ القرار.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>المشغلات</strong>
-          <p>الوسائل المستخدمة لتنفيذ القرارات أو الأفعال.</p>
-        </div>
-
+        <div class="mini-card"><strong>البيئة</strong><p>العالم أو النظام الذي يعمل ضمنه الوكيل.</p></div>
+        <div class="mini-card"><strong>الحساسات</strong><p>الوسائل المستخدمة للحصول على معلومات عن البيئة.</p></div>
+        <div class="mini-card"><strong>الوكيل</strong><p>النظام المسؤول عن اتخاذ القرار.</p></div>
+        <div class="mini-card"><strong>المشغلات</strong><p>الوسائل المستخدمة لتنفيذ القرارات أو الأفعال.</p></div>
       </div>
     </div>
   </section>
-
 
   <section>
     <div class="en">
       <h2>3. PEAS Representation</h2>
-
-      <p>
-        A common way to describe an intelligent agent is the PEAS framework:
-      </p>
-
-      <div class="formula">
-        PEAS = Performance + Environment + Actuators + Sensors
-      </div>
-
+      <p>A common way to describe an intelligent agent is the PEAS framework:</p>
+      <div class="formula">PEAS = Performance + Environment + Actuators + Sensors</div>
       <div class="table-wrap">
         <table>
-          <tr>
-            <th>Element</th>
-            <th>Power-System Example</th>
-          </tr>
-
-          <tr>
-            <td>Performance</td>
-            <td>Low cost, secure voltage, low losses</td>
-          </tr>
-
-          <tr>
-            <td>Environment</td>
-            <td>Electrical distribution network</td>
-          </tr>
-
-          <tr>
-            <td>Actuators</td>
-            <td>Battery inverter, transformer tap, controllable load</td>
-          </tr>
-
-          <tr>
-            <td>Sensors</td>
-            <td>Voltage, current, power, SOC, electricity price</td>
-          </tr>
+          <tr><th>Element</th><th>Power-System Example</th></tr>
+          <tr><td>Performance</td><td>Low cost, secure voltage, low losses</td></tr>
+          <tr><td>Environment</td><td>Electrical distribution network</td></tr>
+          <tr><td>Actuators</td><td>Battery inverter, transformer tap, controllable load</td></tr>
+          <tr><td>Sensors</td><td>Voltage, current, power, SOC, electricity price</td></tr>
         </table>
       </div>
     </div>
-
     <div class="ar">
       <h2>3. تمثيل PEAS</h2>
-
-      <p>
-        يمكن توصيف الوكيل الذكي باستخدام إطار PEAS:
-      </p>
-
-      <div class="formula">
-        PEAS = Performance + Environment + Actuators + Sensors
-      </div>
-
-      <p>
-        أي: معيار الأداء + البيئة + المشغلات + الحساسات.
-      </p>
+      <p>يمكن توصيف الوكيل الذكي باستخدام إطار PEAS:</p>
+      <div class="formula">PEAS = Performance + Environment + Actuators + Sensors</div>
+      <p>أي: معيار الأداء + البيئة + المشغلات + الحساسات.</p>
     </div>
   </section>
-
 
   <section>
     <div class="en">
       <h2>4. Problem Formulation</h2>
-
-      <p>
-        Before a computer can search for a solution, the engineering problem
-        must first be represented mathematically.
-      </p>
-
+      <p>Before a computer can search for a solution, the engineering problem must first be represented mathematically.</p>
       <p>A search problem can be defined by:</p>
-
-      <ul>
-        <li>Initial state</li>
-        <li>Set of possible actions</li>
-        <li>State-transition model</li>
-        <li>Goal condition</li>
-        <li>Path cost</li>
-      </ul>
-
-      <div class="formula">
-        Problem = { S, A, T, G, C }
-      </div>
-
-      <p>
-        where:
-      </p>
-
-      <ul>
-        <li><b>S</b> = set of states</li>
-        <li><b>A</b> = set of actions</li>
-        <li><b>T</b> = transition model</li>
-        <li><b>G</b> = goal condition</li>
-        <li><b>C</b> = cost function</li>
-      </ul>
+      <ul><li>Initial state</li><li>Set of possible actions</li><li>State-transition model</li><li>Goal condition</li><li>Path cost</li></ul>
+      <div class="formula">Problem = { S, A, T, G, C }</div>
+      <p>where:</p>
+      <ul><li><b>S</b> = set of states</li><li><b>A</b> = set of actions</li><li><b>T</b> = transition model</li><li><b>G</b> = goal condition</li><li><b>C</b> = cost function</li></ul>
     </div>
-
     <div class="ar">
       <h2>4. صياغة المسألة</h2>
-
-      <p>
-        قبل أن يتمكن الحاسوب من البحث عن حل، يجب أولًا تمثيل المسألة
-        الهندسية بشكل رياضي.
-      </p>
-
+      <p>قبل أن يتمكن الحاسوب من البحث عن حل، يجب أولًا تمثيل المسألة الهندسية بشكل رياضي.</p>
       <p>يمكن توصيف مسألة البحث من خلال:</p>
-
-      <ul>
-        <li>الحالة الابتدائية</li>
-        <li>مجموعة الأفعال الممكنة</li>
-        <li>نموذج الانتقال بين الحالات</li>
-        <li>شرط الوصول إلى الهدف</li>
-        <li>كلفة المسار</li>
-      </ul>
+      <ul><li>الحالة الابتدائية</li><li>مجموعة الأفعال الممكنة</li><li>نموذج الانتقال بين الحالات</li><li>شرط الوصول إلى الهدف</li><li>كلفة المسار</li></ul>
     </div>
   </section>
-
 
   <section>
     <div class="en">
       <h2>5. State Space</h2>
-
-      <p>
-        The state space is the set of all possible configurations that may
-        occur during problem solving.
-      </p>
-
-      <div class="formula">
-        S = { s₀, s₁, s₂, ..., sₙ }
-      </div>
-
-      <p>
-        Each action moves the system from one state to another:
-      </p>
-
-      <div class="formula">
-        s(k+1) = T(s(k), a(k))
-      </div>
-
-      <p>
-        This equation simply says that the next state depends on the current
-        state and the selected action.
-      </p>
+      <p>The state space is the set of all possible configurations that may occur during problem solving.</p>
+      <div class="formula">S = { s₀, s₁, s₂, ..., sₙ }</div>
+      <p>Each action moves the system from one state to another:</p>
+      <div class="formula">s(k+1) = T(s(k), a(k))</div>
+      <p>This equation simply says that the next state depends on the current state and the selected action.</p>
     </div>
-
     <div class="ar">
       <h2>5. فضاء الحالات</h2>
-
-      <p>
-        فضاء الحالات هو مجموعة جميع الحالات أو التشكيلات الممكنة التي قد
-        يمر بها النظام أثناء عملية البحث.
-      </p>
-
-      <div class="formula">
-        S = { s₀, s₁, s₂, ..., sₙ }
-      </div>
-
-      <p>
-        ويؤدي تنفيذ فعل معين إلى نقل النظام من حالة إلى أخرى:
-      </p>
-
-      <div class="formula">
-        s(k+1) = T(s(k), a(k))
-      </div>
-
-      <p>
-        أي أن الحالة التالية تعتمد على الحالة الحالية والفعل المختار.
-      </p>
+      <p>فضاء الحالات هو مجموعة جميع الحالات أو التشكيلات الممكنة التي قد يمر بها النظام أثناء عملية البحث.</p>
+      <div class="formula">S = { s₀, s₁, s₂, ..., sₙ }</div>
+      <p>ويؤدي تنفيذ فعل معين إلى نقل النظام من حالة إلى أخرى:</p>
+      <div class="formula">s(k+1) = T(s(k), a(k))</div>
+      <p>أي أن الحالة التالية تعتمد على الحالة الحالية والفعل المختار.</p>
     </div>
   </section>
-
 
   <section>
     <div class="en">
       <h2>6. Search Tree</h2>
-
-      <p>
-        A search tree is a graphical representation of possible decisions.
-      </p>
-
+      <p>A search tree is a graphical representation of possible decisions.</p>
       <div class="svg-box">
-        <svg viewBox="0 0 700 330">
-
-          <line class="edge" x1="350" y1="55" x2="190" y2="145"/>
-          <line class="edge" x1="350" y1="55" x2="510" y2="145"/>
-
-          <line class="edge" x1="190" y1="145" x2="100" y2="245"/>
-          <line class="edge" x1="190" y1="145" x2="280" y2="245"/>
-
-          <line class="edge" x1="510" y1="145" x2="430" y2="245"/>
-          <line class="edge" x1="510" y1="145" x2="600" y2="245"/>
-
-          <circle class="node" cx="350" cy="55" r="32"/>
-          <text class="svgtext" x="350" y="55">S</text>
-
-          <circle class="node" cx="190" cy="145" r="32"/>
-          <text class="svgtext" x="190" y="145">A</text>
-
-          <circle class="node" cx="510" cy="145" r="32"/>
-          <text class="svgtext" x="510" y="145">B</text>
-
-          <circle class="node" cx="100" cy="245" r="32"/>
-          <text class="svgtext" x="100" y="245">C</text>
-
-          <circle class="node" cx="280" cy="245" r="32"/>
-          <text class="svgtext" x="280" y="245">D</text>
-
-          <circle class="goal" cx="430" cy="245" r="32"/>
-          <text class="svgtext" x="430" y="245">G</text>
-
-          <circle class="node" cx="600" cy="245" r="32"/>
-          <text class="svgtext" x="600" y="245">E</text>
-
-          <text class="cost" x="270" y="100">2</text>
-          <text class="cost" x="430" y="100">5</text>
-          <text class="cost" x="135" y="200">4</text>
-          <text class="cost" x="235" y="200">2</text>
-          <text class="cost" x="465" y="200">1</text>
-          <text class="cost" x="555" y="200">3</text>
-
+        <svg viewBox="0 0 700 330" role="img" aria-label="Search tree">
+          <line class="edge" x1="350" y1="55" x2="190" y2="145"/><line class="edge" x1="350" y1="55" x2="510" y2="145"/>
+          <line class="edge" x1="190" y1="145" x2="100" y2="245"/><line class="edge" x1="190" y1="145" x2="280" y2="245"/>
+          <line class="edge" x1="510" y1="145" x2="430" y2="245"/><line class="edge" x1="510" y1="145" x2="600" y2="245"/>
+          <circle class="node" cx="350" cy="55" r="32"/><text class="svgtext" x="350" y="55">S</text>
+          <circle class="node" cx="190" cy="145" r="32"/><text class="svgtext" x="190" y="145">A</text>
+          <circle class="node" cx="510" cy="145" r="32"/><text class="svgtext" x="510" y="145">B</text>
+          <circle class="node" cx="100" cy="245" r="32"/><text class="svgtext" x="100" y="245">C</text>
+          <circle class="node" cx="280" cy="245" r="32"/><text class="svgtext" x="280" y="245">D</text>
+          <circle class="goal" cx="430" cy="245" r="32"/><text class="svgtext" x="430" y="245">G</text>
+          <circle class="node" cx="600" cy="245" r="32"/><text class="svgtext" x="600" y="245">E</text>
+          <text class="cost" x="270" y="100">2</text><text class="cost" x="430" y="100">5</text>
+          <text class="cost" x="135" y="200">4</text><text class="cost" x="235" y="200">2</text>
+          <text class="cost" x="465" y="200">1</text><text class="cost" x="555" y="200">3</text>
         </svg>
       </div>
-
-      <p>
-        The green node represents a goal state. The numbers along the edges
-        represent transition costs.
-      </p>
+      <p>The green node represents a goal state. The numbers along the edges represent transition costs.</p>
     </div>
-
     <div class="ar">
       <h2>6. شجرة البحث</h2>
-
-      <p>
-        شجرة البحث هي تمثيل رسومي للقرارات الممكنة والانتقالات بين الحالات.
-      </p>
-
-      <p>
-        العقدة الخضراء تمثل حالة الهدف، بينما تمثل الأرقام المكتوبة على
-        الأفرع كلفة الانتقال من حالة إلى أخرى.
-      </p>
+      <p>شجرة البحث هي تمثيل رسومي للقرارات الممكنة والانتقالات بين الحالات.</p>
+      <p>العقدة الخضراء تمثل حالة الهدف، بينما تمثل الأرقام المكتوبة على الأفرع كلفة الانتقال من حالة إلى أخرى.</p>
     </div>
   </section>
 
+  <section>
+    <div class="en"><h2>7. Breadth-First Search — BFS</h2><p>BFS explores the tree level by level.</p><div class="highlight">First visit all nodes at depth 1, then depth 2, then depth 3, and so on.</div><p>BFS is complete when the branching factor and solution depth are finite, but it may require a large amount of memory.</p></div>
+    <div class="ar"><h2>7. البحث بالعرض — BFS</h2><p>تقوم خوارزمية BFS باستكشاف شجرة البحث مستوى بعد مستوى.</p><div class="highlight">يتم أولًا فحص جميع العقد في المستوى الأول، ثم المستوى الثاني، ثم الثالث، وهكذا.</div><p>تعد BFS مناسبة عندما نرغب في إيجاد حل قريب من الجذر، لكنها قد تحتاج إلى ذاكرة كبيرة.</p></div>
+  </section>
+
+  <section>
+    <div class="en"><h2>8. Depth-First Search — DFS</h2><p>DFS follows one branch as deeply as possible before returning and exploring another branch.</p><div class="highlight">DFS requires less memory than BFS, but it may explore a very long unproductive path.</div></div>
+    <div class="ar"><h2>8. البحث بالعمق — DFS</h2><p>تتبع خوارزمية DFS أحد الأفرع إلى أكبر عمق ممكن، ثم تعود للخلف لاستكشاف فرع آخر.</p><div class="highlight">تحتاج DFS عادةً إلى ذاكرة أقل من BFS، لكنها قد تضيع وقتًا في استكشاف مسار طويل لا يؤدي إلى الحل.</div></div>
+  </section>
+
+  <section>
+    <div class="en"><h2>9. Search Cost</h2><p>If every movement has a cost, then the total path cost is the sum of all transition costs.</p><div class="formula">g(n) = Σ cᵢ</div><p>Here, <b>g(n)</b> represents the actual cost from the initial state to node n.</p></div>
+    <div class="ar"><h2>9. كلفة البحث</h2><p>إذا كان لكل انتقال كلفة، فإن الكلفة الكلية للمسار تساوي مجموع تكاليف جميع الانتقالات.</p><div class="formula">g(n) = Σ cᵢ</div><p>وتمثل <b>g(n)</b> الكلفة الفعلية التي دُفعت للوصول من الحالة الابتدائية إلى العقدة n.</p></div>
+  </section>
+
+  <section>
+    <div class="en"><h2>10. Heuristic Function</h2><p>A heuristic function estimates how far a current state is from the goal.</p><div class="formula">h(n) ≈ estimated remaining cost</div><p>Unlike g(n), the heuristic is not the cost already paid. It is an estimate of the cost that may still be required.</p><div class="highlight">g(n) = past cost<br>h(n) = estimated future cost</div></div>
+    <div class="ar"><h2>10. الدالة الإرشادية</h2><p>تستخدم الدالة الإرشادية لتقدير مدى بُعد الحالة الحالية عن الهدف.</p><div class="formula">h(n) ≈ الكلفة المتبقية المقدرة</div><div class="highlight">g(n) = الكلفة التي دُفعت حتى الآن<br>h(n) = الكلفة المستقبلية المقدرة</div></div>
+  </section>
+
+  <section>
+    <div class="en"><h2>11. A* Search</h2><p>A* combines the known cost and the heuristic estimate:</p><div class="formula">f(n) = g(n) + h(n)</div><p>The algorithm normally expands the node with the smallest value of f(n).</p><div class="highlight">A* asks:<br><br>“How much have I already paid?” + “How much do I expect to pay from here to the goal?”</div></div>
+    <div class="ar"><h2>11. خوارزمية A*</h2><p>تجمع خوارزمية A* بين الكلفة الفعلية والتقدير المستقبلي:</p><div class="formula">f(n) = g(n) + h(n)</div><p>وتقوم الخوارزمية عادةً باختيار العقدة التي تمتلك أصغر قيمة للدالة f(n).</p><div class="highlight">يمكن فهم A* بالسؤال التالي:<br><br>كم دفعت حتى الآن؟ + كم أتوقع أن أدفع حتى أصل إلى الهدف؟</div></div>
+  </section>
 
   <section>
     <div class="en">
-      <h2>7. Breadth-First Search — BFS</h2>
-
-      <p>
-        BFS explores the tree level by level.
-      </p>
-
-      <div class="highlight">
-        First visit all nodes at depth 1, then depth 2, then depth 3, and so on.
-      </div>
-
-      <p>
-        BFS is complete when the branching factor and solution depth are finite,
-        but it may require a large amount of memory.
-      </p>
+      <h2>12. Worked Numerical Example</h2><p>Assume three candidate nodes:</p>
+      <div class="table-wrap"><table><tr><th>Node</th><th>g(n)</th><th>h(n)</th><th>f(n)=g+h</th></tr><tr><td>A</td><td>3</td><td>7</td><td>10</td></tr><tr><td>B</td><td>5</td><td>2</td><td>7</td></tr><tr><td>C</td><td>2</td><td>9</td><td>11</td></tr></table></div>
+      <p>A* selects node B because:</p><div class="formula">f(B) = 5 + 2 = 7</div><p>and 7 is smaller than 10 and 11.</p>
     </div>
-
-    <div class="ar">
-      <h2>7. البحث بالعرض — BFS</h2>
-
-      <p>
-        تقوم خوارزمية BFS باستكشاف شجرة البحث مستوى بعد مستوى.
-      </p>
-
-      <div class="highlight">
-        يتم أولًا فحص جميع العقد في المستوى الأول، ثم المستوى الثاني،
-        ثم الثالث، وهكذا.
-      </div>
-
-      <p>
-        تعد BFS مناسبة عندما نرغب في إيجاد حل قريب من الجذر، لكنها قد
-        تحتاج إلى ذاكرة كبيرة.
-      </p>
-    </div>
+    <div class="ar"><h2>12. مثال عددي محلول</h2><p>لدينا ثلاث عقد مرشحة A وB وC.</p><p>تحسب A* لكل عقدة:</p><div class="formula">f(n) = g(n) + h(n)</div><p>بالنسبة إلى B:</p><div class="formula">f(B) = 5 + 2 = 7</div><p>ولذلك يتم اختيار B لأن القيمة 7 هي الأصغر.</p></div>
   </section>
-
 
   <section>
-    <div class="en">
-      <h2>8. Depth-First Search — DFS</h2>
-
-      <p>
-        DFS follows one branch as deeply as possible before returning and
-        exploring another branch.
-      </p>
-
-      <div class="highlight">
-        DFS requires less memory than BFS, but it may explore a very long
-        unproductive path.
-      </div>
-    </div>
-
-    <div class="ar">
-      <h2>8. البحث بالعمق — DFS</h2>
-
-      <p>
-        تتبع خوارزمية DFS أحد الأفرع إلى أكبر عمق ممكن، ثم تعود للخلف
-        لاستكشاف فرع آخر.
-      </p>
-
-      <div class="highlight">
-        تحتاج DFS عادةً إلى ذاكرة أقل من BFS، لكنها قد تضيع وقتًا في
-        استكشاف مسار طويل لا يؤدي إلى الحل.
-      </div>
-    </div>
+    <div class="en"><h2>13. Power-System Example: Battery Scheduling</h2><p>Consider a battery connected to a distribution network.</p><p>The current state is:</p><div class="formula">SOC = 60%</div><p>The possible actions are:</p><div class="grid"><div class="mini-card"><strong>Charge</strong><p>Increase stored energy.</p></div><div class="mini-card"><strong>Idle</strong><p>Keep the battery unchanged.</p></div><div class="mini-card"><strong>Discharge</strong><p>Supply stored energy to the network.</p></div><div class="mini-card"><strong>Goal</strong><p>Minimize energy cost while respecting SOC limits.</p></div></div><p>A simplified state transition may be written as:</p><div class="formula">SOC(k+1) = SOC(k) + ΔSOC(a(k))</div><p>The search algorithm evaluates different sequences of actions and chooses the path with the best total cost.</p></div>
+    <div class="ar"><h2>13. مثال من نظم الطاقة: جدولة البطارية</h2><p>لنفترض وجود بطارية متصلة بشبكة توزيع كهربائية.</p><p>الحالة الحالية:</p><div class="formula">SOC = 60%</div><p>الأفعال الممكنة:</p><ul><li>الشحن</li><li>عدم اتخاذ أي إجراء</li><li>التفريغ</li></ul><p>والهدف هو تقليل تكلفة الطاقة مع المحافظة على حدود حالة الشحن.</p><div class="formula">SOC(k+1) = SOC(k) + ΔSOC(a(k))</div><p>تقوم خوارزمية البحث بمقارنة مسارات متعددة من الأفعال، ثم تختار المسار الأفضل وفقًا لدالة الكلفة.</p></div>
   </section>
-
 
   <section>
-    <div class="en">
-      <h2>9. Search Cost</h2>
-
-      <p>
-        If every movement has a cost, then the total path cost is the sum
-        of all transition costs.
-      </p>
-
-      <div class="formula">
-        g(n) = Σ cᵢ
-      </div>
-
-      <p>
-        Here, <b>g(n)</b> represents the actual cost from the initial state
-        to node n.
-      </p>
-    </div>
-
-    <div class="ar">
-      <h2>9. كلفة البحث</h2>
-
-      <p>
-        إذا كان لكل انتقال كلفة، فإن الكلفة الكلية للمسار تساوي مجموع
-        تكاليف جميع الانتقالات.
-      </p>
-
-      <div class="formula">
-        g(n) = Σ cᵢ
-      </div>
-
-      <p>
-        وتمثل <b>g(n)</b> الكلفة الفعلية التي دُفعت للوصول من الحالة
-        الابتدائية إلى العقدة n.
-      </p>
-    </div>
+    <div class="en"><h2>14. From Search to Optimization</h2><p>Search and optimization are closely related.</p><p>In search, we explore alternatives. In optimization, we aim to identify the best alternative according to an objective function.</p><div class="formula">x* = arg min J(x)</div><p>where J(x) is the objective or cost function.</p></div>
+    <div class="ar"><h2>14. من البحث إلى التحسين</h2><p>يوجد ارتباط وثيق بين البحث والتحسين.</p><p>في البحث نستكشف البدائل الممكنة، بينما في التحسين نحاول إيجاد أفضل بديل وفقًا لدالة هدف أو كلفة.</p><div class="formula">x* = arg min J(x)</div><p>حيث تمثل J(x) دالة الهدف أو دالة الكلفة.</p></div>
   </section>
-
 
   <section>
-    <div class="en">
-      <h2>10. Heuristic Function</h2>
-
-      <p>
-        A heuristic function estimates how far a current state is from
-        the goal.
-      </p>
-
-      <div class="formula">
-        h(n) ≈ estimated remaining cost
-      </div>
-
-      <p>
-        Unlike g(n), the heuristic is not the cost already paid. It is an
-        estimate of the cost that may still be required.
-      </p>
-
-      <div class="highlight">
-        g(n) = past cost
-        <br>
-        h(n) = estimated future cost
-      </div>
-    </div>
-
-    <div class="ar">
-      <h2>10. الدالة الإرشادية</h2>
-
-      <p>
-        تستخدم الدالة الإرشادية لتقدير مدى بُعد الحالة الحالية عن الهدف.
-      </p>
-
-      <div class="formula">
-        h(n) ≈ الكلفة المتبقية المقدرة
-      </div>
-
-      <div class="highlight">
-        g(n) = الكلفة التي دُفعت حتى الآن
-        <br>
-        h(n) = الكلفة المستقبلية المقدرة
-      </div>
-    </div>
+    <div class="en"><h2>15. MATLAB Concept</h2><p>A simple search algorithm can be understood computationally as:</p><div class="highlight">1. Generate candidate states<br>2. Evaluate their cost<br>3. Select one candidate<br>4. Expand it<br>5. Repeat until the goal is reached</div><p>Later, the MATLAB lab will implement a small search problem step by step.</p></div>
+    <div class="ar"><h2>15. الفكرة البرمجية في MATLAB</h2><p>يمكن فهم خوارزمية البحث برمجيًا وفق الخطوات التالية:</p><div class="highlight">1. توليد الحالات المرشحة<br>2. حساب كلفة كل حالة<br>3. اختيار إحدى الحالات<br>4. توسيعها وتوليد حالات جديدة<br>5. تكرار العملية حتى الوصول إلى الهدف</div><p>سنقوم لاحقًا في مختبر MATLAB بتنفيذ مسألة بحث بسيطة خطوة بخطوة.</p></div>
   </section>
-
 
   <section>
-    <div class="en">
-      <h2>11. A* Search</h2>
-
-      <p>
-        A* combines the known cost and the heuristic estimate:
-      </p>
-
-      <div class="formula">
-        f(n) = g(n) + h(n)
-      </div>
-
-      <p>
-        The algorithm normally expands the node with the smallest value of f(n).
-      </p>
-
-      <div class="highlight">
-        A* asks:
-        <br><br>
-        “How much have I already paid?”
-        +
-        “How much do I expect to pay from here to the goal?”
-      </div>
-    </div>
-
-    <div class="ar">
-      <h2>11. خوارزمية A*</h2>
-
-      <p>
-        تجمع خوارزمية A* بين الكلفة الفعلية والتقدير المستقبلي:
-      </p>
-
-      <div class="formula">
-        f(n) = g(n) + h(n)
-      </div>
-
-      <p>
-        وتقوم الخوارزمية عادةً باختيار العقدة التي تمتلك أصغر قيمة للدالة f(n).
-      </p>
-
-      <div class="highlight">
-        يمكن فهم A* بالسؤال التالي:
-        <br><br>
-        كم دفعت حتى الآن؟
-        +
-        كم أتوقع أن أدفع حتى أصل إلى الهدف؟
-      </div>
-    </div>
+    <div class="en"><h2>16. Summary</h2><ul><li>An intelligent agent perceives, decides, and acts.</li><li>Search problems can be described using states, actions, transitions, goals, and costs.</li><li>BFS explores level by level.</li><li>DFS explores one branch deeply.</li><li>A* combines actual cost g(n) and heuristic cost h(n).</li><li>Search methods can support decision-making in power-system applications.</li></ul></div>
+    <div class="ar"><h2>16. الخلاصة</h2><ul><li>يقوم الوكيل الذكي بالاستشعار واتخاذ القرار وتنفيذ الأفعال.</li><li>يمكن تمثيل مسألة البحث باستخدام الحالات والأفعال والانتقالات والهدف والكلفة.</li><li>تبحث BFS مستوى بعد مستوى.</li><li>تبحث DFS بعمق ضمن أحد الأفرع.</li><li>تجمع A* بين الكلفة الفعلية g(n) والكلفة المقدرة h(n).</li><li>يمكن تطبيق خوارزميات البحث في مسائل اتخاذ القرار في نظم الطاقة.</li></ul></div>
   </section>
-
 
   <section>
-    <div class="en">
-      <h2>12. Worked Numerical Example</h2>
-
-      <p>Assume three candidate nodes:</p>
-
-      <div class="table-wrap">
-        <table>
-          <tr>
-            <th>Node</th>
-            <th>g(n)</th>
-            <th>h(n)</th>
-            <th>f(n)=g+h</th>
-          </tr>
-
-          <tr>
-            <td>A</td>
-            <td>3</td>
-            <td>7</td>
-            <td>10</td>
-          </tr>
-
-          <tr>
-            <td>B</td>
-            <td>5</td>
-            <td>2</td>
-            <td>7</td>
-          </tr>
-
-          <tr>
-            <td>C</td>
-            <td>2</td>
-            <td>9</td>
-            <td>11</td>
-          </tr>
-        </table>
-      </div>
-
-      <p>
-        A* selects node B because:
-      </p>
-
-      <div class="formula">
-        f(B) = 5 + 2 = 7
-      </div>
-
-      <p>
-        and 7 is smaller than 10 and 11.
-      </p>
-    </div>
-
-    <div class="ar">
-      <h2>12. مثال عددي محلول</h2>
-
-      <p>
-        لدينا ثلاث عقد مرشحة A وB وC.
-      </p>
-
-      <p>
-        تحسب A* لكل عقدة:
-      </p>
-
-      <div class="formula">
-        f(n) = g(n) + h(n)
-      </div>
-
-      <p>
-        بالنسبة إلى B:
-      </p>
-
-      <div class="formula">
-        f(B) = 5 + 2 = 7
-      </div>
-
-      <p>
-        ولذلك يتم اختيار B لأن القيمة 7 هي الأصغر.
-      </p>
-    </div>
+    <div class="en"><h2>📝 Review Questions</h2><ol><li>What is an intelligent agent?</li><li>What do sensors and actuators do?</li><li>What is a state space?</li><li>What is the difference between BFS and DFS?</li><li>What does g(n) represent?</li><li>What does h(n) represent?</li><li>Why does A* use f(n)=g(n)+h(n)?</li><li>How can search be used for battery scheduling?</li></ol></div>
+    <div class="ar"><h2>📝 أسئلة المراجعة</h2><ol><li>ما هو الوكيل الذكي؟</li><li>ما وظيفة الحساسات والمشغلات؟</li><li>ما المقصود بفضاء الحالات؟</li><li>ما الفرق بين BFS وDFS؟</li><li>ماذا تمثل g(n)؟</li><li>ماذا تمثل h(n)؟</li><li>لماذا تستخدم A* العلاقة f(n)=g(n)+h(n)؟</li><li>كيف يمكن استخدام البحث في جدولة بطارية تخزين الطاقة؟</li></ol></div>
   </section>
-
-
-  <section>
-    <div class="en">
-      <h2>13. Power-System Example: Battery Scheduling</h2>
-
-      <p>
-        Consider a battery connected to a distribution network.
-      </p>
-
-      <p>The current state is:</p>
-
-      <div class="formula">
-        SOC = 60%
-      </div>
-
-      <p>The possible actions are:</p>
-
-      <div class="grid">
-
-        <div class="mini-card">
-          <strong>Charge</strong>
-          <p>Increase stored energy.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>Idle</strong>
-          <p>Keep the battery unchanged.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>Discharge</strong>
-          <p>Supply stored energy to the network.</p>
-        </div>
-
-        <div class="mini-card">
-          <strong>Goal</strong>
-          <p>Minimize energy cost while respecting SOC limits.</p>
-        </div>
-
-      </div>
-
-      <p>
-        A simplified state transition may be written as:
-      </p>
-
-      <div class="formula">
-        SOC(k+1) = SOC(k) + ΔSOC(a(k))
-      </div>
-
-      <p>
-        The search algorithm evaluates different sequences of actions and
-        chooses the path with the best total cost.
-      </p>
-    </div>
-
-    <div class="ar">
-      <h2>13. مثال من نظم الطاقة: جدولة البطارية</h2>
-
-      <p>
-        لنفترض وجود بطارية متصلة بشبكة توزيع كهربائية.
-      </p>
-
-      <p>الحالة الحالية:</p>
-
-      <div class="formula">
-        SOC = 60%
-      </div>
-
-      <p>الأفعال الممكنة:</p>
-
-      <ul>
-        <li>الشحن</li>
-        <li>عدم اتخاذ أي إجراء</li>
-        <li>التفريغ</li>
-      </ul>
-
-      <p>
-        والهدف هو تقليل تكلفة الطاقة مع المحافظة على حدود حالة الشحن.
-      </p>
-
-      <div class="formula">
-        SOC(k+1) = SOC(k) + ΔSOC(a(k))
-      </div>
-
-      <p>
-        تقوم خوارزمية البحث بمقارنة مسارات متعددة من الأفعال، ثم تختار
-        المسار الأفضل وفقًا لدالة الكلفة.
-      </p>
-    </div>
-  </section>
-
-
-  <section>
-    <div class="en">
-      <h2>14. From Search to Optimization</h2>
-
-      <p>
-        Search and optimization are closely related.
-      </p>
-
-      <p>
-        In search, we explore alternatives.
-        In optimization, we aim to identify the best alternative according
-        to an objective function.
-      </p>
-
-      <div class="formula">
-        x* = arg min J(x)
-      </div>
-
-      <p>
-        where J(x) is the objective or cost function.
-      </p>
-    </div>
-
-    <div class="ar">
-      <h2>14. من البحث إلى التحسين</h2>
-
-      <p>
-        يوجد ارتباط وثيق بين البحث والتحسين.
-      </p>
-
-      <p>
-        في البحث نستكشف البدائل الممكنة، بينما في التحسين نحاول إيجاد
-        أفضل بديل وفقًا لدالة هدف أو كلفة.
-      </p>
-
-      <div class="formula">
-        x* = arg min J(x)
-      </div>
-
-      <p>
-        حيث تمثل J(x) دالة الهدف أو دالة الكلفة.
-      </p>
-    </div>
-  </section>
-
-
-  <section>
-    <div class="en">
-      <h2>15. MATLAB Concept</h2>
-
-      <p>
-        A simple search algorithm can be understood computationally as:
-      </p>
-
-      <div class="highlight">
-        1. Generate candidate states
-        <br>
-        2. Evaluate their cost
-        <br>
-        3. Select one candidate
-        <br>
-        4. Expand it
-        <br>
-        5. Repeat until the goal is reached
-      </div>
-
-      <p>
-        Later, the MATLAB lab will implement a small search problem step by step.
-      </p>
-    </div>
-
-    <div class="ar">
-      <h2>15. الفكرة البرمجية في MATLAB</h2>
-
-      <p>
-        يمكن فهم خوارزمية البحث برمجيًا وفق الخطوات التالية:
-      </p>
-
-      <div class="highlight">
-        1. توليد الحالات المرشحة
-        <br>
-        2. حساب كلفة كل حالة
-        <br>
-        3. اختيار إحدى الحالات
-        <br>
-        4. توسيعها وتوليد حالات جديدة
-        <br>
-        5. تكرار العملية حتى الوصول إلى الهدف
-      </div>
-
-      <p>
-        سنقوم لاحقًا في مختبر MATLAB بتنفيذ مسألة بحث بسيطة خطوة بخطوة.
-      </p>
-    </div>
-  </section>
-
-
-  <section>
-    <div class="en">
-      <h2>16. Summary</h2>
-
-      <ul>
-        <li>An intelligent agent perceives, decides, and acts.</li>
-        <li>Search problems can be described using states, actions, transitions, goals, and costs.</li>
-        <li>BFS explores level by level.</li>
-        <li>DFS explores one branch deeply.</li>
-        <li>A* combines actual cost g(n) and heuristic cost h(n).</li>
-        <li>Search methods can support decision-making in power-system applications.</li>
-      </ul>
-    </div>
-
-    <div class="ar">
-      <h2>16. الخلاصة</h2>
-
-      <ul>
-        <li>يقوم الوكيل الذكي بالاستشعار واتخاذ القرار وتنفيذ الأفعال.</li>
-        <li>يمكن تمثيل مسألة البحث باستخدام الحالات والأفعال والانتقالات والهدف والكلفة.</li>
-        <li>تبحث BFS مستوى بعد مستوى.</li>
-        <li>تبحث DFS بعمق ضمن أحد الأفرع.</li>
-        <li>تجمع A* بين الكلفة الفعلية g(n) والكلفة المقدرة h(n).</li>
-        <li>يمكن تطبيق خوارزميات البحث في مسائل اتخاذ القرار في نظم الطاقة.</li>
-      </ul>
-    </div>
-  </section>
-
-
-  <section>
-    <div class="en">
-      <h2>📝 Review Questions</h2>
-
-      <ol>
-        <li>What is an intelligent agent?</li>
-        <li>What do sensors and actuators do?</li>
-        <li>What is a state space?</li>
-        <li>What is the difference between BFS and DFS?</li>
-        <li>What does g(n) represent?</li>
-        <li>What does h(n) represent?</li>
-        <li>Why does A* use f(n)=g(n)+h(n)?</li>
-        <li>How can search be used for battery scheduling?</li>
-      </ol>
-    </div>
-
-    <div class="ar">
-      <h2>📝 أسئلة المراجعة</h2>
-
-      <ol>
-        <li>ما هو الوكيل الذكي؟</li>
-        <li>ما وظيفة الحساسات والمشغلات؟</li>
-        <li>ما المقصود بفضاء الحالات؟</li>
-        <li>ما الفرق بين BFS وDFS؟</li>
-        <li>ماذا تمثل g(n)؟</li>
-        <li>ماذا تمثل h(n)؟</li>
-        <li>لماذا تستخدم A* العلاقة f(n)=g(n)+h(n)؟</li>
-        <li>كيف يمكن استخدام البحث في جدولة بطارية تخزين الطاقة؟</li>
-      </ol>
-    </div>
-  </section>
-
 </main>
-
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 
 <script src="course-navigation.js" defer></script>
 <script src="course-quiz-data.js" defer></script>
@@ -1253,4 +254,4 @@
 <script src="certificate-canvas.js?v=20260817-2" defer></script>
 <script src="course-footer.js" defer></script>
 </body>
-  </html>
+</html>
