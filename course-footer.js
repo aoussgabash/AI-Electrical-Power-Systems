@@ -1,6 +1,18 @@
 (() => {
   'use strict';
 
+  const COURSE_THEME_VERSION = '20260824-1';
+
+  const loadCourseTheme = () => {
+    if (document.querySelector('link[data-course-theme]')) return;
+
+    const theme = document.createElement('link');
+    theme.rel = 'stylesheet';
+    theme.href = `course-theme.css?v=${COURSE_THEME_VERSION}`;
+    theme.dataset.courseTheme = 'true';
+    document.head.appendChild(theme);
+  };
+
   const loadCentralComponents = () => {
     if (document.querySelector('script[data-ag-loader]')) return;
 
@@ -12,6 +24,7 @@
   };
 
   const startCourseFeatures = () => {
+    loadCourseTheme();
     document.querySelectorAll('link[href^="course-footer.css"]').forEach((link) => link.remove());
 
     if (document.querySelector('script[data-course-legacy]')) {
