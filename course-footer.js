@@ -7,7 +7,7 @@
 
     const styles = document.createElement('link');
     styles.rel = 'stylesheet';
-    styles.href = 'course-footer.css?v=20260823-4';
+    styles.href = 'course-footer.css?v=20260824-1';
     styles.dataset.canonicalFooter = 'true';
     document.head.appendChild(styles);
   };
@@ -35,6 +35,9 @@
           <span class="footer-en">Syria</span>
           <span class="footer-separator" aria-hidden="true">|</span>
           <span class="footer-ar" lang="ar" dir="rtl">سوريا</span>
+        </p>
+        <p class="ag-footer-line ag-footer-legal">
+          <a class="ag-footer-link" href="https://aoussgabash.com/site-information.html">Site Information <span class="footer-separator" aria-hidden="true">|</span> <span class="footer-ar" lang="ar" dir="rtl">بيانات الموقع</span></a>
         </p>
       </div>`;
 
