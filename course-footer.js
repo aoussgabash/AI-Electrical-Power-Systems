@@ -1,11 +1,19 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260824-3';
+  const COURSE_THEME_VERSION = '20260824-4';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
-  const centralizedPages = new Set(['lecture01.html', 'lecture02.html']);
+  const centralizedPages = new Set([
+    'lecture01.html',
+    'lecture02.html',
+    'lecture03.html',
+    'lecture04.html',
+    'lecture05.html',
+    'lecture06.html',
+    'lecture07.html'
+  ]);
 
-  const removePilotInlineStyles = () => {
+  const removeCentralizedInlineStyles = () => {
     if (!centralizedPages.has(page)) return;
     document.head.querySelectorAll('style').forEach((style) => style.remove());
     document.documentElement.dataset.courseThemeCentralized = 'true';
@@ -17,8 +25,8 @@
     );
 
     if (existing) {
-      if (existing.sheet) removePilotInlineStyles();
-      else existing.addEventListener('load', removePilotInlineStyles, { once: true });
+      if (existing.sheet) removeCentralizedInlineStyles();
+      else existing.addEventListener('load', removeCentralizedInlineStyles, { once: true });
       return;
     }
 
@@ -26,7 +34,7 @@
     theme.rel = 'stylesheet';
     theme.href = `course-theme.css?v=${COURSE_THEME_VERSION}`;
     theme.dataset.courseTheme = 'true';
-    theme.addEventListener('load', removePilotInlineStyles, { once: true });
+    theme.addEventListener('load', removeCentralizedInlineStyles, { once: true });
     document.head.appendChild(theme);
   };
 
