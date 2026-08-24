@@ -1,16 +1,22 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260824-6';
+  const COURSE_THEME_VERSION = '20260824-7';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
+  const isLabPage = /^lab\d{2}\.html$/.test(page);
+  const isCourseContentPage = isLecturePage || isLabPage;
 
   const removeLegacyMarkup = () => {
-    if (!isLecturePage) return;
+    if (!isCourseContentPage) return;
 
-    document.head.querySelectorAll('style').forEach((style) => style.remove());
+    if (isLecturePage) {
+      document.head.querySelectorAll('style').forEach((style) => style.remove());
+      document.documentElement.dataset.courseThemeCentralized = 'true';
+    }
+
     document.querySelectorAll('footer').forEach((footer) => footer.remove());
-    document.documentElement.dataset.courseThemeCentralized = 'true';
+    document.documentElement.dataset.courseFooterCentralized = 'true';
   };
 
   const loadCourseTheme = () => {
