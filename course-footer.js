@@ -7,7 +7,7 @@
 
     const styles = document.createElement('link');
     styles.rel = 'stylesheet';
-    styles.href = 'course-footer.css?v=20260824-1';
+    styles.href = 'course-footer.css?v=20260824-2';
     styles.dataset.canonicalFooter = 'true';
     document.head.appendChild(styles);
   };
@@ -28,10 +28,6 @@
           <span class="footer-ar" lang="ar" dir="rtl">منظومة AG الأكاديمية</span>
         </p>
         <p class="ag-footer-line">
-          <span class="footer-en">Germany</span>
-          <span class="footer-separator" aria-hidden="true">|</span>
-          <span class="footer-ar" lang="ar" dir="rtl">ألمانيا</span>
-          <span class="footer-separator footer-dot" aria-hidden="true">•</span>
           <span class="footer-en">Syria</span>
           <span class="footer-separator" aria-hidden="true">|</span>
           <span class="footer-ar" lang="ar" dir="rtl">سوريا</span>
