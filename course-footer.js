@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260824-4';
+  const COURSE_THEME_VERSION = '20260824-5';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const centralizedPages = new Set([
     'lecture01.html',
@@ -10,7 +10,10 @@
     'lecture04.html',
     'lecture05.html',
     'lecture06.html',
-    'lecture07.html'
+    'lecture07.html',
+    'lecture08.html',
+    'lecture09.html',
+    'lecture10.html'
   ]);
 
   const removeCentralizedInlineStyles = () => {
