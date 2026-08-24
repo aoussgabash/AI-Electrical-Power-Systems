@@ -1,11 +1,12 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260824-2';
+  const COURSE_THEME_VERSION = '20260824-3';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
+  const centralizedPages = new Set(['lecture01.html', 'lecture02.html']);
 
   const removePilotInlineStyles = () => {
-    if (page !== 'lecture01.html') return;
+    if (!centralizedPages.has(page)) return;
     document.head.querySelectorAll('style').forEach((style) => style.remove());
     document.documentElement.dataset.courseThemeCentralized = 'true';
   };
