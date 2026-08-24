@@ -237,13 +237,15 @@ th{
 
 .svg-box svg{
   width:100%;
-  min-width:640px;
+  min-width:650px;
   height:auto;
 }
 
-.node{fill:#10263d;stroke:#38bdf8;stroke-width:2}
+.node{fill:#10263d;stroke:#38bdf8;stroke-width:2.5}
+.inputnode{fill:#14283c;stroke:#b8c7d9;stroke-width:2}
+.outputnode{fill:#12351e;stroke:#22c55e;stroke-width:3}
 .goal{fill:#12351e;stroke:#22c55e;stroke-width:3}
-.edge{stroke:#6b7f93;stroke-width:2}
+.edge{stroke:#7890a8;stroke-width:2}
 .axis{stroke:#9fb3c8;stroke-width:2}
 .curve1{fill:none;stroke:#38bdf8;stroke-width:4}
 .curve2{fill:none;stroke:#22c55e;stroke-width:4}
@@ -251,8 +253,9 @@ th{
 .pt1{fill:#38bdf8}
 .pt2{fill:#22c55e}
 .linefit{stroke:#facc15;stroke-width:4}
-.svgtext{fill:#dce8f4;font-size:15px}
-.cost{fill:#facc15;font-size:13px;text-anchor:middle}
+.svgtext{fill:#fff;font-size:15px;text-anchor:middle;dominant-baseline:middle}
+.cost,
+.label{fill:#facc15;font-size:13px;text-anchor:middle}
 
 .warning{
   padding:15px;
