@@ -1,60 +1,49 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg"><title>Lab 14 - Power Engineering RAG Assistant</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body class="course-template-modern"><header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB laboratory on retrieval-augmented generation for power engineering">
+  <title>Lab 14 - Power Engineering RAG Assistant</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LAB 14 | المخبر 14</div>
-  <h1>Building a Power Engineering RAG Assistant</h1>
-  <div class="hero-ar">بناء مساعد هندسي معزز بالاسترجاع</div>
-  <div class="subtitle">MATLAB laboratory for document retrieval, grounding, and prompt construction<br>مخبر MATLAB لاسترجاع المستندات وبناء إجابات موثقة</div>
-</div>
+  <div class="hero">
+    <div class="lecture-number">LAB 14 | المخبر 14</div>
+    <h1>Building a Power Engineering RAG Assistant</h1>
+    <div class="hero-ar">بناء مساعد هندسي معزز بالاسترجاع</div>
+    <div class="subtitle">MATLAB Laboratory for Retrieval, Grounding, and Prompt Construction<br>مخبر MATLAB للاسترجاع وبناء الإجابات المستندة إلى المصادر</div>
+    <div class="toc"><a href="#knowledge">Knowledge Base</a><a href="#model">Retrieval Model</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#evaluation">Evaluation</a><a href="#tasks">Tasks</a></div>
+  </div>
 
-<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
-<li>Create a small power-engineering knowledge base.</li><li>Preprocess and vectorize document chunks.</li>
-<li>Retrieve relevant passages using cosine similarity.</li><li>Construct a grounded prompt.</li>
-<li>Generate a deterministic extractive answer without an external API.</li>
-<li>Prepare an optional interface for a connected language model.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف المخبر</h2><ul>
-<li>إنشاء قاعدة معرفة هندسية صغيرة.</li><li>معالجة المقاطع وتحويلها إلى متجهات.</li>
-<li>استرجاع المقاطع بتشابه جيب التمام.</li><li>بناء أمر مستند إلى الأدلة.</li>
-<li>إنشاء إجابة استخراجية دون API خارجي.</li><li>تهيئة الواجهة لنموذج لغوي اختياري.</li>
-</ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Create a compact power-engineering knowledge base.</li><li>Preprocess and vectorize document chunks.</li><li>Retrieve relevant passages using TF-IDF and cosine similarity.</li><li>Construct a grounded prompt with source identifiers.</li><li>Generate a deterministic extractive answer without an external API.</li><li>Evaluate retrieval quality, faithfulness, and missing-evidence behavior.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>إنشاء قاعدة معرفة هندسية صغيرة.</li><li>معالجة المقاطع وتحويلها إلى متجهات.</li><li>استرجاع المقاطع باستخدام TF-IDF وتشابه جيب التمام.</li><li>بناء أمر يستند إلى الأدلة ومعرفات المصادر.</li><li>إنشاء إجابة استخراجية دون API خارجي.</li><li>تقييم جودة الاسترجاع ووفاء الإجابة بالمصادر.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Requirements</h2>
-<ul><li>MATLAB</li><li>Text Analytics Toolbox</li></ul>
-<div class="note">The laboratory uses bag-of-words TF-IDF retrieval so it remains transparent and can run without an external language-model service.</div></div>
-<div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Text Analytics Toolbox. يستخدم المخبر TF-IDF حتى يعمل دون خدمة خارجية.</p></div></section>
+  <section><div class="en"><h2>1. Requirements</h2><ul><li>MATLAB</li><li>Text Analytics Toolbox</li></ul><div class="note">The laboratory uses transparent TF-IDF retrieval so it can run without an external language-model service.</div></div><div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Text Analytics Toolbox، ويعمل المخبر دون خدمة لغوية خارجية.</p></div></section>
 
-<section><div class="en"><h2>2. Knowledge Base</h2>
-<p>Create a file named <code>power_knowledge.csv</code> with columns <code>ID</code>, <code>Title</code>, and <code>Text</code>.</p>
-<pre><code>ID,Title,Text
-1,Battery SOC,"State of charge is the ratio of stored energy to usable battery capacity. Operational limits protect lifetime and reserve."
-2,DC Power Flow,"The DC approximation assumes voltage magnitudes near one per unit, small angle differences, and negligible resistance."
-3,Voltage Stability,"Voltage stability concerns the ability of a power system to maintain acceptable voltages after disturbances."
-4,Load Forecasting,"Short-term load forecasting predicts demand from historical load, weather, calendar, and operational variables."
-5,State Estimation,"State estimation combines redundant noisy measurements to estimate bus voltage magnitudes and angles."
-6,Transformer Attention,"Self-attention relates every time step to other time steps using query, key, and value vectors."
-7,GNN,"A graph neural network updates each bus representation by aggregating information from electrically connected neighbors."
-8,Demand Response,"Demand response changes electricity consumption in response to prices, incentives, or grid conditions."</code></pre></div>
-<div class="ar"><h2>2. قاعدة المعرفة</h2><p>أنشئ ملف CSV يحوي معرف المقطع وعنوانه ونصه. ويمكن توسيعه لاحقًا بصفحات المحاضرات أو كتيبات التشغيل.</p></div></section>
+  <section id="knowledge"><div class="en"><h2>2. Knowledge Base</h2><p>Create <code>power_knowledge.csv</code> with columns <code>ID</code>, <code>Title</code>, and <code>Text</code>.</p><pre><code>ID,Title,Text
+1,Battery SOC,"State of charge is the ratio of stored energy to usable battery capacity."
+2,DC Power Flow,"The DC approximation assumes voltage magnitudes near one per unit and small angle differences."
+3,Voltage Stability,"Voltage stability concerns maintaining acceptable voltages after disturbances."
+4,Load Forecasting,"Short-term load forecasting uses historical load, weather, and calendar variables."
+5,State Estimation,"State estimation combines noisy measurements to estimate voltage magnitudes and angles."
+6,Transformer Attention,"Self-attention relates time steps using query, key, and value vectors."
+7,GNN,"A graph neural network aggregates information from electrically connected buses."
+8,Demand Response,"Demand response changes consumption in response to prices or grid conditions."</code></pre></div><div class="ar"><h2>2. قاعدة المعرفة</h2><p>يحتوي ملف CSV على معرف وعنوان ونص لكل مقطع، ويمكن توسيعه لاحقًا بصفحات المحاضرات والكتيبات.</p></div></section>
 
-<section><div class="en"><h2>3. Complete MATLAB Script</h2>
-<pre><code>%% Lab 14: Transparent RAG Assistant in MATLAB
+  <section id="model"><div class="en"><h2>3. Retrieval Model</h2><div class="formula">TF-IDF(t,d)=TF(t,d)·log(N/DF(t))</div><div class="formula">similarity(q,d)=qᵀd/(||q||·||d||)</div><div class="grid"><div class="mini-card"><strong>Chunking</strong><p>Divide documents into retrievable passages.</p></div><div class="mini-card"><strong>Vectorization</strong><p>Convert text into TF-IDF vectors.</p></div><div class="mini-card"><strong>Ranking</strong><p>Sort passages by cosine similarity.</p></div><div class="mini-card"><strong>Grounding</strong><p>Answer only from retrieved evidence.</p></div></div><div class="warning">High similarity does not guarantee factual sufficiency. Retrieval and answer faithfulness must be evaluated separately.</div></div><div class="ar"><h2>3. نموذج الاسترجاع</h2><p>تُحوّل المقاطع إلى متجهات TF-IDF، ثم ترتب بحسب تشابهها مع السؤال وتستخدم كأدلة للإجابة.</p></div></section>
+
+  <section id="workflow"><div class="en"><h2>4. Engineering Workflow</h2><div class="flow"><div class="flow-box">Build Knowledge Base</div><div class="arrow">→</div><div class="flow-box">Preprocess Text</div><div class="arrow">→</div><div class="flow-box">Vectorize</div><div class="arrow">→</div><div class="flow-box">Retrieve Top-k</div><div class="arrow">→</div><div class="flow-box">Ground & Evaluate</div></div><ol><li>Collect trusted engineering sources.</li><li>Split them into meaningful chunks.</li><li>Normalize and vectorize the text.</li><li>Retrieve the highest-scoring chunks.</li><li>Construct a prompt with explicit evidence boundaries.</li><li>Check citations, terminology, and unsupported claims.</li></ol></div><div class="ar"><h2>4. سير العمل الهندسي</h2><p>نبني قاعدة المعرفة ونعالج النصوص ونسترجع الأدلة ثم نبني الإجابة ونقيّم وفاءها بالمصادر.</p></div></section>
+
+  <section id="code"><div class="en"><h2>5. Complete MATLAB Script</h2><pre><code>%% Lab 14: Transparent RAG Assistant in MATLAB
 clear; clc; close all;
 
 %% 1) Load knowledge base
-KB = readtable("power_knowledge.csv", ...
-    TextType="string");
-
+KB = readtable("power_knowledge.csv",TextType="string");
 documents = tokenizedDocument(KB.Text);
 
 %% 2) Text preprocessing
@@ -62,82 +51,62 @@ documents = lower(documents);
 documents = erasePunctuation(documents);
 documents = removeStopWords(documents);
 
-%% 3) Build TF-IDF document representation
+%% 3) TF-IDF representation
 bag = bagOfWords(documents);
 X = tfidf(bag);
-
-% Normalize each document vector
 docNorm = sqrt(sum(X.^2,2));
 docNorm(docNorm==0) = 1;
 Xn = X./docNorm;
 
 %% 4) User question
-question = ...
-    "Why are graph neural networks suitable for state estimation?";
-
+question = "Why are graph neural networks suitable for state estimation?";
 queryDoc = tokenizedDocument(question);
 queryDoc = lower(queryDoc);
 queryDoc = erasePunctuation(queryDoc);
 queryDoc = removeStopWords(queryDoc);
 
-%% 5) Transform query into the same vocabulary
+%% 5) Query vector in the same vocabulary
 qCounts = encode(bag,queryDoc);
 idfVector = log(size(X,1)./(1+sum(X&gt;0,1)))+1;
 q = qCounts.*idfVector;
-
 qNorm = sqrt(sum(q.^2,2));
 if qNorm==0
     error("The question contains no known vocabulary.");
 end
 qn = q/qNorm;
 
-%% 6) Cosine similarity
+%% 6) Retrieve top-k chunks
 scores = Xn*qn';
-
 topK = 3;
 [sortedScores,idx] = maxk(scores,topK);
-
-Retrieved = table( ...
-    KB.ID(idx),KB.Title(idx),KB.Text(idx),sortedScores, ...
+Retrieved = table(KB.ID(idx),KB.Title(idx),KB.Text(idx),sortedScores, ...
     VariableNames=["ID","Title","Text","Score"]);
-
 disp(Retrieved);
 
 %% 7) Build grounded context
 contextBlocks = strings(topK,1);
-
 for k = 1:topK
-    contextBlocks(k) = ...
-        "["+Retrieved.ID(k)+"] "+ ...
-        Retrieved.Title(k)+": "+ ...
-        Retrieved.Text(k);
+    contextBlocks(k) = "["+Retrieved.ID(k)+"] "+ ...
+        Retrieved.Title(k)+": "+Retrieved.Text(k);
 end
-
 context = join(contextBlocks,newline);
 
-%% 8) Construct a grounded prompt
+%% 8) Grounded prompt
 prompt = ...
 "You are a power-engineering teaching assistant."+newline+ ...
 "Answer only from the supplied context."+newline+ ...
-"If the context is insufficient, say so."+newline+ ...
+"If evidence is insufficient, say so."+newline+ ...
 "Preserve engineering terminology and cite source IDs."+newline+newline+ ...
 "CONTEXT:"+newline+context+newline+newline+ ...
-"QUESTION:"+newline+question+newline+newline+ ...
-"ANSWER:";
-
+"QUESTION:"+newline+question+newline+newline+"ANSWER:";
 disp(prompt);
 
 %% 9) Deterministic extractive answer
-% This stage avoids an external API.
 answer = ...
 "Graph neural networks are suitable because they represent "+ ...
-"the electrical grid as buses connected by lines and update "+ ...
-"each bus using information from electrically connected "+ ...
-"neighbors [7]. State estimation also uses network-wide "+ ...
-"measurements to estimate voltage states [5]. Therefore, "+ ...
-"the graph structure matches the physical topology used by "+ ...
-"the estimation problem.";
-
+"the grid as buses connected by lines and aggregate information "+ ...
+"from electrically connected neighbors [7]. State estimation "+ ...
+"uses network measurements to estimate voltage states [5].";
 fprintf("\nANSWER:\n%s\n",answer);
 
 %% 10) Retrieval visualization
@@ -145,59 +114,21 @@ figure;
 barh(categorical(Retrieved.Title),Retrieved.Score);
 grid on;
 xlabel("Cosine Similarity");
-title("Top Retrieved Knowledge Chunks");</code></pre></div>
-<div class="ar"><h2>3. الكود الكامل</h2>
-<p>يقرأ الكود قاعدة المعرفة، ويعالج النصوص، ويبني TF-IDF، ثم يسترجع أفضل المقاطع ويبني أمرًا مستندًا إلى الأدلة.</p></div></section>
+title("Top Retrieved Knowledge Chunks");</code></pre></div><div class="ar"><h2>5. كود MATLAB الكامل</h2><p>يقرأ الكود قاعدة المعرفة، ويبني تمثيل TF-IDF، ثم يسترجع المقاطع ويبني أمرًا وإجابة مرتبطة بالأدلة.</p></div></section>
 
-<section><div class="en"><h2>4. TF-IDF</h2>
-<div class="formula">TF-IDF(t,d)=TF(t,d)·log(N/DF(t))</div>
-<p>Frequent terms within one document receive weight, while terms appearing in every document are down-weighted.</p></div>
-<div class="ar"><h2>4. طريقة TF-IDF</h2><p>تعطي وزنًا للكلمات المهمة داخل مستند، وتخفض وزن الكلمات الشائعة في جميع المستندات.</p></div></section>
+  <section><div class="en"><h2>6. Grounded Prompt Design</h2><ul><li>Use only supplied context.</li><li>State when evidence is insufficient.</li><li>Preserve units and engineering terminology.</li><li>Cite source IDs.</li><li>Avoid inventing standards, limits, or equations.</li></ul><div class="highlight">The retrieval stage and the generation stage should be tested independently.</div></div><div class="ar"><h2>6. تصميم الأمر المستند إلى المصادر</h2><p>يفرض الأمر الاعتماد على السياق، والتصريح عند نقص الأدلة، والحفاظ على المصطلحات والوحدات والمراجع.</p></div></section>
 
-<section><div class="en"><h2>5. Retrieval</h2>
-<div class="formula">similarity(q,d)=qᵀd/(||q||·||d||)</div>
-<p>The top-k chunks become the evidence supplied to the answer-generation stage.</p></div>
-<div class="ar"><h2>5. الاسترجاع</h2><p>تُحسب مشابهة السؤال لكل مقطع، ثم تُختار أفضل المقاطع لتصبح الأدلة المستخدمة في الإجابة.</p></div></section>
+  <section id="evaluation"><div class="en"><h2>7. Evaluation Checklist</h2><div class="grid"><div class="mini-card"><strong>Retrieval Accuracy</strong><p>Did the system return the right source?</p></div><div class="mini-card"><strong>Faithfulness</strong><p>Is every claim supported by context?</p></div><div class="mini-card"><strong>Citation Quality</strong><p>Do source IDs match the claim?</p></div><div class="mini-card"><strong>Abstention</strong><p>Does the system admit missing evidence?</p></div></div><ul><li>Test at least five questions.</li><li>Include one unanswerable question.</li><li>Compare topK values of 1, 3, and 5.</li><li>Inspect low-similarity cases.</li><li>Check multilingual terminology and units.</li></ul></div><div class="ar"><h2>7. قائمة التقييم</h2><p>نقيّم صحة الاسترجاع ووفاء الإجابة وصحة الإحالات وقدرة النظام على الامتناع عندما تكون الأدلة غير كافية.</p></div></section>
 
-<section><div class="en"><h2>6. Grounded Prompt Design</h2>
-<p>The prompt explicitly instructs the assistant to:</p>
-<ul><li>Use only the supplied context.</li><li>State when evidence is insufficient.</li><li>Preserve engineering terms.</li><li>Cite source IDs.</li></ul></div>
-<div class="ar"><h2>6. تصميم الأمر المستند إلى المصادر</h2><p>يفرض الأمر الاعتماد على السياق والتصريح عند نقص المعلومات والحفاظ على المصطلحات وذكر معرفات المصادر.</p></div></section>
+  <section><div class="en"><h2>8. Optional Language-Model Connection</h2><p>A connected model can receive the variable <code>prompt</code> and generate the final answer.</p><div class="warning">Never store API keys in public HTML or GitHub files. Use environment variables or a secure secret manager.</div></div><div class="ar"><h2>8. الربط الاختياري بنموذج لغوي</h2><p>يمكن إرسال المتغير <code>prompt</code> إلى نموذج متصل، مع حفظ مفاتيح الوصول في بيئة آمنة.</p></div></section>
 
-<section><div class="en"><h2>7. Optional Language-Model Connection</h2>
-<p>The retrieval stage is independent of the generation provider. A connected model can receive the variable <code>prompt</code> and return a generated answer.</p>
-<div class="warning">Never place secret API keys directly inside a public HTML page or a GitHub repository. Store credentials in environment variables or a secure secret manager.</div></div>
-<div class="ar"><h2>7. الربط الاختياري بنموذج لغوي</h2><p>يمكن إرسال المتغير prompt إلى نموذج متصل. ويجب عدم وضع مفاتيح API في صفحة عامة أو مستودع GitHub.</p></div></section>
+  <section id="tasks"><div class="en"><h2>9. Student Tasks</h2><ol><li>Add 20 engineering chunks.</li><li>Compare topK = 1, 3, and 5.</li><li>Test vague and highly specific questions.</li><li>Add Arabic documents and questions.</li><li>Replace TF-IDF with document embeddings.</li><li>Create a confidence rule from the highest similarity score.</li><li>Evaluate one successful and one failed query.</li></ol></div><div class="ar"><h2>9. مهام الطالب</h2><ol><li>إضافة 20 مقطعًا هندسيًا.</li><li>مقارنة قيم topK.</li><li>اختبار أسئلة عامة ودقيقة.</li><li>إضافة مستندات وأسئلة عربية.</li><li>استبدال TF-IDF بتمثيلات مستندات.</li><li>إنشاء قاعدة ثقة اعتمادًا على التشابه.</li><li>تقييم حالة نجاح وحالة فشل.</li></ol></div></section>
 
-<section><div class="en"><h2>8. Evaluation Questions</h2>
-<ul><li>Did retrieval return the correct source?</li><li>Does the answer contain unsupported claims?</li><li>Are citations correct?</li><li>Are units and technical terms preserved?</li><li>Does the system admit missing evidence?</li></ul></div>
-<div class="ar"><h2>8. أسئلة التقييم</h2><p>افحص صحة الاسترجاع ووفاء الإجابة بالمصادر وصحة الإحالات والوحدات وقدرة النظام على الاعتراف بنقص الأدلة.</p></div></section>
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Course assistant:</strong> index all lecture HTML pages, retrieve relevant sections, generate bilingual answers with citations, and compare sparse TF-IDF retrieval with dense embeddings and hybrid search.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">أنشئ مساعدًا للمقرر يفهرس جميع صفحات HTML ويجيب باللغتين مع الإحالات، ثم قارن الاسترجاع المتناثر والكثيف والهجين.</div></div></section>
 
-<section><div class="en"><h2>9. Student Experiments</h2><div class="task"><ol>
-<li>Add 20 new engineering chunks.</li><li>Compare topK=1, 3, and 5.</li><li>Test vague and highly specific questions.</li>
-<li>Add Arabic documents and questions.</li><li>Replace TF-IDF with document embeddings.</li><li>Create a confidence rule based on the best similarity score.</li>
-</ol></div></div>
-<div class="ar"><h2>9. تجارب الطالب</h2><div class="task"><ol>
-<li>أضف 20 مقطعًا.</li><li>قارن قيم topK.</li><li>اختبر أسئلة عامة ودقيقة.</li>
-<li>أضف مستندات وأسئلة عربية.</li><li>استبدل TF-IDF بتمثيلات مستندات.</li><li>أنشئ قاعدة ثقة اعتمادًا على التشابه.</li>
-</ol></div></div></section>
-
-<section><div class="en"><h2>10. Mini Project</h2>
-<div class="research"><strong>Course assistant:</strong> Index all lecture HTML pages, retrieve the most relevant sections, and produce bilingual answers with citations to lecture and section numbers.</div></div>
-<div class="ar"><h2>10. مشروع مصغر</h2><div class="research">أنشئ مساعدًا للمقرر يفهرس جميع صفحات HTML ويجيب بالعربية والإنجليزية مع ذكر رقم المحاضرة والقسم.</div></div></section>
-
-<section><div class="en"><h2>11. Laboratory Report</h2><ul>
-<li>Describe the knowledge base.</li><li>Explain preprocessing and TF-IDF.</li><li>Show retrieval results for five questions.</li>
-<li>Evaluate one successful and one failed query.</li><li>Discuss hallucination and source grounding.</li><li>Propose privacy and security controls.</li></ul></div>
-<div class="ar"><h2>11. تقرير المخبر</h2><p>يتضمن وصف قاعدة المعرفة والمعالجة وTF-IDF ونتائج خمسة أسئلة وحالة نجاح وفشل وتحليل الهلوسة والأمان والخصوصية.</p></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>What is the role of TF-IDF?</li><li>How is cosine similarity computed?</li><li>Why is top-k retrieval needed?</li><li>What is grounding?</li><li>Why must retrieval and generation be evaluated separately?</li><li>What causes an unanswerable query?</li><li>How can dense embeddings improve retrieval?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>ما دور TF-IDF؟</li><li>كيف يحسب تشابه جيب التمام؟</li><li>لماذا نستخدم top-k؟</li><li>ما معنى الاستناد إلى المصادر؟</li><li>لماذا نقيم الاسترجاع والتوليد بشكل منفصل؟</li><li>ما سبب عدم قابلية بعض الأسئلة للإجابة؟</li><li>كيف تحسن التمثيلات الكثيفة الاسترجاع؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
