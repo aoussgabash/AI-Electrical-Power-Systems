@@ -1,406 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-<meta name="description" content="MATLAB Graph Neural Network laboratory for power-system state estimation">
-<title>Lab 11 - GNN State Estimation</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB laboratory on graph neural networks for six-bus power-system state estimation">
+  <title>Lab 11 - GNN State Estimation</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
-<body class="course-template-modern">
-
-<header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
-
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LAB 11 | المخبر 11</div>
-  <h1>Graph Neural Network for State Estimation</h1>
-  <div class="hero-ar">شبكة عصبية بيانية لتقدير حالة شبكة كهربائية</div>
-  <div class="subtitle">A transparent MATLAB implementation of graph convolution on a six-bus system<br>تنفيذ واضح في MATLAB للالتفاف البياني على شبكة من ستة قضبان</div>
-</div>
+  <div class="hero">
+    <div class="lecture-number">LAB 11 | المخبر 11</div>
+    <h1>Graph Neural Network for State Estimation</h1>
+    <div class="hero-ar">شبكة عصبية بيانية لتقدير حالة شبكة كهربائية</div>
+    <div class="subtitle">A Transparent MATLAB Implementation on a Six-Bus System<br>تنفيذ واضح في MATLAB على شبكة من ستة قضبان</div>
+    <div class="toc"><a href="#network">Network</a><a href="#model">Model</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#results">Results</a><a href="#tasks">Tasks</a></div>
+  </div>
 
-<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
-<li>Represent a six-bus power network as a graph.</li><li>Construct adjacency, degree, and normalized adjacency matrices.</li>
-<li>Generate synthetic operating points using a DC power-flow relation.</li><li>Implement a two-layer GCN manually in MATLAB.</li>
-<li>Train the GCN to estimate bus voltage angles.</li><li>Compare it with a topology-blind multilayer perceptron.</li>
-</ul></div>
-<div class="ar"><h2>🎯 أهداف المخبر</h2><ul>
-<li>تمثيل شبكة من ستة قضبان كرسم بياني.</li><li>بناء مصفوفات المجاورة والدرجة والمجاورة المطَبّعة.</li>
-<li>إنشاء حالات تشغيل اصطناعية باستخدام تدفق القدرة المستمر.</li><li>تنفيذ GCN من طبقتين يدويًا في MATLAB.</li>
-<li>تدريبها لتقدير زوايا الجهد.</li><li>مقارنتها بشبكة أمامية لا تستخدم الطوبولوجيا.</li>
-</ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Represent a six-bus power network as a graph.</li><li>Construct adjacency, degree, and normalized adjacency matrices.</li><li>Generate synthetic operating points using DC power flow.</li><li>Implement a two-layer GCN manually in MATLAB.</li><li>Train the GCN to estimate voltage angles.</li><li>Evaluate error by bus and discuss topology awareness.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>تمثيل شبكة من ستة قضبان كرسم بياني.</li><li>بناء مصفوفات المجاورة والدرجة والمجاورة المطبعة.</li><li>إنشاء حالات تشغيل اصطناعية باستخدام تدفق القدرة المستمر.</li><li>تنفيذ GCN من طبقتين يدويًا في MATLAB.</li><li>تدريبها لتقدير زوايا الجهد.</li><li>تقييم الخطأ لكل قضيب ومناقشة أثر الطوبولوجيا.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Six-Bus Network</h2>
-<div class="svg-wrap">
-<svg viewBox="0 0 900 420" role="img" aria-label="Electrical grid represented as a graph">
-  <defs>
-    <filter id="glow"><feGaussianBlur stdDeviation="3" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>
-  <rect width="900" height="420" rx="18" fill="#06101d"/>
-  <g stroke="#38bdf8" stroke-width="5" opacity=".85">
-    <line x1="140" y1="200" x2="330" y2="100"/><line x1="140" y1="200" x2="340" y2="300"/>
-    <line x1="330" y1="100" x2="560" y2="105"/><line x1="340" y1="300" x2="560" y2="105"/>
-    <line x1="340" y1="300" x2="585" y2="310"/><line x1="560" y1="105" x2="760" y2="210"/>
-    <line x1="585" y1="310" x2="760" y2="210"/>
-  </g>
-  <g font-family="Arial" font-size="18" text-anchor="middle">
-    <g filter="url(#glow)"><circle cx="140" cy="200" r="34" fill="#22c55e"/><text x="140" y="207" fill="#07111f" font-weight="bold">Bus 1</text></g>
-    <g><circle cx="330" cy="100" r="34" fill="#38bdf8"/><text x="330" y="107" fill="#07111f" font-weight="bold">Bus 2</text></g>
-    <g><circle cx="340" cy="300" r="34" fill="#38bdf8"/><text x="340" y="307" fill="#07111f" font-weight="bold">Bus 3</text></g>
-    <g><circle cx="560" cy="105" r="34" fill="#a78bfa"/><text x="560" y="112" fill="#07111f" font-weight="bold">Bus 4</text></g>
-    <g><circle cx="585" cy="310" r="34" fill="#a78bfa"/><text x="585" y="317" fill="#07111f" font-weight="bold">Bus 5</text></g>
-    <g><circle cx="760" cy="210" r="34" fill="#facc15"/><text x="760" y="217" fill="#07111f" font-weight="bold">Bus 6</text></g>
-  </g>
-  <g fill="#b8c7d9" font-family="Arial" font-size="17">
-    <text x="440" y="42">Nodes = buses | Edges = lines | Features = measurements and states</text>
-    <text x="440" y="395">العقد = قضبان | الحواف = خطوط | الميزات = قياسات وحالات</text>
-  </g>
-</svg>
-</div>
+  <section id="network"><div class="en"><h2>1. Six-Bus Graph</h2><div class="svg-wrap"><svg viewBox="0 0 900 420" role="img" aria-label="Six-bus electrical graph"><rect width="900" height="420" rx="18" fill="#06101d"/><g stroke="#38bdf8" stroke-width="5" opacity=".85"><line x1="140" y1="200" x2="330" y2="100"/><line x1="140" y1="200" x2="340" y2="300"/><line x1="330" y1="100" x2="560" y2="105"/><line x1="340" y1="300" x2="560" y2="105"/><line x1="340" y1="300" x2="585" y2="310"/><line x1="560" y1="105" x2="760" y2="210"/><line x1="585" y1="310" x2="760" y2="210"/></g><g font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold"><circle cx="140" cy="200" r="34" fill="#22c55e"/><text x="140" y="207" fill="#07111f">Bus 1</text><circle cx="330" cy="100" r="34" fill="#38bdf8"/><text x="330" y="107" fill="#07111f">Bus 2</text><circle cx="340" cy="300" r="34" fill="#38bdf8"/><text x="340" y="307" fill="#07111f">Bus 3</text><circle cx="560" cy="105" r="34" fill="#a78bfa"/><text x="560" y="112" fill="#07111f">Bus 4</text><circle cx="585" cy="310" r="34" fill="#a78bfa"/><text x="585" y="317" fill="#07111f">Bus 5</text><circle cx="760" cy="210" r="34" fill="#facc15"/><text x="760" y="217" fill="#07111f">Bus 6</text></g></svg></div><p>Bus 1 is the slack bus. Noisy active-power injections are node features, while true voltage angles are training targets.</p></div><div class="ar"><h2>1. الرسم البياني للشبكة</h2><p>يستخدم القضيب 1 كمرجع، وتمثل حقن القدرة المشوبة بالضجيج ميزات العقد، بينما تمثل زوايا الجهد الصحيحة أهداف التدريب.</p></div></section>
 
-<p>Bus 1 is the slack/reference bus. The remaining bus angles are estimated from noisy active-power injections.</p></div>
-<div class="ar"><h2>1. شبكة من ستة قضبان</h2><p>يُستخدم القضيب 1 كمرجع للزاوية، ويُطلب تقدير زوايا بقية القضبان انطلاقًا من حقن القدرة الفعالة المشوبة بالضجيج.</p></div></section>
+  <section id="model"><div class="en"><h2>2. Mathematical Model</h2><div class="formula">P=B<sub>bus</sub>θ</div><div class="formula">θ<sub>red</sub>=B<sub>red</sub><sup>-1</sup>P<sub>red</sub></div><div class="formula">S=D̃<sup>-1/2</sup>(A+I)D̃<sup>-1/2</sup></div><div class="formula">H<sup>(1)</sup>=ReLU(SXW<sub>1</sub>+b<sub>1</sub>)</div><div class="formula">Ŷ=SH<sup>(1)</sup>W<sub>2</sub>+b<sub>2</sub></div><div class="note">The normalized adjacency matrix mixes each bus feature with neighboring buses before the learned feature transformation.</div></div><div class="ar"><h2>2. النموذج الرياضي</h2><p>يولد نموذج DC زوايا الجهد الصحيحة، بينما تستخدم GCN مصفوفة المجاورة المطبعة لنقل المعلومات بين القضبان المتجاورة.</p></div></section>
 
-<section><div class="en"><h2>2. Mathematical Model</h2>
-<div class="formula">P=B<sub>bus</sub>θ</div>
-<p>After removing the slack-bus row and column:</p>
-<div class="formula">θ<sub>red</sub>=B<sub>red</sub><sup>-1</sup>P<sub>red</sub></div>
-<p>The supervised learning input is the noisy injection vector, and the target is the true bus-angle vector.</p></div>
-<div class="ar"><h2>2. النموذج الرياضي</h2><p>يعتمد المخبر على نموذج DC، حيث ترتبط القدرة الفعالة بزوايا الجهد عبر مصفوفة Bbus. تُستخدم النتائج الصحيحة كتسميات للتدريب.</p></div></section>
+  <section id="workflow"><div class="en"><h2>3. Engineering Workflow</h2><div class="flow"><div class="flow-box">Build Graph</div><div class="arrow">→</div><div class="flow-box">Generate DC Samples</div><div class="arrow">→</div><div class="flow-box">Normalize Data</div><div class="arrow">→</div><div class="flow-box">Train GCN</div><div class="arrow">→</div><div class="flow-box">Validate Physically</div></div><ol><li>Construct A, D̃, S, and Bbus.</li><li>Generate balanced active-power injections.</li><li>Compute exact DC angles.</li><li>Add measurement noise.</li><li>Train with Adam and validation monitoring.</li><li>Evaluate MAE, RMSE, and bus-wise errors.</li></ol></div><div class="ar"><h2>3. سير العمل الهندسي</h2><p>نبني الرسم البياني ونولد البيانات ونطبعها، ثم ندرب النموذج ونقيم الدقة والاتساق الفيزيائي.</p></div></section>
 
-<section><div class="en"><h2>3. Complete MATLAB Script</h2>
-<pre><code>%% Lab 11: Manual GCN for Six-Bus State Estimation
-clear; clc; close all;
-rng(11);
+  <section id="code"><div class="en"><h2>4. Complete MATLAB Script</h2><pre><code>%% Lab 11: Manual GCN for Six-Bus State Estimation
+clear; clc; close all; rng(11);
 
 %% 1) Graph topology
 N = 6;
-edges = [
-    1 2
-    1 3
-    2 4
-    3 4
-    3 5
-    4 6
-    5 6
-];
-
+edges = [1 2; 1 3; 2 4; 3 4; 3 5; 4 6; 5 6];
 A = zeros(N);
 for k = 1:size(edges,1)
-    i = edges(k,1);
-    j = edges(k,2);
-    A(i,j) = 1;
-    A(j,i) = 1;
+    i = edges(k,1); j = edges(k,2);
+    A(i,j) = 1; A(j,i) = 1;
 end
-
-% Add self-loops and normalize
 Atilde = A + eye(N);
 Dtilde = diag(sum(Atilde,2));
 S = Dtilde^(-0.5)*Atilde*Dtilde^(-0.5);
 
-%% 2) DC network susceptance matrix
+%% 2) DC susceptance matrix
 x = [0.18 0.22 0.20 0.25 0.30 0.17 0.21]';
 b = 1./x;
-
 Bbus = zeros(N);
 for k = 1:size(edges,1)
-    i = edges(k,1);
-    j = edges(k,2);
-    Bbus(i,i) = Bbus(i,i) + b(k);
-    Bbus(j,j) = Bbus(j,j) + b(k);
-    Bbus(i,j) = Bbus(i,j) - b(k);
-    Bbus(j,i) = Bbus(j,i) - b(k);
+    i = edges(k,1); j = edges(k,2);
+    Bbus(i,i)=Bbus(i,i)+b(k); Bbus(j,j)=Bbus(j,j)+b(k);
+    Bbus(i,j)=Bbus(i,j)-b(k); Bbus(j,i)=Bbus(j,i)-b(k);
 end
-
-slack = 1;
-nonSlack = 2:N;
+slack = 1; nonSlack = 2:N;
 Bred = Bbus(nonSlack,nonSlack);
 
-%% 3) Generate operating samples
+%% 3) Generate samples
 numSamples = 5000;
-X = zeros(N,1,numSamples);      % noisy injections
-Y = zeros(N,1,numSamples);      % true angles
-
+X = zeros(N,1,numSamples);
+Y = zeros(N,1,numSamples);
 for s = 1:numSamples
     P = zeros(N,1);
-
-    % Random net injections at non-slack buses
     P(nonSlack) = 0.35*randn(N-1,1);
-
-    % Slack balances the total power
     P(slack) = -sum(P(nonSlack));
-
     theta = zeros(N,1);
     theta(nonSlack) = Bred\P(nonSlack);
-
-    % Measurement noise
-    Pmeas = P + 0.02*randn(N,1);
-
-    X(:,:,s) = Pmeas;
+    X(:,:,s) = P + 0.02*randn(N,1);
     Y(:,:,s) = theta;
 end
 
-%% 4) Chronological-style split
-nTrain = 3500;
-nVal = 750;
-
+%% 4) Split and normalize
+nTrain = 3500; nVal = 750;
 iTrain = 1:nTrain;
 iVal = nTrain+1:nTrain+nVal;
 iTest = nTrain+nVal+1:numSamples;
+XTrain=X(:,:,iTrain); YTrain=Y(:,:,iTrain);
+XVal=X(:,:,iVal); YVal=Y(:,:,iVal);
+XTest=X(:,:,iTest); YTest=Y(:,:,iTest);
+muX=mean(XTrain,'all'); sigX=std(XTrain,0,'all');
+muY=mean(YTrain,'all'); sigY=std(YTrain,0,'all');
+XTrainN=(XTrain-muX)/sigX; XValN=(XVal-muX)/sigX;
+XTestN=(XTest-muX)/sigX; YTrainN=(YTrain-muY)/sigY;
+YValN=(YVal-muY)/sigY;
 
-XTrain = X(:,:,iTrain);
-YTrain = Y(:,:,iTrain);
-XVal = X(:,:,iVal);
-YVal = Y(:,:,iVal);
-XTest = X(:,:,iTest);
-YTest = Y(:,:,iTest);
-
-%% 5) Normalize using training statistics
-muX = mean(XTrain,'all');
-sigX = std(XTrain,0,'all');
-
-XTrainN = (XTrain-muX)/sigX;
-XValN = (XVal-muX)/sigX;
-XTestN = (XTest-muX)/sigX;
-
-muY = mean(YTrain,'all');
-sigY = std(YTrain,0,'all');
-
-YTrainN = (YTrain-muY)/sigY;
-YValN = (YVal-muY)/sigY;
-
-%% 6) Initialize two-layer GCN
-Fin = 1;
+%% 5) Parameters
 Fhidden = 16;
-Fout = 1;
+W1=dlarray(0.15*randn(1,Fhidden)); b1=dlarray(zeros(1,Fhidden));
+W2=dlarray(0.15*randn(Fhidden,1)); b2=dlarray(0);
+avgW1=[]; avgSqW1=[]; avgb1=[]; avgSqb1=[];
+avgW2=[]; avgSqW2=[]; avgb2=[]; avgSqb2=[];
+numEpochs=180; learnRate=2e-3; miniBatchSize=64; iteration=0;
+trainLoss=zeros(numEpochs,1); valLoss=zeros(numEpochs,1);
 
-W1 = dlarray(0.15*randn(Fin,Fhidden));
-b1 = dlarray(zeros(1,Fhidden));
-W2 = dlarray(0.15*randn(Fhidden,Fout));
-b2 = dlarray(zeros(1,Fout));
-
-avgW1=[]; avgSqW1=[];
-avgb1=[]; avgSqb1=[];
-avgW2=[]; avgSqW2=[];
-avgb2=[]; avgSqb2=[];
-
-numEpochs = 180;
-learnRate = 2e-3;
-miniBatchSize = 64;
-iteration = 0;
-
-trainLoss = zeros(numEpochs,1);
-valLoss = zeros(numEpochs,1);
-
-%% 7) Training loop
-for epoch = 1:numEpochs
-    order = randperm(nTrain);
-    epochLoss = 0;
-    nBatches = 0;
-
-    for startIdx = 1:miniBatchSize:nTrain
-        iteration = iteration + 1;
-        batchIdx = order(startIdx:min(startIdx+miniBatchSize-1,nTrain));
-
-        xb = dlarray(XTrainN(:,:,batchIdx),'SCB');
-        yb = dlarray(YTrainN(:,:,batchIdx),'SCB');
-
-        [loss,grads] = dlfeval(@modelGradients, ...
-            xb,yb,S,W1,b1,W2,b2);
-
-        [W1,avgW1,avgSqW1] = adamupdate(W1,grads.W1, ...
-            avgW1,avgSqW1,iteration,learnRate);
-        [b1,avgb1,avgSqb1] = adamupdate(b1,grads.b1, ...
-            avgb1,avgSqb1,iteration,learnRate);
-        [W2,avgW2,avgSqW2] = adamupdate(W2,grads.W2, ...
-            avgW2,avgSqW2,iteration,learnRate);
-        [b2,avgb2,avgSqb2] = adamupdate(b2,grads.b2, ...
-            avgb2,avgSqb2,iteration,learnRate);
-
-        epochLoss = epochLoss + double(gather(extractdata(loss)));
-        nBatches = nBatches + 1;
+%% 6) Training
+for epoch=1:numEpochs
+    order=randperm(nTrain); epochLoss=0; nBatches=0;
+    for startIdx=1:miniBatchSize:nTrain
+        iteration=iteration+1;
+        idx=order(startIdx:min(startIdx+miniBatchSize-1,nTrain));
+        xb=dlarray(XTrainN(:,:,idx),'SCB');
+        yb=dlarray(YTrainN(:,:,idx),'SCB');
+        [loss,g]=dlfeval(@modelGradients,xb,yb,S,W1,b1,W2,b2);
+        [W1,avgW1,avgSqW1]=adamupdate(W1,g.W1,avgW1,avgSqW1,iteration,learnRate);
+        [b1,avgb1,avgSqb1]=adamupdate(b1,g.b1,avgb1,avgSqb1,iteration,learnRate);
+        [W2,avgW2,avgSqW2]=adamupdate(W2,g.W2,avgW2,avgSqW2,iteration,learnRate);
+        [b2,avgb2,avgSqb2]=adamupdate(b2,g.b2,avgb2,avgSqb2,iteration,learnRate);
+        epochLoss=epochLoss+double(gather(extractdata(loss))); nBatches=nBatches+1;
     end
-
-    trainLoss(epoch) = epochLoss/nBatches;
-
-    xv = dlarray(XValN,'SCB');
-    yv = dlarray(YValN,'SCB');
-    yvPred = gcnForward(xv,S,W1,b1,W2,b2);
-    valLoss(epoch) = mean((extractdata(yvPred)-extractdata(yv)).^2,'all');
-
-    if mod(epoch,20)==0
-        fprintf('Epoch %3d | Train %.5f | Val %.5f\n', ...
-            epoch,trainLoss(epoch),valLoss(epoch));
-    end
+    trainLoss(epoch)=epochLoss/nBatches;
+    yv=gcnForward(dlarray(XValN,'SCB'),S,W1,b1,W2,b2);
+    valLoss(epoch)=mean((extractdata(yv)-YValN).^2,'all');
 end
 
-%% 8) Test prediction
-xt = dlarray(XTestN,'SCB');
-ytPredN = gcnForward(xt,S,W1,b1,W2,b2);
-YPred = extractdata(ytPredN)*sigY + muY;
+%% 7) Testing
+YPredN=gcnForward(dlarray(XTestN,'SCB'),S,W1,b1,W2,b2);
+YPred=extractdata(YPredN)*sigY+muY;
+YPred(1,:,:)=0;
+err=YPred-YTest;
+MAE=mean(abs(err),'all');
+RMSE=sqrt(mean(err.^2,'all'));
+fprintf('Test MAE  = %.6f rad\n',MAE);
+fprintf('Test RMSE = %.6f rad\n',RMSE);
 
-% Enforce reference angle exactly
-YPred(1,:,:) = 0;
+figure; semilogy(trainLoss,'LineWidth',1.3); hold on;
+semilogy(valLoss,'LineWidth',1.3); grid on;
+legend('Training','Validation'); xlabel('Epoch'); ylabel('MSE');
 
-%% 9) Performance
-err = YPred-YTest;
-MAE = mean(abs(err),'all');
-RMSE = sqrt(mean(err.^2,'all'));
+sample=25;
+figure; stem(1:N,YTest(:,:,sample),'filled'); hold on;
+stem(1:N,YPred(:,:,sample)); grid on;
+legend('True','GCN Estimate'); xlabel('Bus'); ylabel('Angle (rad)');
 
-fprintf('\nGCN Test MAE  = %.6f rad\n',MAE);
-fprintf('GCN Test RMSE = %.6f rad\n',RMSE);
-
-%% 10) Plot learning curves
-figure;
-semilogy(trainLoss,'LineWidth',1.3); hold on;
-semilogy(valLoss,'LineWidth',1.3);
-grid on;
-xlabel('Epoch');
-ylabel('MSE');
-legend('Training','Validation');
-title('GCN Training History');
-
-%% 11) Plot one test sample
-sample = 25;
-figure;
-stem(1:N,YTest(:,:,sample),'filled','LineWidth',1.2); hold on;
-stem(1:N,YPred(:,:,sample),'LineWidth',1.2);
-grid on;
-xlabel('Bus');
-ylabel('Voltage Angle (rad)');
-legend('True','GCN Estimate');
-title('Six-Bus State Estimation');
-
-%% 12) Error by bus
-busRMSE = squeeze(sqrt(mean(err.^2,3)));
-figure;
-bar(1:N,busRMSE);
-grid on;
-xlabel('Bus');
-ylabel('RMSE (rad)');
-title('Estimation Error by Bus');
+busRMSE=squeeze(sqrt(mean(err.^2,3)));
+figure; bar(1:N,busRMSE); grid on;
+xlabel('Bus'); ylabel('RMSE (rad)');
 
 %% Local functions
-function Y = gcnForward(X,S,W1,b1,W2,b2)
-    % X: N x 1 x Batch
-    B = size(X,3);
-    Sdl = dlarray(repmat(S,1,1,B),'SSB');
-
-    % Graph aggregation: S*X
-    AX = pagemtimes(Sdl,X);
-
-    % Feature transform
-    H = pagemtimes(AX,W1) + reshape(b1,1,[],1);
-    H = relu(H);
-
-    % Second graph aggregation
-    AH = pagemtimes(Sdl,H);
-
-    % Output layer
-    Y = pagemtimes(AH,W2) + reshape(b2,1,[],1);
+function Y=gcnForward(X,S,W1,b1,W2,b2)
+    B=size(X,3);
+    Sdl=dlarray(repmat(S,1,1,B),'SSB');
+    H=relu(pagemtimes(pagemtimes(Sdl,X),W1)+reshape(b1,1,[],1));
+    Y=pagemtimes(pagemtimes(Sdl,H),W2)+reshape(b2,1,1,1);
 end
 
-function [loss,grads] = modelGradients(X,T,S,W1,b1,W2,b2)
-    Y = gcnForward(X,S,W1,b1,W2,b2);
-    loss = mean((Y-T).^2,'all');
+function [loss,g]=modelGradients(X,T,S,W1,b1,W2,b2)
+    Y=gcnForward(X,S,W1,b1,W2,b2);
+    loss=mean((Y-T).^2,'all');
+    [g.W1,g.b1,g.W2,g.b2]=dlgradient(loss,W1,b1,W2,b2);
+end</code></pre><div class="note">Requires Deep Learning Toolbox because the script uses dlarray, dlfeval, dlgradient, and adamupdate.</div></div><div class="ar"><h2>4. كود MATLAB الكامل</h2><p>ينشئ الكود الشبكة والبيانات، ثم يدرب GCN يدويًا باستخدام الاشتقاق التلقائي وخوارزمية Adam.</p></div></section>
 
-    [gW1,gb1,gW2,gb2] = dlgradient(loss,W1,b1,W2,b2);
+  <section id="results"><div class="en"><h2>5. Expected Results and Validation</h2><div class="grid"><div class="mini-card"><strong>Learning Curves</strong><p>Training and validation losses should decrease without large divergence.</p></div><div class="mini-card"><strong>Angle Reconstruction</strong><p>Estimated bus angles should follow the DC targets closely.</p></div><div class="mini-card"><strong>Bus-wise Error</strong><p>Higher errors may appear at weakly connected or electrically remote buses.</p></div><div class="mini-card"><strong>Physical Check</strong><p>Bus 1 angle must remain exactly zero.</p></div></div><div class="formula">MAE=mean(|θ̂-θ|), &nbsp; RMSE=√mean[(θ̂-θ)²]</div><div class="warning">A low test error is insufficient if the model is evaluated only on the same topology and noise level used during training.</div></div><div class="ar"><h2>5. النتائج المتوقعة والتحقق</h2><p>يجب انخفاض خسارتي التدريب والتحقق، وتقارب الزوايا المقدرة من القيم الصحيحة، مع تثبيت زاوية القضيب المرجعي عند الصفر.</p></div></section>
 
-    grads.W1 = gW1;
-    grads.b1 = gb1;
-    grads.W2 = gW2;
-    grads.b2 = gb2;
-end</code></pre></div>
-<div class="ar"><h2>3. الكود الكامل في MATLAB</h2>
-<p>ينشئ الكود شبكة من ستة قضبان، ويولد آلاف حالات التشغيل، ثم ينفذ طبقتين من GCN يدويًا باستخدام المصفوفة المطَبّعة S وحلقة تدريب مخصصة.</p></div></section>
+  <section id="tasks"><div class="en"><h2>6. Student Tasks</h2><ol><li>Increase measurement noise from 0.02 to 0.05 and compare RMSE.</li><li>Remove line 3-4 and test the trained model without retraining.</li><li>Change the hidden width from 16 to 8 and 32.</li><li>Compare one and three graph-convolution layers.</li><li>Replace the GCN with a topology-blind MLP.</li><li>Report global and bus-wise errors.</li></ol></div><div class="ar"><h2>6. مهام الطالب</h2><ol><li>زيادة ضجيج القياس ومقارنة الخطأ.</li><li>فصل الخط 3-4 واختبار النموذج دون إعادة تدريب.</li><li>تغيير عدد العصبونات المخفية.</li><li>مقارنة عدد طبقات الالتفاف البياني.</li><li>استبدال GCN بشبكة MLP لا تستخدم الطوبولوجيا.</li><li>عرض الخطأ الكلي والخطأ لكل قضيب.</li></ol></div></section>
 
-<section><div class="en"><h2>4. Normalized Adjacency</h2>
-<div class="formula">S=D̃<sup>-1/2</sup>(A+I)D̃<sup>-1/2</sup></div>
-<p>The multiplication S·X lets each bus receive a weighted average of its own feature and neighboring features.</p></div>
-<div class="ar"><h2>4. المجاورة المطَبّعة</h2>
-<p>تسمح المصفوفة S لكل قضيب بدمج قياسه مع قياسات القضبان المجاورة مع منع العقد ذات الدرجة العالية من السيطرة.</p></div></section>
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Possible extensions:</strong> AC state estimation, PMU and SCADA fusion, topology uncertainty, graph attention, bad-data detection, physics-informed losses, and transfer to unseen grids.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">يمكن توسيع المخبر إلى تقدير AC ودمج PMU وSCADA وعدم يقين الطوبولوجيا والانتباه البياني وكشف البيانات السيئة.</div></div></section>
 
-<section><div class="en"><h2>5. Two-Layer GCN</h2>
-<div class="formula">H=ReLU(SXW₁+b₁)</div>
-<div class="formula">Ŷ=SHW₂+b₂</div>
-<p>The first layer learns hidden node representations. The second layer maps them to estimated voltage angles.</p></div>
-<div class="ar"><h2>5. شبكة GCN من طبقتين</h2>
-<p>تتعلم الطبقة الأولى تمثيلًا داخليًا لكل قضيب، ثم تحول الطبقة الثانية هذا التمثيل إلى زاوية جهد مقدرة.</p></div></section>
-
-<section><div class="en"><h2>6. Why the Slack Bus Is Special</h2>
-<p>Voltage angles are defined relative to a reference. Therefore, the slack-bus angle is fixed to zero.</p>
-<div class="warning">A learning model may produce a small nonzero slack angle unless the constraint is enforced explicitly or included in the loss.</div></div>
-<div class="ar"><h2>6. لماذا قضيب المرجع مميز؟</h2>
-<p>زوايا الجهد نسبية، لذلك تُثبت زاوية قضيب المرجع عند الصفر. ويُعاد فرض هذا الشرط بعد التنبؤ في الكود.</p></div></section>
-
-<section><div class="en"><h2>7. Interpretation of the Input and Output</h2>
-<div class="grid"><div class="mini-card"><strong>Input at each node</strong><p>Noisy active-power injection P<sub>i</sub>.</p></div>
-<div class="mini-card"><strong>Output at each node</strong><p>Estimated voltage angle θ<sub>i</sub>.</p></div></div>
-<p>The same graph matrix is shared across all operating samples.</p></div>
-<div class="ar"><h2>7. تفسير الدخل والخرج</h2>
-<p>يحمل كل قضيب قياس حقن قدرة فعال كدخل، وتنتج الشبكة زاوية الجهد المقدرة لكل قضيب.</p></div></section>
-
-<section><div class="en"><h2>8. Expected Results</h2><ul>
-<li>Training and validation losses decrease steadily.</li><li>Estimated angles follow the true DC-state solution.</li>
-<li>The slack-bus error is zero after enforcing the reference.</li><li>Buses with weaker measurement information may show larger errors.</li></ul></div>
-<div class="ar"><h2>8. النتائج المتوقعة</h2><p>يجب أن ينخفض الخطأ، وأن تتبع الزوايا المقدرة الحل الحقيقي. وقد تختلف الدقة بين القضبان بحسب موقعها واتصالها.</p></div></section>
-
-<section><div class="en"><h2>9. Comparison with a Topology-Blind MLP</h2>
-<p>Flatten each six-bus injection vector and train an ordinary fully connected network:</p>
-<pre><code>layersMLP = [
-    featureInputLayer(6)
-    fullyConnectedLayer(32)
-    reluLayer
-    fullyConnectedLayer(32)
-    reluLayer
-    fullyConnectedLayer(6)
-    regressionLayer
-];</code></pre>
-<div class="highlight">Use exactly the same training, validation, and test samples. Compare RMSE, parameter count, and robustness to a line outage.</div></div>
-<div class="ar"><h2>9. المقارنة مع MLP دون طوبولوجيا</h2>
-<p>درّب شبكة أمامية عادية على المتجه نفسه ثم قارن الدقة وعدد المعاملات والأداء عند خروج خط.</p></div></section>
-
-<section><div class="en"><h2>10. Topology-Change Experiment</h2><div class="task"><ol>
-<li>Remove edge (3,5) from A.</li><li>Recompute S.</li><li>Regenerate Bbus for the changed network.</li><li>Test the original GCN without retraining.</li><li>Fine-tune the model with a small number of new samples.</li></ol></div></div>
-<div class="ar"><h2>10. تجربة تغير الطوبولوجيا</h2><div class="task"><ol>
-<li>احذف الخط بين القضيبين 3 و5.</li><li>أعد حساب S.</li><li>أعد بناء Bbus.</li><li>اختبر النموذج القديم دون تدريب.</li><li>أعد ضبطه بعدد قليل من العينات.</li></ol></div></div></section>
-
-<section><div class="en"><h2>11. Student Tasks</h2><div class="task"><ol>
-<li>Increase the measurement noise from 0.02 to 0.05.</li><li>Change hidden features from 16 to 8, 32, and 64.</li>
-<li>Add reactive-power or voltage-magnitude features.</li><li>Use a weighted adjacency matrix based on 1/x.</li>
-<li>Add a physics penalty ||P-Bbus·θ̂||² to the loss.</li><li>Compare one, two, and three GCN layers.</li>
-</ol></div></div>
-<div class="ar"><h2>11. مهام الطالب</h2><div class="task"><ol>
-<li>زد ضجيج القياس.</li><li>غيّر عدد الميزات المخفية.</li><li>أضف ميزات كهربائية أخرى.</li>
-<li>استخدم مجاورة موزونة بـ 1/x.</li><li>أضف عقوبة فيزيائية لمعادلة القدرة.</li><li>قارن أعماقًا مختلفة.</li>
-</ol></div></div></section>
-
-<section><div class="en"><h2>12. Mini Project</h2>
-<div class="research"><strong>Physics-informed graph state estimator:</strong> Extend the loss with a DC power-balance residual and test whether the model becomes more robust under noisy or missing measurements.</div></div>
-<div class="ar"><h2>12. مشروع مصغر</h2><div class="research">أضف إلى دالة الخسارة خطأ اتزان القدرة وفق نموذج DC، ثم اختبر متانة النموذج عند الضجيج أو فقد القياسات.</div></div></section>
-
-<section><div class="en"><h2>13. Laboratory Report</h2><ul>
-<li>Draw the graph and list all edges.</li><li>Show A, D̃, and S.</li><li>Explain the two GCN equations.</li>
-<li>Report training, validation, and test errors.</li><li>Plot true and estimated angles.</li>
-<li>Compare GCN and MLP.</li><li>Discuss topology changes and physical constraints.</li>
-</ul></div>
-<div class="ar"><h2>13. تقرير المخبر</h2><p>يتضمن التقرير الرسم البياني والمصفوفات والمعادلات والنتائج والرسوم والمقارنة مع MLP وتحليل تغير الطوبولوجيا والقيود الفيزيائية.</p></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Why are self-loops added to the adjacency matrix?</li><li>Why is normalized adjacency used?</li><li>What information does one GCN layer collect?</li><li>Why must the slack angle be enforced?</li><li>What causes topology generalization failure?</li><li>How would AC state estimation change the targets?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>لماذا تضاف الوصلات الذاتية؟</li><li>لماذا نستخدم المجاورة المطبعة؟</li><li>ما المعلومات التي تجمعها طبقة GCN واحدة؟</li><li>لماذا يجب تثبيت زاوية المرجع؟</li><li>ما سبب فشل التعميم عند تغير الطوبولوجيا؟</li><li>كيف يتغير المخبر عند استخدام تقدير AC؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
