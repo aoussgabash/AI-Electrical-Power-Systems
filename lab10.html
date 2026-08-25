@@ -1,60 +1,33 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-<title>Lab 10 - Transformer Load Forecasting</title>
-<style>
-:root{--bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;--muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;--red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
-.container{width:min(1050px,92%);margin:auto}
-header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
-nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
-.logo{font-weight:bold}.logo span{color:var(--blue)}
-.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
-.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
-h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
-.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
-section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
-h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
-.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
-.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
-.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
-.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
-.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
-.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.15rem;font-family:"Times New Roman",serif;overflow-x:auto}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
-.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
-.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
-pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
-code{font-family:Consolas,monospace}.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
-.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
-footer{text-align:center;color:var(--muted);padding:35px 0}@media(max-width:750px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
-</style>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body><header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <title>Lab 10 - Transformer Load Forecasting</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260824-7">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero"><div class="lecture-number">LAB 10 | المخبر 10</div><h1>Load Forecasting with a Transformer</h1>
-<div class="hero-ar">التنبؤ بالحمل الكهربائي باستخدام Transformer</div>
-<div class="subtitle">MATLAB R2023b+ practical laboratory using self-attention and positional embeddings<br>مخبر عملي باستخدام الانتباه الذاتي والترميز الموضعي</div></div>
+  <div class="hero"><div class="lab-number">LAB 10 | المختبر 10</div><h1>Load Forecasting with a Transformer</h1><div class="hero-ar">التنبؤ بالحمل الكهربائي باستخدام Transformer</div><div class="subtitle">Self-Attention, Positional Embeddings, Sequence Learning, and MATLAB<br>الانتباه الذاتي والترميز الموضعي وتعلم المتتاليات باستخدام MATLAB</div></div>
 
-<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Prepare hourly load sequences for transformer regression.</li><li>Create feature embeddings and positional embeddings.</li><li>Use multi-head self-attention in MATLAB.</li><li>Train a one-step-ahead forecasting model.</li><li>Compare transformer, persistence, and optionally LSTM results.</li><li>Visualize attention-compatible temporal behavior and errors.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>تجهيز متتاليات حمل ساعية للانحدار.</li><li>إنشاء تمثيل للميزات والمواضع.</li><li>استخدام الانتباه الذاتي متعدد الرؤوس في MATLAB.</li><li>تدريب نموذج لتوقع الساعة التالية.</li><li>مقارنته بخط الأساس وLSTM اختياريًا.</li><li>تحليل النتائج والأخطاء.</li></ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Prepare hourly load sequences for transformer regression.</li><li>Create feature and positional embeddings.</li><li>Use multi-head self-attention in MATLAB.</li><li>Train a one-step-ahead forecasting model.</li><li>Compare Transformer and persistence results.</li><li>Analyze forecasting errors.</li></ul></div><div class="ar"><h2>🎯 أهداف المختبر</h2><ul><li>تجهيز متتاليات حمل ساعية للانحدار.</li><li>إنشاء تمثيل للميزات والمواضع.</li><li>استخدام الانتباه الذاتي متعدد الرؤوس.</li><li>تدريب نموذج لتوقع الساعة التالية.</li><li>مقارنة Transformer بخط الأساس.</li><li>تحليل أخطاء التنبؤ.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Software Requirement</h2><div class="warning">Use MATLAB R2023b or newer with Deep Learning Toolbox because this laboratory uses <code>selfAttentionLayer</code> and <code>positionEmbeddingLayer</code>.</div></div>
-<div class="ar"><h2>1. متطلبات البرنامج</h2><p>يتطلب المخبر MATLAB R2023b أو أحدث مع Deep Learning Toolbox.</p></div></section>
+  <section><div class="en"><h2>1. Software Requirement</h2><div class="warning">Use MATLAB R2023b or newer with Deep Learning Toolbox because this lab uses <code>selfAttentionLayer</code> and <code>positionEmbeddingLayer</code>.</div></div><div class="ar"><h2>1. متطلبات البرنامج</h2><p>يتطلب المختبر MATLAB R2023b أو أحدث مع Deep Learning Toolbox.</p></div></section>
 
-<section><div class="en"><h2>2. Forecasting Task</h2><div class="formula">[Pₜ₋₄₇,...,Pₜ] → Pₜ₊₁</div><span class="tag">48-hour window</span><span class="tag">One-step ahead</span><span class="tag">Regression</span></div>
-<div class="ar"><h2>2. مسألة التنبؤ</h2><p>نستخدم آخر 48 ساعة لتوقع حمل الساعة التالية، مما يسمح للنموذج بمشاهدة نمط يومين متتاليين.</p></div></section>
+  <section><div class="en"><h2>2. Forecasting Task</h2><div class="formula">[Pₜ₋₄₇,...,Pₜ] → Pₜ₊₁</div><div class="highlight">Input window: 48 hours. Output: next-hour load.</div></div><div class="ar"><h2>2. مسألة التنبؤ</h2><p>نستخدم آخر 48 ساعة لتوقع حمل الساعة التالية، بحيث يرى النموذج نمط يومين متتاليين.</p></div></section>
 
-<section><div class="en"><h2>3. Complete MATLAB Script</h2>
-<pre><code>%% Lab 10: Transformer Load Forecasting
+  <section><div class="en"><h2>3. Transformer Workflow</h2><div class="flow"><div class="flow-box">Load Sequence</div><div class="arrow">→</div><div class="flow-box">Projection</div><div class="arrow">→</div><div class="flow-box">Position Embedding</div><div class="arrow">→</div><div class="flow-box">Self-Attention</div><div class="arrow">→</div><div class="flow-box">Forecast</div></div></div><div class="ar"><h2>3. تسلسل عمل Transformer</h2><p>يحوّل النموذج المتتالية إلى تمثيل عددي، ويضيف معلومات الموضع، ثم يستخدم الانتباه الذاتي قبل إنتاج التنبؤ.</p></div></section>
+
+  <section><div class="en"><h2>4. Complete MATLAB Script</h2><pre><code>%% Lab 10: Transformer Load Forecasting
 % MATLAB R2023b or newer
 clear; clc; close all;
 rng(10);
 
-%% 1) Generate hourly load data
+%% Generate hourly load data
 nDays = 240;
 N = 24*nDays;
 t = (0:N-1)';
@@ -70,8 +43,7 @@ temperature = 17 ...
 daily = 115 ...
     + 24*sin(2*pi*(hour-7)/24) ...
     + 9*sin(4*pi*(hour-5)/24);
-
-weekly = 9*(dow &lt; 5) - 8*(dow &gt;= 5);
+weekly = 9*(dow&lt;5) - 8*(dow&gt;=5);
 seasonal = 10*sin(2*pi*day/240);
 
 loadMW = daily + weekly + seasonal ...
@@ -79,46 +51,38 @@ loadMW = daily + weekly + seasonal ...
     + 0.45*max(11-temperature,0) ...
     + 2.2*randn(N,1);
 
-%% 2) Create sequence-to-one samples
+%% Create 48-hour sequence-to-one samples
 seqLen = 48;
 numSamples = N-seqLen;
-
 X = cell(numSamples,1);
 Y = zeros(numSamples,1);
-
 for k = 1:numSamples
-    X{k} = loadMW(k:k+seqLen-1)';   % 1 x 48
-    Y(k) = loadMW(k+seqLen);           % next hour
+    X{k} = loadMW(k:k+seqLen-1)';
+    Y(k) = loadMW(k+seqLen);
 end
 
-%% 3) Chronological split
+%% Chronological split
 nTrain = floor(0.70*numSamples);
-nVal   = floor(0.15*numSamples);
-
+nVal = floor(0.15*numSamples);
 iTrain = 1:nTrain;
-iVal   = nTrain+1:nTrain+nVal;
-iTest  = nTrain+nVal+1:numSamples;
+iVal = nTrain+1:nTrain+nVal;
+iTest = nTrain+nVal+1:numSamples;
 
-XTrain = X(iTrain); YTrain = Y(iTrain);
-XVal   = X(iVal);   YVal   = Y(iVal);
-XTest  = X(iTest);  YTest  = Y(iTest);
+XTrain=X(iTrain); YTrain=Y(iTrain);
+XVal=X(iVal); YVal=Y(iVal);
+XTest=X(iTest); YTest=Y(iTest);
 
-%% 4) Normalize using training data only
+%% Normalize using training data only
 trainMatrix = cell2mat(XTrain);
 mu = mean(trainMatrix,'all');
 sigma = std(trainMatrix,0,'all');
-
-XTrainN = cellfun(@(x)(x-mu)/sigma,XTrain, ...
-    'UniformOutput',false);
-XValN = cellfun(@(x)(x-mu)/sigma,XVal, ...
-    'UniformOutput',false);
-XTestN = cellfun(@(x)(x-mu)/sigma,XTest, ...
-    'UniformOutput',false);
-
+XTrainN = cellfun(@(x)(x-mu)/sigma,XTrain,'UniformOutput',false);
+XValN = cellfun(@(x)(x-mu)/sigma,XVal,'UniformOutput',false);
+XTestN = cellfun(@(x)(x-mu)/sigma,XTest,'UniformOutput',false);
 YTrainN = (YTrain-mu)/sigma;
-YValN   = (YVal-mu)/sigma;
+YValN = (YVal-mu)/sigma;
 
-%% 5) Transformer architecture
+%% Transformer architecture
 numFeatures = 1;
 embedDim = 32;
 numHeads = 4;
@@ -129,32 +93,27 @@ layers = [
     fullyConnectedLayer(embedDim,Name="projection")
     positionEmbeddingLayer(embedDim,seqLen,Name="position")
     additionLayer(2,Name="add_position")
-
     selfAttentionLayer(numHeads,embedDim, ...
         DropoutProbability=0.10,Name="attention")
     additionLayer(2,Name="add_attention")
     layerNormalizationLayer(Name="norm1")
-
     fullyConnectedLayer(ffnDim,Name="ffn1")
     reluLayer(Name="relu")
     dropoutLayer(0.10,Name="dropout")
     fullyConnectedLayer(embedDim,Name="ffn2")
     additionLayer(2,Name="add_ffn")
     layerNormalizationLayer(Name="norm2")
-
     globalAveragePooling1dLayer(Name="pool")
     fullyConnectedLayer(1,Name="forecast")
     regressionLayer(Name="output")
 ];
 
 lgraph = layerGraph(layers);
-
-% Residual and positional connections
 lgraph = connectLayers(lgraph,"projection","add_position/in2");
 lgraph = connectLayers(lgraph,"add_position","add_attention/in2");
 lgraph = connectLayers(lgraph,"norm1","add_ffn/in2");
 
-%% 6) Training options
+%% Training
 options = trainingOptions("adam", ...
     MaxEpochs=70, ...
     MiniBatchSize=64, ...
@@ -167,17 +126,14 @@ options = trainingOptions("adam", ...
     Verbose=false, ...
     Plots="training-progress");
 
-%% 7) Train network
 net = trainNetwork(XTrainN,YTrainN,lgraph,options);
 
-%% 8) Test prediction
+%% Prediction and inverse normalization
 YPredN = predict(net,XTestN,MiniBatchSize=64);
 YPred = YPredN*sigma + mu;
-
-%% 9) Persistence baseline
 YPersistence = cellfun(@(x)x(end),XTest);
 
-%% 10) Performance metrics
+%% Performance metrics
 metric = @(yp,yt) [ ...
     mean(abs(yp-yt)), ...
     sqrt(mean((yp-yt).^2)), ...
@@ -185,78 +141,48 @@ metric = @(yp,yt) [ ...
 
 mBase = metric(YPersistence,YTest);
 mTrans = metric(YPred,YTest);
-
 Results = array2table([mBase;mTrans], ...
     VariableNames={"MAE_MW","RMSE_MW","MAPE_percent"}, ...
     RowNames={"Persistence","Transformer"});
+disp(Results)
 
-disp(Results);
-
-%% 11) Plot forecasts
+%% Forecast plots
 nShow = min(240,numel(YTest));
-figure;
-plot(YTest(1:nShow),"k",LineWidth=1.35); hold on;
-plot(YPersistence(1:nShow),"--",LineWidth=1.0);
-plot(YPred(1:nShow),LineWidth=1.2);
-grid on;
-xlabel("Test Hour");
-ylabel("Load (MW)");
-legend("Actual","Persistence","Transformer", ...
-    Location="best");
-title("Transformer One-Step-Ahead Load Forecast");
+figure
+plot(YTest(1:nShow),"k",LineWidth=1.35); hold on
+plot(YPersistence(1:nShow),"--",LineWidth=1.0)
+plot(YPred(1:nShow),LineWidth=1.2)
+grid on
+xlabel("Test Hour"); ylabel("Load (MW)")
+legend("Actual","Persistence","Transformer",Location="best")
+title("Transformer One-Step-Ahead Load Forecast")
 
-%% 12) Error analysis
+%% Error analysis
 e = YPred-YTest;
+figure
+histogram(e,30)
+grid on
+xlabel("Prediction Error (MW)"); ylabel("Frequency")
+title("Transformer Error Distribution")
 
-figure;
-histogram(e,30);
-grid on;
-xlabel("Prediction Error (MW)");
-ylabel("Frequency");
-title("Transformer Error Distribution");
+figure
+scatter(YTest,YPred,10,"filled")
+grid on; axis equal
+xlabel("Actual Load (MW)")
+ylabel("Predicted Load (MW)")
+title("Actual versus Predicted Load")</code></pre></div><div class="ar"><h2>4. البرنامج الكامل في MATLAB</h2><p>ينشئ البرنامج بيانات حمل، ويبني نوافذ بطول 48 ساعة، ويطبّعها باستخدام بيانات التدريب فقط، ثم يدرب Transformer صغيرًا ويقارنه بخط أساس.</p></div></section>
 
-figure;
-scatter(YTest,YPred,10,"filled");
-grid on; axis equal;
-xlabel("Actual Load (MW)");
-ylabel("Predicted Load (MW)");
-title("Actual versus Predicted Load");</code></pre></div>
-<div class="ar"><h2>3. الكود الكامل</h2><p>ينشئ الكود بيانات حمل، يبني نوافذ بطول 48 ساعة، يطبّعها اعتمادًا على التدريب فقط، ثم يبني Encoder صغيرًا بانتباه متعدد الرؤوس.</p></div></section>
+  <section><div class="en"><h2>5. Core Components</h2><div class="grid"><div class="mini-card"><strong>Projection Layer</strong><p>Maps the input feature to the embedding dimension.</p></div><div class="mini-card"><strong>Position Embedding</strong><p>Adds temporal-order information.</p></div><div class="mini-card"><strong>Self-Attention</strong><p>Lets each time step attend to other steps.</p></div><div class="mini-card"><strong>Residual Connections</strong><p>Support stable gradient flow.</p></div></div></div><div class="ar"><h2>5. المكونات الأساسية</h2><p>يتكون النموذج من إسقاط للميزات وترميز موضعي وانتباه ذاتي ووصلات متبقية وطبقات تغذية أمامية.</p></div></section>
 
-<section><div class="en"><h2>4. Network Structure</h2>
-<div class="flow"><div class="flow-box">1×48 load sequence</div><div class="arrow">→</div><div class="flow-box">Projection to 32 channels</div><div class="arrow">→</div><div class="flow-box">Position embedding</div><div class="arrow">→</div><div class="flow-box">4-head attention</div><div class="arrow">→</div><div class="flow-box">FFN + pooling</div><div class="arrow">→</div><div class="flow-box">Next-hour load</div></div></div>
-<div class="ar"><h2>4. بنية الشبكة</h2><p>تُرفع الإشارة من ميزة واحدة إلى 32 قناة، ثم يضاف الترميز الموضعي، وبعد الانتباه والشبكة الأمامية يجمع المتوسط الزمني التمثيل لإنتاج التوقع.</p></div></section>
+  <section><div class="en"><h2>6. Evaluation Metrics</h2><div class="formula">MAE=(1/N)Σ|ŷᵢ-yᵢ|</div><div class="formula">RMSE=√[(1/N)Σ(ŷᵢ-yᵢ)²]</div><div class="formula">MAPE=(100/N)Σ|(ŷᵢ-yᵢ)/yᵢ|</div></div><div class="ar"><h2>6. مؤشرات التقييم</h2><p>تستخدم MAE وRMSE وMAPE لتقييم دقة التنبؤ ومقارنتها بخط الأساس.</p></div></section>
 
-<section><div class="en"><h2>5. Residual Connections</h2>
-<div class="formula">y = LayerNorm(x + Attention(x))</div><div class="formula">z = LayerNorm(y + FFN(y))</div>
-<p>The MATLAB graph explicitly connects the block input to the second input of each addition layer.</p></div>
-<div class="ar"><h2>5. الوصلات المتبقية</h2><p>تُجمع إشارة الدخل مع خرج الانتباه، ثم يُجمع خرج المرحلة الأولى مع خرج الشبكة الأمامية. تساعد هذه الوصلات على استقرار التدريب.</p></div></section>
+  <section><div class="en"><h2>7. Experiments</h2><ol><li>Change the input window to 24, 72, or 168 hours.</li><li>Change the embedding dimension.</li><li>Change the number of attention heads.</li><li>Add temperature as a second feature.</li><li>Compare Transformer and LSTM on the same split.</li></ol></div><div class="ar"><h2>7. التجارب</h2><ol><li>غيّر طول نافذة الإدخال.</li><li>غيّر بُعد التمثيل.</li><li>غيّر عدد رؤوس الانتباه.</li><li>أضف درجة الحرارة كميزة ثانية.</li><li>قارن Transformer وLSTM على التقسيم نفسه.</li></ol></div></section>
 
-<section><div class="en"><h2>6. Important Hyperparameters</h2><div class="table-wrap"><table>
-<tr><th>Parameter</th><th>Value</th><th>Meaning</th></tr><tr><td>Sequence length</td><td>48</td><td>Two days of hourly history</td></tr>
-<tr><td>Embedding dimension</td><td>32</td><td>Internal feature space</td></tr><tr><td>Attention heads</td><td>4</td><td>Four relationship subspaces</td></tr>
-<tr><td>FFN dimension</td><td>64</td><td>Nonlinear processing capacity</td></tr><tr><td>Dropout</td><td>0.10</td><td>Regularization</td></tr></table></div></div>
-<div class="ar"><h2>6. المعاملات المهمة</h2><p>يمكن تغيير طول النافذة وبعد التمثيل وعدد الرؤوس وحجم الشبكة الأمامية ونسبة الإسقاط لدراسة أثرها في الدقة والكلفة.</p></div></section>
+  <section><div class="en"><h2>8. Lab Tasks</h2><ol><li>Run the complete script.</li><li>Record Transformer and persistence metrics.</li><li>Plot predictions and error distribution.</li><li>Explain the role of positional embeddings.</li><li>Explain the residual connections.</li><li>Repeat at least two experiments.</li></ol></div><div class="ar"><h2>8. مهام المختبر</h2><ol><li>شغّل البرنامج الكامل.</li><li>سجل مؤشرات Transformer وخط الأساس.</li><li>ارسم التنبؤات وتوزيع الأخطاء.</li><li>اشرح دور الترميز الموضعي.</li><li>اشرح الوصلات المتبقية.</li><li>نفذ تجربتين على الأقل.</li></ol></div></section>
 
-<section><div class="en"><h2>7. Expected Behavior</h2><ul><li>The transformer should learn the daily load cycle.</li><li>It should usually outperform persistence when the load is changing.</li><li>Validation loss should stop improving before training loss if overfitting begins.</li><li>Peak hours may remain harder to predict.</li></ul>
-<div class="warning">A transformer is not automatically better than LSTM. Performance depends on data volume, window length, features, and tuning.</div></div>
-<div class="ar"><h2>7. السلوك المتوقع</h2><p>يُفترض أن يتعلم النموذج النمط اليومي، لكن التفوق على LSTM ليس مضمونًا، بل يعتمد على كمية البيانات والميزات والإعدادات.</p></div></section>
-
-<section><div class="en"><h2>8. Student Experiments</h2><div class="task"><ol>
-<li>Test sequence lengths 24, 48, 72, and 168.</li><li>Test 1, 2, 4, and 8 attention heads.</li><li>Change embedding dimension from 32 to 64.</li><li>Add temperature and hour-of-day features.</li><li>Replace global average pooling with last-step indexing.</li><li>Compare with Lab 09 LSTM using identical data and splits.</li></ol></div></div>
-<div class="ar"><h2>8. تجارب الطالب</h2><div class="task"><ol><li>جرّب نوافذ 24 و48 و72 و168 ساعة.</li><li>جرّب 1 و2 و4 و8 رؤوس.</li><li>غيّر بعد التمثيل من 32 إلى 64.</li><li>أضف الحرارة والساعة كميزات.</li><li>قارن التجميع المتوسط باستخدام آخر خطوة.</li><li>قارن النتائج مباشرة مع LSTM في المخبر 09.</li></ol></div></div></section>
-
-<section><div class="en"><h2>9. Mini Project</h2><div class="research"><strong>Day-ahead forecasting:</strong> Modify the model to output the next 24 hourly loads. The final fully connected layer must output 24 values, and each target must be a 24-element vector.</div></div>
-<div class="ar"><h2>9. مشروع مصغر</h2><div class="research">حوّل النموذج من توقع ساعة واحدة إلى توقع اليوم التالي كاملًا، بحيث ينتج 24 قيمة حمل دفعة واحدة.</div></div></section>
-
-<section><div class="en"><h2>10. Laboratory Report</h2><ul><li>Explain Q, K, V in the context of hourly load.</li><li>Draw the network architecture.</li><li>Report MAE, RMSE, and MAPE.</li><li>Compare transformer and persistence.</li><li>Compare transformer and LSTM.</li><li>Discuss accuracy, training cost, and overfitting.</li></ul></div>
-<div class="ar"><h2>10. تقرير المخبر</h2><p>يجب أن يتضمن تفسير Q وK وV، رسم البنية، مؤشرات الخطأ، مقارنة Transformer بخط الأساس وLSTM، ومناقشة الدقة والكلفة وفرط التخصيص.</p></div></section>
-</main><footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer><script src="course-navigation.js" defer></script>
+  <section><div class="en"><h2>📝 Review Questions</h2><ol><li>Why does a Transformer need positional information?</li><li>What does self-attention calculate?</li><li>Why use multiple attention heads?</li><li>Why is chronological splitting required?</li><li>Why compare with persistence?</li><li>How can weather inputs improve forecasting?</li></ol></div><div class="ar"><h2>📝 أسئلة المراجعة</h2><ol><li>لماذا يحتاج Transformer إلى معلومات الموضع؟</li><li>ماذا يحسب الانتباه الذاتي؟</li><li>لماذا نستخدم عدة رؤوس انتباه؟</li><li>لماذا نحتاج إلى تقسيم زمني؟</li><li>لماذا نقارن بخط أساس؟</li><li>كيف تحسن بيانات الطقس التنبؤ؟</li></ol></div></section>
+</main>
+<script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
