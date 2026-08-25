@@ -1,70 +1,65 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg"><title>Lab 12 - Battery Scheduling with DQN</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body class="course-template-modern"><header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB laboratory on battery scheduling with deep Q-learning">
+  <title>Lab 12 - Battery Scheduling with DQN</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero"><div class="lecture-number">LAB 12 | المخبر 12</div><h1>Battery Scheduling with Deep Q-Learning</h1>
-<div class="hero-ar">جدولة بطارية باستخدام DQN</div>
-<div class="subtitle">A MATLAB custom environment for time-of-use energy management<br>بيئة MATLAB مخصصة لإدارة الطاقة وفق التعرفة الزمنية</div></div>
+  <div class="hero">
+    <div class="lecture-number">LAB 12 | المخبر 12</div>
+    <h1>Battery Scheduling with Deep Q-Learning</h1>
+    <div class="hero-ar">جدولة بطارية باستخدام التعلم العميق Q</div>
+    <div class="subtitle">A MATLAB Custom Environment for Time-of-Use Energy Management<br>بيئة MATLAB مخصصة لإدارة الطاقة وفق التعرفة الزمنية</div>
+    <div class="toc"><a href="#environment">Environment</a><a href="#model">Model</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#results">Results</a><a href="#tasks">Tasks</a></div>
+  </div>
 
-<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
-<li>Create a custom battery environment with <code>rlFunctionEnv</code>.</li><li>Define observations and discrete actions.</li>
-<li>Implement SOC dynamics, cost, degradation, and penalties.</li><li>Train a DQN agent.</li>
-<li>Compare the learned policy with a no-battery baseline.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>إنشاء بيئة بطارية مخصصة.</li><li>تعريف الملاحظات والأفعال.</li><li>تنفيذ SOC والكلفة والتآكل والعقوبات.</li><li>تدريب وكيل DQN.</li><li>المقارنة مع عدم استخدام البطارية.</li></ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Create a custom battery environment with <code>rlFunctionEnv</code>.</li><li>Define observations, actions, rewards, and terminal conditions.</li><li>Implement SOC dynamics, energy cost, degradation, and penalties.</li><li>Train a DQN agent and inspect its learned policy.</li><li>Compare the learned schedule with a no-battery baseline.</li><li>Evaluate safety, reward sensitivity, and generalization.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>إنشاء بيئة بطارية مخصصة باستخدام <code>rlFunctionEnv</code>.</li><li>تعريف الملاحظات والأفعال والمكافآت وشروط النهاية.</li><li>تنفيذ ديناميكا SOC وكلفة الطاقة والتآكل والعقوبات.</li><li>تدريب وكيل DQN وتحليل سياسته.</li><li>مقارنة الجدولة المتعلمة مع خط أساس دون بطارية.</li><li>تقييم الأمان وحساسية المكافأة والتعميم.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Requirements</h2><ul><li>MATLAB</li><li>Reinforcement Learning Toolbox</li><li>Deep Learning Toolbox</li></ul></div>
-<div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Reinforcement Learning Toolbox وDeep Learning Toolbox.</p></div></section>
+  <section><div class="en"><h2>1. Requirements</h2><ul><li>MATLAB</li><li>Reinforcement Learning Toolbox</li><li>Deep Learning Toolbox</li></ul></div><div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Reinforcement Learning Toolbox وDeep Learning Toolbox.</p></div></section>
 
-<section><div class="en"><h2>2. Environment</h2>
-<div class="grid"><div class="mini-card"><strong>Observation</strong><p>SOC, load, price, hour.</p></div>
-<div class="mini-card"><strong>Actions</strong><p>−1 charge, 0 idle, +1 discharge.</p></div>
-<div class="mini-card"><strong>Episode</strong><p>24 hourly steps.</p></div>
-<div class="mini-card"><strong>Reward</strong><p>Negative operating cost and penalties.</p></div></div></div>
-<div class="ar"><h2>2. البيئة</h2><p>تتكون الملاحظة من SOC والحمل والسعر والساعة، والأفعال من الشحن والتوقف والتفريغ، والحلقة يوم واحد.</p></div></section>
+  <section id="environment"><div class="en"><h2>2. Environment Definition</h2><div class="grid"><div class="mini-card"><strong>Observation</strong><p>SOC, normalized load, normalized price, normalized hour.</p></div><div class="mini-card"><strong>Actions</strong><p>−1 charge, 0 idle, +1 discharge.</p></div><div class="mini-card"><strong>Episode</strong><p>24 hourly steps.</p></div><div class="mini-card"><strong>Reward</strong><p>Negative energy cost, degradation, and violations.</p></div></div><div class="formula">s<sub>t</sub>=[SOC<sub>t</sub>,L<sub>t</sub>,Price<sub>t</sub>,Hour<sub>t</sub>]</div><div class="formula">a<sub>t</sub>∈{-1,0,+1}</div></div><div class="ar"><h2>2. تعريف البيئة</h2><p>تتكون الحالة من SOC والحمل والسعر والساعة، بينما تمثل الأفعال الشحن والتوقف والتفريغ.</p></div></section>
 
-<section><div class="en"><h2>3. Main MATLAB Script</h2>
-<pre><code>%% Lab 12: Battery Scheduling using DQN
-clear; clc; close all;
-rng(12);
+  <section id="model"><div class="en"><h2>3. Battery and Reward Model</h2><div class="formula">SOC<sub>t+1</sub>=SOC<sub>t</sub>+η<sub>c</sub>P<sub>c,t</sub>Δt/E<sub>cap</sub>-P<sub>d,t</sub>Δt/(η<sub>d</sub>E<sub>cap</sub>)</div><div class="formula">P<sub>grid,t</sub>=max(0,P<sub>load,t</sub>+P<sub>batt,t</sub>)</div><div class="formula">r<sub>t</sub>=-C<sub>energy,t</sub>-C<sub>deg,t</sub>-λ<sub>v</sub>Violation<sub>t</sub></div><div class="formula">r<sub>T</sub>←r<sub>T</sub>-λ<sub>f</sub>|SOC<sub>T</sub>-SOC<sub>target</sub>|</div><div class="warning">The terminal-SOC penalty prevents the agent from exploiting the episode boundary by emptying the battery at the final hour.</div></div><div class="ar"><h2>3. نموذج البطارية والمكافأة</h2><p>تتغير حالة الشحن بحسب كفاءة الشحن والتفريغ، وتُعاقب المكافأة كلفة الطاقة والتآكل وتجاوز الحدود والانحراف النهائي في SOC.</p></div></section>
+
+  <section id="workflow"><div class="en"><h2>4. Engineering Workflow</h2><div class="flow"><div class="flow-box">Define MDP</div><div class="arrow">→</div><div class="flow-box">Build Environment</div><div class="arrow">→</div><div class="flow-box">Configure DQN</div><div class="arrow">→</div><div class="flow-box">Train Agent</div><div class="arrow">→</div><div class="flow-box">Validate Cost & Safety</div></div><ol><li>Specify states, actions, dynamics, and limits.</li><li>Normalize observations.</li><li>Define a reward aligned with operating cost and safety.</li><li>Train with replay memory and target updates.</li><li>Compare against a no-battery and rule-based baseline.</li><li>Test changed prices, loads, and battery sizes.</li></ol></div><div class="ar"><h2>4. سير العمل الهندسي</h2><p>نعرّف MDP ونبني البيئة ونضبط DQN، ثم ندرب الوكيل ونختبر الكلفة والأمان والتعميم.</p></div></section>
+
+  <section id="code"><div class="en"><h2>5. Main MATLAB Script</h2><pre><code>%% Lab 12: Battery Scheduling using DQN
+clear; clc; close all; rng(12);
 
 %% Observation and action specifications
 obsInfo = rlNumericSpec([4 1], ...
     LowerLimit=[0;0;0;0], ...
-    UpperLimit=[1;2;2;1]);
+    UpperLimit=[1;1;1;1]);
 obsInfo.Name = "battery_observation";
 
 actInfo = rlFiniteSetSpec({-1,0,1});
 actInfo.Name = "battery_action";
 
-%% Create custom environment
+%% Create and validate environment
 env = rlFunctionEnv(obsInfo,actInfo, ...
     @batteryStepFunction,@batteryResetFunction);
-
 validateEnvironment(env);
 
-%% Create a default DQN agent
+%% DQN agent
 agent = rlDQNAgent(obsInfo,actInfo);
-
 agent.AgentOptions.UseDoubleDQN = true;
 agent.AgentOptions.DiscountFactor = 0.99;
 agent.AgentOptions.MiniBatchSize = 128;
 agent.AgentOptions.ExperienceBufferLength = 1e5;
 agent.AgentOptions.TargetUpdateFrequency = 4;
-
 agent.AgentOptions.EpsilonGreedyExploration.Epsilon = 1.0;
 agent.AgentOptions.EpsilonGreedyExploration.EpsilonMin = 0.05;
 agent.AgentOptions.EpsilonGreedyExploration.EpsilonDecay = 1e-4;
 
-%% Training options
+%% Training
 trainOpts = rlTrainingOptions( ...
     MaxEpisodes=1200, ...
     MaxStepsPerEpisode=24, ...
@@ -73,14 +68,11 @@ trainOpts = rlTrainingOptions( ...
     StopTrainingValue=-8, ...
     Verbose=false, ...
     Plots="training-progress");
-
-%% Train
 trainingStats = train(agent,env,trainOpts);
 
-%% Simulate one day
+%% Simulation
 simOpts = rlSimulationOptions(MaxSteps=24);
 experience = sim(env,agent,simOpts);
-
 obs = experience.Observation.battery_observation.Data;
 act = experience.Action.battery_action.Data;
 rew = experience.Reward.Data;
@@ -90,171 +82,98 @@ actions = squeeze(act);
 rewards = squeeze(rew);
 hours = 0:numel(actions)-1;
 
-figure;
-stairs(0:numel(soc)-1,soc,'LineWidth',1.4);
-grid on;
-xlabel('Hour'); ylabel('SOC');
-title('Battery State of Charge');
+figure; stairs(0:numel(soc)-1,soc,'LineWidth',1.4); grid on;
+xlabel('Hour'); ylabel('SOC'); title('Battery State of Charge');
 
-figure;
-stairs(hours,actions,'LineWidth',1.4);
-grid on;
-yticks([-1 0 1]);
-yticklabels({'Charge','Idle','Discharge'});
-xlabel('Hour'); ylabel('Action');
-title('DQN Battery Actions');
+figure; stairs(hours,actions,'LineWidth',1.4); grid on;
+yticks([-1 0 1]); yticklabels({'Charge','Idle','Discharge'});
+xlabel('Hour'); ylabel('Action'); title('DQN Battery Actions');
 
-fprintf('Episode reward = %.3f\n',sum(rewards));</code></pre></div>
-<div class="ar"><h2>3. البرنامج الرئيسي</h2><p>ينشئ مواصفات الملاحظات والأفعال والبيئة، ثم ينشئ وكيل DQN ويدربه ويشغله ليوم واحد.</p></div></section>
+fprintf('Episode reward = %.3f\n',sum(rewards));
 
-<section><div class="en"><h2>4. Reset Function</h2>
-<pre><code>function [InitialObservation,Info] = batteryResetFunction()
+%% Baseline
+[~,baseInfo] = batteryResetFunction();
+baselineCost = sum(baseInfo.Load.*baseInfo.Price);
+fprintf('No-battery daily cost = %.2f EUR\n',baselineCost);</code></pre></div><div class="ar"><h2>5. البرنامج الرئيسي</h2><p>ينشئ مواصفات البيئة والوكيل، ثم يدرب DQN ويشغله ليوم كامل ويقارن الأداء مع خط الأساس.</p></div></section>
 
-Info.Load = [2.2 2.0 1.9 1.8 1.9 2.3 ...
-             3.0 3.8 4.2 4.0 3.7 3.5 ...
-             3.4 3.6 4.0 4.8 5.8 6.5 ...
-             6.1 5.4 4.7 4.0 3.2 2.6]';
-
-Info.Price = [0.18*ones(6,1); ...
-              0.25*ones(10,1); ...
-              0.42*ones(5,1); ...
-              0.23*ones(3,1)];
-
-Info.Capacity = 10;       % kWh
-Info.Pmax = 2.5;          % kW
-Info.EtaCharge = 0.95;
-Info.EtaDischarge = 0.95;
-Info.SOCmin = 0.10;
-Info.SOCmax = 0.90;
-
-Info.Hour = 1;
-Info.SOC = 0.50;
-Info.TotalCost = 0;
-
+  <section><div class="en"><h2>6. Reset Function</h2><pre><code>function [InitialObservation,Info] = batteryResetFunction()
+Info.Load = [2.2 2.0 1.9 1.8 1.9 2.3 3.0 3.8 ...
+             4.2 4.0 3.7 3.5 3.4 3.6 4.0 4.8 ...
+             5.8 6.5 6.1 5.4 4.7 4.0 3.2 2.6]';
+Info.Price = [0.18*ones(6,1); 0.25*ones(10,1); ...
+              0.42*ones(5,1); 0.23*ones(3,1)];
+Info.Capacity = 10; Info.Pmax = 2.5;
+Info.EtaCharge = 0.95; Info.EtaDischarge = 0.95;
+Info.SOCmin = 0.10; Info.SOCmax = 0.90;
+Info.Hour = 1; Info.SOC = 0.50; Info.TotalCost = 0;
 InitialObservation = makeObservation(Info);
-end</code></pre></div>
-<div class="ar"><h2>4. دالة إعادة الضبط</h2><p>تهيئ الحمل والتعرفة ومعاملات البطارية والساعة وحالة الشحن في بداية كل حلقة.</p></div></section>
+end</code></pre></div><div class="ar"><h2>6. دالة إعادة الضبط</h2><p>تهيئ الحمل والتعرفة ومعاملات البطارية والساعة وحالة الشحن في بداية كل حلقة.</p></div></section>
 
-<section><div class="en"><h2>5. Step Function</h2>
-<pre><code>function [NextObservation,Reward,IsDone,Info] = ...
+  <section><div class="en"><h2>7. Step Function</h2><pre><code>function [NextObservation,Reward,IsDone,Info] = ...
     batteryStepFunction(Action,Info)
 
-action = double(Action);
-h = Info.Hour;
-loadPower = Info.Load(h);
-price = Info.Price(h);
-
-% -1 charge, 0 idle, +1 discharge
+action = double(Action); h = Info.Hour;
+loadPower = Info.Load(h); price = Info.Price(h);
 PbattCommand = action*Info.Pmax;
-socOld = Info.SOC;
-violation = 0;
+socOld = Info.SOC; violation = 0;
 
 if PbattCommand &lt; 0
-    Pcharge = -PbattCommand;
-    socNew = socOld + ...
-        Info.EtaCharge*Pcharge/Info.Capacity;
+    socNew = socOld + Info.EtaCharge*(-PbattCommand)/Info.Capacity;
 elseif PbattCommand &gt; 0
-    Pdischarge = PbattCommand;
-    socNew = socOld - ...
-        Pdischarge/(Info.EtaDischarge*Info.Capacity);
+    socNew = socOld - PbattCommand/(Info.EtaDischarge*Info.Capacity);
 else
     socNew = socOld;
 end
 
 if socNew &gt; Info.SOCmax
-    violation = socNew-Info.SOCmax;
-    socNew = Info.SOCmax;
+    violation = socNew-Info.SOCmax; socNew = Info.SOCmax;
 elseif socNew &lt; Info.SOCmin
-    violation = Info.SOCmin-socNew;
-    socNew = Info.SOCmin;
+    violation = Info.SOCmin-socNew; socNew = Info.SOCmin;
 end
 
 deltaSOC = socNew-socOld;
-
 if deltaSOC &gt;= 0
-    gridBatteryPower = ...
-        deltaSOC*Info.Capacity/Info.EtaCharge;
+    gridBatteryPower = deltaSOC*Info.Capacity/Info.EtaCharge;
 else
-    deliveredPower = ...
-        -deltaSOC*Info.Capacity*Info.EtaDischarge;
-    gridBatteryPower = -deliveredPower;
+    gridBatteryPower = deltaSOC*Info.Capacity*Info.EtaDischarge;
 end
 
 gridPower = max(0,loadPower+gridBatteryPower);
 energyCost = price*gridPower;
 degradationCost = 0.015*abs(gridBatteryPower);
-
-Reward = -energyCost ...
-         -degradationCost ...
-         -30*violation;
+Reward = -energyCost-degradationCost-30*violation;
 
 Info.SOC = socNew;
 Info.TotalCost = Info.TotalCost+energyCost;
 Info.Hour = Info.Hour+1;
-
 IsDone = Info.Hour &gt; 24;
 
 if IsDone
-    terminalPenalty = 3*abs(Info.SOC-0.50);
-    Reward = Reward-terminalPenalty;
+    Reward = Reward-3*abs(Info.SOC-0.50);
     Info.Hour = 24;
 end
-
 NextObservation = makeObservation(Info);
-end</code></pre></div>
-<div class="ar"><h2>5. دالة الخطوة</h2><p>تحدث حالة الشحن، وتفرض الحدود، وتحسب قدرة الشبكة والكلفة والتآكل والمكافأة.</p></div></section>
+end</code></pre></div><div class="ar"><h2>7. دالة الخطوة</h2><p>تحدّث SOC وتفرض الحدود وتحسب قدرة الشبكة والكلفة والتآكل والمكافأة.</p></div></section>
 
-<section><div class="en"><h2>6. Observation Helper</h2>
-<pre><code>function observation = makeObservation(Info)
+  <section><div class="en"><h2>8. Observation Helper</h2><pre><code>function observation = makeObservation(Info)
 h = min(Info.Hour,24);
-
-loadNorm = Info.Load(h)/max(Info.Load);
-priceNorm = Info.Price(h)/max(Info.Price);
-hourNorm = (h-1)/23;
-
 observation = [
     Info.SOC
-    loadNorm
-    priceNorm
-    hourNorm
+    Info.Load(h)/max(Info.Load)
+    Info.Price(h)/max(Info.Price)
+    (h-1)/23
 ];
-end</code></pre></div>
-<div class="ar"><h2>6. بناء الملاحظة</h2><p>تُطبع قيم الحمل والسعر والساعة وتُجمع مع SOC في متجه من أربعة عناصر.</p></div></section>
+end</code></pre></div><div class="ar"><h2>8. بناء الملاحظة</h2><p>تُطبع قيم الحمل والسعر والساعة وتُجمع مع SOC في متجه واحد.</p></div></section>
 
-<section><div class="en"><h2>7. Reward</h2>
-<div class="formula">rₜ = −Costₜ − Degradationₜ − 30·SOCViolationₜ</div>
-<p>A final-SOC penalty prevents the agent from emptying the battery at the end of every episode.</p></div>
-<div class="ar"><h2>7. المكافأة</h2><p>تعاقب الكلفة والتآكل وتجاوز SOC، وتمنع العقوبة النهائية تفريغ البطارية بالكامل في نهاية اليوم.</p></div></section>
+  <section id="results"><div class="en"><h2>9. Expected Results and Validation</h2><div class="grid"><div class="mini-card"><strong>Low-Price Charging</strong><p>The battery should charge during inexpensive periods.</p></div><div class="mini-card"><strong>Peak Discharging</strong><p>It should discharge during high-price evening hours.</p></div><div class="mini-card"><strong>SOC Safety</strong><p>No sustained violation of SOC bounds.</p></div><div class="mini-card"><strong>Economic Benefit</strong><p>Total daily cost should beat the no-battery baseline.</p></div></div><ul><li>Plot episodic and moving-average reward.</li><li>Plot SOC and actions.</li><li>Compute energy cost, degradation cost, and violations separately.</li><li>Repeat simulation over several randomized days.</li></ul><div class="warning">Training reward alone is not enough; verify physical feasibility and cost reduction explicitly.</div></div><div class="ar"><h2>9. النتائج المتوقعة والتحقق</h2><p>يُتوقع الشحن في الفترات الرخيصة والتفريغ في الذروة مع احترام حدود SOC وتحقيق وفر مقارنة بخط الأساس.</p></div></section>
 
-<section><div class="en"><h2>8. Baseline</h2>
-<pre><code>[~,baseInfo] = batteryResetFunction();
-baselineCost = sum(baseInfo.Load.*baseInfo.Price);
-fprintf('No-battery daily cost = %.2f EUR\n',baselineCost);</code></pre>
-<div class="highlight">Judge the trained policy against a simple baseline, not only by episode reward.</div></div>
-<div class="ar"><h2>8. خط الأساس</h2><p>احسب كلفة شراء الحمل كاملًا دون بطارية ثم قارنها بسياسة DQN.</p></div></section>
+  <section id="tasks"><div class="en"><h2>10. Student Tasks</h2><ol><li>Change battery capacity to 5 and 20 kWh.</li><li>Use five discrete power levels.</li><li>Add PV generation.</li><li>Add a demand-charge term.</li><li>Randomize load and price at reset.</li><li>Compare DQN with a rule-based controller.</li><li>Test a changed tariff without retraining.</li></ol></div><div class="ar"><h2>10. مهام الطالب</h2><ol><li>تغيير سعة البطارية.</li><li>استخدام خمسة مستويات قدرة.</li><li>إضافة إنتاج PV.</li><li>إضافة كلفة للطلب الأعظمي.</li><li>تغيير الحمل والسعر عشوائيًا.</li><li>المقارنة مع تحكم قائم على قواعد.</li><li>اختبار تعرفة مختلفة دون إعادة تدريب.</li></ol></div></section>
 
-<section><div class="en"><h2>9. Expected Behavior</h2><ul><li>Charge during low-price hours.</li><li>Discharge during expensive evening hours.</li><li>Avoid SOC violations.</li><li>Preserve final SOC.</li></ul>
-<div class="warning">Training is stochastic. Stopping thresholds may need adjustment when reward scaling changes.</div></div>
-<div class="ar"><h2>9. السلوك المتوقع</h2><p>يُتوقع الشحن في الساعات الرخيصة والتفريغ في الذروة مع احترام الحدود والمحافظة على SOC نهائية مناسبة.</p></div></section>
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Microgrid extension:</strong> add PV, a diesel generator, grid-import limits, load shedding, and uncertain forecasts. Compare DQN with Double DQN, dueling DQN, PPO, and model-predictive control.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">وسّع البيئة إلى شبكة مصغرة تضم PV ومولد ديزل وحدود استيراد وفصل أحمال وتنبؤات غير مؤكدة، ثم قارن خوارزميات متعددة.</div></div></section>
 
-<section><div class="en"><h2>10. Student Experiments</h2><div class="task"><ol>
-<li>Change capacity to 5 and 20 kWh.</li><li>Use five action levels.</li><li>Add PV generation.</li>
-<li>Add a demand-charge penalty.</li><li>Randomize load and price at reset.</li><li>Compare with a rule-based controller.</li></ol></div></div>
-<div class="ar"><h2>10. تجارب الطالب</h2><div class="task"><ol><li>غيّر سعة البطارية.</li><li>استخدم خمسة مستويات قدرة.</li><li>أضف PV.</li><li>أضف عقوبة للذروة.</li><li>غيّر الحمل والسعر عشوائيًا.</li><li>قارن بتحكم قائم على قواعد.</li></ol></div></div></section>
-
-<section><div class="en"><h2>11. Mini Project</h2><div class="research"><strong>Microgrid extension:</strong> Add PV, a diesel generator, grid-import limits, and load shedding. Balance cost, emissions, reliability, and degradation.</div></div>
-<div class="ar"><h2>11. مشروع مصغر</h2><div class="research">وسّع البيئة إلى شبكة مصغرة تضم PV ومولد ديزل وحدود استيراد وفصل أحمال.</div></div></section>
-
-<section><div class="en"><h2>12. Laboratory Report</h2><ul><li>Define the MDP.</li><li>Explain SOC dynamics.</li><li>Plot training reward, SOC, and actions.</li><li>Compare cost with the baseline.</li><li>Report violations.</li><li>Discuss reward sensitivity and safety.</li></ul></div>
-<div class="ar"><h2>12. تقرير المخبر</h2><p>يتضمن تعريف MDP ومعادلات SOC والرسوم والمقارنة مع خط الأساس والمخالفات وتحليل المكافأة والأمان.</p></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Why is battery scheduling an MDP?</li><li>Why are observations normalized?</li><li>What does the replay buffer do?</li><li>Why is a target network used in DQN?</li><li>How does reward scaling affect learning?</li><li>Why is a terminal-SOC penalty necessary?</li><li>How should the learned policy be validated?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>لماذا تعد جدولة البطارية مسألة MDP؟</li><li>لماذا نطبع الملاحظات؟</li><li>ما دور ذاكرة الخبرة؟</li><li>لماذا تستخدم شبكة هدف في DQN؟</li><li>كيف يؤثر مقياس المكافأة في التعلم؟</li><li>لماذا نحتاج عقوبة SOC النهائية؟</li><li>كيف نتحقق من السياسة المتعلمة؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
