@@ -1,199 +1,65 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg"><title>Lecture 13 - Explainable Artificial Intelligence</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-quiz.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body class="course-template-modern"><header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="Explainable Artificial Intelligence for Electrical Power Systems">
+  <title>Lecture 13 - Explainable Artificial Intelligence</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-quiz.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LECTURE 13 | المحاضرة 13</div>
-  <h1>Explainable Artificial Intelligence</h1>
-  <div class="hero-ar">الذكاء الاصطناعي القابل للتفسير</div>
-  <div class="subtitle">Understanding, validating, and communicating AI decisions in power systems<br>فهم قرارات الذكاء الاصطناعي والتحقق منها وشرحها في أنظمة القدرة</div>
-</div>
-
-<section><div class="en"><h2>🎯 Learning Objectives</h2><ul>
-<li>Distinguish interpretability, explainability, transparency, and causality.</li>
-<li>Differentiate global and local explanations.</li>
-<li>Understand permutation importance, partial dependence, LIME, and SHAP.</li>
-<li>Explain Shapley values mathematically.</li>
-<li>Identify explanation pitfalls in correlated power-system data.</li>
-<li>Use XAI for load forecasting, fault detection, and state estimation.</li>
-</ul></div>
-<div class="ar"><h2>🎯 أهداف التعلم</h2><ul>
-<li>التمييز بين قابلية الفهم والتفسير والشفافية والسببية.</li>
-<li>التمييز بين التفسير العام والمحلي.</li>
-<li>فهم أهمية التبديل وPDP وLIME وSHAP.</li>
-<li>شرح قيم شابلي رياضيًا.</li>
-<li>معرفة أخطاء التفسير في البيانات المترابطة.</li>
-<li>استخدام XAI في التنبؤ والأعطال وتقدير الحالة.</li>
-</ul></div></section>
-
-<section><div class="en"><h2>1. Why Explainability Matters</h2>
-<p>Power systems are safety-critical. Engineers need to understand why an AI model recommends a decision, especially when the recommendation affects protection, dispatch, voltage control, or reliability.</p>
-<div class="highlight">High predictive accuracy does not automatically imply physical validity, robustness, fairness, or operational safety.</div></div>
-<div class="ar"><h2>1. لماذا نحتاج إلى التفسير؟</h2>
-<p>تعمل نماذج الذكاء الاصطناعي في تطبيقات حرجة، لذلك يجب معرفة سبب القرار قبل استخدامه في الحماية أو التشغيل أو التحكم.</p></div></section>
-
-<section><div class="en"><h2>2. Interpretability, Explainability, and Transparency</h2>
-<div class="grid3">
-<div class="mini-card"><strong>Interpretability</strong><p>How directly a human can understand the model.</p></div>
-<div class="mini-card"><strong>Explainability</strong><p>Methods used to explain a prediction or behavior.</p></div>
-<div class="mini-card"><strong>Transparency</strong><p>Visibility of data, training, assumptions, and implementation.</p></div>
-</div></div>
-<div class="ar"><h2>2. قابلية الفهم والتفسير والشفافية</h2>
-<p>النموذج البسيط قد يكون مفهومًا بذاته، بينما يحتاج النموذج المعقد إلى أدوات تفسير. أما الشفافية فتشمل البيانات وطريقة التدريب والافتراضات.</p></div></section>
-
-<section><div class="en"><h2>3. Global and Local Explanations</h2>
-<div class="grid"><div class="mini-card"><strong>Global explanation</strong><p>How the model behaves across the full dataset.</p></div>
-<div class="mini-card"><strong>Local explanation</strong><p>Why the model made one specific prediction.</p></div></div>
-<div class="note">A feature can be globally important but unimportant for one specific operating point, and vice versa.</div></div>
-<div class="ar"><h2>3. التفسير العام والمحلي</h2>
-<p>يشرح التفسير العام سلوك النموذج ككل، بينما يشرح التفسير المحلي قرارًا واحدًا أو حالة تشغيل محددة.</p></div></section>
-
-<section><div class="en"><h2>4. Intrinsic and Post-Hoc Explanations</h2>
-<div class="table-wrap"><table>
-<tr><th>Type</th><th>Example</th><th>Advantage</th><th>Limitation</th></tr>
-<tr><td>Intrinsic</td><td>Linear model, small tree</td><td>Model itself is understandable</td><td>May sacrifice flexibility</td></tr>
-<tr><td>Post-hoc</td><td>SHAP, LIME, PDP</td><td>Works with complex models</td><td>Explanation is an approximation</td></tr>
-</table></div></div>
-<div class="ar"><h2>4. التفسير الذاتي واللاحق</h2>
-<p>بعض النماذج قابلة للفهم بذاتها، بينما تحتاج النماذج المعقدة إلى أدوات تفسير بعد التدريب.</p></div></section>
-
-<section><div class="en"><h2>5. Feature Importance</h2>
-<p>Feature importance ranks predictors according to their influence on model performance or structure.</p>
-<div class="warning">Importance does not indicate the direction of influence and does not prove causality.</div></div>
-<div class="ar"><h2>5. أهمية الميزات</h2>
-<p>تحدد أهمية الميزات أي المتغيرات أكثر تأثيرًا، لكنها لا توضح دائمًا اتجاه التأثير ولا تثبت علاقة سببية.</p></div></section>
-
-<section><div class="en"><h2>6. Permutation Importance</h2>
-<div class="formula">Imp(j) = Loss(X with feature j permuted) − Loss(X)</div>
-<p>If permuting a feature destroys predictive structure, model loss increases and the feature is considered important.</p>
-<div class="warning">When predictors are strongly correlated, one feature can replace another, causing importance to be underestimated.</div></div>
-<div class="ar"><h2>6. أهمية التبديل</h2>
-<p>نبدل قيم ميزة واحدة عشوائيًا ثم نقيس زيادة الخطأ. إذا ازداد الخطأ كثيرًا كانت الميزة مهمة للنموذج.</p></div></section>
-
-<section><div class="en"><h2>7. Partial Dependence</h2>
-<div class="formula">PD_j(z) = E_X[-j][ f(z, X_-j) ]</div>
-<p>Partial dependence estimates the average prediction when one feature is fixed to z and all other features retain their observed values.</p></div>
-<div class="ar"><h2>7. الاعتماد الجزئي</h2>
-<p>يقيس PDP متوسط خرج النموذج عند تثبيت ميزة على قيمة محددة مع إبقاء بقية الميزات كما هي في البيانات.</p></div></section>
-
-<section><div class="en"><h2>8. Individual Conditional Expectation</h2>
-<p>ICE curves show one response curve per observation rather than only the average curve.</p>
-<div class="highlight">PDP may hide heterogeneous behavior. ICE reveals whether different operating points respond differently to the same feature.</div></div>
-<div class="ar"><h2>8. منحنيات ICE</h2>
-<p>تعرض ICE منحنى لكل عينة، ولذلك تكشف اختلاف استجابة حالات التشغيل التي قد يخفيها المتوسط في PDP.</p></div></section>
-
-<section><div class="en"><h2>9. LIME</h2>
-<p>LIME creates perturbed samples around a query point, obtains black-box predictions, and fits a weighted simple surrogate.</p>
-<div class="formula">g* = arg min_g [ L(f,g,π_x) + Ω(g) ]</div>
-<div class="grid"><div class="mini-card"><strong>L</strong><p>Local fidelity to the black-box model.</p></div>
-<div class="mini-card"><strong>Ω</strong><p>Penalty that keeps the surrogate simple.</p></div></div></div>
-<div class="ar"><h2>9. طريقة LIME</h2>
-<p>تنشئ LIME عينات قريبة من الحالة المطلوب تفسيرها، ثم تدرب نموذجًا بسيطًا موزونًا ليقلد النموذج المعقد محليًا.</p></div></section>
-
-<section><div class="en"><h2>10. Limits of LIME</h2>
-<ul><li>Results depend on the neighborhood definition.</li><li>Different random perturbations may produce different explanations.</li><li>The surrogate may have poor local fidelity.</li><li>Perturbed samples may be physically impossible.</li></ul></div>
-<div class="ar"><h2>10. قيود LIME</h2>
-<p>تعتمد النتيجة على تعريف الجوار والعينات الاصطناعية، وقد تكون بعض العينات غير واقعية فيزيائيًا.</p></div></section>
-
-<section><div class="en"><h2>11. Shapley Values</h2>
-<p>SHAP is based on cooperative game theory. Predictors are players and the model prediction is the payout.</p>
-<div class="formula">φ_j = Σ_{S⊆F\{j}} |S|!(M−|S|−1)! / M! · [v(S∪{j})−v(S)]</div>
-<p>The contribution of feature j is averaged over all possible coalitions of other features.</p></div>
-<div class="ar"><h2>11. قيم شابلي</h2>
-<p>تعامل SHAP الميزات كلاعبين في لعبة تعاونية، وتوزع التنبؤ بينهم بحسب مساهمة كل ميزة عبر جميع المجموعات الممكنة.</p></div></section>
-
-<section><div class="en"><h2>12. SHAP Additive Explanation</h2>
-<div class="formula">f(x) = φ₀ + Σ_j φ_j</div>
-<p>φ₀ is the baseline prediction. Positive SHAP values increase the prediction; negative values decrease it.</p></div>
-<div class="ar"><h2>12. التفسير الجمعي في SHAP</h2>
-<p>يتكون التنبؤ من قيمة أساس زائد مساهمات جميع الميزات. المساهمة الموجبة ترفع التنبؤ والسالبة تخفضه.</p></div></section>
-
-<section><div class="en"><h2>13. SHAP Properties</h2>
-<div class="grid3"><div class="mini-card"><strong>Local accuracy</strong><p>Contributions sum to the prediction.</p></div>
-<div class="mini-card"><strong>Missingness</strong><p>Absent features receive zero contribution.</p></div>
-<div class="mini-card"><strong>Consistency</strong><p>Increased model influence should not reduce attribution.</p></div></div></div>
-<div class="ar"><h2>13. خصائص SHAP</h2>
-<p>تتميز بالدقة المحلية وانعدام مساهمة الميزة الغائبة والاتساق في توزيع المساهمات.</p></div></section>
-
-<section><div class="en"><h2>14. Correlated Features</h2>
-<p>In power systems, load, temperature, hour, and previous load values are often correlated.</p>
-<div class="warning">Attributions can be split among correlated predictors or assigned differently depending on the background distribution and conditional assumptions.</div></div>
-<div class="ar"><h2>14. الميزات المترابطة</h2>
-<p>قد تتوزع المساهمة بين ميزات مترابطة مثل الحمل السابق والساعة والحرارة، لذلك يجب تفسير النتائج بحذر.</p></div></section>
-
-<section><div class="en"><h2>15. Explanation Is Not Causality</h2>
-<div class="formula">Predictive association ≠ causal effect</div>
-<p>A high SHAP value means the model used a feature strongly for this prediction. It does not prove that changing the feature will physically cause the predicted change.</p></div>
-<div class="ar"><h2>15. التفسير ليس سببية</h2>
-<p>توضح SHAP كيف استخدم النموذج الميزة، لكنها لا تثبت أن تغيير الميزة يسبب فعليًا تغير الخرج.</p></div></section>
-
-<section><div class="en"><h2>16. Explanation Fidelity</h2>
-<p>An explanation should be evaluated, not merely visualized.</p>
-<ul><li>Local surrogate R²</li><li>Stability under small perturbations</li><li>Consistency across similar samples</li><li>Agreement with physical knowledge</li><li>Sensitivity to background data</li></ul></div>
-<div class="ar"><h2>16. جودة التفسير</h2>
-<p>يجب تقييم دقة النموذج البديل واستقرار الشرح واتساقه وموافقته للمعرفة الفيزيائية.</p></div></section>
-
-<section><div class="en"><h2>17. XAI for Load Forecasting</h2>
-<div class="grid"><div class="mini-card"><strong>Global</strong><p>Rank temperature, hour, weekday, and lagged loads.</p></div>
-<div class="mini-card"><strong>Local</strong><p>Explain why tomorrow's 18:00 peak is high.</p></div></div></div>
-<div class="ar"><h2>17. XAI في التنبؤ بالحمل</h2>
-<p>يمكن ترتيب أهمية الحرارة والساعة والأيام وقيم الحمل السابقة، ثم تفسير توقع قمة محددة محليًا.</p></div></section>
-
-<section><div class="en"><h2>18. XAI for Fault Detection</h2>
-<p>Explanations can identify which current, voltage, harmonic, or sequence components drove a fault classification.</p>
-<div class="good">An explanation that highlights physically relevant phases and time intervals increases engineering confidence, but still requires validation.</div></div>
-<div class="ar"><h2>18. XAI في كشف الأعطال</h2>
-<p>يمكن للتفسير تحديد الأطوار أو المركبات أو المقاطع الزمنية التي أثرت في تصنيف العطل.</p></div></section>
-
-<section><div class="en"><h2>19. XAI for State Estimation and Stability</h2>
-<p>Feature attribution can indicate influential measurements, buses, or contingencies for a predicted state or stability margin.</p></div>
-<div class="ar"><h2>19. XAI في تقدير الحالة والاستقرار</h2>
-<p>يمكن تحديد القياسات والقضبان والحالات الطارئة الأكثر تأثيرًا في التقدير أو هامش الاستقرار المتوقع.</p></div></section>
-
-<section><div class="en"><h2>20. Explanation Workflow</h2>
-<div class="flow"><div class="flow-box">Train model</div><div class="arrow">→</div><div class="flow-box">Check accuracy</div><div class="arrow">→</div><div class="flow-box">Global XAI</div><div class="arrow">→</div><div class="flow-box">Local XAI</div><div class="arrow">→</div><div class="flow-box">Physical validation</div></div></div>
-<div class="ar"><h2>20. سير عمل التفسير</h2><p>بعد تدريب النموذج وفحص دقته، نبدأ بالتفسير العام ثم المحلي ونقارن النتائج بالمعرفة الفيزيائية.</p></div></section>
-
-<section><div class="en"><h2>21. Common Mistakes</h2>
-<div class="grid"><div class="mini-card"><strong>Cherry-picking</strong><p>Showing only explanations that look reasonable.</p></div>
-<div class="mini-card"><strong>Ignoring correlation</strong><p>Reading attribution as independent influence.</p></div>
-<div class="mini-card"><strong>No fidelity check</strong><p>Trusting a poor surrogate.</p></div>
-<div class="mini-card"><strong>Causal language</strong><p>Claiming explanation proves cause.</p></div></div></div>
-<div class="ar"><h2>21. الأخطاء الشائعة</h2><p>من الأخطاء اختيار أمثلة مريحة فقط، تجاهل الارتباط، عدم تقييم دقة الشرح، واستخدام لغة سببية دون دليل.</p></div></section>
-
-<section><div class="en"><h2>🔬 Research Corner</h2>
-<div class="research"><strong>Emerging directions:</strong> physics-consistent explanations, graph-based XAI, counterfactual explanations, uncertainty-aware attributions, causal XAI, and human-centered explanation interfaces for control rooms.</div></div>
-<div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">من الاتجاهات الحديثة التفسيرات المتوافقة مع الفيزياء وGraph-XAI والتفسيرات المضادة للواقع وعدم اليقين والسببية وواجهات غرف التحكم.</div></div></section>
-
-<section><div class="en"><h2>🧠 Review Questions</h2><ol>
-<li>Differentiate global and local explanations.</li><li>Explain permutation importance.</li><li>Derive the idea behind LIME.</li>
-<li>What does a SHAP value represent?</li><li>Why are correlated predictors difficult?</li><li>Why is explanation not causality?</li>
-</ol></div>
-<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol>
-<li>ما الفرق بين التفسير العام والمحلي؟</li><li>اشرح أهمية التبديل.</li><li>اشرح فكرة LIME.</li>
-<li>ماذا تمثل قيمة SHAP؟</li><li>لماذا تصعب الميزات المترابطة؟</li><li>لماذا لا يعني التفسير السببية؟</li>
-</ol></div></section>
-</main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
+  <div class="hero">
+    <div class="lecture-number">LECTURE 13 | المحاضرة 13</div>
+    <h1>Explainable Artificial Intelligence</h1>
+    <div class="hero-ar">الذكاء الاصطناعي القابل للتفسير</div>
+    <div class="subtitle">Understanding, Validating, and Communicating AI Decisions in Power Systems<br>فهم قرارات الذكاء الاصطناعي والتحقق منها وشرحها في أنظمة القدرة</div>
+    <div class="toc"><a href="#foundations">Foundations</a><a href="#global-local">Global & Local</a><a href="#lime">LIME</a><a href="#shap">SHAP</a><a href="#applications">Applications</a><a href="#workflow">Workflow</a></div>
   </div>
-</footer>
+
+  <section><div class="en"><h2>🎯 Learning Objectives</h2><ul><li>Distinguish interpretability, explainability, transparency, and causality.</li><li>Differentiate global and local explanations.</li><li>Understand permutation importance, PDP, ICE, LIME, and SHAP.</li><li>Explain Shapley values mathematically.</li><li>Recognize explanation pitfalls with correlated power-system data.</li><li>Apply XAI to forecasting, fault detection, and state estimation.</li><li>Evaluate explanation fidelity, stability, and physical consistency.</li></ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>التمييز بين قابلية الفهم والتفسير والشفافية والسببية.</li><li>التمييز بين التفسير العام والمحلي.</li><li>فهم أهمية التبديل وPDP وICE وLIME وSHAP.</li><li>شرح قيم شابلي رياضيًا.</li><li>معرفة أخطاء التفسير مع البيانات المترابطة.</li><li>تطبيق XAI في التنبؤ والأعطال وتقدير الحالة.</li><li>تقييم دقة واستقرار واتساق التفسير مع الفيزياء.</li></ul></div></section>
+
+  <section id="foundations"><div class="en"><h2>1. Why Explainability Matters</h2><p>Power systems are safety-critical. Engineers need to understand why an AI model recommends an action when the result affects protection, dispatch, voltage control, reliability, or market operation.</p><div class="highlight">High predictive accuracy does not automatically imply physical validity, robustness, fairness, or operational safety.</div></div><div class="ar"><h2>1. لماذا نحتاج إلى التفسير؟</h2><p>يجب معرفة سبب القرار قبل استخدامه في تطبيقات حرجة مثل الحماية والتشغيل والتحكم بالجهد.</p></div></section>
+
+  <section><div class="en"><h2>2. Core Concepts</h2><div class="grid"><div class="mini-card"><strong>Interpretability</strong><p>How directly a human can understand the model itself.</p></div><div class="mini-card"><strong>Explainability</strong><p>Methods used to explain a prediction or behavior.</p></div><div class="mini-card"><strong>Transparency</strong><p>Visibility of data, training, assumptions, and implementation.</p></div><div class="mini-card"><strong>Causality</strong><p>Whether changing a variable physically changes the outcome.</p></div></div><div class="warning">A predictive explanation is not automatically a causal explanation.</div></div><div class="ar"><h2>2. المفاهيم الأساسية</h2><p>قد يكون النموذج مفهومًا بذاته، أو يحتاج إلى أدوات تفسير، بينما تشمل الشفافية البيانات وطريقة التدريب والافتراضات.</p></div></section>
+
+  <section id="global-local"><div class="en"><h2>3. Global, Local, Intrinsic, and Post-Hoc</h2><div class="table-wrap"><table><tr><th>Type</th><th>Purpose</th><th>Example</th><th>Limitation</th></tr><tr><td>Global</td><td>Explain overall behavior</td><td>Feature importance, PDP</td><td>May hide local variation</td></tr><tr><td>Local</td><td>Explain one prediction</td><td>LIME, local SHAP</td><td>May be unstable</td></tr><tr><td>Intrinsic</td><td>Model is understandable</td><td>Linear model, small tree</td><td>May reduce flexibility</td></tr><tr><td>Post-hoc</td><td>Explain a complex model</td><td>SHAP, LIME, PDP</td><td>Explanation is approximate</td></tr></table></div><div class="note">A feature can be globally important but locally unimportant for one operating point, and vice versa.</div></div><div class="ar"><h2>3. أنواع التفسير</h2><p>يشرح التفسير العام سلوك النموذج ككل، بينما يشرح التفسير المحلي حالة تشغيل محددة.</p></div></section>
+
+  <section><div class="en"><h2>4. Feature Importance</h2><p>Feature importance ranks predictors according to their influence on model performance or internal structure.</p><div class="formula">Imp(j)=Loss(X with feature j permuted)-Loss(X)</div><div class="warning">Importance does not show the direction of influence and does not prove causality. Correlated predictors may replace one another and underestimate individual importance.</div></div><div class="ar"><h2>4. أهمية الميزات</h2><p>نقيس مقدار ازدياد الخطأ بعد تبديل ميزة، لكن النتيجة لا تثبت السببية وقد تتأثر بترابط الميزات.</p></div></section>
+
+  <section><div class="en"><h2>5. Partial Dependence and ICE</h2><div class="formula">PD<sub>j</sub>(z)=E<sub>X<sub>-j</sub></sub>[f(z,X<sub>-j</sub>)]</div><div class="grid"><div class="mini-card"><strong>PDP</strong><p>Shows the average model response when one feature is varied.</p></div><div class="mini-card"><strong>ICE</strong><p>Shows one response curve per observation.</p></div></div><div class="highlight">ICE can reveal heterogeneous operating behavior that an average PDP may hide.</div></div><div class="ar"><h2>5. الاعتماد الجزئي وICE</h2><p>يعرض PDP التأثير المتوسط، بينما تكشف ICE اختلاف استجابة الحالات الفردية.</p></div></section>
+
+  <section id="lime"><div class="en"><h2>6. LIME</h2><p>LIME perturbs samples around a query point, obtains black-box predictions, and fits a weighted simple surrogate.</p><div class="formula">g*=arg min<sub>g</sub>[L(f,g,π<sub>x</sub>)+Ω(g)]</div><div class="grid"><div class="mini-card"><strong>L</strong><p>Local fidelity to the black-box model.</p></div><div class="mini-card"><strong>Ω</strong><p>Penalty that keeps the surrogate simple.</p></div></div><div class="warning">Results depend on the neighborhood definition, random perturbations, surrogate fidelity, and whether perturbed samples are physically feasible.</div></div><div class="ar"><h2>6. طريقة LIME</h2><p>تنشئ عينات قريبة من الحالة وتدرب نموذجًا بسيطًا ليقلد النموذج المعقد محليًا، لكن النتيجة قد تتغير مع تعريف الجوار.</p></div></section>
+
+  <section id="shap"><div class="en"><h2>7. Shapley Values and SHAP</h2><p>SHAP is based on cooperative game theory. Features are players and the model prediction is the payout.</p><div class="formula">φ<sub>j</sub>=Σ<sub>S⊆F\{j}</sub> |S|!(M-|S|-1)!/M! · [v(S∪{j})-v(S)]</div><div class="formula">f(x)=φ₀+Σ<sub>j</sub>φ<sub>j</sub></div><p>Positive values increase the prediction relative to the baseline; negative values decrease it.</p></div><div class="ar"><h2>7. قيم شابلي وSHAP</h2><p>توزع SHAP التنبؤ على الميزات وفق مساهمة كل ميزة عبر جميع المجموعات الممكنة.</p></div></section>
+
+  <section><div class="en"><h2>8. SHAP Properties</h2><div class="grid"><div class="mini-card"><strong>Local Accuracy</strong><p>Contributions sum to the prediction.</p></div><div class="mini-card"><strong>Missingness</strong><p>Absent features receive zero contribution.</p></div><div class="mini-card"><strong>Consistency</strong><p>Greater model influence should not reduce attribution.</p></div><div class="mini-card"><strong>Baseline Dependence</strong><p>Results depend on background data and conditional assumptions.</p></div></div></div><div class="ar"><h2>8. خصائص SHAP</h2><p>تتميز بالدقة المحلية والاتساق، لكنها تتأثر ببيانات الخلفية والافتراضات الشرطية.</p></div></section>
+
+  <section><div class="en"><h2>9. Correlated Features and Causality</h2><p>Load, temperature, hour, renewable output, and lagged measurements are often strongly correlated.</p><div class="warning">Attributions may be split among correlated predictors or assigned differently depending on the background distribution.</div><div class="formula">Predictive association ≠ Causal effect</div><p>A high SHAP value means the model used a feature strongly. It does not prove that changing that feature will physically cause the predicted change.</p></div><div class="ar"><h2>9. الميزات المترابطة والسببية</h2><p>يجب تفسير المساهمات بحذر، لأن التفسير يصف استخدام النموذج للميزة ولا يثبت التأثير الفيزيائي السببي.</p></div></section>
+
+  <section><div class="en"><h2>10. Explanation Fidelity and Stability</h2><ul><li>Local surrogate R² or approximation error.</li><li>Stability under small input perturbations.</li><li>Consistency across similar operating points.</li><li>Agreement with physical knowledge.</li><li>Sensitivity to background or reference data.</li><li>Robustness under distribution shift.</li></ul><div class="good">An explanation should be evaluated, not merely visualized.</div></div><div class="ar"><h2>10. جودة واستقرار التفسير</h2><p>يجب قياس دقة الشرح واستقراره واتساقه مع المعرفة الفيزيائية ومع تغير البيانات المرجعية.</p></div></section>
+
+  <section id="applications"><div class="en"><h2>11. XAI Applications in Power Systems</h2><div class="grid"><div class="mini-card"><strong>Load Forecasting</strong><p>Explain the influence of temperature, hour, weekdays, and lagged load.</p></div><div class="mini-card"><strong>Renewable Forecasting</strong><p>Assess irradiance, wind, weather, and temporal features.</p></div><div class="mini-card"><strong>Fault Detection</strong><p>Identify waveform regions or measurements driving a classification.</p></div><div class="mini-card"><strong>State Estimation</strong><p>Show which measurements support each estimated state.</p></div><div class="mini-card"><strong>Voltage Stability</strong><p>Reveal buses and variables influencing a security decision.</p></div><div class="mini-card"><strong>OPF Surrogates</strong><p>Explain which loads, limits, and network features affect outputs.</p></div></div></div><div class="ar"><h2>11. تطبيقات XAI في نظم القدرة</h2><p>تستخدم لشرح التنبؤ والأعطال وتقدير الحالة والاستقرار وبدائل OPF.</p></div></section>
+
+  <section><div class="en"><h2>12. Physics-Based Validation</h2><p>Explanations should be compared with engineering expectations, sensitivity factors, power-flow equations, protection logic, and operating constraints.</p><div class="formula">ΔP≈J<sub>Pθ</sub>Δθ+J<sub>PV</sub>ΔV</div><div class="highlight">Agreement with physics increases confidence, while disagreement should trigger investigation rather than automatic rejection or acceptance.</div></div><div class="ar"><h2>12. التحقق الفيزيائي</h2><p>نقارن التفسير مع الحساسية ومعادلات تدفق القدرة ومنطق الحماية وحدود التشغيل.</p></div></section>
+
+  <section><div class="en"><h2>13. Common Pitfalls</h2><ul><li>Confusing explanation with causality.</li><li>Ignoring feature correlation.</li><li>Using unrealistic perturbations.</li><li>Showing only one explanation method.</li><li>Ignoring uncertainty and distribution shift.</li><li>Interpreting attention weights as complete explanations.</li><li>Using visual appeal instead of quantitative fidelity.</li></ul></div><div class="ar"><h2>13. الأخطاء الشائعة</h2><p>تشمل الخلط بين التفسير والسببية، وتجاهل الترابط، واستخدام عينات غير واقعية، والاعتماد على رسم جذاب دون تقييم كمي.</p></div></section>
+
+  <section id="workflow"><div class="en"><h2>14. Engineering Workflow</h2><div class="flow"><div class="flow-box">Define Decision</div><div class="arrow">→</div><div class="flow-box">Select XAI Method</div><div class="arrow">→</div><div class="flow-box">Generate Explanation</div><div class="arrow">→</div><div class="flow-box">Test Fidelity</div><div class="arrow">→</div><div class="flow-box">Validate with Physics</div></div><ol><li>Clarify whether a global or local explanation is required.</li><li>Use more than one explanation method where practical.</li><li>Check sensitivity to reference data and perturbations.</li><li>Compare findings with engineering knowledge.</li><li>Document limitations before operational use.</li></ol></div><div class="ar"><h2>14. سير العمل الهندسي</h2><p>نحدد نوع الشرح المطلوب، ونختبر دقته واستقراره، ثم نتحقق منه بالفيزياء قبل استخدامه تشغيليًا.</p></div></section>
+
+  <section><div class="en"><h2>🔬 Research Corner</h2><div class="research"><strong>Emerging directions:</strong> causal XAI, uncertainty-aware explanations, physics-informed explanations, explanation monitoring, counterfactuals under grid constraints, and human-in-the-loop validation.</div></div><div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">تشمل الاتجاهات الحديثة التفسير السببي، وعدم اليقين، والقيود الفيزيائية، والتفسيرات المضادة للواقع، والتحقق البشري.</div></div></section>
+
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>What is the difference between interpretability and explainability?</li><li>How do global and local explanations differ?</li><li>How is permutation importance calculated?</li><li>What are the main limitations of PDP and LIME?</li><li>Explain the SHAP additive formula.</li><li>Why do correlated features complicate attribution?</li><li>Why is explanation not causality?</li><li>How should an explanation be validated physically?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>ما الفرق بين قابلية الفهم والتفسير؟</li><li>ما الفرق بين التفسير العام والمحلي؟</li><li>كيف تحسب أهمية التبديل؟</li><li>ما قيود PDP وLIME؟</li><li>اشرح الصيغة الجمعية لـSHAP.</li><li>لماذا تعقد الميزات المترابطة توزيع المساهمات؟</li><li>لماذا لا يعد التفسير سببية؟</li><li>كيف نتحقق من التفسير فيزيائيًا؟</li></ol></div></section>
+</main>
 <script src="course-navigation.js" defer></script>
 <script src="course-quiz-data.js" defer></script>
 <script src="course-quiz.js" defer></script>
 <script src="certificate-canvas.js?v=20260817-2" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
