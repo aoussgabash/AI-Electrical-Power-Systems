@@ -1,2077 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-
-<title>Lab 08 - Integrated PV-Battery Smart Energy Management</title>
-
-<style>
-:root{
-  --bg:#07111f;
-  --card:#0f2238;
-  --card2:#0b1b2c;
-  --text:#f4f7fb;
-  --muted:#b8c7d9;
-  --blue:#38bdf8;
-  --green:#22c55e;
-  --yellow:#facc15;
-  --red:#fb7185;
-  --line:rgba(255,255,255,.10);
-}
-
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,Tahoma,sans-serif;
-  background:linear-gradient(180deg,#07111f,#0a1728);
-  color:var(--text);
-  line-height:1.8;
-}
-
-.container{
-  width:min(1050px,92%);
-  margin:auto;
-}
-
-header{
-  background:rgba(7,17,31,.95);
-  border-bottom:1px solid var(--line);
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-
-nav{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:14px;
-  padding:17px 0;
-}
-
-.logo{font-weight:bold}
-.logo span{color:var(--blue)}
-
-.back{
-  color:white;
-  text-decoration:none;
-  border:1px solid var(--line);
-  padding:8px 12px;
-  border-radius:9px;
-}
-
-.hero{
-  text-align:center;
-  padding:60px 0 35px;
-}
-
-.lab-number{
-  color:var(--blue);
-  font-weight:bold;
-  letter-spacing:1px;
-}
-
-h1{
-  font-size:clamp(2rem,6vw,3.6rem);
-  line-height:1.15;
-  margin:10px 0;
-}
-
-.hero-ar{
-  direction:rtl;
-  font-size:1.5rem;
-  color:#e5edf6;
-}
-
-.subtitle{
-  color:var(--muted);
-  margin-top:10px;
-}
-
-section{
-  margin:22px 0;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:22px;
-}
-
-h2{margin-top:0;color:#edf8ff}
-h3{color:var(--blue)}
-p,li{color:#d8e2ec}
-
-.en{direction:ltr;text-align:left}
-
-.ar{
-  direction:rtl;
-  text-align:right;
-  border-top:1px dashed var(--line);
-  padding-top:18px;
-  margin-top:18px;
-}
-
-.highlight{
-  background:var(--card2);
-  border-left:4px solid var(--blue);
-  border-radius:10px;
-  padding:15px;
-  margin:15px 0;
-}
-
-.ar .highlight{
-  border-left:none;
-  border-right:4px solid var(--blue);
-}
-
-.formula{
-  direction:ltr;
-  text-align:center;
-  background:#06101d;
-  border:1px solid var(--line);
-  padding:18px;
-  margin:16px 0;
-  border-radius:12px;
-  font-size:1.22rem;
-  font-family:"Times New Roman",serif;
-  overflow-x:auto;
-}
-
-pre{
-  direction:ltr;
-  text-align:left;
-  background:#06101d;
-  color:#dff5ff;
-  border:1px solid var(--line);
-  padding:16px;
-  border-radius:12px;
-  overflow-x:auto;
-  white-space:pre;
-  line-height:1.55;
-}
-
-code{
-  font-family:Consolas,Monaco,monospace;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-}
-
-.mini-card{
-  background:var(--card2);
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:16px;
-}
-
-.mini-card strong{color:white}
-
-.flow{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:10px;
-  margin:20px 0;
-}
-
-.flow-box{
-  background:#0b1b2c;
-  border:1px solid rgba(56,189,248,.3);
-  padding:14px 17px;
-  border-radius:12px;
-  text-align:center;
-  min-width:120px;
-}
-
-.arrow{
-  color:var(--blue);
-  font-size:1.5rem;
-  font-weight:bold;
-}
-
-.table-wrap{overflow-x:auto}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px;
-  margin:15px 0;
-}
-
-th,td{
-  border:1px solid var(--line);
-  padding:11px;
-  text-align:center;
-}
-
-th{
-  background:#0b1b2c;
-  color:#eaf7ff;
-}
-
-footer{
-  text-align:center;
-  color:var(--muted);
-  padding:35px 0;
-}
-
-@media(max-width:750px){
-  .grid{grid-template-columns:1fr}
-}
-</style>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <title>Lab 08 - Integrated PV-Battery Smart Energy Management</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260824-7">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
-
 <body>
-
-<header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
-
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
+  <div class="hero"><div class="lab-number">LAB 08 | المختبر 08</div><h1>Integrated PV-Battery Smart Energy Management</h1><div class="hero-ar">الإدارة الذكية المتكاملة لنظام PV والبطارية</div><div class="subtitle">PV Generation, Load, Battery Storage, Grid Exchange, and Electricity Price<br>توليد PV والحمل وتخزين الطاقة والتبادل مع الشبكة وأسعار الكهرباء</div></div>
 
-<div class="hero">
+  <section><div class="en"><h2>🎯 Lab Objectives</h2><ul><li>Integrate PV, load, battery storage, and the utility grid.</li><li>Formulate the power-balance equation.</li><li>Model battery charging and discharging.</li><li>Calculate grid import and export.</li><li>Use electricity prices in the objective.</li><li>Optimize the battery schedule.</li><li>Evaluate PV self-consumption and grid-energy reduction.</li></ul></div><div class="ar"><h2>🎯 أهداف المختبر</h2><ul><li>دمج توليد PV والحمل والبطارية والشبكة الكهربائية.</li><li>صياغة معادلة توازن القدرة.</li><li>نمذجة شحن وتفريغ البطارية.</li><li>حساب الاستيراد والتصدير من الشبكة.</li><li>إدخال أسعار الكهرباء ضمن دالة الهدف.</li><li>تحسين جدول تشغيل البطارية.</li><li>تقييم الاستهلاك الذاتي وتقليل السحب من الشبكة.</li></ul></div></section>
 
-  <div class="lab-number">
-    LAB 08 | المختبر 08
-  </div>
+  <section><div class="en"><h2>1. Smart Energy System</h2><div class="flow"><div class="flow-box">PV System</div><div class="arrow">→</div><div class="flow-box">Load</div><div class="arrow">↔</div><div class="flow-box">Battery</div><div class="arrow">↔</div><div class="flow-box">Grid</div></div><div class="highlight">The energy manager coordinates power flow among all components.</div></div><div class="ar"><h2>1. نظام إدارة الطاقة الذكي</h2><p>تتمثل المهمة في تنسيق تدفق القدرة بين PV والحمل والبطارية والشبكة بطريقة اقتصادية وآمنة.</p></div></section>
 
-  <h1>Integrated PV-Battery Smart Energy Management</h1>
+  <section><div class="en"><h2>2. Power Balance</h2><div class="formula">P<sub>B</sub> &gt; 0 → Battery Discharge</div><div class="formula">P<sub>B</sub> &lt; 0 → Battery Charge</div><div class="formula">P<sub>grid</sub>(k)=P<sub>load</sub>(k)-P<sub>PV</sub>(k)-P<sub>B</sub>(k)</div></div><div class="ar"><h2>2. معادلة توازن القدرة</h2><p>إذا لم يكفِ توليد PV والبطارية لتغذية الحمل، يتم شراء الفرق من الشبكة.</p></div></section>
 
-  <div class="hero-ar">
-    الإدارة الذكية المتكاملة لنظام PV والبطارية
-  </div>
+  <section><div class="en"><h2>3. Grid Import and Export</h2><div class="formula">P<sub>grid</sub> &gt; 0 → Import</div><div class="formula">P<sub>grid</sub> &lt; 0 → Export</div><div class="formula">P<sub>import</sub>=max(P<sub>grid</sub>,0)</div><div class="formula">P<sub>export</sub>=max(-P<sub>grid</sub>,0)</div></div><div class="ar"><h2>3. الاستيراد والتصدير</h2><p>القيمة الموجبة تعني شراء الطاقة، والسالبة تعني تصدير فائض الطاقة المحلية.</p></div></section>
 
-  <div class="subtitle">
-    PV Generation, Load, Battery Storage, Grid Exchange, and Electricity Price
-    <br>
-    توليد PV والحمل وتخزين الطاقة والتبادل مع الشبكة وأسعار الكهرباء
-  </div>
+  <section><div class="en"><h2>4. Example Profiles</h2><div class="table-wrap"><table><tr><th>Hour</th><th>Load [MW]</th><th>PV [MW]</th><th>Buy Price [€/MWh]</th></tr><tr><td>1</td><td>5.0</td><td>0.0</td><td>45</td></tr><tr><td>2</td><td>4.8</td><td>0.5</td><td>40</td></tr><tr><td>3</td><td>4.5</td><td>2.0</td><td>35</td></tr><tr><td>4</td><td>5.0</td><td>4.5</td><td>45</td></tr><tr><td>5</td><td>6.5</td><td>3.0</td><td>85</td></tr><tr><td>6</td><td>7.0</td><td>0.5</td><td>95</td></tr></table></div></div><div class="ar"><h2>4. بيانات النظام</h2><p>يتغير الحمل وتوليد PV وسعر الشراء على مدى ست ساعات.</p></div></section>
 
-</div>
+  <section><div class="en"><h2>5. Battery Parameters</h2><div class="table-wrap"><table><tr><th>Parameter</th><th>Value</th></tr><tr><td>Energy Capacity</td><td>5 MWh</td></tr><tr><td>Initial SOC</td><td>50%</td></tr><tr><td>Minimum SOC</td><td>20%</td></tr><tr><td>Maximum SOC</td><td>90%</td></tr><tr><td>Maximum Charge Power</td><td>2 MW</td></tr><tr><td>Maximum Discharge Power</td><td>2 MW</td></tr><tr><td>Charge Efficiency</td><td>95%</td></tr><tr><td>Discharge Efficiency</td><td>95%</td></tr></table></div></div><div class="ar"><h2>5. معاملات البطارية</h2><p>تستخدم بطارية بسعة 5 MWh وحدود SOC بين 20% و90%.</p></div></section>
 
+  <section><div class="en"><h2>6. SOC Model</h2><div class="formula">Charging: E(k+1)=E(k)+η<sub>ch</sub>|P<sub>B</sub>(k)|Δt</div><div class="formula">Discharging: E(k+1)=E(k)-P<sub>B</sub>(k)Δt/η<sub>dis</sub></div><div class="formula">SOC(k)=E(k)/E<sub>max</sub></div><div class="formula">SOC<sub>min</sub>≤SOC(k)≤SOC<sub>max</sub></div></div><div class="ar"><h2>6. نموذج حالة الشحن</h2><p>تأخذ المعادلات كفاءتي الشحن والتفريغ وحدود SOC بعين الاعتبار.</p></div></section>
 
-<section>
+  <section><div class="en"><h2>7. Energy-Management Objective</h2><div class="formula">J=Σ[Price<sub>buy</sub>P<sub>import</sub>-Price<sub>sell</sub>P<sub>export</sub]Δt</div><div class="formula">J<sub>pen</sub>=J+λ<sub>SOC</sub>P<sub>SOC</sub>+λ<sub>final</sub>[SOC(T+1)-SOC(1)]²</div></div><div class="ar"><h2>7. دالة هدف إدارة الطاقة</h2><p>تجمع الدالة بين تكلفة الاستيراد وعائد التصدير والعقوبات المرتبطة بقيود البطارية.</p></div></section>
 
-<div class="en">
+  <section><div class="en"><h2>8. Optimization Workflow</h2><div class="flow"><div class="flow-box">Battery Schedule</div><div class="arrow">→</div><div class="flow-box">Simulate SOC</div><div class="arrow">→</div><div class="flow-box">Grid Exchange</div><div class="arrow">→</div><div class="flow-box">Cost & Penalties</div><div class="arrow">→</div><div class="flow-box">Select Best</div></div></div><div class="ar"><h2>8. تسلسل التحسين</h2><div class="highlight">جدول البطارية ← محاكاة SOC ← تبادل الشبكة ← التكلفة والعقوبات ← اختيار الأفضل</div></div></section>
 
-<h2>🎯 Lab Objectives</h2>
-
-<ul>
-<li>Integrate PV generation, electrical load, battery storage, and the utility grid.</li>
-<li>Formulate the power-balance equation.</li>
-<li>Model charging and discharging of the battery.</li>
-<li>Calculate grid import and export.</li>
-<li>Use electricity prices in an energy-management objective.</li>
-<li>Optimize the battery schedule.</li>
-<li>Evaluate PV self-consumption and grid-energy reduction.</li>
-</ul>
-
-</div>
-
-<div class="ar">
-
-<h2>🎯 أهداف المختبر</h2>
-
-<ul>
-<li>دمج توليد PV والحمل والبطارية والشبكة الكهربائية في نموذج واحد.</li>
-<li>صياغة معادلة توازن القدرة.</li>
-<li>نمذجة شحن وتفريغ البطارية.</li>
-<li>حساب الاستيراد والتصدير من الشبكة.</li>
-<li>إدخال أسعار الكهرباء ضمن دالة إدارة الطاقة.</li>
-<li>تحسين جدول تشغيل البطارية.</li>
-<li>تقييم الاستهلاك الذاتي للطاقة الشمسية وتقليل الطاقة المسحوبة من الشبكة.</li>
-</ul>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>1. Smart Energy System</h2>
-
-<p>
-The energy-management system contains four main components:
-</p>
-
-<div class="flow">
-<div class="flow-box">PV System</div>
-<div class="arrow">→</div>
-<div class="flow-box">Load</div>
-<div class="arrow">↔</div>
-<div class="flow-box">Battery</div>
-<div class="arrow">↔</div>
-<div class="flow-box">Grid</div>
-</div>
-
-<div class="highlight">
-The energy manager decides when the battery should charge or discharge.
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>1. نظام إدارة الطاقة الذكي</h2>
-
-<p>
-يتكون النظام من توليد شمسي وحمل وبطارية وشبكة كهربائية.
-</p>
-
-<div class="highlight">
-مهمة نظام إدارة الطاقة هي تنسيق تدفق القدرة بين هذه العناصر بطريقة اقتصادية وآمنة.
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>2. Power-Balance Equation</h2>
-
-<p>
-Using the battery sign convention:
-</p>
-
-<div class="formula">
-PB &gt; 0 → Battery Discharge
-</div>
-
-<div class="formula">
-PB &lt; 0 → Battery Charge
-</div>
-
-<p>
-The grid power is:
-</p>
-
-<div class="formula">
-Pgrid(k)=Pload(k)-PPV(k)-PB(k)
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>2. معادلة توازن القدرة</h2>
-
-<div class="formula">
-Pgrid(k)=Pload(k)-PPV(k)-PB(k)
-</div>
-
-<p>
-إذا كان توليد PV والبطارية غير كافيين لتغذية الحمل، يتم شراء الفرق من الشبكة.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>3. Grid Import and Export</h2>
-
-<div class="formula">
-Pgrid &gt; 0 → Import
-</div>
-
-<div class="formula">
-Pgrid &lt; 0 → Export
-</div>
-
-<p>
-A negative grid-power value means excess local energy is exported.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>3. الاستيراد والتصدير من الشبكة</h2>
-
-<ul>
-<li>Pgrid موجبة → شراء طاقة من الشبكة.</li>
-<li>Pgrid سالبة → تصدير فائض إلى الشبكة.</li>
-</ul>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>4. Example Profiles</h2>
-
-<div class="table-wrap">
-
-<table>
-
-<tr>
-<th>Hour</th>
-<th>Load [MW]</th>
-<th>PV [MW]</th>
-<th>Buy Price [€/MWh]</th>
-</tr>
-
-<tr><td>1</td><td>5.0</td><td>0.0</td><td>45</td></tr>
-<tr><td>2</td><td>4.8</td><td>0.5</td><td>40</td></tr>
-<tr><td>3</td><td>4.5</td><td>2.0</td><td>35</td></tr>
-<tr><td>4</td><td>5.0</td><td>4.5</td><td>45</td></tr>
-<tr><td>5</td><td>6.5</td><td>3.0</td><td>85</td></tr>
-<tr><td>6</td><td>7.0</td><td>0.5</td><td>95</td></tr>
-
-</table>
-
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>4. بيانات النظام</h2>
-
-<p>
-لدينا حمل وتوليد شمسي وسعر شراء مختلف لكل ساعة.
-</p>
-
-<div class="highlight">
-يظهر توليد PV في ساعات النهار، بينما يرتفع السعر في الساعات الأخيرة.
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>5. Battery Parameters</h2>
-
-<div class="table-wrap">
-
-<table>
-
-<tr>
-<th>Parameter</th>
-<th>Value</th>
-</tr>
-
-<tr><td>Energy Capacity</td><td>5 MWh</td></tr>
-<tr><td>Initial SOC</td><td>50%</td></tr>
-<tr><td>Minimum SOC</td><td>20%</td></tr>
-<tr><td>Maximum SOC</td><td>90%</td></tr>
-<tr><td>Maximum Charge Power</td><td>2 MW</td></tr>
-<tr><td>Maximum Discharge Power</td><td>2 MW</td></tr>
-<tr><td>Charge Efficiency</td><td>95%</td></tr>
-<tr><td>Discharge Efficiency</td><td>95%</td></tr>
-
-</table>
-
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>5. معاملات البطارية</h2>
-
-<p>
-نستخدم بطارية بسعة 5 MWh وحدود SOC من 20% إلى 90%.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>6. Energy-Management Objective</h2>
-
-<p>
-The simplest objective is to minimize electricity-purchase cost:
-</p>
-
-<div class="formula">
-J = Σ Cgrid(k)
-</div>
-
-<p>
-where:
-</p>
-
-<div class="formula">
-Cgrid(k)=Pricebuy(k)Pimport(k)Δt
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>6. دالة هدف إدارة الطاقة</h2>
-
-<p>
-نبدأ بهدف بسيط هو تقليل تكلفة شراء الطاقة من الشبكة.
-</p>
-
-<div class="formula">
-J=Σ Pricebuy(k)Pimport(k)Δt
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>7. Import Power</h2>
-
-<p>
-Only positive grid power corresponds to purchased electricity:
-</p>
-
-<div class="formula">
-Pimport(k)=max(Pgrid(k),0)
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>7. قدرة الاستيراد</h2>
-
-<div class="formula">
-Pimport(k)=max(Pgrid(k),0)
-</div>
-
-<p>
-إذا كان Pgrid سالبًا فلا توجد طاقة مشتراة في تلك الساعة.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>8. Optional Export Revenue</h2>
-
-<p>
-If exported electricity is compensated:
-</p>
-
-<div class="formula">
-Pexport(k)=max(-Pgrid(k),0)
-</div>
-
-<p>
-Then:
-</p>
-
-<div class="formula">
-Revenue =
-Σ Pricesell(k)Pexport(k)Δt
-</div>
-
-<p>
-and the net objective becomes:
-</p>
-
-<div class="formula">
-J =
-Purchase Cost
--
-Export Revenue
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>8. عائد تصدير الطاقة</h2>
-
-<p>
-إذا كانت الشبكة تسمح ببيع الطاقة الفائضة، يمكن إضافة عائد التصدير إلى المسألة.
-</p>
-
-<div class="formula">
-J = تكلفة الشراء - عائد التصدير
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>9. Battery Energy Model</h2>
-
-<p>Charging:</p>
-
-<div class="formula">
-E(k+1)=E(k)+ηch|PB(k)|Δt
-</div>
-
-<p>Discharging:</p>
-
-<div class="formula">
-E(k+1)=E(k)-PB(k)Δt/ηdis
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>9. نموذج طاقة البطارية</h2>
-
-<p>
-تتغير الطاقة المخزنة حسب الشحن أو التفريغ مع أخذ الكفاءة في الحسبان.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>10. SOC Constraints</h2>
-
-<div class="formula">
-SOCmin ≤ SOC(k) ≤ SOCmax
-</div>
-
-<p>For this case:</p>
-
-<div class="formula">
-0.20 ≤ SOC(k) ≤ 0.90
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>10. قيود SOC</h2>
-
-<p>
-يجب الحفاظ على البطارية ضمن المجال التشغيلي الآمن طوال الفترة.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>11. Decision Vector</h2>
-
-<p>
-For six hours:
-</p>
-
-<div class="formula">
-x=[PB(1),PB(2),...,PB(6)]
-</div>
-
-<p>
-Each candidate solution is therefore a complete battery schedule.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>11. متجه القرار</h2>
-
-<div class="formula">
-x=[PB(1),PB(2),...,PB(6)]
-</div>
-
-<p>
-يمثل كل كروموسوم جدول تشغيل كامل للبطارية.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>12. Baseline Without Battery</h2>
-
-<p>
-Before optimization:
-</p>
-
-<div class="formula">
-PB(k)=0
-</div>
-
-<p>
-therefore:
-</p>
-
-<div class="formula">
-Pgrid,base=Pload-PPV
-</div>
-
-<p>
-This provides a reference cost for comparison.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>12. الحالة المرجعية دون البطارية</h2>
-
-<p>
-نحسب أولًا تكلفة النظام عندما لا تستخدم البطارية إطلاقًا.
-</p>
-
-<div class="highlight">
-يجب دائمًا مقارنة الحل المحسن بحالة مرجعية واضحة.
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>13. MATLAB Input Data</h2>
-
-<pre><code>loadMW = [5.0 4.8 4.5 5.0 6.5 7.0];
-
-pvMW = [0.0 0.5 2.0 4.5 3.0 0.5];
-
-buyPrice = [45 40 35 45 85 95];
-
-N = length(loadMW);
-
-dt = 1;</code></pre>
-
-</div>
-
-<div class="ar">
-
-<h2>13. البيانات في MATLAB</h2>
-
-<p>
-نخزن الحمل وقدرة PV وسعر شراء الكهرباء في متجهات زمنية.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>14. Baseline Calculation</h2>
-
-<pre><code>PgridBase = loadMW - pvMW;
-
-PimportBase = max(PgridBase,0);
-
-baseCost = sum(buyPrice .* PimportBase * dt);</code></pre>
-
-</div>
-
-<div class="ar">
-
-<h2>14. حساب الحالة المرجعية</h2>
-
-<p>
-نحسب الاستيراد من الشبكة والتكلفة من دون استخدام البطارية.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>15. SOC Penalty</h2>
-
-<p>
-If the battery violates its limits:
-</p>
-
-<div class="formula">
-Jpen=J+PenaltySOC
-</div>
-
-<p>
-A large penalty coefficient ensures infeasible schedules are unattractive.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>15. عقوبة SOC</h2>
-
-<p>
-أي جدول تشغيل يؤدي إلى تجاوز حدود حالة الشحن يحصل على عقوبة كبيرة.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>16. Final SOC Condition</h2>
-
-<p>
-We also require:
-</p>
-
-<div class="formula">
-SOCfinal ≈ SOCinitial
-</div>
-
-<p>
-This prevents the optimizer from artificially lowering cost simply by emptying the battery at the end.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>16. شرط SOC النهائي</h2>
-
-<p>
-نطلب عودة البطارية تقريبًا إلى حالة الشحن الابتدائية عند نهاية أفق الجدولة.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>17. Complete MATLAB Program</h2>
-
-<pre><code>clear; clc; close all;
-
-% ------------------------------------------------
-% Integrated PV-Battery Smart Energy Management
-% Educational evolutionary optimization example
-% ------------------------------------------------
+  <section><div class="en"><h2>9. Complete MATLAB Program</h2><pre><code>clear; clc; close all;
 
 loadMW = [5.0 4.8 4.5 5.0 6.5 7.0];
-
-pvMW = [0.0 0.5 2.0 4.5 3.0 0.5];
-
+Ppv = [0.0 0.5 2.0 4.5 3.0 0.5];
 buyPrice = [45 40 35 45 85 95];
-
-N = length(loadMW);
-
+sellPrice = 0.5*buyPrice;
+T = numel(loadMW);
 dt = 1;
 
-% ------------------------------------------------
-% Battery parameters
-% ------------------------------------------------
-
 Emax = 5;
-
 SOC0 = 0.50;
-
 SOCmin = 0.20;
 SOCmax = 0.90;
-
 PchMax = 2;
 PdisMax = 2;
-
 etaCh = 0.95;
 etaDis = 0.95;
 
-% ------------------------------------------------
-% Optimization parameters
-% ------------------------------------------------
-
 popSize = 70;
-maxGen = 180;
-
-Pc = 0.8;
+maxGen = 160;
+Pc = 0.85;
 Pm = 0.12;
-
-sigmaMut = 0.4;
-
+sigmaMut = 0.35;
 lambdaSOC = 1e5;
-lambdaFinal = 1e5;
+lambdaFinal = 5e4;
 
-% ------------------------------------------------
-% Baseline without battery
-% ------------------------------------------------
-
-PgridBase = loadMW - pvMW;
-
-PimportBase = max(PgridBase,0);
-
-baseCost = ...
-    sum(buyPrice .* PimportBase * dt);
-
-% ------------------------------------------------
-% Initial population
-% ------------------------------------------------
-
-population = ...
-    -PchMax + ...
-    rand(popSize,N)*(PchMax+PdisMax);
-
+population = -PchMax + rand(popSize,T)*(PchMax+PdisMax);
 bestHist = zeros(maxGen,1);
 
-% ------------------------------------------------
-% Evolutionary optimization
-% ------------------------------------------------
-
 for gen = 1:maxGen
-
-    Jvec = zeros(popSize,1);
+    J = zeros(popSize,1);
 
     for i = 1:popSize
-
-        schedule = population(i,:);
-
-        E = SOC0*Emax;
-
+        PB = population(i,:);
+        E = zeros(1,T+1);
+        E(1) = SOC0*Emax;
+        socPenalty = 0;
         energyCost = 0;
-        penaltySOC = 0;
 
-        for k = 1:N
-
-            PB = schedule(k);
-
-            % ------------------------------------
-            % Update battery energy
-            % ------------------------------------
-
-            if PB &lt; 0
-
-                E = E + ...
-                    etaCh*(-PB)*dt;
-
+        for k = 1:T
+            if PB(k) < 0
+                E(k+1)=E(k)+etaCh*abs(PB(k))*dt;
             else
-
-                E = E - ...
-                    PB*dt/etaDis;
-
+                E(k+1)=E(k)-PB(k)*dt/etaDis;
             end
 
-            SOC = E/Emax;
+            SOC = E(k+1)/Emax;
+            socPenalty = socPenalty ...
+                + max(SOCmin-SOC,0)^2 ...
+                + max(SOC-SOCmax,0)^2;
 
-            % ------------------------------------
-            % SOC constraint penalty
-            % ------------------------------------
-
-            if SOC &lt; SOCmin
-
-                penaltySOC = penaltySOC + ...
-                    lambdaSOC*(SOCmin-SOC)^2;
-
-            elseif SOC &gt; SOCmax
-
-                penaltySOC = penaltySOC + ...
-                    lambdaSOC*(SOC-SOCmax)^2;
-
-            end
-
-            % ------------------------------------
-            % Grid power balance
-            % ------------------------------------
-
-            Pgrid = ...
-                loadMW(k) - ...
-                pvMW(k) - ...
-                PB;
-
+            Pgrid = loadMW(k)-Ppv(k)-PB(k);
             Pimport = max(Pgrid,0);
-
-            % ------------------------------------
-            % Energy purchase cost
-            % ------------------------------------
-
-            energyCost = ...
-                energyCost + ...
-                buyPrice(k)*Pimport*dt;
-
+            Pexport = max(-Pgrid,0);
+            energyCost = energyCost ...
+                + buyPrice(k)*Pimport*dt ...
+                - sellPrice(k)*Pexport*dt;
         end
 
-        % ----------------------------------------
-        % Final SOC penalty
-        % ----------------------------------------
-
-        SOCfinal = E/Emax;
-
-        penaltyFinal = ...
-            lambdaFinal*(SOCfinal-SOC0)^2;
-
-        % ----------------------------------------
-        % Total objective
-        % ----------------------------------------
-
-        Jvec(i) = ...
-            energyCost + ...
-            penaltySOC + ...
-            penaltyFinal;
-
+        finalSOC = E(end)/Emax;
+        J(i)=energyCost ...
+            + lambdaSOC*socPenalty ...
+            + lambdaFinal*(finalSOC-SOC0)^2;
     end
 
-    % ------------------------------------------------
-    % Elitism
-    % ------------------------------------------------
+    [bestHist(gen),bestIdx]=min(J);
+    elite=population(bestIdx,:);
+    newPopulation=zeros(size(population));
+    newPopulation(1,:)=elite;
+    m=2;
 
-    [bestJ,bestIdx] = min(Jvec);
+    while m<=popSize
+        ids=randi(popSize,4,1);
+        if J(ids(1))<J(ids(2)), p1=population(ids(1),:); else, p1=population(ids(2),:); end
+        if J(ids(3))<J(ids(4)), p2=population(ids(3),:); else, p2=population(ids(4),:); end
 
-    elite = population(bestIdx,:);
-
-    bestHist(gen) = bestJ;
-
-    % ------------------------------------------------
-    % New population
-    % ------------------------------------------------
-
-    newPopulation = zeros(size(population));
-
-    newPopulation(1,:) = elite;
-
-    row = 2;
-
-    while row &lt;= popSize
-
-        % ----------------------------------------
-        % Tournament selection: Parent 1
-        % ----------------------------------------
-
-        a = randi(popSize);
-        b = randi(popSize);
-
-        if Jvec(a) &lt; Jvec(b)
-            parent1 = population(a,:);
+        if rand<Pc
+            a=rand;
+            c1=a*p1+(1-a)*p2;
+            c2=(1-a)*p1+a*p2;
         else
-            parent1 = population(b,:);
+            c1=p1; c2=p2;
         end
 
-        % ----------------------------------------
-        % Tournament selection: Parent 2
-        % ----------------------------------------
-
-        a = randi(popSize);
-        b = randi(popSize);
-
-        if Jvec(a) &lt; Jvec(b)
-            parent2 = population(a,:);
-        else
-            parent2 = population(b,:);
+        for k=1:T
+            if rand<Pm, c1(k)=c1(k)+sigmaMut*randn; end
+            if rand<Pm, c2(k)=c2(k)+sigmaMut*randn; end
         end
 
-        % ----------------------------------------
-        % Crossover
-        % ----------------------------------------
-
-        if rand &lt; Pc
-
-            alpha = rand;
-
-            child1 = ...
-                alpha*parent1 + ...
-                (1-alpha)*parent2;
-
-            child2 = ...
-                (1-alpha)*parent1 + ...
-                alpha*parent2;
-
-        else
-
-            child1 = parent1;
-            child2 = parent2;
-
-        end
-
-        % ----------------------------------------
-        % Mutation
-        % ----------------------------------------
-
-        for k = 1:N
-
-            if rand &lt; Pm
-
-                child1(k) = ...
-                    child1(k) + ...
-                    sigmaMut*randn;
-
-            end
-
-            if rand &lt; Pm
-
-                child2(k) = ...
-                    child2(k) + ...
-                    sigmaMut*randn;
-
-            end
-
-        end
-
-        % ----------------------------------------
-        % Battery power limits
-        % ----------------------------------------
-
-        child1 = ...
-            min(max(child1,-PchMax),PdisMax);
-
-        child2 = ...
-            min(max(child2,-PchMax),PdisMax);
-
-        % ----------------------------------------
-        % Store children
-        % ----------------------------------------
-
-        newPopulation(row,:) = child1;
-
-        if row+1 &lt;= popSize
-            newPopulation(row+1,:) = child2;
-        end
-
-        row = row + 2;
-
+        c1=min(max(c1,-PchMax),PdisMax);
+        c2=min(max(c2,-PchMax),PdisMax);
+        newPopulation(m,:)=c1;
+        if m+1<=popSize, newPopulation(m+1,:)=c2; end
+        m=m+2;
     end
 
-    population = newPopulation;
-
+    population=newPopulation;
 end
 
-% ------------------------------------------------
-% Final population evaluation
-% ------------------------------------------------
-
-Jvec = zeros(popSize,1);
-
-for i = 1:popSize
-
-    schedule = population(i,:);
-
-    E = SOC0*Emax;
-
-    energyCost = 0;
-    penaltySOC = 0;
-
-    for k = 1:N
-
-        PB = schedule(k);
-
-        if PB &lt; 0
-
-            E = E + ...
-                etaCh*(-PB)*dt;
-
+% Final evaluation
+J=zeros(popSize,1);
+for i=1:popSize
+    PB=population(i,:);
+    E=zeros(1,T+1); E(1)=SOC0*Emax;
+    socPenalty=0; energyCost=0;
+    for k=1:T
+        if PB(k)<0
+            E(k+1)=E(k)+etaCh*abs(PB(k))*dt;
         else
-
-            E = E - ...
-                PB*dt/etaDis;
-
+            E(k+1)=E(k)-PB(k)*dt/etaDis;
         end
-
-        SOC = E/Emax;
-
-        if SOC &lt; SOCmin
-
-            penaltySOC = penaltySOC + ...
-                lambdaSOC*(SOCmin-SOC)^2;
-
-        elseif SOC &gt; SOCmax
-
-            penaltySOC = penaltySOC + ...
-                lambdaSOC*(SOC-SOCmax)^2;
-
-        end
-
-        Pgrid = ...
-            loadMW(k) - ...
-            pvMW(k) - ...
-            PB;
-
-        Pimport = max(Pgrid,0);
-
-        energyCost = ...
-            energyCost + ...
-            buyPrice(k)*Pimport*dt;
-
+        SOC=E(k+1)/Emax;
+        socPenalty=socPenalty+max(SOCmin-SOC,0)^2+max(SOC-SOCmax,0)^2;
+        Pgrid=loadMW(k)-Ppv(k)-PB(k);
+        energyCost=energyCost+buyPrice(k)*max(Pgrid,0)-sellPrice(k)*max(-Pgrid,0);
     end
-
-    SOCfinal = E/Emax;
-
-    penaltyFinal = ...
-        lambdaFinal*(SOCfinal-SOC0)^2;
-
-    Jvec(i) = ...
-        energyCost + ...
-        penaltySOC + ...
-        penaltyFinal;
-
+    J(i)=energyCost+lambdaSOC*socPenalty+lambdaFinal*(E(end)/Emax-SOC0)^2;
 end
 
-[bestJ,bestIdx] = min(Jvec);
-
-bestSchedule = population(bestIdx,:);
-
-% ------------------------------------------------
-% Simulate optimal schedule
-% ------------------------------------------------
-
-SOCbest = zeros(1,N+1);
-
-SOCbest(1) = SOC0;
-
-PgridBest = zeros(1,N);
-PimportBest = zeros(1,N);
-
-E = SOC0*Emax;
-
-optimizedCost = 0;
-
-for k = 1:N
-
-    PB = bestSchedule(k);
-
-    if PB &lt; 0
-
-        E = E + ...
-            etaCh*(-PB)*dt;
-
+[~,idx]=min(J);
+PBbest=population(idx,:);
+E=zeros(1,T+1); E(1)=SOC0*Emax;
+for k=1:T
+    if PBbest(k)<0
+        E(k+1)=E(k)+etaCh*abs(PBbest(k))*dt;
     else
-
-        E = E - ...
-            PB*dt/etaDis;
-
+        E(k+1)=E(k)-PBbest(k)*dt/etaDis;
     end
-
-    SOCbest(k+1) = E/Emax;
-
-    PgridBest(k) = ...
-        loadMW(k) - ...
-        pvMW(k) - ...
-        PB;
-
-    PimportBest(k) = ...
-        max(PgridBest(k),0);
-
-    optimizedCost = ...
-        optimizedCost + ...
-        buyPrice(k)*PimportBest(k)*dt;
-
 end
+SOC=E/Emax;
+Pgrid=loadMW-Ppv-PBbest;
+Pimport=max(Pgrid,0);
+Pexport=max(-Pgrid,0);
+baseGrid=loadMW-Ppv;
+baseCost=sum(buyPrice.*max(baseGrid,0)-sellPrice.*max(-baseGrid,0));
+optCost=sum(buyPrice.*Pimport-sellPrice.*Pexport);
+selfConsumption=1-sum(Pexport)/max(sum(Ppv),eps);
 
-saving = baseCost - optimizedCost;
+fprintf('Base cost = %.2f\n',baseCost)
+fprintf('Optimized cost = %.2f\n',optCost)
+fprintf('Savings = %.2f\n',baseCost-optCost)
+fprintf('PV self-consumption = %.2f %%\n',100*selfConsumption)
 
-% ------------------------------------------------
-% PV self-consumption indicators
-% ------------------------------------------------
-
-gridImportEnergyBase = ...
-    sum(PimportBase)*dt;
-
-gridImportEnergyOpt = ...
-    sum(PimportBest)*dt;
-
-importReduction = ...
-    gridImportEnergyBase - ...
-    gridImportEnergyOpt;
-
-% ------------------------------------------------
-% Display results
-% ------------------------------------------------
-
-fprintf('Integrated PV-Battery Energy Management\n\n')
-
-fprintf('Base cost without battery = %.2f EUR\n', ...
-        baseCost)
-
-fprintf('Optimized cost = %.2f EUR\n', ...
-        optimizedCost)
-
-fprintf('Cost saving = %.2f EUR\n\n', ...
-        saving)
-
-fprintf('Grid import without battery = %.3f MWh\n', ...
-        gridImportEnergyBase)
-
-fprintf('Grid import with battery = %.3f MWh\n', ...
-        gridImportEnergyOpt)
-
-fprintf('Grid import reduction = %.3f MWh\n\n', ...
-        importReduction)
-
-fprintf('Optimal Battery Schedule [MW]:\n')
-disp(bestSchedule)
-
-fprintf('SOC Trajectory:\n')
-disp(SOCbest)
-
-% ------------------------------------------------
-% Convergence
-% ------------------------------------------------
+disp('Best battery schedule PB [MW]:')
+disp(PBbest)
+disp('SOC trajectory:')
+disp(SOC)
 
 figure
+stairs(1:T,PBbest,'LineWidth',1.6)
+grid on
+xlabel('Hour'); ylabel('Battery Power [MW]')
+title('Optimized Battery Schedule')
 
+figure
+plot(1:T,loadMW,'o-','LineWidth',1.4); hold on
+plot(1:T,Ppv,'s-','LineWidth',1.4)
+plot(1:T,Pgrid,'d-','LineWidth',1.4)
+grid on
+xlabel('Hour'); ylabel('Power [MW]')
+legend('Load','PV','Grid','Location','best')
+title('Integrated Energy Flows')
+
+figure
+stairs(0:T,SOC,'LineWidth',1.6)
+grid on
+xlabel('Hour'); ylabel('SOC')
+title('Battery State of Charge')
+
+figure
 plot(1:maxGen,bestHist,'LineWidth',1.6)
-
 grid on
+xlabel('Generation'); ylabel('Best Penalized Cost')
+title('PV-Battery Energy-Management Convergence')</code></pre></div><div class="ar"><h2>9. البرنامج الكامل في MATLAB</h2><p>ينفذ البرنامج تحسينًا تطوريًا لجدول البطارية ضمن منظومة متكاملة تضم PV والحمل والشبكة، ثم يحسب التكلفة والتوفير والاستهلاك الذاتي للطاقة الشمسية.</p></div></section>
 
-xlabel('Generation')
-ylabel('Best Objective')
+  <section><div class="en"><h2>10. Performance Indicators</h2><div class="formula">Savings = Base Cost - Optimized Cost</div><div class="formula">PV Self-Consumption = 1 - Exported PV Energy / Total PV Energy</div><div class="formula">Grid-Energy Reduction = Base Import - Optimized Import</div></div><div class="ar"><h2>10. مؤشرات الأداء</h2><p>نقيس التوفير المالي والاستهلاك الذاتي للطاقة الشمسية وانخفاض الطاقة المسحوبة من الشبكة.</p></div></section>
 
-title('PV-Battery Energy Management Convergence')
+  <section><div class="en"><h2>11. Experiments</h2><ol><li>Change the PV profile.</li><li>Change buy and sell prices.</li><li>Change battery capacity.</li><li>Remove export revenue.</li><li>Add battery-degradation cost.</li><li>Require zero grid export.</li></ol></div><div class="ar"><h2>11. التجارب</h2><ol><li>غيّر منحنى PV.</li><li>غيّر أسعار الشراء والبيع.</li><li>غيّر سعة البطارية.</li><li>ألغِ عائد التصدير.</li><li>أضف تكلفة الاهتراء.</li><li>امنع التصدير إلى الشبكة.</li></ol></div></section>
 
-% ------------------------------------------------
-% Load and PV
-% ------------------------------------------------
+  <section><div class="en"><h2>12. Lab Tasks</h2><ol><li>Run the program.</li><li>Record the optimized schedule, SOC, import, and export.</li><li>Compare base and optimized costs.</li><li>Calculate PV self-consumption.</li><li>Verify all constraints.</li><li>Repeat the proposed experiments.</li></ol></div><div class="ar"><h2>12. مهام المختبر</h2><ol><li>شغّل البرنامج.</li><li>سجل جدول البطارية وSOC والاستيراد والتصدير.</li><li>قارن التكلفة الأساسية بالمحسنة.</li><li>احسب الاستهلاك الذاتي للطاقة الشمسية.</li><li>تحقق من جميع القيود.</li><li>نفذ التجارب المقترحة.</li></ol></div></section>
 
-figure
-
-plot(1:N,loadMW,'o-','LineWidth',1.6)
-hold on
-
-plot(1:N,pvMW,'s-','LineWidth',1.6)
-
-grid on
-
-xlabel('Hour')
-ylabel('Power [MW]')
-
-legend('Load','PV Generation', ...
-       'Location','best')
-
-title('Load and PV Profiles')
-
-% ------------------------------------------------
-% Battery schedule
-% ------------------------------------------------
-
-figure
-
-bar(1:N,bestSchedule)
-
-grid on
-
-xlabel('Hour')
-ylabel('Battery Power [MW]')
-
-title('Optimal Battery Schedule')
-
-% ------------------------------------------------
-% SOC trajectory
-% ------------------------------------------------
-
-figure
-
-plot(0:N,SOCbest,'o-','LineWidth',1.6)
-
-hold on
-
-yline(SOCmin,'--')
-yline(SOCmax,'--')
-
-grid on
-
-xlabel('Hour')
-ylabel('State of Charge')
-
-title('Battery SOC')
-
-% ------------------------------------------------
-% Grid exchange
-% ------------------------------------------------
-
-figure
-
-plot(1:N,PgridBase,'o-','LineWidth',1.6)
-hold on
-
-plot(1:N,PgridBest,'s-','LineWidth',1.6)
-
-yline(0,'--')
-
-grid on
-
-xlabel('Hour')
-ylabel('Grid Power [MW]')
-
-legend('Without Battery','With Battery', ...
-       'Location','best')
-
-title('Grid Exchange Comparison')
-
-% ------------------------------------------------
-% Electricity price
-% ------------------------------------------------
-
-figure
-
-stairs(1:N,buyPrice,'LineWidth',1.6)
-
-grid on
-
-xlabel('Hour')
-ylabel('Price [EUR/MWh]')
-
-title('Electricity Price')</code></pre>
-
-</div>
-
-<div class="ar">
-
-<h2>17. البرنامج الكامل في MATLAB</h2>
-
-<p>
-يجمع البرنامج الحمل والطاقة الشمسية والبطارية والشبكة والسعر ضمن مسألة تحسين واحدة.
-</p>
-
-<div class="flow">
-<div class="flow-box">Load</div>
-<div class="arrow">+</div>
-<div class="flow-box">PV</div>
-<div class="arrow">+</div>
-<div class="flow-box">Battery</div>
-<div class="arrow">→</div>
-<div class="flow-box">Grid Exchange</div>
-<div class="arrow">→</div>
-<div class="flow-box">Cost</div>
-<div class="arrow">→</div>
-<div class="flow-box">Optimization</div>
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>18. Interpreting Midday Operation</h2>
-
-<p>
-During high PV production:
-</p>
-
-<div class="formula">
-PPV ≈ Pload
-</div>
-
-<p>or even:</p>
-
-<div class="formula">
-PPV &gt; Pload
-</div>
-
-<p>
-charging the battery may increase local use of solar energy.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>18. تفسير التشغيل في ساعات الظهر</h2>
-
-<p>
-عندما يكون توليد PV مرتفعًا، يمكن استخدام البطارية لتخزين الطاقة الشمسية بدل الاعتماد على الشبكة لاحقًا.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>19. Interpreting Evening Operation</h2>
-
-<p>
-During high-price evening hours:
-</p>
-
-<div class="formula">
-Price ↑
-</div>
-
-<p>
-the stored solar energy can be discharged:
-</p>
-
-<div class="formula">
-PB &gt; 0
-</div>
-
-<p>
-reducing expensive grid purchases.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>19. تفسير التشغيل في ساعات المساء</h2>
-
-<p>
-عند ارتفاع السعر وانخفاض إنتاج PV، تستطيع البطارية استخدام الطاقة المخزنة لتقليل شراء الطاقة المرتفعة السعر.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>20. PV Self-Consumption</h2>
-
-<p>
-PV self-consumption means using locally generated PV energy locally rather than exporting or curtailing it.
-</p>
-
-<div class="highlight">
-Battery storage can shift solar energy from the time of generation to the time of demand.
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>20. الاستهلاك الذاتي للطاقة الشمسية</h2>
-
-<p>
-تعني زيادة الاستهلاك الذاتي استخدام نسبة أكبر من الطاقة الشمسية محليًا.
-</p>
-
-<div class="highlight">
-تسمح البطارية بنقل الطاقة زمنيًا من ساعات الإنتاج الشمسي إلى ساعات الحاجة.
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>21. Experiment 1 — Remove PV</h2>
-
-<pre><code>pvMW = zeros(size(pvMW));</code></pre>
-
-<p>
-Compare the battery schedule and energy cost.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>21. التجربة 1 — إزالة PV</h2>
-
-<p>
-اجعل قدرة PV مساوية للصفر، ثم قارن طريقة تشغيل البطارية بالمسألة الأصلية.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>22. Experiment 2 — Increase PV Size</h2>
-
-<pre><code>pvMW = 1.5*pvMW;</code></pre>
-
-<p>
-Observe grid exchange and battery charging.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>22. التجربة 2 — زيادة حجم نظام PV</h2>
-
-<p>
-زد قدرة النظام الشمسي ولاحظ تأثير ذلك على شحن البطارية والطاقة المستوردة من الشبكة.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>23. Experiment 3 — Remove Battery</h2>
-
-<p>Set:</p>
-
-<pre><code>PchMax = 0;
-PdisMax = 0;</code></pre>
-
-<p>
-This reproduces the PV-only reference case.
-</p>
-
-</div>
-
-<div class="ar">
-
-<h2>23. التجربة 3 — إزالة البطارية</h2>
-
-<p>
-ثبت قدرة الشحن والتفريغ عند الصفر للحصول على نظام PV دون تخزين.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>24. Experiment 4 — Increase Battery Capacity</h2>
-
-<pre><code>Emax = 3;
-Emax = 5;
-Emax = 10;</code></pre>
-
-<div class="highlight">
-A larger battery may increase flexibility, but benefits depend on PV surplus, load profile, and electricity prices.
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>24. التجربة 4 — تغيير سعة البطارية</h2>
-
-<p>
-قارن الوفر الاقتصادي وتقليل الاستيراد عند استخدام سعات بطارية مختلفة.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>25. Add Export Price</h2>
-
-<p>
-Define:
-</p>
-
-<pre><code>sellPrice = [20 20 20 20 20 20];</code></pre>
-
-<p>
-Then use:
-</p>
-
-<div class="formula">
-Cost =
-BuyPrice × Import
--
-SellPrice × Export
-</div>
-
-<div class="highlight">
-The optimal battery strategy can change significantly when exported PV energy has economic value.
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>25. إضافة سعر بيع للطاقة</h2>
-
-<p>
-عند وجود سعر لبيع الكهرباء الفائضة، تصبح الخوارزمية أمام قرار جديد:
-هل تخزن الطاقة أم تبيعها مباشرة؟
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>26. Add Battery Degradation</h2>
-
-<p>
-A more realistic objective can include:
-</p>
-
-<div class="formula">
-Cdeg =
-cdeg Σ|PB(k)|Δt
-</div>
-
-<p>
-Then:
-</p>
-
-<div class="formula">
-J =
-Grid Cost
-+
-Battery Degradation Cost
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>26. إضافة تكلفة تدهور البطارية</h2>
-
-<p>
-يمكن جعل نموذج إدارة الطاقة أكثر واقعية من خلال احتساب تكلفة مرتبطة باستخدام البطارية.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>27. Add PV Curtailment</h2>
-
-<p>
-When PV production is larger than local demand and storage capability,
-some PV power may need to be curtailed.
-</p>
-
-<div class="formula">
-0 ≤ Pcurt(k) ≤ PPV(k)
-</div>
-
-<p>
-The power balance becomes:
-</p>
-
-<div class="formula">
-Pgrid =
-Pload -
-(PPV-Pcurt) -
-PB
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>27. إضافة خفض إنتاج PV</h2>
-
-<p>
-إذا كان إنتاج PV أكبر من قدرة الحمل والبطارية على الاستيعاب، قد نحتاج إلى خفض جزء من التوليد.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>28. Multi-Objective Smart Energy Management</h2>
-
-<p>
-An advanced objective can combine:
-</p>
-
-<div class="formula">
-J =
-w₁ Cost
-+
-w₂ Grid Import
-+
-w₃ PV Curtailment
-+
-w₄ Battery Degradation
-</div>
-
-<div class="highlight">
-The weights express the engineering priorities of the energy-management system.
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>28. إدارة طاقة متعددة الأهداف</h2>
-
-<div class="formula">
-J =
-w₁ التكلفة
-+
-w₂ الاستيراد
-+
-w₃ خفض PV
-+
-w₄ تدهور البطارية
-</div>
-
-<p>
-تمثل الأوزان أولويات المصمم أو المشغل.
-</p>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>29. From Optimization to AI Control</h2>
-
-<p>
-The optimizer can generate many optimal operating examples:
-</p>
-
-<div class="formula">
-System State → Optimal Battery Action
-</div>
-
-<p>
-These examples can then train a neural network:
-</p>
-
-<div class="formula">
-[Load,PV,Price,SOC]
-→ ANN →
-PB*
-</div>
-
-<div class="highlight">
-This creates a bridge between offline optimization and fast AI-based real-time control.
-</div>
-
-</div>
-
-<div class="ar">
-
-<h2>29. من التحسين إلى التحكم بالذكاء الاصطناعي</h2>
-
-<p>
-يمكن استخدام الحلول المثلى الناتجة عن خوارزمية التحسين لتدريب شبكة عصبية تتعلم القرار الأمثل تقريبًا.
-</p>
-
-<div class="formula">
-[Load,PV,Price,SOC]
-→ ANN →
-PB*
-</div>
-
-<div class="highlight">
-وهذا يسمح لاحقًا بالحصول على قرار سريع جدًا في الزمن الحقيقي.
-</div>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>30. Lab Tasks</h2>
-
-<ol>
-<li>Enter load, PV, and electricity-price profiles.</li>
-<li>Calculate the baseline grid exchange without battery.</li>
-<li>Calculate baseline electricity cost.</li>
-<li>Implement the battery SOC equations.</li>
-<li>Implement the grid-power equation.</li>
-<li>Add SOC and final-SOC penalties.</li>
-<li>Run the optimizer.</li>
-<li>Plot load and PV generation.</li>
-<li>Plot the optimal battery schedule.</li>
-<li>Plot SOC.</li>
-<li>Compare grid exchange before and after optimization.</li>
-<li>Calculate economic savings.</li>
-<li>Calculate grid-import reduction.</li>
-<li>Increase PV size and compare results.</li>
-<li>Increase battery capacity and compare results.</li>
-<li>Explain how this optimization can provide training data for an ANN.</li>
-</ol>
-
-</div>
-
-<div class="ar">
-
-<h2>30. مهام المختبر</h2>
-
-<ol>
-<li>أدخل منحنيات الحمل وPV والسعر.</li>
-<li>احسب تبادل الشبكة دون بطارية.</li>
-<li>احسب التكلفة المرجعية.</li>
-<li>نفذ معادلات SOC.</li>
-<li>نفذ معادلة قدرة الشبكة.</li>
-<li>أضف عقوبات SOC وSOC النهائي.</li>
-<li>شغّل المحسن.</li>
-<li>ارسم الحمل وتوليد PV.</li>
-<li>ارسم جدول تشغيل البطارية الأمثل.</li>
-<li>ارسم SOC.</li>
-<li>قارن تبادل الشبكة قبل التحسين وبعده.</li>
-<li>احسب الوفر الاقتصادي.</li>
-<li>احسب تقليل الاستيراد من الشبكة.</li>
-<li>زد حجم PV وقارن النتائج.</li>
-<li>زد سعة البطارية وقارن النتائج.</li>
-<li>اشرح كيف يمكن استخدام هذه الحلول لتدريب ANN.</li>
-</ol>
-
-</div>
-
-</section>
-
-
-<section>
-
-<div class="en">
-
-<h2>📝 Review Questions</h2>
-
-<ol>
-<li>Write the power-balance equation for the PV-battery-grid system.</li>
-<li>What does positive battery power mean?</li>
-<li>What does negative grid power mean?</li>
-<li>Why can a battery increase PV self-consumption?</li>
-<li>Why is the final-SOC condition important?</li>
-<li>How does electricity price influence battery scheduling?</li>
-<li>What is the effect of increasing PV capacity?</li>
-<li>What is the effect of increasing battery capacity?</li>
-<li>Why should battery degradation be included in realistic optimization?</li>
-<li>How can optimal schedules be used to train an AI controller?</li>
-</ol>
-
-</div>
-
-<div class="ar">
-
-<h2>📝 أسئلة المراجعة</h2>
-
-<ol>
-<li>اكتب معادلة توازن القدرة لنظام PV والبطارية والشبكة.</li>
-<li>ماذا تعني قدرة بطارية موجبة؟</li>
-<li>ماذا تعني قدرة شبكة سالبة؟</li>
-<li>كيف تزيد البطارية من الاستهلاك الذاتي للطاقة الشمسية؟</li>
-<li>لماذا يعد شرط SOC النهائي مهمًا؟</li>
-<li>كيف يؤثر سعر الكهرباء على جدولة البطارية؟</li>
-<li>ما تأثير زيادة قدرة PV؟</li>
-<li>ما تأثير زيادة سعة البطارية؟</li>
-<li>لماذا يجب احتساب تدهور البطارية في النماذج الواقعية؟</li>
-<li>كيف يمكن استخدام الجداول المثلى لتدريب متحكم ذكي؟</li>
-</ol>
-
-</div>
-
-</section>
-
+  <section><div class="en"><h2>📝 Review Questions</h2><ol><li>Write the integrated power-balance equation.</li><li>What do positive and negative grid power mean?</li><li>How does the battery increase PV self-consumption?</li><li>Why is a final-SOC constraint useful?</li><li>How can export revenue affect the schedule?</li><li>How can degradation cost be added?</li></ol></div><div class="ar"><h2>📝 أسئلة المراجعة</h2><ol><li>اكتب معادلة توازن القدرة المتكاملة.</li><li>ماذا تعني قدرة الشبكة الموجبة والسالبة؟</li><li>كيف ترفع البطارية الاستهلاك الذاتي للطاقة الشمسية؟</li><li>لماذا نحتاج إلى قيد SOC النهائية؟</li><li>كيف يؤثر عائد التصدير على الجدولة؟</li><li>كيف تضاف تكلفة الاهتراء؟</li></ol></div></section>
 </main>
-
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
-
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
 </body>
-  </html>
+</html>
