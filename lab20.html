@@ -1,304 +1,151 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg"><title>Lab 20 - Autonomous Microgrid Supervisor</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body class="course-template-modern"><header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB capstone laboratory on an autonomous microgrid supervisor">
+  <title>Lab 20 - Autonomous Microgrid Supervisor</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LAB 20 | المخبر 20</div>
-  <h1>Autonomous Microgrid Supervisor</h1>
-  <div class="hero-ar">مشرف ذاتي التشغيل لشبكة مصغرة</div>
-  <div class="subtitle">Integrated MATLAB capstone with forecasting, battery scheduling, anomaly detection, and safety filtering<br>مشروع MATLAB متكامل للتنبؤ وجدولة البطارية وكشف الشذوذ ومرشح الأمان</div>
-</div>
+  <div class="hero">
+    <div class="lecture-number">LAB 20 | المخبر 20</div>
+    <h1>Autonomous Microgrid Supervisor</h1>
+    <div class="hero-ar">مشرف ذاتي التشغيل لشبكة مصغرة</div>
+    <div class="subtitle">Integrated MATLAB Capstone with Forecasting, Battery Scheduling, Anomaly Detection, and Safety Filtering<br>مشروع MATLAB متكامل للتنبؤ وجدولة البطارية وكشف الشذوذ ومرشح الأمان</div>
+    <div class="toc"><a href="#architecture">Architecture</a><a href="#model">Model</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#validation">Validation</a><a href="#tasks">Tasks</a></div>
+  </div>
 
-<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
-<li>Simulate a 24-hour microgrid with load, PV, battery, and grid exchange.</li>
-<li>Forecast one hour ahead using a simple predictive model.</li>
-<li>Schedule battery actions using an economic policy.</li>
-<li>Detect abnormal measurements.</li>
-<li>Apply deterministic SOC and grid-power safety limits.</li>
-<li>Compare autonomous operation with a no-control baseline.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف المخبر</h2><ul>
-<li>محاكاة شبكة مصغرة لمدة 24 ساعة.</li><li>التنبؤ بالساعة التالية.</li>
-<li>جدولة البطارية اقتصاديًا.</li><li>كشف القياسات الشاذة.</li>
-<li>تطبيق حدود SOC وقدرة الشبكة.</li><li>المقارنة مع خط أساس.</li>
-</ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Simulate a 24-hour microgrid with load, PV, battery, and grid exchange.</li><li>Validate measurements and detect anomalies.</li><li>Forecast one hour ahead using a transparent predictor.</li><li>Schedule battery actions economically.</li><li>Apply deterministic SOC and grid-power safety filters.</li><li>Compare autonomous operation with a no-control baseline.</li><li>Integrate modules developed throughout the course.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>محاكاة شبكة مصغرة لمدة 24 ساعة.</li><li>التحقق من القياسات وكشف الشذوذ.</li><li>التنبؤ بالساعة التالية.</li><li>جدولة البطارية اقتصاديًا.</li><li>تطبيق حدود SOC وقدرة الشبكة.</li><li>المقارنة مع خط أساس دون تحكم.</li><li>دمج وحدات المقرر ضمن مشروع واحد.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Integrated Control Loop</h2>
-<div class="flow">
-<div class="flow-box">Measure</div><div class="arrow">→</div>
-<div class="flow-box">Validate</div><div class="arrow">→</div>
-<div class="flow-box">Forecast</div><div class="arrow">→</div>
-<div class="flow-box">Propose action</div><div class="arrow">→</div>
-<div class="flow-box">Safety filter</div><div class="arrow">→</div>
-<div class="flow-box">Execute</div>
-</div></div>
-<div class="ar"><h2>1. حلقة التحكم المتكاملة</h2><p>تبدأ بالقياس والتحقق ثم التنبؤ واقتراح القرار وفلترته قبل التنفيذ.</p></div></section>
+  <section id="architecture"><div class="en"><h2>1. Integrated Control Architecture</h2><div class="flow"><div class="flow-box">Measure</div><div class="arrow">→</div><div class="flow-box">Validate</div><div class="arrow">→</div><div class="flow-box">Forecast</div><div class="arrow">→</div><div class="flow-box">Propose Action</div><div class="arrow">→</div><div class="flow-box">Safety Filter</div><div class="arrow">→</div><div class="flow-box">Execute</div></div><div class="highlight">Every autonomous action passes through deterministic safety checks before execution.</div></div><div class="ar"><h2>1. البنية المتكاملة للتحكم</h2><p>تبدأ بالقياس والتحقق ثم التنبؤ واقتراح القرار وفلترته قبل التنفيذ.</p></div></section>
 
-<section><div class="en"><h2>2. Complete MATLAB Script</h2>
-<pre><code>%% Lab 20: Autonomous Microgrid Supervisor
-clear; clc; close all;
-rng(20);
+  <section id="model"><div class="en"><h2>2. Mathematical Model</h2><div class="formula">P<sub>grid</sub>=P<sub>load</sub>−P<sub>PV</sub>−P<sub>batt</sub></div><div class="formula">SOC<sub>k+1</sub>=SOC<sub>k</sub>+η<sub>c</sub>P<sub>c</sub>/E−P<sub>d</sub>/(η<sub>d</sub>E)</div><div class="formula">Cost=Σ P<sub>grid,k</sub>·Price<sub>k</sub></div><div class="formula">P<sub>safe</sub>=Project(P<sub>proposed</sub>, feasible set)</div><div class="warning">The economic policy is subordinate to SOC, power, and grid-import constraints.</div></div><div class="ar"><h2>2. النموذج الرياضي</h2><p>تحسب قدرة الشبكة من الحمل والطاقة الشمسية والبطارية، ثم يُسقط القرار على مجموعة الأفعال الآمنة.</p></div></section>
 
-%% 1) Time series
-T = 24;
-hour = (0:T-1)';
+  <section id="workflow"><div class="en"><h2>3. Engineering Workflow</h2><div class="flow"><div class="flow-box">Create Profiles</div><div class="arrow">→</div><div class="flow-box">Validate Data</div><div class="arrow">→</div><div class="flow-box">Forecast Net Load</div><div class="arrow">→</div><div class="flow-box">Schedule Battery</div><div class="arrow">→</div><div class="flow-box">Verify Safety</div></div><ol><li>Create hourly load, PV, and price profiles.</li><li>Insert and detect one abnormal measurement.</li><li>Forecast net demand.</li><li>Propose charge, idle, or discharge actions.</li><li>Apply SOC and grid-limit constraints.</li><li>Evaluate cost, peak reduction, alarms, and violations.</li></ol></div><div class="ar"><h2>3. سير العمل الهندسي</h2><p>ننشئ البيانات ونتحقق منها ونتنبأ بالحمل الصافي ثم نقرر ونطبق مرشحات الأمان ونقيّم النتائج.</p></div></section>
 
-loadKW = [2.1 2.0 1.9 1.8 1.9 2.3 ...
-          3.0 3.8 4.4 4.7 4.5 4.2 ...
-          4.0 4.1 4.5 5.2 6.0 6.8 ...
-          6.4 5.7 4.9 4.1 3.2 2.6]';
+  <section id="code"><div class="en"><h2>4. Complete MATLAB Script</h2><pre><code>%% Lab 20: Autonomous Microgrid Supervisor
+clear; clc; close all; rng(20);
 
+T = 24; hour = (0:T-1)';
+loadKW = [2.1 2.0 1.9 1.8 1.9 2.3 3.0 3.8 4.4 4.7 4.5 4.2 ...
+          4.0 4.1 4.5 5.2 6.0 6.8 6.4 5.7 4.9 4.1 3.2 2.6]';
 pvKW = max(0,5.5*sin(pi*(hour-6)/12));
 pvKW = pvKW.*(0.90+0.08*randn(T,1));
+price = [0.18*ones(6,1);0.25*ones(10,1);0.42*ones(5,1);0.23*ones(3,1)];
 
-price = [0.18*ones(6,1); ...
-         0.25*ones(10,1); ...
-         0.42*ones(5,1); ...
-         0.23*ones(3,1)];
-
-%% 2) Insert one abnormal sensor measurement
 loadMeasured = loadKW + 0.08*randn(T,1);
 loadMeasured(18) = loadMeasured(18)+4.5;
 
-%% 3) Battery parameters
-capacity = 12;       % kWh
-pMax = 3.0;          % kW
-etaC = 0.95;
-etaD = 0.95;
-socMin = 0.10;
-socMax = 0.90;
-soc = zeros(T+1,1);
-soc(1) = 0.50;
+capacity=12; pMax=3.0; etaC=0.95; etaD=0.95;
+socMin=0.10; socMax=0.90; gridLimit=7.0;
+soc=zeros(T+1,1); soc(1)=0.50;
+batteryPower=zeros(T,1); gridPower=zeros(T,1);
+forecastLoad=zeros(T,1); alarm=false(T,1); cost=zeros(T,1);
 
-gridLimit = 7.0;     % kW
-batteryPower = zeros(T,1);
-gridPower = zeros(T,1);
-forecastLoad = zeros(T,1);
-alarm = false(T,1);
-cost = zeros(T,1);
+baselineGrid=max(0,loadKW-pvKW);
+baselineCost=sum(baselineGrid.*price);
 
-%% 4) Baseline cost without battery
-baselineGrid = max(0,loadKW-pvKW);
-baselineCost = sum(baselineGrid.*price);
-
-%% 5) Autonomous loop
-for k = 1:T
-
-    % A) Measurement validation
-    if k &gt;= 4
-        recent = loadMeasured(k-3:k-1);
-        mu = mean(recent);
-        sigma = std(recent);
-
-        if sigma &lt; 0.05
-            sigma = 0.05;
-        end
-
-        zScore = abs(loadMeasured(k)-mu)/sigma;
-
-        if zScore &gt; 4
-            alarm(k) = true;
-
-            % Replace suspicious measurement with local estimate
-            validatedLoad = mu;
+for k=1:T
+    if k&gt;=4
+        recent=loadMeasured(k-3:k-1);
+        mu=mean(recent); sigma=max(std(recent),0.05);
+        zScore=abs(loadMeasured(k)-mu)/sigma;
+        if zScore&gt;4
+            alarm(k)=true; validatedLoad=mu;
         else
-            validatedLoad = loadMeasured(k);
+            validatedLoad=loadMeasured(k);
         end
     else
-        validatedLoad = loadMeasured(k);
+        validatedLoad=loadMeasured(k);
     end
 
-    % B) One-step forecast
-    if k == 1
-        forecastLoad(k) = validatedLoad;
+    if k==1
+        forecastLoad(k)=validatedLoad;
     else
-        forecastLoad(k) = ...
-            0.65*validatedLoad + ...
-            0.35*loadMeasured(k-1);
+        forecastLoad(k)=0.65*validatedLoad+0.35*loadMeasured(k-1);
     end
+    netForecast=forecastLoad(k)-pvKW(k);
 
-    netForecast = forecastLoad(k)-pvKW(k);
-
-    % C) Economic action proposal
-    if price(k) &lt;= 0.20
-        proposedPower = -pMax;      % charge
-    elseif price(k) &gt;= 0.40
-        proposedPower = pMax;       % discharge
+    if price(k)&lt;=0.20
+        proposedPower=-pMax;
+    elseif price(k)&gt;=0.40
+        proposedPower=pMax;
     else
-        proposedPower = 0;
+        proposedPower=0;
+    end
+    if netForecast&gt;gridLimit
+        proposedPower=min(pMax,netForecast-gridLimit);
     end
 
-    % D) Peak-support override
-    if netForecast &gt; gridLimit
-        proposedPower = ...
-            min(pMax,netForecast-gridLimit);
-    end
-
-    % E) Safety filter for SOC limits
-    maxCharge = ...
-        (socMax-soc(k))*capacity/etaC;
-    maxDischarge = ...
-        (soc(k)-socMin)*capacity*etaD;
-
-    if proposedPower &lt; 0
-        safePower = -min(-proposedPower,maxCharge);
+    maxCharge=(socMax-soc(k))*capacity/etaC;
+    maxDischarge=(soc(k)-socMin)*capacity*etaD;
+    if proposedPower&lt;0
+        safePower=-min(-proposedPower,maxCharge);
     else
-        safePower = min(proposedPower,maxDischarge);
+        safePower=min(proposedPower,maxDischarge);
     end
 
-    % F) Grid-limit safety filter
-    rawGridPower = ...
-        validatedLoad-pvKW(k)-safePower;
-
-    if rawGridPower &gt; gridLimit
-        extraDischarge = ...
-            min(gridLimit-rawGridPower+pMax, ...
-                maxDischarge-safePower);
-
-        extraDischarge = max(0,extraDischarge);
-        safePower = safePower+extraDischarge;
+    rawGridPower=validatedLoad-pvKW(k)-safePower;
+    if rawGridPower&gt;gridLimit
+        extra=min(rawGridPower-gridLimit,maxDischarge-safePower);
+        safePower=safePower+max(0,extra);
     end
 
-    batteryPower(k) = safePower;
-
-    % G) Battery state transition
-    if safePower &lt; 0
-        soc(k+1) = soc(k) + ...
-            etaC*(-safePower)/capacity;
+    batteryPower(k)=safePower;
+    if safePower&lt;0
+        soc(k+1)=soc(k)+etaC*(-safePower)/capacity;
     else
-        soc(k+1) = soc(k) - ...
-            safePower/(etaD*capacity);
+        soc(k+1)=soc(k)-safePower/(etaD*capacity);
     end
+    soc(k+1)=min(max(soc(k+1),socMin),socMax);
 
-    soc(k+1) = min(max(soc(k+1),socMin),socMax);
-
-    % H) Executed grid power and cost
-    gridPower(k) = max(0, ...
-        validatedLoad-pvKW(k)-safePower);
-
-    cost(k) = gridPower(k)*price(k);
+    gridPower(k)=max(0,validatedLoad-pvKW(k)-safePower);
+    cost(k)=gridPower(k)*price(k);
 end
 
-%% 6) Performance
-autonomousCost = sum(cost);
-saving = baselineCost-autonomousCost;
-peakReduction = max(baselineGrid)-max(gridPower);
+autonomousCost=sum(cost);
+saving=baselineCost-autonomousCost;
+peakReduction=max(baselineGrid)-max(gridPower);
 
-fprintf("Baseline cost   = %.2f EUR\n",baselineCost);
-fprintf("Autonomous cost = %.2f EUR\n",autonomousCost);
-fprintf("Saving          = %.2f EUR\n",saving);
-fprintf("Peak reduction  = %.2f kW\n",peakReduction);
-fprintf("Detected alarms = %d\n",sum(alarm));
-
-%% 7) Plots
-figure;
-plot(hour,loadMeasured,"o-",LineWidth=1.0); hold on;
-plot(hour,loadKW,"k",LineWidth=1.4);
-stem(hour(alarm),loadMeasured(alarm),"r",LineWidth=1.5);
-grid on;
-xlabel("Hour");
-ylabel("Load (kW)");
-legend("Measured","True","Alarm");
-title("Measurement Validation");
+fprintf('Baseline cost   = %.2f EUR\n',baselineCost);
+fprintf('Autonomous cost = %.2f EUR\n',autonomousCost);
+fprintf('Saving          = %.2f EUR\n',saving);
+fprintf('Peak reduction  = %.2f kW\n',peakReduction);
+fprintf('Detected alarms = %d\n',sum(alarm));
 
 figure;
-stairs(0:T,soc,LineWidth=1.5);
-grid on;
-xlabel("Hour");
-ylabel("SOC");
-title("Battery State of Charge");
+plot(hour,loadMeasured,'o-'); hold on;
+plot(hour,loadKW,'k','LineWidth',1.4);
+stem(hour(alarm),loadMeasured(alarm),'r'); grid on;
+legend('Measured','True','Alarm'); xlabel('Hour'); ylabel('Load (kW)');
+
+figure; stairs(0:T,soc,'LineWidth',1.5); grid on;
+xlabel('Hour'); ylabel('SOC');
+
+figure; stairs(hour,batteryPower,'LineWidth',1.4); grid on;
+xlabel('Hour'); ylabel('Battery Power (kW)');
 
 figure;
-stairs(hour,batteryPower,LineWidth=1.4);
-grid on;
-xlabel("Hour");
-ylabel("Battery Power (kW)");
-title("Battery Action: Positive = Discharge");
+plot(hour,baselineGrid,'--'); hold on;
+plot(hour,gridPower,'LineWidth',1.5); yline(gridLimit,'r:'); grid on;
+legend('Baseline','Autonomous','Grid Limit');
+xlabel('Hour'); ylabel('Grid Import (kW)');</code></pre></div><div class="ar"><h2>4. كود MATLAB الكامل</h2><p>ينفذ الكود حلقة ذاتية تشمل التحقق من القياسات والتنبؤ والقرار الاقتصادي ومرشحات الأمان والتنفيذ وتقييم الأداء.</p></div></section>
 
-figure;
-plot(hour,baselineGrid,"--",LineWidth=1.2); hold on;
-plot(hour,gridPower,LineWidth=1.5);
-yline(gridLimit,"r:");
-grid on;
-xlabel("Hour");
-ylabel("Grid Import (kW)");
-legend("Baseline","Autonomous","Grid Limit");
-title("Grid Import and Safety Limit");</code></pre></div>
-<div class="ar"><h2>2. الكود الكامل</h2>
-<p>ينفذ الكود حلقة ذاتية تشمل التحقق من القياسات والتنبؤ والقرار الاقتصادي ومرشح SOC وحد الشبكة والتنفيذ وتقييم الأداء.</p></div></section>
+  <section id="validation"><div class="en"><h2>5. Expected Results and Validation</h2><div class="grid"><div class="mini-card"><strong>Cost</strong><p>Autonomous cost should be lower than the baseline.</p></div><div class="mini-card"><strong>Peak Reduction</strong><p>Grid import should remain closer to the limit.</p></div><div class="mini-card"><strong>SOC Safety</strong><p>SOC must stay between 0.10 and 0.90.</p></div><div class="mini-card"><strong>Anomaly Detection</strong><p>The injected abnormal measurement should be flagged.</p></div></div><ul><li>Check cost savings and peak reduction.</li><li>Verify zero SOC-limit violations.</li><li>Measure forecast error.</li><li>Report alarm precision and recall when multiple anomalies are added.</li><li>Test PV forecast error and communication outages.</li></ul><div class="highlight">A successful capstone must be economical, safe, explainable, and robust—not merely functional.</div></div><div class="ar"><h2>5. النتائج المتوقعة والتحقق</h2><p>يجب خفض الكلفة والذروة مع الحفاظ على حدود SOC وكشف القياس الشاذ دون إنذارات مفرطة.</p></div></section>
 
-<section><div class="en"><h2>3. Measurement Validation</h2>
-<div class="formula">z = |measurement − local mean| / local standard deviation</div>
-<p>A suspicious measurement is replaced by a local estimate before control.</p>
-<div class="warning">In real systems, anomaly detection should use multiple channels, topology, temporal context, and independent validation.</div></div>
-<div class="ar"><h2>3. التحقق من القياسات</h2>
-<p>تُقارن القيمة الحالية بالمتوسط والانحراف المحليين، وتُستبدل القيمة الشاذة بتقدير مؤقت قبل اتخاذ القرار.</p></div></section>
+  <section id="tasks"><div class="en"><h2>6. Student Tasks</h2><ol><li>Replace the forecast with the LSTM from Lab 09.</li><li>Replace the rule policy with the DQN from Lab 12.</li><li>Add a GNN state-estimation module.</li><li>Simulate PV forecast error.</li><li>Simulate communication loss.</li><li>Add human approval for high-impact actions.</li><li>Compare rule-based, optimization-based, and RL control.</li></ol></div><div class="ar"><h2>6. مهام الطالب</h2><ol><li>استبدال التنبؤ بـ LSTM.</li><li>استبدال السياسة بوكيل DQN.</li><li>إضافة تقدير حالة باستخدام GNN.</li><li>إضافة خطأ توقع PV.</li><li>محاكاة انقطاع الاتصال.</li><li>إضافة موافقة بشرية للقرارات المهمة.</li><li>مقارنة التحكم القاعدي والتحسيني وRL.</li></ol></div></section>
 
-<section><div class="en"><h2>4. Forecasting Module</h2>
-<div class="formula">P̂_load(k)=0.65 P_validated(k)+0.35 P_measured(k−1)</div>
-<p>This simple model is intentionally transparent. It can later be replaced by LSTM or transformer forecasting.</p></div>
-<div class="ar"><h2>4. وحدة التنبؤ</h2>
-<p>يستخدم المثال نموذجًا بسيطًا شفافًا، ويمكن استبداله لاحقًا بـ LSTM أو Transformer.</p></div></section>
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Full autonomous-grid prototype:</strong> connect forecasting, digital twin, anomaly detection, optimization, safety filtering, uncertainty estimation, and operator assistance in one verified architecture.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">اربط التنبؤ والتوأم الرقمي وكشف الشذوذ والتحسين ومرشح الأمان وعدم اليقين ومساعد المشغل ضمن بنية واحدة.</div></div></section>
 
-<section><div class="en"><h2>5. Economic Policy</h2>
-<ul><li>Charge during low-price hours.</li><li>Discharge during high-price hours.</li><li>Support the grid when predicted import exceeds the limit.</li></ul></div>
-<div class="ar"><h2>5. السياسة الاقتصادية</h2>
-<p>تشحن البطارية عند السعر المنخفض وتفرغ عند السعر المرتفع وتدعم الشبكة عند تجاوز القدرة المتوقعة للحد.</p></div></section>
-
-<section><div class="en"><h2>6. Safety Filter</h2>
-<p>The proposed action is clipped by available energy and SOC limits before execution.</p>
-<div class="formula">P_safe = Project(P_proposed, feasible battery set)</div></div>
-<div class="ar"><h2>6. مرشح الأمان</h2>
-<p>يُسقط القرار المقترح على مجموعة الأفعال الممكنة التي تحقق حدود SOC والطاقة والقدرة.</p></div></section>
-
-<section><div class="en"><h2>7. Performance Indicators</h2>
-<div class="grid">
-<div class="mini-card"><strong>Energy cost</strong><p>Autonomous versus baseline cost.</p></div>
-<div class="mini-card"><strong>Peak reduction</strong><p>Reduction in maximum grid import.</p></div>
-<div class="mini-card"><strong>Safety</strong><p>Number of SOC or grid-limit violations.</p></div>
-<div class="mini-card"><strong>Anomaly detection</strong><p>Detected suspicious measurements.</p></div>
-</div></div>
-<div class="ar"><h2>7. مؤشرات الأداء</h2>
-<p>تشمل الكلفة وخفض الذروة والمخالفات وعدد القياسات الشاذة المكتشفة.</p></div></section>
-
-<section><div class="en"><h2>8. Student Experiments</h2><div class="task"><ol>
-<li>Replace the simple forecast with the LSTM from Lab 09.</li>
-<li>Replace the rule-based policy with the DQN agent from Lab 12.</li>
-<li>Add a GNN-based state-estimation module.</li>
-<li>Simulate PV forecast error.</li>
-<li>Simulate a communication outage.</li>
-<li>Add a human-approval flag for high-impact actions.</li>
-</ol></div></div>
-<div class="ar"><h2>8. تجارب الطالب</h2><div class="task"><ol>
-<li>استبدل التنبؤ بـ LSTM.</li><li>استبدل السياسة بوكيل DQN.</li>
-<li>أضف تقدير حالة باستخدام GNN.</li><li>أضف خطأ توقع PV.</li>
-<li>حاكِ انقطاع الاتصال.</li><li>أضف موافقة بشرية للقرارات المهمة.</li>
-</ol></div></div></section>
-
-<section><div class="en"><h2>9. Capstone Extension</h2>
-<div class="research"><strong>Full autonomous-grid prototype:</strong> Connect the forecasting, digital twin, anomaly detection, optimization, safety filter, and operator-assistant modules developed throughout the course.</div></div>
-<div class="ar"><h2>9. مشروع ختامي</h2><div class="research">اربط وحدات التنبؤ والتوأم الرقمي وكشف الشذوذ والتحسين ومرشح الأمان ومساعد المشغل ضمن نموذج واحد.</div></div></section>
-
-<section><div class="en"><h2>10. Laboratory Report</h2><ul>
-<li>Draw the autonomous-loop architecture.</li><li>Explain every module.</li><li>Report cost and peak reduction.</li>
-<li>Analyze anomaly detection.</li><li>List all safety constraints.</li><li>Discuss human oversight and failure modes.</li></ul></div>
-<div class="ar"><h2>10. تقرير المخبر</h2><p>يتضمن المعمارية وشرح الوحدات والكلفة وخفض الذروة وكشف الشذوذ وقيود الأمان والإشراف البشري وحالات الفشل.</p></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Why must measurement validation precede control?</li><li>How does the safety filter modify actions?</li><li>What is the difference between forecast error and anomaly?</li><li>Why is a baseline comparison necessary?</li><li>How should uncertainty reduce autonomous authority?</li><li>Which modules require human oversight?</li><li>How can this supervisor be validated before deployment?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>لماذا يسبق التحقق من القياس عملية التحكم؟</li><li>كيف يعدل مرشح الأمان القرار؟</li><li>ما الفرق بين خطأ التنبؤ والشذوذ؟</li><li>لماذا نحتاج خط أساس للمقارنة؟</li><li>كيف يؤثر عدم اليقين في صلاحيات النظام؟</li><li>ما الوحدات التي تحتاج إشرافًا بشريًا؟</li><li>كيف نتحقق من المشرف قبل النشر؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
