@@ -1,125 +1,52 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-<title>Lecture 10 - Transformer Models and Attention</title>
-<style>
-:root{--bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;--muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;--red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
-.container{width:min(1050px,92%);margin:auto}
-header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
-nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
-.logo{font-weight:bold}.logo span{color:var(--blue)}
-.back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
-.hero{text-align:center;padding:58px 0 34px}.lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
-h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}.hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}.subtitle{color:var(--muted);margin-top:10px}
-.toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}.toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
-section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
-h2{margin-top:0;color:#edf8ff}h3{color:var(--blue)}p,li{color:#d8e2ec}
-.en{direction:ltr;text-align:left}.ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
-.highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}.ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
-.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
-.warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
-.research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
-.formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.15rem;font-family:"Times New Roman",serif;overflow-x:auto}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}.mini-card strong{color:white}
-.flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}.flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}.arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
-.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}th,td{border:1px solid var(--line);padding:11px;text-align:center}th{background:#0b1b2c;color:#eaf7ff}
-pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
-code{font-family:Consolas,monospace}.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
-.task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
-footer{text-align:center;color:var(--muted);padding:35px 0}@media(max-width:750px){.grid,.grid3{grid-template-columns:1fr}.back{font-size:.86rem}}
-</style>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-quiz.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body><header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <title>Lecture 10 - Transformer Models and Attention</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-quiz.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260824-7">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero"><div class="lecture-number">LECTURE 10 | المحاضرة 10</div><h1>Transformer Models and Attention</h1>
-<div class="hero-ar">نماذج المحوّل وآلية الانتباه</div>
-<div class="subtitle">Modern sequence modeling for load, renewable-energy, and grid-event forecasting<br>نمذجة حديثة للسلاسل الزمنية في الأحمال والطاقة المتجددة وأحداث الشبكة</div>
-<div class="toc"><a href="#objectives">Objectives</a><a href="#attention">Attention</a><a href="#self">Self-Attention</a><a href="#multi">Multi-Head</a><a href="#position">Position</a><a href="#power">Power Applications</a></div></div>
+  <div class="hero"><div class="lecture-number">LECTURE 10 | المحاضرة 10</div><h1>Transformer Models and Attention</h1><div class="hero-ar">نماذج المحوّل وآلية الانتباه</div><div class="subtitle">Modern Sequence Modeling for Load, Renewable-Energy, and Grid-Event Forecasting<br>نمذجة حديثة للسلاسل الزمنية في الأحمال والطاقة المتجددة وأحداث الشبكة</div></div>
 
-<section id="objectives"><div class="en"><h2>🎯 Learning Objectives</h2><ul>
-<li>Explain why recurrence is not required in transformer models.</li><li>Derive scaled dot-product attention from queries, keys, and values.</li><li>Understand self-attention, multi-head attention, and positional encoding.</li><li>Describe an encoder block and residual connections.</li><li>Compare transformers with RNN and LSTM for power-system time series.</li><li>Recognize data, computation, and interpretability limitations.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>فهم سبب عدم حاجة Transformer إلى التكرار الزمني التقليدي.</li><li>اشتقاق الانتباه النقطي المُقاس من Q وK وV.</li><li>فهم الانتباه الذاتي ومتعدد الرؤوس والترميز الموضعي.</li><li>شرح كتلة Encoder والوصلات المتبقية.</li><li>مقارنة Transformer مع RNN وLSTM في بيانات الطاقة.</li><li>معرفة القيود الحسابية والبيانية والتفسيرية.</li></ul></div></section>
+  <section><div class="en"><h2>🎯 Learning Objectives</h2><ul><li>Explain why recurrence is not required in Transformer models.</li><li>Derive scaled dot-product attention from queries, keys, and values.</li><li>Understand self-attention, multi-head attention, and positional encoding.</li><li>Describe an encoder block and residual connections.</li><li>Compare Transformers with RNN and LSTM for power-system time series.</li><li>Recognize computational and interpretability limitations.</li></ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>فهم سبب عدم حاجة Transformer إلى التكرار الزمني التقليدي.</li><li>اشتقاق الانتباه النقطي المقاس من Q وK وV.</li><li>فهم الانتباه الذاتي ومتعدد الرؤوس والترميز الموضعي.</li><li>شرح كتلة Encoder والوصلات المتبقية.</li><li>مقارنة Transformer مع RNN وLSTM.</li><li>معرفة القيود الحسابية والتفسيرية.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Why Transformers?</h2><p>RNNs process a sequence step by step. Transformers instead compare time steps directly through attention.</p>
-<div class="flow"><div class="flow-box">All time steps</div><div class="arrow">→</div><div class="flow-box">Attention scores</div><div class="arrow">→</div><div class="flow-box">Weighted context</div><div class="arrow">→</div><div class="flow-box">Forecast</div></div>
-<div class="highlight">A transformer can learn that the load at 18:00 today is strongly related to 18:00 yesterday, even when many time steps separate them.</div></div>
-<div class="ar"><h2>1. لماذا نستخدم Transformer؟</h2><p>تعالج RNN البيانات خطوة بعد خطوة، بينما تسمح آلية الانتباه لكل خطوة زمنية بالنظر مباشرة إلى الخطوات الأخرى وتحديد أهميتها.</p></div></section>
+  <section><div class="en"><h2>1. Why Transformers?</h2><div class="flow"><div class="flow-box">All Time Steps</div><div class="arrow">→</div><div class="flow-box">Attention Scores</div><div class="arrow">→</div><div class="flow-box">Weighted Context</div><div class="arrow">→</div><div class="flow-box">Forecast</div></div><div class="highlight">Attention allows distant time steps to interact directly instead of passing information sequentially through every intermediate step.</div></div><div class="ar"><h2>1. لماذا نستخدم Transformer؟</h2><p>تسمح آلية الانتباه لكل خطوة زمنية بالنظر مباشرة إلى الخطوات الأخرى وتحديد أهميتها.</p></div></section>
 
-<section id="attention"><div class="en"><h2>2. Query, Key, and Value</h2><p>For each input representation xₜ, three learned projections are created:</p>
-<div class="formula">qₜ=W<sub>Q</sub>xₜ, &nbsp; kₜ=W<sub>K</sub>xₜ, &nbsp; vₜ=W<sub>V</sub>xₜ</div>
-<div class="grid3"><div class="mini-card"><strong>Query Q</strong><p>What information is this time step looking for?</p></div><div class="mini-card"><strong>Key K</strong><p>What information does each time step offer?</p></div><div class="mini-card"><strong>Value V</strong><p>What content is transferred if a step is relevant?</p></div></div></div>
-<div class="ar"><h2>2. الاستعلام والمفتاح والقيمة</h2><p>يُحوّل كل متجه دخل إلى ثلاثة متجهات متعلمة: الاستعلام Q، المفتاح K، والقيمة V. يحدد التشابه بين Q وK مقدار الاستفادة من V.</p></div></section>
+  <section><div class="en"><h2>2. Query, Key, and Value</h2><div class="formula">qₜ=W<sub>Q</sub>xₜ, &nbsp; kₜ=W<sub>K</sub>xₜ, &nbsp; vₜ=W<sub>V</sub>xₜ</div><div class="grid"><div class="mini-card"><strong>Query Q</strong><p>What information is this step seeking?</p></div><div class="mini-card"><strong>Key K</strong><p>What information does each step offer?</p></div><div class="mini-card"><strong>Value V</strong><p>What content is transferred?</p></div></div></div><div class="ar"><h2>2. الاستعلام والمفتاح والقيمة</h2><p>يحدد التشابه بين Q وK مقدار الاستفادة من V في بناء السياق.</p></div></section>
 
-<section id="self"><div class="en"><h2>3. Scaled Dot-Product Attention</h2>
-<div class="formula">S = QKᵀ</div><p>Large dot products can make softmax too sharp. Therefore, scale by the square root of key dimension d<sub>k</sub>:</p>
-<div class="formula">A = softmax(QKᵀ / √d<sub>k</sub>)</div><div class="formula">Attention(Q,K,V)=AV</div>
-<div class="note">Each row of A sums to one and represents how one time step distributes attention over the full sequence.</div></div>
-<div class="ar"><h2>3. الانتباه النقطي المُقاس</h2><p>تُحسب درجات التشابه بين الاستعلامات والمفاتيح، ثم تُقسم على √d<sub>k</sub> وتُمرر عبر Softmax. بعد ذلك تُستخدم الأوزان لجمع متجهات القيمة.</p></div></section>
+  <section><div class="en"><h2>3. Scaled Dot-Product Attention</h2><div class="formula">S=QKᵀ</div><div class="formula">A=softmax(QKᵀ/√d<sub>k</sub>)</div><div class="formula">Attention(Q,K,V)=AV</div><div class="note">Each row of A sums to one and represents the attention distribution of one time step.</div></div><div class="ar"><h2>3. الانتباه النقطي المقاس</h2><p>تُحسب درجات التشابه ثم تُقسم على √d<sub>k</sub> وتُمرر عبر Softmax للحصول على أوزان الانتباه.</p></div></section>
 
-<section><div class="en"><h2>4. Numerical Example</h2><p>Suppose one query has similarities [2, 1, 0] with three keys.</p>
-<div class="formula">softmax([2,1,0]) ≈ [0.665, 0.245, 0.090]</div>
-<p>The first time step contributes about 66.5% of the context, the second 24.5%, and the third 9%.</p></div>
-<div class="ar"><h2>4. مثال عددي</h2><p>إذا كانت درجات التشابه [2،1،0]، فإن Softmax تحولها إلى أوزان موجبة مجموعها واحد، ويصبح العنصر الأول الأكثر تأثيرًا.</p></div></section>
+  <section><div class="en"><h2>4. Numerical Example</h2><div class="formula">softmax([2,1,0])≈[0.665,0.245,0.090]</div><p>The first item contributes most strongly to the resulting context.</p></div><div class="ar"><h2>4. مثال عددي</h2><p>تحول Softmax الدرجات إلى أوزان موجبة مجموعها واحد، ويكون العنصر الأول الأكثر تأثيرًا.</p></div></section>
 
-<section id="multi"><div class="en"><h2>5. Multi-Head Attention</h2><p>One attention head may focus on short-term variation, another on daily periodicity, and another on weather-related dependencies.</p>
-<div class="formula">headᵢ = Attention(QWᵢ<sup>Q</sup>,KWᵢ<sup>K</sup>,VWᵢ<sup>V</sup>)</div>
-<div class="formula">MultiHead = Concat(head₁,...,headₕ)W<sup>O</sup></div></div>
-<div class="ar"><h2>5. الانتباه متعدد الرؤوس</h2><p>يتيح تعدد الرؤوس تعلم أنواع مختلفة من العلاقات في الوقت نفسه، مثل العلاقة مع الساعة السابقة، واليوم السابق، ونمط نهاية الأسبوع.</p></div></section>
+  <section><div class="en"><h2>5. Multi-Head Attention</h2><div class="formula">headᵢ=Attention(QWᵢ<sup>Q</sup>,KWᵢ<sup>K</sup>,VWᵢ<sup>V</sup>)</div><div class="formula">MultiHead=Concat(head₁,...,headₕ)W<sup>O</sup></div><div class="highlight">Different heads can learn short-term variation, daily periodicity, and weather-related dependencies simultaneously.</div></div><div class="ar"><h2>5. الانتباه متعدد الرؤوس</h2><p>يتيح تعدد الرؤوس تعلم أنواع مختلفة من العلاقات الزمنية في الوقت نفسه.</p></div></section>
 
-<section id="position"><div class="en"><h2>6. Positional Information</h2><p>Attention alone does not know sequence order. A position representation is added to each time step.</p>
-<div class="formula">zₜ = xₜ + pₜ</div><p>Positions can be learned or generated using sinusoidal functions.</p>
-<div class="formula">PE(pos,2i)=sin(pos/10000<sup>2i/d</sup>)<br>PE(pos,2i+1)=cos(pos/10000<sup>2i/d</sup>)</div></div>
-<div class="ar"><h2>6. المعلومات الموضعية</h2><p>آلية الانتباه لا تعرف تلقائيًا ترتيب الزمن، لذلك نضيف تمثيلًا لموضع كل خطوة. يمكن تعلم هذا التمثيل أو حسابه بدوال جيبية.</p></div></section>
+  <section><div class="en"><h2>6. Positional Information</h2><div class="formula">zₜ=xₜ+pₜ</div><div class="formula">PE(pos,2i)=sin(pos/10000<sup>2i/d</sup>)</div><div class="formula">PE(pos,2i+1)=cos(pos/10000<sup>2i/d</sup>)</div><p>Attention alone does not know sequence order, so positional information must be added.</p></div><div class="ar"><h2>6. المعلومات الموضعية</h2><p>يُضاف تمثيل لموضع كل خطوة لأن الانتباه وحده لا يعرف ترتيب الزمن.</p></div></section>
 
-<section><div class="en"><h2>7. Transformer Encoder Block</h2>
-<div class="flow"><div class="flow-box">Input + Position</div><div class="arrow">→</div><div class="flow-box">Multi-Head Attention</div><div class="arrow">→</div><div class="flow-box">Add & Normalize</div><div class="arrow">→</div><div class="flow-box">Feed-Forward Network</div><div class="arrow">→</div><div class="flow-box">Add & Normalize</div></div>
-<div class="formula">FFN(x)=W₂ φ(W₁x+b₁)+b₂</div><div class="highlight">Residual connections preserve information and improve gradient flow through deep stacks.</div></div>
-<div class="ar"><h2>7. كتلة Encoder</h2><p>تتكون من انتباه متعدد الرؤوس، وصلة متبقية مع تطبيع، ثم شبكة أمامية صغيرة لكل خطوة، ثم وصلة متبقية أخرى.</p></div></section>
+  <section><div class="en"><h2>7. Transformer Encoder Block</h2><div class="flow"><div class="flow-box">Input + Position</div><div class="arrow">→</div><div class="flow-box">Multi-Head Attention</div><div class="arrow">→</div><div class="flow-box">Add & Normalize</div><div class="arrow">→</div><div class="flow-box">Feed-Forward</div><div class="arrow">→</div><div class="flow-box">Add & Normalize</div></div><div class="formula">FFN(x)=W₂φ(W₁x+b₁)+b₂</div><div class="highlight">Residual connections preserve information and improve gradient flow.</div></div><div class="ar"><h2>7. كتلة Encoder</h2><p>تتكون من الانتباه متعدد الرؤوس والوصلات المتبقية والتطبيع وشبكة تغذية أمامية.</p></div></section>
 
-<section><div class="en"><h2>8. Causal and Non-Causal Attention</h2><div class="grid"><div class="mini-card"><strong>Non-causal</strong><p>Every position can see all positions. Useful for classification or complete-window regression.</p></div><div class="mini-card"><strong>Causal</strong><p>A position can only attend to present and past steps. Necessary for autoregressive forecasting.</p></div></div>
-<div class="warning">Using future samples inside the attention window during training creates information leakage and unrealistically optimistic accuracy.</div></div>
-<div class="ar"><h2>8. الانتباه السببي وغير السببي</h2><p>في التنبؤ الذاتي يجب منع النموذج من رؤية المستقبل باستخدام قناع سببي. أما عند تلخيص نافذة تاريخية مكتملة لتوقع قيمة واحدة، فيمكن استخدام النافذة كلها.</p></div></section>
+  <section><div class="en"><h2>8. Causal and Non-Causal Attention</h2><div class="grid"><div class="mini-card"><strong>Causal Attention</strong><p>Prevents access to future time steps.</p></div><div class="mini-card"><strong>Non-Causal Attention</strong><p>Allows access to the full input window.</p></div></div><div class="warning">Forecasting systems must prevent future-information leakage.</div></div><div class="ar"><h2>8. الانتباه السببي وغير السببي</h2><p>يمنع الانتباه السببي الوصول إلى المستقبل، وهو ضروري في التنبؤ الزمني الحقيقي.</p></div></section>
 
-<section><div class="en"><h2>9. Transformer vs. LSTM</h2><div class="table-wrap"><table><tr><th>Aspect</th><th>LSTM</th><th>Transformer</th></tr>
-<tr><td>Sequence processing</td><td>Step-by-step</td><td>Parallel within a window</td></tr><tr><td>Long dependencies</td><td>Controlled memory</td><td>Direct attention paths</td></tr>
-<tr><td>Data requirement</td><td>Often moderate</td><td>Often larger</td></tr><tr><td>Computational cost</td><td>Linear recurrence</td><td>Attention often O(T²)</td></tr>
-<tr><td>Interpretability</td><td>Hidden-state analysis</td><td>Attention maps, with caution</td></tr></table></div></div>
-<div class="ar"><h2>9. مقارنة Transformer وLSTM</h2><p>يمتاز Transformer بالتوازي والوصول المباشر للعلاقات البعيدة، لكنه قد يحتاج بيانات وحوسبة أكبر، خصوصًا عندما تطول المتتالية.</p></div></section>
+  <section><div class="en"><h2>9. Transformer vs RNN and LSTM</h2><div class="table-wrap"><table><tr><th>Property</th><th>RNN/LSTM</th><th>Transformer</th></tr><tr><td>Processing</td><td>Sequential</td><td>Parallel over sequence</td></tr><tr><td>Long-range dependencies</td><td>Possible but harder</td><td>Direct attention links</td></tr><tr><td>Memory cost</td><td>Moderate</td><td>Can grow quadratically</td></tr><tr><td>Small datasets</td><td>Often competitive</td><td>May overfit</td></tr></table></div></div><div class="ar"><h2>9. مقارنة Transformer مع RNN وLSTM</h2><p>يمتاز Transformer بالمعالجة المتوازية والروابط المباشرة، لكنه قد يحتاج إلى بيانات وحوسبة أكبر.</p></div></section>
 
-<section id="power"><div class="en"><h2>10. Applications in Electrical Power Systems</h2><div class="grid">
-<div class="mini-card"><strong>Load forecasting</strong><p>Hourly and day-ahead demand prediction.</p></div><div class="mini-card"><strong>PV forecasting</strong><p>Combining historical output and weather variables.</p></div>
-<div class="mini-card"><strong>Wind forecasting</strong><p>Learning delayed weather-power dependencies.</p></div><div class="mini-card"><strong>Electricity prices</strong><p>Capturing market and calendar interactions.</p></div>
-<div class="mini-card"><strong>Event detection</strong><p>Classifying disturbances from multichannel sequences.</p></div><div class="mini-card"><strong>Asset monitoring</strong><p>Long-window condition and degradation analysis.</p></div></div></div>
-<div class="ar"><h2>10. التطبيقات في أنظمة الطاقة</h2><p>تشمل التنبؤ بالأحمال والطاقة الشمسية والرياح والأسعار، وتحليل أحداث الشبكة ومراقبة حالة المعدات.</p></div></section>
+  <section><div class="en"><h2>10. Applications in Power Systems</h2><div class="grid"><div class="mini-card"><strong>Load Forecasting</strong><p>Short- and long-horizon demand.</p></div><div class="mini-card"><strong>Renewable Forecasting</strong><p>PV and wind time series.</p></div><div class="mini-card"><strong>Event Detection</strong><p>Disturbances and anomalies.</p></div><div class="mini-card"><strong>Price Forecasting</strong><p>Market time-series modeling.</p></div><div class="mini-card"><strong>State Estimation</strong><p>Temporal measurement relationships.</p></div><div class="mini-card"><strong>Asset Monitoring</strong><p>Long-term sensor patterns.</p></div></div></div><div class="ar"><h2>10. التطبيقات في نظم القدرة</h2><p>تشمل التنبؤ بالحمل والمتجددة والأسعار وكشف الأحداث ومراقبة الأصول وتقدير الحالة.</p></div></section>
 
-<section><div class="en"><h2>11. Practical Design Choices</h2><ul><li>Sequence length and forecast horizon</li><li>Number of attention heads</li><li>Embedding dimension</li><li>Number of encoder blocks</li><li>Dropout and regularization</li><li>Feature engineering and normalization</li></ul>
-<div class="note">The embedding dimension should be compatible with the number of heads so each head receives a meaningful channel subspace.</div></div>
-<div class="ar"><h2>11. خيارات التصميم العملية</h2><p>من أهم الخيارات طول النافذة، عدد الرؤوس، بعد التمثيل، عدد الكتل، نسبة الإسقاط، وطريقة تجهيز الميزات.</p></div></section>
+  <section><div class="en"><h2>11. Limitations</h2><ul><li>Attention cost can scale quadratically with sequence length.</li><li>Large models may require substantial data and computation.</li><li>Attention weights are not always complete explanations.</li><li>Distribution shift can reduce performance after deployment.</li></ul></div><div class="ar"><h2>11. القيود</h2><p>قد تكون الكلفة الحسابية مرتفعة، كما أن أوزان الانتباه لا تعد دائمًا تفسيرًا كاملًا للقرار.</p></div></section>
 
-<section><div class="en"><h2>12. Limitations and Common Mistakes</h2><div class="grid">
-<div class="mini-card"><strong>Small datasets</strong><p>A large transformer may overfit.</p></div><div class="mini-card"><strong>Long windows</strong><p>Attention matrices grow quadratically.</p></div>
-<div class="mini-card"><strong>Leakage</strong><p>Future features may accidentally enter training inputs.</p></div><div class="mini-card"><strong>Attention ≠ explanation</strong><p>High attention weight is not always a causal explanation.</p></div></div></div>
-<div class="ar"><h2>12. القيود والأخطاء الشائعة</h2><p>أكثر المشكلات شيوعًا هي قلة البيانات، تضخم الكلفة مع النوافذ الطويلة، تسرب المستقبل، واعتبار خريطة الانتباه تفسيرًا سببيًا كاملًا.</p></div></section>
+  <section><div class="en"><h2>12. Engineering Workflow</h2><div class="flow"><div class="flow-box">Define Forecast</div><div class="arrow">→</div><div class="flow-box">Prepare Sequences</div><div class="arrow">→</div><div class="flow-box">Build Baseline</div><div class="arrow">→</div><div class="flow-box">Train Transformer</div><div class="arrow">→</div><div class="flow-box">Validate & Monitor</div></div></div><div class="ar"><h2>12. سير العمل الهندسي</h2><p>يجب بناء خط أساس، والحفاظ على التقسيم الزمني، ثم تقييم النموذج ومراقبته بعد التشغيل.</p></div></section>
 
-<section><div class="en"><h2>🔬 Research Corner</h2><div class="research"><strong>Emerging directions:</strong> Temporal Fusion Transformers, sparse attention, probabilistic forecasting, multimodal weather-grid models, and physics-guided transformer architectures.</div></div>
-<div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">من الاتجاهات الحديثة: Temporal Fusion Transformer، الانتباه المتناثر، التنبؤ الاحتمالي، دمج بيانات الطقس والشبكة، ودمج القيود الفيزيائية ضمن النموذج.</div></div></section>
-
-<section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Why is the factor √d<sub>k</sub> used?</li><li>What do Q, K, and V represent?</li><li>Why is positional encoding required?</li><li>What is the difference between causal and non-causal attention?</li><li>Why can attention cost grow quadratically?</li></ol></div>
-<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>لماذا نقسم على √d<sub>k</sub>؟</li><li>ما معنى Q وK وV؟</li><li>لماذا نحتاج الترميز الموضعي؟</li><li>ما الفرق بين الانتباه السببي وغير السببي؟</li><li>لماذا تنمو كلفة الانتباه تربيعيًا؟</li></ol></div></section>
-</main><footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer><script src="course-navigation.js" defer></script>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>What are queries, keys, and values?</li><li>Why is attention scaled by √d<sub>k</sub>?</li><li>Why is positional information necessary?</li><li>What is the purpose of multiple heads?</li><li>What is causal masking?</li><li>When might LSTM be preferable to Transformer?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>ما هي Q وK وV؟</li><li>لماذا نقسم على √d<sub>k</sub>؟</li><li>لماذا نحتاج إلى معلومات الموضع؟</li><li>ما فائدة تعدد الرؤوس؟</li><li>ما المقصود بالقناع السببي؟</li><li>متى قد تكون LSTM أنسب من Transformer؟</li></ol></div></section>
+</main>
+<script src="course-navigation.js" defer></script>
 <script src="course-quiz-data.js" defer></script>
 <script src="course-quiz.js" defer></script>
 <script src="certificate-canvas.js?v=20260817-2" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
