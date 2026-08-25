@@ -1,275 +1,147 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg"><title>Lab 13 - Explainable Load Forecasting</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body class="course-template-modern"><header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB laboratory on explainable artificial intelligence for load forecasting">
+  <title>Lab 13 - Explainable Load Forecasting</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LAB 13 | المخبر 13</div>
-  <h1>Explaining a Load-Forecasting Model</h1>
-  <div class="hero-ar">تفسير نموذج للتنبؤ بالحمل الكهربائي</div>
-  <div class="subtitle">MATLAB laboratory using feature importance, SHAP, LIME, and partial dependence<br>مخبر MATLAB باستخدام أهمية الميزات وSHAP وLIME والاعتماد الجزئي</div>
-</div>
+  <div class="hero">
+    <div class="lecture-number">LAB 13 | المخبر 13</div>
+    <h1>Explaining a Load-Forecasting Model</h1>
+    <div class="hero-ar">تفسير نموذج للتنبؤ بالحمل الكهربائي</div>
+    <div class="subtitle">MATLAB Laboratory Using Feature Importance, SHAP, LIME, and Partial Dependence<br>مخبر MATLAB باستخدام أهمية الميزات وSHAP وLIME والاعتماد الجزئي</div>
+    <div class="toc"><a href="#data">Data</a><a href="#model">Model</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#interpretation">Interpretation</a><a href="#tasks">Tasks</a></div>
+  </div>
 
-<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
-<li>Train a nonlinear regression ensemble for next-hour load prediction.</li>
-<li>Compute global predictor importance.</li>
-<li>Explain one forecast using SHAP.</li>
-<li>Explain the same forecast using LIME.</li>
-<li>Visualize partial dependence.</li>
-<li>Compare global and local explanations.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف المخبر</h2><ul>
-<li>تدريب نموذج انحدار غير خطي لتوقع الحمل.</li><li>حساب الأهمية العامة للميزات.</li>
-<li>تفسير توقع باستخدام SHAP.</li><li>تفسيره باستخدام LIME.</li><li>رسم الاعتماد الجزئي.</li><li>مقارنة التفسير العام والمحلي.</li>
-</ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Train a nonlinear ensemble for next-hour load prediction.</li><li>Compute global feature importance.</li><li>Explain one forecast using SHAP and LIME.</li><li>Visualize partial dependence.</li><li>Compare global and local explanations.</li><li>Evaluate explanation stability and physical plausibility.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>تدريب نموذج انحدار غير خطي لتوقع حمل الساعة التالية.</li><li>حساب الأهمية العامة للميزات.</li><li>تفسير توقع باستخدام SHAP وLIME.</li><li>رسم الاعتماد الجزئي.</li><li>مقارنة التفسير العام والمحلي.</li><li>تقييم استقرار التفسير واتساقه الفيزيائي.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Requirements</h2>
-<ul><li>MATLAB</li><li>Statistics and Machine Learning Toolbox</li></ul>
-<div class="note">The optional <code>permutationImportance</code> section requires MATLAB R2024a or newer. The remaining sections can use model-specific importance, SHAP, LIME, and partial dependence.</div></div>
-<div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Statistics and Machine Learning Toolbox. تتطلب دالة permutationImportance إصدار R2024a أو أحدث.</p></div></section>
+  <section><div class="en"><h2>1. Requirements</h2><ul><li>MATLAB</li><li>Statistics and Machine Learning Toolbox</li></ul><div class="note">The optional <code>permutationImportance</code> section requires MATLAB R2024a or newer.</div></div><div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Statistics and Machine Learning Toolbox، وتتطلب دالة <code>permutationImportance</code> إصدار R2024a أو أحدث.</p></div></section>
 
-<section><div class="en"><h2>2. Predictors</h2>
-<div class="grid3"><div class="mini-card"><strong>LoadLag1</strong><p>Previous-hour load.</p></div>
-<div class="mini-card"><strong>LoadLag24</strong><p>Load at the same hour yesterday.</p></div>
-<div class="mini-card"><strong>Temperature</strong><p>Weather influence.</p></div>
-<div class="mini-card"><strong>Hour</strong><p>Daily cycle.</p></div>
-<div class="mini-card"><strong>Weekday</strong><p>Working-day effect.</p></div>
-<div class="mini-card"><strong>PV</strong><p>Distributed generation effect.</p></div></div></div>
-<div class="ar"><h2>2. الميزات</h2><p>يستخدم النموذج الحمل السابق وحمل اليوم السابق والحرارة والساعة ويوم العمل والإنتاج الشمسي.</p></div></section>
+  <section id="data"><div class="en"><h2>2. Predictors</h2><div class="grid"><div class="mini-card"><strong>LoadLag1</strong><p>Previous-hour load.</p></div><div class="mini-card"><strong>LoadLag24</strong><p>Load at the same hour yesterday.</p></div><div class="mini-card"><strong>Temperature</strong><p>Weather influence.</p></div><div class="mini-card"><strong>Hour</strong><p>Daily cycle.</p></div><div class="mini-card"><strong>Weekday</strong><p>Working-day effect.</p></div><div class="mini-card"><strong>PV</strong><p>Distributed generation effect.</p></div></div><div class="formula">ŷ<sub>t+1</sub>=f(L<sub>t</sub>,L<sub>t-23</sub>,T<sub>t</sub>,Hour<sub>t</sub>,Weekday<sub>t</sub>,PV<sub>t</sub>)</div></div><div class="ar"><h2>2. الميزات</h2><p>يستخدم النموذج الحمل السابق وحمل اليوم السابق والحرارة والساعة ويوم العمل والإنتاج الشمسي.</p></div></section>
 
-<section><div class="en"><h2>3. Complete MATLAB Script</h2>
-<pre><code>%% Lab 13: Explainable AI for Load Forecasting
-clear; clc; close all;
-rng(13);
+  <section id="model"><div class="en"><h2>3. Model and Explanation Methods</h2><div class="grid"><div class="mini-card"><strong>Boosted Trees</strong><p>Capture nonlinear interactions.</p></div><div class="mini-card"><strong>Global Importance</strong><p>Ranks predictors over the dataset.</p></div><div class="mini-card"><strong>SHAP</strong><p>Allocates one prediction among features.</p></div><div class="mini-card"><strong>LIME</strong><p>Fits a local surrogate near one query.</p></div><div class="mini-card"><strong>PDP</strong><p>Shows average model response.</p></div><div class="mini-card"><strong>Permutation</strong><p>Measures loss increase after disruption.</p></div></div><div class="warning">Feature importance and attribution describe model behavior; they do not prove causality.</div></div><div class="ar"><h2>3. النموذج وطرق التفسير</h2><p>تستخدم أشجار التعزيز للتنبؤ، ثم تطبق طرق عامة ومحلية لفهم سلوك النموذج دون ادعاء السببية.</p></div></section>
 
-%% 1) Generate synthetic hourly data
-nDays = 220;
-N = 24*nDays;
-t = (0:N-1)';
+  <section id="workflow"><div class="en"><h2>4. Engineering Workflow</h2><div class="flow"><div class="flow-box">Generate Data</div><div class="arrow">→</div><div class="flow-box">Build Lags</div><div class="arrow">→</div><div class="flow-box">Train Ensemble</div><div class="arrow">→</div><div class="flow-box">Explain Predictions</div><div class="arrow">→</div><div class="flow-box">Validate Physically</div></div><ol><li>Create chronological hourly data.</li><li>Build lagged and contextual predictors.</li><li>Use a chronological train-test split.</li><li>Evaluate forecasting accuracy.</li><li>Generate global and local explanations.</li><li>Check stability, correlation effects, and engineering plausibility.</li></ol></div><div class="ar"><h2>4. سير العمل الهندسي</h2><p>ننشىء البيانات والميزات الزمنية، ثم ندرب النموذج ونفسر النتائج ونتحقق من استقرارها ومنطقها الهندسي.</p></div></section>
 
-Hour = mod(t,24);
-Day = floor(t/24);
+  <section id="code"><div class="en"><h2>5. Complete MATLAB Script</h2><pre><code>%% Lab 13: Explainable AI for Load Forecasting
+clear; clc; close all; rng(13);
+
+%% 1) Synthetic hourly data
+nDays = 220; N = 24*nDays; t = (0:N-1)';
+Hour = mod(t,24); Day = floor(t/24);
 Weekday = double(mod(Day,7) &lt; 5);
-
-Temperature = 18 ...
-    + 8*sin(2*pi*(Hour-14)/24) ...
-    + 5*sin(2*pi*Day/nDays) ...
-    + 1.2*randn(N,1);
-
+Temperature = 18 + 8*sin(2*pi*(Hour-14)/24) ...
+    + 5*sin(2*pi*Day/nDays) + 1.2*randn(N,1);
 PV = max(0,18*sin(pi*(Hour-6)/12));
 PV = PV.*(0.75+0.20*rand(N,1));
-
-BaseLoad = 110 ...
-    + 24*sin(2*pi*(Hour-7)/24) ...
+BaseLoad = 110 + 24*sin(2*pi*(Hour-7)/24) ...
     + 8*sin(4*pi*(Hour-5)/24);
-
-Load = BaseLoad ...
-    + 9*Weekday ...
+Load = BaseLoad + 9*Weekday ...
     + 0.9*max(Temperature-23,0) ...
     + 0.5*max(11-Temperature,0) ...
-    - 0.30*PV ...
-    + 2.5*randn(N,1);
+    - 0.30*PV + 2.5*randn(N,1);
 
-%% 2) Build lagged predictors
+%% 2) Lagged predictors
 LoadLag1 = [NaN; Load(1:end-1)];
 LoadLag24 = [NaN(24,1); Load(1:end-24)];
 Target = [Load(2:end); NaN];
-
-T = table(LoadLag1,LoadLag24,Temperature,Hour, ...
-    Weekday,PV,Target);
-
-T = rmmissing(T);
+T = rmmissing(table(LoadLag1,LoadLag24,Temperature, ...
+    Hour,Weekday,PV,Target));
 
 %% 3) Chronological split
-n = height(T);
-nTrain = floor(0.70*n);
-nTest = n-nTrain;
+n = height(T); nTrain = floor(0.70*n);
+TTrain = T(1:nTrain,:); TTest = T(nTrain+1:end,:);
+predictorNames = ["LoadLag1","LoadLag24","Temperature", ...
+    "Hour","Weekday","PV"];
 
-TTrain = T(1:nTrain,:);
-TTest = T(nTrain+1:end,:);
-
-predictorNames = ...
-    ["LoadLag1","LoadLag24","Temperature", ...
-     "Hour","Weekday","PV"];
-
-%% 4) Train nonlinear regression ensemble
-Mdl = fitrensemble(TTrain, ...
-    "Target", ...
-    Method="LSBoost", ...
-    NumLearningCycles=250, ...
+%% 4) Train boosted-tree ensemble
+Mdl = fitrensemble(TTrain,"Target", ...
+    Method="LSBoost",NumLearningCycles=250, ...
     Learners=templateTree(MaxNumSplits=20), ...
     PredictorNames=predictorNames);
 
-%% 5) Test accuracy
-YPred = predict(Mdl,TTest);
-YTrue = TTest.Target;
-
+%% 5) Accuracy
+YPred = predict(Mdl,TTest); YTrue = TTest.Target;
 MAE = mean(abs(YPred-YTrue));
 RMSE = sqrt(mean((YPred-YTrue).^2));
 MAPE = 100*mean(abs((YPred-YTrue)./YTrue));
-
 fprintf("MAE  = %.3f MW\n",MAE);
 fprintf("RMSE = %.3f MW\n",RMSE);
 fprintf("MAPE = %.3f %%\n",MAPE);
 
-figure;
-plot(YTrue(1:240),"k",LineWidth=1.3); hold on;
-plot(YPred(1:240),LineWidth=1.2);
-grid on;
-xlabel("Test Hour");
-ylabel("Load (MW)");
-legend("Actual","Predicted");
-title("Load Forecasting Model");
+figure; plot(YTrue(1:240),"k",LineWidth=1.3); hold on;
+plot(YPred(1:240),LineWidth=1.2); grid on;
+legend("Actual","Predicted"); xlabel("Test Hour"); ylabel("Load (MW)");
 
-%% 6) Model-specific global importance
+%% 6) Global importance
 impTree = predictorImportance(Mdl);
+figure; bar(categorical(predictorNames),impTree); grid on;
+ylabel("Predictor Importance"); title("Global Importance");
 
-figure;
-bar(categorical(predictorNames),impTree);
-grid on;
-ylabel("Predictor Importance");
-title("Global Tree-Ensemble Importance");
-
-%% 7) Optional permutation importance (R2024a+)
+%% 7) Optional permutation importance
 try
-    impPerm = permutationImportance( ...
-        Mdl,TTest,"Target", ...
+    impPerm = permutationImportance(Mdl,TTest,"Target", ...
         NumPermutations=20);
-
-    disp(impPerm);
-
-    figure;
-    bar(categorical(impPerm.Predictor), ...
-        impPerm.ImportanceMean);
-    grid on;
-    ylabel("Increase in Loss");
-    title("Permutation Importance");
+    figure; bar(categorical(impPerm.Predictor), ...
+        impPerm.ImportanceMean); grid on;
+    ylabel("Increase in Loss"); title("Permutation Importance");
 catch ME
     warning("Permutation importance skipped: %s",ME.message);
 end
 
-%% 8) Select one query point
+%% 8) Local query
 queryIndex = 80;
 queryPoint = TTest(queryIndex,predictorNames);
 queryPrediction = predict(Mdl,queryPoint);
+fprintf("Query prediction = %.3f MW\n",queryPrediction);
 
-fprintf("\nQuery prediction = %.3f MW\n",queryPrediction);
-disp(queryPoint);
-
-%% 9) SHAP explanation
+%% 9) SHAP
 explainerSHAP = shapley(Mdl,TTrain(:,predictorNames), ...
     QueryPoint=queryPoint);
+figure; plot(explainerSHAP); title("SHAP Explanation");
 
-figure;
-plot(explainerSHAP);
-title("SHAP Explanation for One Load Forecast");
-
-disp(explainerSHAP.ShapleyValues);
-
-%% 10) LIME explanation
+%% 10) LIME
 explainerLIME = lime(Mdl,queryPoint,6);
-
-figure;
-plot(explainerLIME);
-title("LIME Explanation for the Same Forecast");
+figure; plot(explainerLIME); title("LIME Explanation");
 
 %% 11) Partial dependence
-figure;
-plotPartialDependence(Mdl,"Temperature",TTrain);
-grid on;
-title("Partial Dependence on Temperature");
-
-figure;
-plotPartialDependence(Mdl,"Hour",TTrain);
-grid on;
-title("Partial Dependence on Hour");
+figure; plotPartialDependence(Mdl,"Temperature",TTrain);
+grid on; title("Partial Dependence on Temperature");
+figure; plotPartialDependence(Mdl,"Hour",TTrain);
+grid on; title("Partial Dependence on Hour");
 
 %% 12) Manual permutation importance
 XTest = TTest(:,predictorNames);
-basePred = predict(Mdl,XTest);
-baseLoss = mean((basePred-YTrue).^2);
-
+baseLoss = mean((predict(Mdl,XTest)-YTrue).^2);
 manualImp = zeros(numel(predictorNames),1);
-
 for j = 1:numel(predictorNames)
     Xp = XTest;
     Xp.(predictorNames(j)) = ...
         Xp.(predictorNames(j))(randperm(height(Xp)));
-
-    predPerm = predict(Mdl,Xp);
-    permLoss = mean((predPerm-YTrue).^2);
-    manualImp(j) = permLoss-baseLoss;
+    manualImp(j) = mean((predict(Mdl,Xp)-YTrue).^2)-baseLoss;
 end
+figure; bar(categorical(predictorNames),manualImp); grid on;
+ylabel("Increase in MSE"); title("Manual Permutation Importance");</code></pre></div><div class="ar"><h2>5. كود MATLAB الكامل</h2><p>ينشئ الكود بيانات حمل اصطناعية، ويدرب نموذج أشجار معززة، ثم يطبق أهمية الميزات وSHAP وLIME وPDP وأهمية التبديل.</p></div></section>
 
-figure;
-bar(categorical(predictorNames),manualImp);
-grid on;
-ylabel("Increase in MSE");
-title("Manual Permutation Importance");</code></pre></div>
-<div class="ar"><h2>3. الكود الكامل</h2>
-<p>ينشئ الكود بيانات حمل، ويدرب نموذج Boosted Trees، ثم يطبق الأهمية العامة وSHAP وLIME وPDP وأهمية التبديل اليدوية.</p></div></section>
+  <section id="interpretation"><div class="en"><h2>6. Interpreting the Results</h2><div class="grid"><div class="mini-card"><strong>Global View</strong><p>LoadLag1 and LoadLag24 should usually dominate.</p></div><div class="mini-card"><strong>Local View</strong><p>SHAP and LIME explain one operating hour.</p></div><div class="mini-card"><strong>Temperature</strong><p>Importance rises at heating and cooling extremes.</p></div><div class="mini-card"><strong>Hour</strong><p>Captures the daily demand cycle.</p></div><div class="mini-card"><strong>Weekday</strong><p>Shifts baseline demand.</p></div><div class="mini-card"><strong>PV</strong><p>Tends to reduce net load.</p></div></div><div class="formula">Prediction = Baseline + Σ Feature Contributions</div><div class="warning">Correlated features can split or redistribute importance, and PDP can evaluate unrealistic combinations.</div></div><div class="ar"><h2>6. تفسير النتائج</h2><p>يفترض أن يهيمن الحمل السابق، بينما تكشف الطرق المحلية مساهمة كل ميزة في ساعة محددة، مع ضرورة الحذر من الترابط بين الميزات.</p></div></section>
 
-<section><div class="en"><h2>4. Why Use a Tree Ensemble?</h2>
-<p>A boosted-tree model captures nonlinear interactions while remaining compatible with several MATLAB explanation tools.</p>
-<div class="highlight">The aim is not to claim that trees are always the best forecasting model, but to create a transparent XAI laboratory.</div></div>
-<div class="ar"><h2>4. لماذا نستخدم نموذج أشجار؟</h2><p>يلتقط العلاقات اللاخطية ويتوافق مع عدة أدوات تفسير، لذلك يناسب الغرض التعليمي للمخبر.</p></div></section>
+  <section><div class="en"><h2>7. Validation Checklist</h2><ul><li>Check MAE, RMSE, and MAPE on chronological test data.</li><li>Repeat LIME and SHAP for several query points.</li><li>Compare explanations for peak and off-peak hours.</li><li>Test sensitivity to SHAP background data.</li><li>Inspect correlated-feature effects.</li><li>Compare explanation direction with engineering expectations.</li></ul><div class="good">An explanation should be quantitatively stable and physically plausible, not merely visually attractive.</div></div><div class="ar"><h2>7. قائمة التحقق</h2><p>يجب فحص الدقة والاستقرار والحساسية لبيانات الخلفية والترابط، ثم مقارنة التفسير مع المعرفة الهندسية.</p></div></section>
 
-<section><div class="en"><h2>5. Global Importance</h2>
-<p>Global importance answers: “Which predictors matter most across the test set?”</p>
-<ul><li>Tree importance reflects the ensemble structure.</li><li>Permutation importance reflects loss increase after feature disruption.</li></ul></div>
-<div class="ar"><h2>5. الأهمية العامة</h2><p>تجيب عن سؤال: ما الميزات الأهم للنموذج عبر كامل البيانات؟ ويمكن أن تختلف طريقة الأشجار عن طريقة التبديل.</p></div></section>
+  <section id="tasks"><div class="en"><h2>8. Student Tasks</h2><ol><li>Explain a low-load night and a high-load evening peak.</li><li>Compare SHAP and LIME stability across repeated runs.</li><li>Add a holiday feature.</li><li>Remove LoadLag1 and retrain.</li><li>Create a correlated copy of Temperature.</li><li>Change SHAP background data.</li><li>Compare tree importance with permutation importance.</li></ol></div><div class="ar"><h2>8. مهام الطالب</h2><ol><li>تفسير حالة ليلية منخفضة وقمة مسائية.</li><li>مقارنة استقرار SHAP وLIME.</li><li>إضافة ميزة عطلة.</li><li>حذف LoadLag1 وإعادة التدريب.</li><li>إنشاء نسخة مترابطة من الحرارة.</li><li>تغيير بيانات خلفية SHAP.</li><li>مقارنة أهمية الأشجار مع أهمية التبديل.</li></ol></div></section>
 
-<section><div class="en"><h2>6. SHAP Interpretation</h2>
-<div class="formula">Prediction = Baseline + Σ Feature Contributions</div>
-<p>For the selected hour, inspect which predictors increased or reduced the forecast relative to the baseline.</p></div>
-<div class="ar"><h2>6. تفسير SHAP</h2><p>يوضح الرسم كيف رفعت أو خفضت كل ميزة التنبؤ مقارنة بالقيمة الأساسية.</p></div></section>
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Explainable peak-warning system:</strong> build a classifier for next-hour peak risk, compare SHAP and counterfactual explanations, and assess explanation drift under changing weather and load patterns.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">أنشئ نظام إنذار للقمة القادمة، وقارن SHAP مع التفسيرات المضادة للواقع، وادرس انجراف التفسير مع تغير الطقس والحمل.</div></div></section>
 
-<section><div class="en"><h2>7. LIME Interpretation</h2>
-<p>LIME fits a simple local model around the query point. Compare the signs and rankings with SHAP.</p>
-<div class="warning">Disagreement does not automatically mean one method is wrong; the methods make different approximations.</div></div>
-<div class="ar"><h2>7. تفسير LIME</h2><p>يبني LIME نموذجًا بسيطًا قرب العينة المحددة. قارن اتجاهات وترتيب الميزات مع SHAP.</p></div></section>
-
-<section><div class="en"><h2>8. Partial Dependence</h2>
-<p>Temperature PDP should often show increased load under strong heating or cooling demand. Hour PDP should reveal the daily pattern.</p>
-<div class="warning">PDP can evaluate feature combinations that are rare or unrealistic when predictors are correlated.</div></div>
-<div class="ar"><h2>8. الاعتماد الجزئي</h2><p>قد يظهر منحنى الحرارة زيادة الحمل عند التدفئة أو التبريد، بينما يكشف منحنى الساعة النمط اليومي. لكن الارتباط قد ينتج حالات غير واقعية.</p></div></section>
-
-<section><div class="en"><h2>9. Expected Findings</h2><ul>
-<li>LoadLag1 and LoadLag24 are usually dominant.</li><li>Hour captures daily structure.</li><li>Temperature matters more at extreme values.</li>
-<li>Weekday changes the baseline demand.</li><li>PV tends to reduce net load.</li></ul></div>
-<div class="ar"><h2>9. النتائج المتوقعة</h2><p>غالبًا يكون الحمل السابق وحمل اليوم السابق الأكثر أهمية، وتظهر الساعة النمط اليومي، وتزداد أهمية الحرارة عند القيم المتطرفة.</p></div></section>
-
-<section><div class="en"><h2>10. Student Experiments</h2><div class="task"><ol>
-<li>Explain a low-load night and a high-load evening peak.</li><li>Compare SHAP and LIME stability across repeated runs.</li>
-<li>Add a holiday feature.</li><li>Remove LoadLag1 and retrain.</li><li>Create correlated copies of Temperature and inspect attribution.</li>
-<li>Change the background data used by SHAP.</li></ol></div></div>
-<div class="ar"><h2>10. تجارب الطالب</h2><div class="task"><ol>
-<li>فسر حالة ليلية منخفضة وقمة مسائية.</li><li>قارن استقرار SHAP وLIME.</li><li>أضف ميزة عطلة.</li>
-<li>احذف LoadLag1 وأعد التدريب.</li><li>أنشئ نسخة مترابطة من الحرارة.</li><li>غيّر بيانات الخلفية لـ SHAP.</li></ol></div></div></section>
-
-<section><div class="en"><h2>11. Mini Project</h2>
-<div class="research"><strong>Explainable peak-warning system:</strong> Build a classifier that predicts whether the next-hour load will exceed a threshold, then explain false alarms and missed peaks using SHAP and LIME.</div></div>
-<div class="ar"><h2>11. مشروع مصغر</h2><div class="research">ابنِ مصنفًا لتحذير القمم، ثم فسّر الإنذارات الكاذبة والقمم الفائتة باستخدام SHAP وLIME.</div></div></section>
-
-<section><div class="en"><h2>12. Laboratory Report</h2><ul>
-<li>Report forecasting accuracy.</li><li>Compare tree and permutation importance.</li><li>Explain two contrasting query points.</li>
-<li>Compare SHAP and LIME.</li><li>Discuss correlation and causality.</li><li>Evaluate explanation stability.</li></ul></div>
-<div class="ar"><h2>12. تقرير المخبر</h2><p>يتضمن دقة النموذج ومقارنة طرق الأهمية وتفسير حالتين ومقارنة SHAP وLIME وتحليل الارتباط والسببية والاستقرار.</p></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>What is the difference between global and local explanations?</li><li>How does permutation importance work?</li><li>What does a positive SHAP value mean?</li><li>Why can LIME be unstable?</li><li>Why can correlated features distort attribution?</li><li>What is the main limitation of PDP?</li><li>Why is explanation not causality?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>ما الفرق بين التفسير العام والمحلي؟</li><li>كيف تعمل أهمية التبديل؟</li><li>ماذا تعني قيمة SHAP الموجبة؟</li><li>لماذا قد يكون LIME غير مستقر؟</li><li>كيف تشوه الميزات المترابطة توزيع المساهمات؟</li><li>ما القيد الرئيس لـPDP؟</li><li>لماذا لا يعد التفسير سببية؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
