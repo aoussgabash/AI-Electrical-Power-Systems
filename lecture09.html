@@ -3,361 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
   <meta name="description" content="Deep Learning for Electrical Power Systems - bilingual lecture">
   <title>Lecture 09 - Deep Learning for Power Systems</title>
-
-  <style>
-    :root{
-      --bg:#07111f; --card:#0f2238; --card2:#0b1b2c; --text:#f4f7fb;
-      --muted:#b8c7d9; --blue:#38bdf8; --green:#22c55e; --yellow:#facc15;
-      --red:#fb7185; --violet:#a78bfa; --line:rgba(255,255,255,.10);
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0; font-family:Arial,Tahoma,sans-serif;
-      background:linear-gradient(180deg,#07111f,#0a1728);
-      color:var(--text); line-height:1.8;
-    }
-    .container{width:min(1050px,92%);margin:auto}
-    header{
-      background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);
-      position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)
-    }
-    nav{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
-    .logo{font-weight:bold}.logo span{color:var(--blue)}
-    .back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
-    .hero{text-align:center;padding:58px 0 34px}
-    .lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
-    h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
-    .hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}
-    .subtitle{color:var(--muted);margin-top:10px}
-    .toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
-    .toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
-    section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
-    h2{margin-top:0;color:#edf8ff} h3{color:var(--blue)}
-    p,li{color:#d8e2ec}
-    .en{direction:ltr;text-align:left}
-    .ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
-    .highlight,.note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
-    .ar .highlight,.ar .note{border-left:none;border-right:4px solid var(--blue)}
-    .good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;margin:15px 0}
-    .warning{background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:12px;padding:16px;margin:15px 0}
-    .formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}
-    .mini-card strong{color:white}
-    .flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
-    .flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
-    .arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
-    .table-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;min-width:650px;margin:15px 0}
-    th,td{border:1px solid var(--line);padding:11px;text-align:center}
-    th{background:#0b1b2c;color:#eaf7ff}
-    code{font-family:Consolas,monospace}
-    pre{direction:ltr;text-align:left;background:#06101d;border:1px solid var(--line);padding:18px;border-radius:12px;overflow:auto;line-height:1.55;color:#e6edf3}
-    .tag{display:inline-block;padding:4px 9px;border-radius:999px;background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3);margin:3px;color:#ddd6fe}
-    .task{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.28);padding:16px;border-radius:12px;margin:15px 0}
-    footer{text-align:center;color:var(--muted);padding:35px 0}
-    @media(max-width:750px){.grid,.grid3{grid-template-columns:1fr}nav{align-items:flex-start}.back{font-size:.86rem}}
-  </style>
-
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-quiz.css">
-<link rel="stylesheet" href="course-footer.css">
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-quiz.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260824-7">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
 <body>
-
-<header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
-
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-  <div class="hero">
-    <div class="lecture-number">LECTURE 09 | المحاضرة 09</div>
-    <h1>Deep Learning for Power Systems</h1>
-    <div class="hero-ar">التعلم العميق في أنظمة الطاقة الكهربائية</div>
-    <div class="subtitle">
-      From multilayer networks to recurrent models and LSTM-based forecasting<br>
-      من الشبكات متعددة الطبقات إلى النماذج المتكررة والتنبؤ باستخدام LSTM
-    </div>
-    <div class="toc">
-      <a href="#objectives">Objectives</a><a href="#deep">Deep Networks</a>
-      <a href="#training">Training</a><a href="#cnn">CNN</a>
-      <a href="#rnn">RNN</a><a href="#lstm">LSTM</a><a href="#power">Applications</a>
-    </div>
-  </div>
+  <div class="hero"><div class="lecture-number">LECTURE 09 | المحاضرة 09</div><h1>Deep Learning for Power Systems</h1><div class="hero-ar">التعلم العميق في أنظمة الطاقة الكهربائية</div><div class="subtitle">From Multilayer Networks to Recurrent Models and LSTM Forecasting<br>من الشبكات متعددة الطبقات إلى النماذج المتكررة والتنبؤ باستخدام LSTM</div></div>
 
-  <section id="objectives">
-    <div class="en">
-      <h2>🎯 Learning Objectives</h2>
-      <ul>
-        <li>Distinguish shallow learning from deep learning.</li>
-        <li>Formulate forward propagation through multiple hidden layers.</li>
-        <li>Explain activation functions, loss functions, and gradient-based training.</li>
-        <li>Understand CNN, RNN, and LSTM architectures.</li>
-        <li>Select a suitable deep model for a power-system problem.</li>
-        <li>Recognize overfitting, data leakage, and distribution shift.</li>
-      </ul>
-    </div>
-    <div class="ar">
-      <h2>🎯 أهداف التعلم</h2>
-      <ul>
-        <li>التمييز بين التعلم السطحي والتعلم العميق.</li>
-        <li>صياغة الانتشار الأمامي عبر عدة طبقات مخفية.</li>
-        <li>فهم دوال التفعيل والخسارة والتدريب المعتمد على التدرج.</li>
-        <li>فهم بنى CNN وRNN وLSTM.</li>
-        <li>اختيار البنية المناسبة لمسألة في نظام القدرة.</li>
-        <li>التعرف على فرط التخصيص وتسرب البيانات وتغير توزيعها.</li>
-      </ul>
-    </div>
-  </section>
+  <section><div class="en"><h2>🎯 Learning Objectives</h2><ul><li>Distinguish shallow and deep learning.</li><li>Formulate forward propagation through multiple layers.</li><li>Explain activation, loss, and gradient-based training.</li><li>Understand CNN, RNN, and LSTM architectures.</li><li>Select a suitable deep model for a power-system problem.</li><li>Recognize overfitting, leakage, and distribution shift.</li></ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>التمييز بين التعلم السطحي والعميق.</li><li>صياغة الانتشار الأمامي عبر عدة طبقات.</li><li>فهم دوال التفعيل والخسارة والتدريب.</li><li>فهم CNN وRNN وLSTM.</li><li>اختيار النموذج المناسب لمسألة نظام قدرة.</li><li>التعرف على فرط التخصيص وتسرب البيانات وتغير توزيعها.</li></ul></div></section>
 
-  <section id="deep">
-    <div class="en">
-      <h2>1. What Makes a Network “Deep”?</h2>
-      <p>A deep neural network contains several trainable representation layers between input and output.</p>
-      <div class="flow">
-        <div class="flow-box">Measurements<br>x</div><div class="arrow">→</div>
-        <div class="flow-box">Hidden 1<br>h¹</div><div class="arrow">→</div>
-        <div class="flow-box">Hidden 2<br>h²</div><div class="arrow">→</div>
-        <div class="flow-box">Output<br>ŷ</div>
-      </div>
-      <div class="formula">h⁽ˡ⁾ = φ⁽ˡ⁾(W⁽ˡ⁾h⁽ˡ⁻¹⁾ + b⁽ˡ⁾), &nbsp; h⁽⁰⁾ = x</div>
-      <div class="highlight">Depth enables the model to build hierarchical features: raw measurements → local patterns → operating states → engineering prediction.</div>
-    </div>
-    <div class="ar">
-      <h2>1. متى تُسمّى الشبكة عميقة؟</h2>
-      <p>تحتوي الشبكة العميقة على عدة طبقات قابلة للتدريب بين الدخل والخرج، وتتعلم كل طبقة تمثيلًا أكثر تجريدًا للبيانات.</p>
-      <div class="formula">h⁽ˡ⁾ = φ⁽ˡ⁾(W⁽ˡ⁾h⁽ˡ⁻¹⁾ + b⁽ˡ⁾)</div>
-      <div class="highlight">يمكن للطبقات الأولى تعلم الأنماط المحلية، بينما تجمع الطبقات الأعمق هذه الأنماط لتتعرف على حالات تشغيل معقدة.</div>
-    </div>
-  </section>
+  <section><div class="en"><h2>1. Deep Neural Networks</h2><div class="flow"><div class="flow-box">Measurements x</div><div class="arrow">→</div><div class="flow-box">Hidden 1</div><div class="arrow">→</div><div class="flow-box">Hidden 2</div><div class="arrow">→</div><div class="flow-box">Prediction ŷ</div></div><div class="formula">h⁽ˡ⁾=φ⁽ˡ⁾(W⁽ˡ⁾h⁽ˡ⁻¹⁾+b⁽ˡ⁾), &nbsp; h⁽⁰⁾=x</div><div class="highlight">Depth enables hierarchical feature learning from raw measurements to engineering predictions.</div></div><div class="ar"><h2>1. الشبكات العصبية العميقة</h2><p>تتعلم كل طبقة تمثيلًا أكثر تجريدًا للبيانات، وتبني الميزات المعقدة من ميزات أبسط.</p></div></section>
 
-  <section>
-    <div class="en">
-      <h2>2. Forward Propagation Example</h2>
-      <p>For a two-hidden-layer model:</p>
-      <div class="formula">
-        z¹=W¹x+b¹, &nbsp; h¹=ReLU(z¹)<br>
-        z²=W²h¹+b², &nbsp; h²=ReLU(z²)<br>
-        ŷ=W³h²+b³
-      </div>
-      <p>For load forecasting, the output can be a real-valued active-power estimate in MW.</p>
-    </div>
-    <div class="ar">
-      <h2>2. مثال على الانتشار الأمامي</h2>
-      <p>تمر بيانات الحمل والطقس والزمن عبر الطبقات بالتتابع. في مسائل الانحدار يكون الخرج رقمًا حقيقيًا، مثل الحمل المتوقع بالميغاواط.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>2. Forward Propagation</h2><div class="formula">z¹=W¹x+b¹, &nbsp; h¹=ReLU(z¹)</div><div class="formula">z²=W²h¹+b², &nbsp; h²=ReLU(z²)</div><div class="formula">ŷ=W³h²+b³</div></div><div class="ar"><h2>2. الانتشار الأمامي</h2><p>تمر بيانات الحمل والطقس والزمن عبر الطبقات بالتتابع حتى إنتاج قيمة الحمل المتنبأ بها.</p></div></section>
 
-  <section id="training">
-    <div class="en">
-      <h2>3. Loss Function and Training</h2>
-      <p>For a dataset of N samples, a common regression loss is mean squared error:</p>
-      <div class="formula">MSE = (1/N) Σᵢ₌₁ᴺ (ŷᵢ - yᵢ)²</div>
-      <p>Parameters are updated using gradient descent or an adaptive optimizer such as Adam:</p>
-      <div class="formula">θ ← θ - η ∇θ J(θ)</div>
-      <div class="grid">
-        <div class="mini-card"><strong>η: Learning rate</strong><p>Controls update size.</p></div>
-        <div class="mini-card"><strong>Batch size</strong><p>Number of samples per gradient estimate.</p></div>
-        <div class="mini-card"><strong>Epoch</strong><p>One complete pass through training data.</p></div>
-        <div class="mini-card"><strong>Validation loss</strong><p>Monitors generalization during training.</p></div>
-      </div>
-    </div>
-    <div class="ar">
-      <h2>3. دالة الخسارة والتدريب</h2>
-      <p>يهدف التدريب إلى تقليل الفرق بين الخرج المتوقع والقيمة الحقيقية. يتم تحديث جميع الأوزان والانزياحات بعكس اتجاه تدرج الخسارة.</p>
-      <div class="formula">θ ← θ - η ∇θ J(θ)</div>
-    </div>
-  </section>
+  <section><div class="en"><h2>3. Loss and Training</h2><div class="formula">MSE=(1/N)Σ(ŷᵢ-yᵢ)²</div><div class="formula">θ←θ-η∇θJ(θ)</div><div class="grid"><div class="mini-card"><strong>Learning Rate</strong><p>Controls update size.</p></div><div class="mini-card"><strong>Batch Size</strong><p>Samples per gradient estimate.</p></div><div class="mini-card"><strong>Epoch</strong><p>One full pass through training data.</p></div><div class="mini-card"><strong>Validation Loss</strong><p>Monitors generalization.</p></div></div></div><div class="ar"><h2>3. الخسارة والتدريب</h2><p>يتم تحديث الأوزان بعكس اتجاه التدرج لتقليل الفرق بين التنبؤ والقيمة الحقيقية.</p></div></section>
 
-  <section>
-    <div class="en">
-      <h2>4. Activation Functions</h2>
-      <div class="table-wrap"><table>
-        <tr><th>Function</th><th>Expression</th><th>Typical use</th><th>Remark</th></tr>
-        <tr><td>ReLU</td><td>max(0,z)</td><td>Hidden layers</td><td>Fast and widely used</td></tr>
-        <tr><td>Sigmoid</td><td>1/(1+e⁻ᶻ)</td><td>Gates / probabilities</td><td>Can saturate</td></tr>
-        <tr><td>Tanh</td><td>tanh(z)</td><td>Recurrent states</td><td>Zero-centered</td></tr>
-        <tr><td>Linear</td><td>z</td><td>Regression output</td><td>Unbounded output</td></tr>
-      </table></div>
-    </div>
-    <div class="ar">
-      <h2>4. دوال التفعيل</h2>
-      <p>تضيف دالة التفعيل اللاخطية القدرة على تمثيل العلاقات المعقدة. دونها تصبح عدة طبقات خطية مكافئة لطبقة خطية واحدة.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>4. Activation Functions</h2><div class="table-wrap"><table><tr><th>Function</th><th>Expression</th><th>Typical Use</th></tr><tr><td>ReLU</td><td>max(0,z)</td><td>Hidden layers</td></tr><tr><td>Sigmoid</td><td>1/(1+e⁻ᶻ)</td><td>Gates and probabilities</td></tr><tr><td>Tanh</td><td>tanh(z)</td><td>Recurrent states</td></tr><tr><td>Linear</td><td>z</td><td>Regression output</td></tr></table></div></div><div class="ar"><h2>4. دوال التفعيل</h2><p>تمنح دوال التفعيل اللاخطية الشبكة القدرة على تمثيل العلاقات المعقدة.</p></div></section>
 
-  <section id="cnn">
-    <div class="en">
-      <h2>5. Convolutional Neural Networks (CNN)</h2>
-      <p>CNNs learn local filters shared across a signal or image. In power engineering they can process:</p>
-      <div class="grid3">
-        <div class="mini-card"><strong>Waveforms</strong><p>Fault and disturbance classification.</p></div>
-        <div class="mini-card"><strong>Spectrograms</strong><p>Power-quality event recognition.</p></div>
-        <div class="mini-card"><strong>Spatial maps</strong><p>Thermal or asset inspection images.</p></div>
-      </div>
-      <div class="formula">y[k] = Σₘ w[m]x[k-m] + b</div>
-    </div>
-    <div class="ar">
-      <h2>5. الشبكات الالتفافية CNN</h2>
-      <p>تتعلم CNN مرشحات محلية تُطبّق على كامل الإشارة. لذلك تناسب تحليل أشكال الموجة والأطياف وصور المعدات الكهربائية.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>5. Convolutional Neural Networks</h2><div class="formula">y[k]=Σₘw[m]x[k-m]+b</div><div class="grid"><div class="mini-card"><strong>Waveforms</strong><p>Fault and disturbance classification.</p></div><div class="mini-card"><strong>Spectrograms</strong><p>Power-quality recognition.</p></div><div class="mini-card"><strong>Spatial Maps</strong><p>Thermal and inspection images.</p></div></div></div><div class="ar"><h2>5. الشبكات الالتفافية CNN</h2><p>تتعلم CNN مرشحات محلية تناسب أشكال الموجة والأطياف وصور المعدات.</p></div></section>
 
-  <section id="rnn">
-    <div class="en">
-      <h2>6. Recurrent Neural Networks (RNN)</h2>
-      <p>Time-series problems require memory. An RNN carries a hidden state from one time step to the next:</p>
-      <div class="formula">hₜ = tanh(Wₓxₜ + Wₕhₜ₋₁ + b)</div>
-      <div class="formula">ŷₜ = Wᵧhₜ + bᵧ</div>
-      <div class="warning">Basic RNNs may suffer from vanishing or exploding gradients when learning long-term dependencies.</div>
-    </div>
-    <div class="ar">
-      <h2>6. الشبكات العصبية المتكررة RNN</h2>
-      <p>تحمل الشبكة حالة مخفية من لحظة إلى اللحظة التالية، ولهذا تستطيع استخدام التاريخ الزمني. لكن الشبكة التقليدية قد تواجه صعوبة في الاحتفاظ بالمعلومات البعيدة.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>6. Recurrent Neural Networks</h2><div class="formula">hₜ=tanh(Wₓxₜ+Wₕhₜ₋₁+b)</div><div class="formula">ŷₜ=Wᵧhₜ+bᵧ</div><div class="warning">Basic RNNs may suffer from vanishing or exploding gradients.</div></div><div class="ar"><h2>6. الشبكات المتكررة RNN</h2><p>تحمل الشبكة حالة مخفية بين الخطوات الزمنية، لكنها قد تواجه صعوبة في تعلم الاعتماديات الطويلة.</p></div></section>
 
-  <section id="lstm">
-    <div class="en">
-      <h2>7. Long Short-Term Memory (LSTM)</h2>
-      <p>LSTM introduces gates that regulate what is forgotten, written, and exposed.</p>
-      <div class="formula">
-        fₜ = σ(Wf[xₜ,hₜ₋₁]+bf) &nbsp; Forget gate<br>
-        iₜ = σ(Wi[xₜ,hₜ₋₁]+bi) &nbsp; Input gate<br>
-        gₜ = tanh(Wg[xₜ,hₜ₋₁]+bg) &nbsp; Candidate state<br>
-        cₜ = fₜ⊙cₜ₋₁ + iₜ⊙gₜ<br>
-        oₜ = σ(Wo[xₜ,hₜ₋₁]+bo), &nbsp; hₜ=oₜ⊙tanh(cₜ)
-      </div>
-      <div class="good">The cell state cₜ provides a controlled path for long-term information, making LSTM useful for electrical load, renewable generation, and price forecasting.</div>
-    </div>
-    <div class="ar">
-      <h2>7. الذاكرة طويلة وقصيرة الأمد LSTM</h2>
-      <p>تستخدم LSTM بوابات نسيان وإدخال وإخراج للتحكم بالمعلومة التي تبقى في ذاكرة الخلية، ولذلك تستطيع التقاط الأنماط اليومية والأسبوعية والموسمية.</p>
-      <div class="highlight">لا تعني الذاكرة أن النموذج “يفهم” الزمن؛ بل يتعلم رياضيًا أي معلومات سابقة تساعد على تقليل خطأ التنبؤ.</div>
-    </div>
-  </section>
+  <section><div class="en"><h2>7. Long Short-Term Memory</h2><div class="formula">fₜ=σ(Wf[xₜ,hₜ₋₁]+bf)</div><div class="formula">iₜ=σ(Wi[xₜ,hₜ₋₁]+bi), &nbsp; gₜ=tanh(Wg[xₜ,hₜ₋₁]+bg)</div><div class="formula">cₜ=fₜ⊙cₜ₋₁+iₜ⊙gₜ</div><div class="formula">oₜ=σ(Wo[xₜ,hₜ₋₁]+bo), &nbsp; hₜ=oₜ⊙tanh(cₜ)</div><div class="good">LSTM is useful for load, renewable generation, and price forecasting.</div></div><div class="ar"><h2>7. الذاكرة طويلة وقصيرة الأمد LSTM</h2><p>تستخدم LSTM بوابات للتحكم بالمعلومات التي يتم نسيانها أو تخزينها أو إخراجها.</p></div></section>
 
-  <section>
-    <div class="en">
-      <h2>8. Sequence Construction for Load Forecasting</h2>
-      <p>A supervised sample can use the previous 24 hourly values to predict the next hour:</p>
-      <div class="formula">Xₜ=[Pₜ₋₂₃,...,Pₜ], &nbsp; target=Pₜ₊₁</div>
-      <p>Additional features may include temperature, hour of day, weekday, holiday indicator, and renewable generation.</p>
-      <div class="warning">Split data chronologically. Random shuffling before train/test separation can leak future information into the training set.</div>
-    </div>
-    <div class="ar">
-      <h2>8. بناء المتتاليات للتنبؤ بالحمل</h2>
-      <p>يمكن استخدام آخر 24 قيمة ساعية كدخل لتوقع الساعة التالية، مع إضافة درجة الحرارة والساعة واليوم والعطل الرسمية.</p>
-      <div class="warning">يجب تقسيم بيانات السلاسل الزمنية زمنيًا، لأن الخلط العشوائي قد يسمح للنموذج برؤية معلومات من المستقبل.</div>
-    </div>
-  </section>
+  <section><div class="en"><h2>8. Sequence Construction</h2><div class="formula">Xₜ=[Pₜ₋₂₃,...,Pₜ], &nbsp; target=Pₜ₊₁</div><p>Additional features may include temperature, hour, weekday, holidays, and renewable generation.</p><div class="warning">Split time-series data chronologically to avoid future-information leakage.</div></div><div class="ar"><h2>8. بناء المتتاليات</h2><p>يمكن استخدام آخر 24 قيمة ساعية ومدخلات إضافية للتنبؤ بالساعة التالية، مع الحفاظ على التقسيم الزمني.</p></div></section>
 
-  <section id="power">
-    <div class="en">
-      <h2>9. Applications in Electrical Power Systems</h2>
-      <div class="grid">
-        <div class="mini-card"><strong>Load forecasting</strong><p>Short- and medium-term demand prediction.</p></div>
-        <div class="mini-card"><strong>Renewable forecasting</strong><p>PV and wind power estimation.</p></div>
-        <div class="mini-card"><strong>Fault diagnosis</strong><p>Classification from current and voltage signals.</p></div>
-        <div class="mini-card"><strong>Predictive maintenance</strong><p>Asset health and remaining useful life.</p></div>
-        <div class="mini-card"><strong>State estimation</strong><p>Learning nonlinear measurement-to-state mappings.</p></div>
-        <div class="mini-card"><strong>Power quality</strong><p>Detection of sags, swells, harmonics, and transients.</p></div>
-      </div>
-    </div>
-    <div class="ar">
-      <h2>9. التطبيقات في أنظمة القدرة الكهربائية</h2>
-      <p>تشمل التطبيقات التنبؤ بالحمل والطاقة المتجددة، تشخيص الأعطال، الصيانة التنبؤية، تقدير الحالة، وتصنيف اضطرابات جودة القدرة.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>9. Power-System Applications</h2><div class="grid"><div class="mini-card"><strong>Load Forecasting</strong><p>Short- and medium-term demand.</p></div><div class="mini-card"><strong>Renewable Forecasting</strong><p>PV and wind estimation.</p></div><div class="mini-card"><strong>Fault Diagnosis</strong><p>Classification from voltage and current.</p></div><div class="mini-card"><strong>Predictive Maintenance</strong><p>Asset health and remaining life.</p></div><div class="mini-card"><strong>State Estimation</strong><p>Measurement-to-state mappings.</p></div><div class="mini-card"><strong>Power Quality</strong><p>Detection of disturbances.</p></div></div></div><div class="ar"><h2>9. تطبيقات نظم القدرة</h2><p>تشمل التنبؤ بالحمل والمتجددة وتشخيص الأعطال والصيانة التنبؤية وتقدير الحالة وجودة القدرة.</p></div></section>
 
-  <section>
-    <div class="en">
-      <h2>10. Overfitting and Regularization</h2>
-      <div class="grid">
-        <div class="mini-card"><strong>Dropout</strong><p>Randomly disables units during training.</p></div>
-        <div class="mini-card"><strong>L2 regularization</strong><p>Penalizes large weights.</p></div>
-        <div class="mini-card"><strong>Early stopping</strong><p>Stops when validation performance no longer improves.</p></div>
-        <div class="mini-card"><strong>More representative data</strong><p>Covers seasons and operating conditions.</p></div>
-      </div>
-      <div class="formula">Jregularized = Jdata + λ Σ w²</div>
-    </div>
-    <div class="ar">
-      <h2>10. فرط التخصيص والتنظيم</h2>
-      <p>يحدث فرط التخصيص عندما يحفظ النموذج بيانات التدريب ولا يعمم جيدًا. من وسائل الحد منه: الإسقاط، تنظيم L2، الإيقاف المبكر، وبيانات أكثر تمثيلًا.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>10. Overfitting and Regularization</h2><div class="formula">J<sub>regularized</sub>=J<sub>data</sub>+λΣw²</div><ul><li>Dropout</li><li>L2 regularization</li><li>Early stopping</li><li>Representative data</li></ul></div><div class="ar"><h2>10. فرط التخصيص والتنظيم</h2><p>تساعد Dropout وL2 والإيقاف المبكر والبيانات الممثلة على تحسين التعميم.</p></div></section>
 
-  <section>
-    <div class="en">
-      <h2>11. Model Evaluation</h2>
-      <div class="formula">MAE = (1/N)Σ|ŷᵢ-yᵢ|</div>
-      <div class="formula">RMSE = √[(1/N)Σ(ŷᵢ-yᵢ)²]</div>
-      <div class="formula">MAPE = (100/N)Σ |(ŷᵢ-yᵢ)/yᵢ|</div>
-      <div class="note">Always compare the deep model with a simple baseline such as persistence, moving average, or linear regression.</div>
-    </div>
-    <div class="ar">
-      <h2>11. تقييم النموذج</h2>
-      <p>تُستخدم MAE وRMSE وMAPE، لكن لا تكفي قيمة واحدة للحكم. يجب فحص الأخطاء حسب الساعة واليوم والموسم ومقارنتها بخط أساس بسيط.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>11. Model Evaluation</h2><div class="formula">MAE=(1/N)Σ|ŷᵢ-yᵢ|</div><div class="formula">RMSE=√[(1/N)Σ(ŷᵢ-yᵢ)²]</div><div class="formula">MAPE=(100/N)Σ|(ŷᵢ-yᵢ)/yᵢ|</div><div class="note">Compare the deep model with a simple baseline such as persistence or linear regression.</div></div><div class="ar"><h2>11. تقييم النموذج</h2><p>يجب تقييم الأخطاء ومقارنتها بخط أساس بسيط، وليس الاعتماد على مؤشر واحد فقط.</p></div></section>
 
-  <section>
-    <div class="en">
-      <h2>12. Engineering Workflow</h2>
-      <div class="flow">
-        <div class="flow-box">Define task</div><div class="arrow">→</div>
-        <div class="flow-box">Prepare data</div><div class="arrow">→</div>
-        <div class="flow-box">Train baseline</div><div class="arrow">→</div>
-        <div class="flow-box">Train deep model</div><div class="arrow">→</div>
-        <div class="flow-box">Validate & deploy</div>
-      </div>
-    </div>
-    <div class="ar">
-      <h2>12. سير العمل الهندسي</h2>
-      <p>ابدأ بتعريف الهدف ومقياس النجاح، ثم حضّر البيانات وابنِ خط أساس، وبعدها درّب النموذج العميق واختبره خارج بيانات التدريب قبل النشر.</p>
-    </div>
-  </section>
+  <section><div class="en"><h2>12. Engineering Workflow</h2><div class="flow"><div class="flow-box">Define Task</div><div class="arrow">→</div><div class="flow-box">Prepare Data</div><div class="arrow">→</div><div class="flow-box">Train Baseline</div><div class="arrow">→</div><div class="flow-box">Train Deep Model</div><div class="arrow">→</div><div class="flow-box">Validate & Deploy</div></div></div><div class="ar"><h2>12. سير العمل الهندسي</h2><p>ابدأ بتحديد الهدف وتحضير البيانات وخط الأساس، ثم درب النموذج واختبره قبل النشر.</p></div></section>
 
-  <section>
-    <div class="en">
-      <h2>🧠 Review Questions</h2>
-      <ol>
-        <li>Why are nonlinear activation functions necessary?</li>
-        <li>What causes vanishing gradients in recurrent networks?</li>
-        <li>How does the LSTM cell state help preserve information?</li>
-        <li>Why must time-series data be split chronologically?</li>
-        <li>When might a CNN be preferable to an LSTM?</li>
-      </ol>
-    </div>
-    <div class="ar">
-      <h2>🧠 أسئلة المراجعة</h2>
-      <ol>
-        <li>لماذا نحتاج إلى دوال تفعيل لاخطية؟</li>
-        <li>ما مشكلة تلاشي التدرج في الشبكات المتكررة؟</li>
-        <li>كيف تساعد حالة خلية LSTM على حفظ المعلومات؟</li>
-        <li>لماذا يجب تقسيم السلاسل الزمنية زمنيًا؟</li>
-        <li>متى تكون CNN أنسب من LSTM؟</li>
-      </ol>
-    </div>
-  </section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Why are nonlinear activations necessary?</li><li>What causes vanishing gradients?</li><li>How does LSTM preserve information?</li><li>Why must time-series data be split chronologically?</li><li>When might CNN be preferable to LSTM?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>لماذا نحتاج إلى دوال تفعيل لاخطية؟</li><li>ما سبب تلاشي التدرج؟</li><li>كيف تحفظ LSTM المعلومات؟</li><li>لماذا يجب تقسيم السلاسل زمنيًا؟</li><li>متى تكون CNN أنسب من LSTM؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-quiz-data.js" defer></script>
 <script src="course-quiz.js" defer></script>
