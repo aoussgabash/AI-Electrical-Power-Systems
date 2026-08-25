@@ -1,306 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-<title>Lecture 15 - Multi-Agent AI for Smart Grids</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-quiz.css">
-<link rel="stylesheet" href="course-footer.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="Multi-Agent Artificial Intelligence for Smart Grids">
+  <title>Lecture 15 - Multi-Agent AI for Smart Grids</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-quiz.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
-<body class="course-template-modern">
-<header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
-
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LECTURE 15 | المحاضرة 15</div>
-  <h1>Multi-Agent AI for Smart Grids</h1>
-  <div class="hero-ar">الذكاء الاصطناعي متعدد الوكلاء في الشبكات الذكية</div>
-  <div class="subtitle">Distributed intelligence, consensus, coordination, and resilient energy management<br>الذكاء الموزع والإجماع والتنسيق وإدارة الطاقة المرنة</div>
-</div>
-
-<section>
-<div class="en"><h2>🎯 Learning Objectives</h2><ul>
-<li>Explain the agent and multi-agent system concepts.</li>
-<li>Compare centralized, decentralized, and distributed control.</li>
-<li>Represent communication networks using graphs and adjacency matrices.</li>
-<li>Derive and interpret discrete-time consensus algorithms.</li>
-<li>Understand distributed optimization and economic dispatch.</li>
-<li>Explain Multi-Agent Reinforcement Learning (MARL).</li>
-<li>Apply MAS concepts to microgrids, DERs, EV charging, and electricity markets.</li>
-<li>Evaluate communication, cybersecurity, privacy, and resilience challenges.</li>
-</ul></div>
-<div class="ar"><h2>🎯 أهداف التعلم</h2><ul>
-<li>شرح مفهوم الوكيل والنظام متعدد الوكلاء.</li>
-<li>المقارنة بين التحكم المركزي واللامركزي والموزع.</li>
-<li>تمثيل شبكات الاتصال باستخدام الرسوم البيانية ومصفوفة التجاور.</li>
-<li>اشتقاق خوارزمية الإجماع في الزمن المتقطع وتفسيرها.</li>
-<li>فهم التحسين الموزع والتوزيع الاقتصادي للأحمال.</li>
-<li>شرح التعلم المعزز متعدد الوكلاء.</li>
-<li>تطبيق المفاهيم على الشبكات المصغرة ومصادر الطاقة والمركبات الكهربائية والأسواق.</li>
-<li>تقييم تحديات الاتصال والأمن السيبراني والخصوصية والمرونة.</li>
-</ul></div>
-</section>
-
-<section>
-<div class="en"><h2>1. What Is an Intelligent Agent?</h2>
-<p>An intelligent agent is an autonomous computational entity that senses its environment, makes decisions, and performs actions to achieve a goal.</p>
-<div class="flow"><div class="flow-box">Environment</div><div class="arrow">→</div><div class="flow-box">Sensors / Measurements</div><div class="arrow">→</div><div class="flow-box">Agent Decision</div><div class="arrow">→</div><div class="flow-box">Action / Control</div></div>
-<div class="formula">a_i(k)=\pi_i\big(o_i(k),m_i(k),\theta_i\big)</div>
-<p>Here, <b>o<sub>i</sub></b> is the local observation, <b>m<sub>i</sub></b> is information received from neighbors, and <b>π<sub>i</sub></b> is the agent policy.</p></div>
-<div class="ar"><h2>1. ما هو الوكيل الذكي؟</h2>
-<p>الوكيل الذكي كيان حاسوبي مستقل يقيس بيئته ويتخذ قرارًا وينفذ فعلًا لتحقيق هدف محدد. يعتمد قراره على القياسات المحلية والمعلومات المتبادلة مع الوكلاء المجاورين.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>2. Multi-Agent Systems</h2>
-<p>A Multi-Agent System (MAS) consists of several interacting agents. Each agent has limited local information, but cooperation can produce a global system-level behavior.</p>
-<div class="grid3">
-<div class="mini-card"><strong>Autonomy</strong><p>Each agent makes local decisions.</p></div>
-<div class="mini-card"><strong>Interaction</strong><p>Agents exchange measurements, states, or prices.</p></div>
-<div class="mini-card"><strong>Emergence</strong><p>Global behavior arises from local rules.</p></div>
-</div>
-<div class="highlight">In a smart grid, an agent may represent a generator, battery, load, EV charger, microgrid, substation, or market participant.</div></div>
-<div class="ar"><h2>2. الأنظمة متعددة الوكلاء</h2>
-<p>يتكون النظام متعدد الوكلاء من عدة وكلاء متفاعلين. يمتلك كل وكيل معلومات محلية محدودة، لكن التعاون بينهم يحقق سلوكًا عامًا على مستوى الشبكة.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>3. Centralized, Decentralized, and Distributed Control</h2>
-<div class="table-wrap"><table>
-<tr><th>Architecture</th><th>Information</th><th>Advantages</th><th>Limitations</th></tr>
-<tr><td>Centralized</td><td>All data sent to one controller</td><td>Global view, simple coordination</td><td>Single point of failure, communication burden</td></tr>
-<tr><td>Decentralized</td><td>Local measurements only</td><td>Fast and robust locally</td><td>Weak global coordination</td></tr>
-<tr><td>Distributed</td><td>Local data plus neighbor exchange</td><td>Scalable, flexible, resilient</td><td>Convergence and communication challenges</td></tr>
-</table></div></div>
-<div class="ar"><h2>3. التحكم المركزي واللامركزي والموزع</h2>
-<p>يجمع التحكم المركزي كل البيانات في متحكم واحد، بينما يعتمد اللامركزي على القياسات المحلية فقط. أما التحكم الموزع فيبادل المعلومات بين الجيران للوصول إلى قرار منسق.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>4. Communication Graph</h2>
-<p>The interaction topology is modeled by a graph <b>G=(V,E)</b>. Nodes represent agents and edges represent communication links.</p>
-<div class="formula">A=[a_{ij}], \quad a_{ij}>0 \text{ if agent } j \text{ sends information to agent } i</div>
-<div class="formula">D=\operatorname{diag}(d_1,\dots,d_n), \quad d_i=\sum_j a_{ij}</div>
-<div class="formula">L=D-A</div>
-<p>The matrix <b>L</b> is the graph Laplacian. Its structure determines connectivity and consensus behavior.</p></div>
-<div class="ar"><h2>4. رسم الاتصال البياني</h2>
-<p>تُمثل الوكلاء بعقد وروابط الاتصال بحواف. وتُستخدم مصفوفة التجاور ومصفوفة الدرجات ومصفوفة لابلاسيان لتحليل الاتصال والتقارب.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>5. Consensus Problem</h2>
-<p>Consensus means that all agents asymptotically agree on a common value.</p>
-<div class="formula">\lim_{k\to\infty}|x_i(k)-x_j(k)|=0 \quad \forall i,j</div>
-<p>A standard discrete-time update is:</p>
-<div class="formula">x_i(k+1)=x_i(k)+\varepsilon\sum_{j\in\mathcal{N}_i}a_{ij}\big(x_j(k)-x_i(k)\big)</div>
-<p>In matrix form:</p>
-<div class="formula">x(k+1)=\big(I-\varepsilon L\big)x(k)=Wx(k)</div>
-<div class="note">The step size ε must be selected so that W is stable and compatible with the communication graph.</div></div>
-<div class="ar"><h2>5. مسألة الإجماع</h2>
-<p>الإجماع يعني تقارب حالات جميع الوكلاء نحو قيمة مشتركة. يصحح كل وكيل حالته اعتمادًا على الفرق بينها وبين حالات جيرانه.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>6. Why Does Average Consensus Work?</h2>
-<p>If the graph is connected and W is doubly stochastic, the average is preserved:</p>
-<div class="formula">\mathbf{1}^T x(k+1)=\mathbf{1}^T W x(k)=\mathbf{1}^T x(k)</div>
-<p>Therefore, the limiting value is the initial average:</p>
-<div class="formula">x_i(\infty)=\bar{x}(0)=\frac{1}{n}\sum_{i=1}^{n}x_i(0)</div>
-<div class="highlight">Consensus does not require every agent to communicate with every other agent. A connected neighbor network is sufficient.</div></div>
-<div class="ar"><h2>6. لماذا يعمل إجماع المتوسط؟</h2>
-<p>عندما تكون شبكة الاتصال مترابطة ومصفوفة الأوزان مزدوجة الاحتمالية، يبقى مجموع الحالات محفوظًا، ولذلك تتقارب الحالات إلى متوسط القيم الابتدائية.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>7. Leader–Follower Coordination</h2>
-<p>Some applications require agents to follow a reference supplied by a leader, such as grid frequency, market price, or voltage setpoint.</p>
-<div class="formula">x_i(k+1)=x_i(k)+\varepsilon\sum_{j\in\mathcal{N}_i}a_{ij}(x_j-x_i)+\varepsilon b_i(x_0-x_i)</div>
-<p>The pinning gain <b>b<sub>i</sub></b> is nonzero for agents that receive the leader reference.</p></div>
-<div class="ar"><h2>7. تنسيق القائد والتابعين</h2>
-<p>في بعض التطبيقات يوجد وكيل قائد يرسل مرجعًا للتردد أو الجهد أو السعر، بينما تتعاون بقية الوكلاء لتتبع هذا المرجع.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>8. Distributed Economic Dispatch</h2>
-<p>Generators or batteries can coordinate to minimize total operating cost while satisfying the power-balance constraint.</p>
-<div class="formula">\min_{P_1,\dots,P_n}\sum_{i=1}^{n}C_i(P_i)</div>
-<div class="formula">\text{s.t. }\sum_i P_i=P_D, \quad P_i^{\min}\le P_i\le P_i^{\max}</div>
-<p>For an unconstrained optimum, incremental costs are equal:</p>
-<div class="formula">\frac{dC_1}{dP_1}=\cdots=\frac{dC_n}{dP_n}=\lambda</div>
-<p>Agents can exchange estimates of λ and update local power setpoints without revealing all private cost data.</p></div>
-<div class="ar"><h2>8. التوزيع الاقتصادي الموزع</h2>
-<p>تتعاون وحدات التوليد أو البطاريات لتقليل التكلفة الكلية مع تحقيق توازن القدرة واحترام الحدود التشغيلية. وفي الحل الأمثل تتساوى التكاليف الحدية للوحدات غير المقيدة.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>9. Distributed Gradient Method</h2>
-<div class="formula">z_i(k+1)=\sum_j w_{ij}z_j(k)-\alpha_k\nabla f_i(z_i(k))</div>
-<p>The first term mixes neighbor estimates; the second performs a local optimization step. Convergence depends on graph connectivity, convexity, weights, and step-size selection.</p></div>
-<div class="ar"><h2>9. طريقة التدرج الموزع</h2>
-<p>يمزج الوكيل تقديره مع تقديرات الجيران ثم يطبق خطوة تدرج محلية. يعتمد التقارب على ترابط الشبكة وتحدب دوال الهدف واختيار الأوزان وخطوة التعلم.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>10. Cooperative and Competitive Agents</h2>
-<div class="grid">
-<div class="mini-card"><strong>Cooperative setting</strong><p>Agents share a common objective, such as minimizing microgrid operating cost.</p></div>
-<div class="mini-card"><strong>Competitive setting</strong><p>Agents maximize individual profit or utility, as in electricity-market bidding.</p></div>
-</div>
-<div class="formula">u_i(a_i,a_{-i})</div>
-<p>Game theory studies strategic interactions. A Nash equilibrium occurs when no agent benefits from changing its action alone.</p></div>
-<div class="ar"><h2>10. الوكلاء المتعاونون والمتنافسون</h2>
-<p>قد يعمل الوكلاء لتحقيق هدف مشترك، أو يتنافسون لتعظيم أرباحهم الفردية. وتستخدم نظرية الألعاب لتحليل القرارات الاستراتيجية ونقطة توازن ناش.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>11. Multi-Agent Reinforcement Learning</h2>
-<p>In MARL, each agent learns a policy through interaction with a shared environment and other learning agents.</p>
-<div class="formula">J_i(\theta_i)=\mathbb{E}\left[\sum_{t=0}^{\infty}\gamma^t r_i(t)\right]</div>
-<div class="grid3">
-<div class="mini-card"><strong>Independent learners</strong><p>Each agent treats others as part of the environment.</p></div>
-<div class="mini-card"><strong>Centralized training</strong><p>Global information is used during training.</p></div>
-<div class="mini-card"><strong>Decentralized execution</strong><p>Agents act using local observations during operation.</p></div>
-</div>
-<div class="warning">Because all policies change during learning, the environment appears non-stationary to each individual agent.</div></div>
-<div class="ar"><h2>11. التعلم المعزز متعدد الوكلاء</h2>
-<p>يتعلم كل وكيل سياسة قرار من خلال التفاعل مع البيئة والوكلاء الآخرين. ومن الأساليب المهمة التدريب المركزي والتنفيذ اللامركزي.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>12. Reward Design</h2>
-<p>A smart-grid reward may combine economic, technical, and environmental terms:</p>
-<div class="formula">r_t=-c_E C_t-c_V\sum_b(V_b-V_b^{ref})^2-c_F(\Delta f_t)^2-c_{CO_2}E_t</div>
-<p>Poorly designed rewards can produce unsafe or unintended behavior. Operational constraints should be enforced explicitly whenever possible.</p></div>
-<div class="ar"><h2>12. تصميم المكافأة</h2>
-<p>يمكن أن تجمع المكافأة بين تكلفة الطاقة وانحرافات الجهد والتردد والانبعاثات. يجب ألا تكون المكافأة بديلًا عن قيود الأمان الصريحة.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>13. Smart-Grid Applications</h2>
-<div class="table-wrap"><table>
-<tr><th>Application</th><th>Agent</th><th>Shared information</th><th>Goal</th></tr>
-<tr><td>Microgrid energy management</td><td>DER / battery / load</td><td>Power, SOC, price</td><td>Balance and cost minimization</td></tr>
-<tr><td>Voltage control</td><td>Inverter</td><td>Voltage and reactive power</td><td>Keep voltages within limits</td></tr>
-<tr><td>EV charging</td><td>Vehicle or charger</td><td>Arrival, SOC, tariff</td><td>Avoid peaks and meet departure SOC</td></tr>
-<tr><td>Restoration</td><td>Switch / feeder / microgrid</td><td>Status and available power</td><td>Restore critical loads</td></tr>
-<tr><td>Electricity market</td><td>Producer / consumer</td><td>Bid, price, quantity</td><td>Efficient trading</td></tr>
-</table></div></div>
-<div class="ar"><h2>13. تطبيقات الشبكات الذكية</h2>
-<p>تشمل التطبيقات إدارة طاقة الشبكات المصغرة والتحكم بالجهد وشحن المركبات الكهربائية واستعادة الخدمة والتجارة المحلية للطاقة.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>14. Communication Constraints</h2>
-<div class="grid3">
-<div class="mini-card"><strong>Delay</strong><p>Old information may destabilize fast control loops.</p></div>
-<div class="mini-card"><strong>Packet loss</strong><p>Messages may be missing or intermittent.</p></div>
-<div class="mini-card"><strong>Bandwidth</strong><p>Frequent high-resolution exchange may be impossible.</p></div>
-</div>
-<div class="formula">x_i(k+1)=x_i(k)+\varepsilon\sum_j a_{ij}\big(x_j(k-\tau_{ij})-x_i(k)\big)</div>
-<p>Event-triggered communication reduces traffic by transmitting only when a local error exceeds a threshold.</p></div>
-<div class="ar"><h2>14. قيود الاتصال</h2>
-<p>تؤثر التأخيرات وفقدان الحزم ومحدودية عرض الحزمة في الاستقرار وسرعة التقارب. ويمكن استخدام الاتصال المحفز بالحدث لتقليل الرسائل.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>15. Cybersecurity and Resilience</h2>
-<p>Distributed control increases flexibility but creates a larger cyber-attack surface.</p>
-<div class="table-wrap"><table>
-<tr><th>Threat</th><th>Effect</th><th>Mitigation</th></tr>
-<tr><td>False-data injection</td><td>Biased consensus or wrong dispatch</td><td>State validation, robust estimators</td></tr>
-<tr><td>Replay attack</td><td>Old measurements appear current</td><td>Timestamps, authentication</td></tr>
-<tr><td>Denial of service</td><td>Communication links unavailable</td><td>Redundant paths, local fallback</td></tr>
-<tr><td>Malicious agent</td><td>Manipulated neighbor information</td><td>Trust models, resilient consensus</td></tr>
-</table></div>
-<div class="warning">Critical grid protection should never depend solely on an unverified learning or communication layer.</div></div>
-<div class="ar"><h2>15. الأمن السيبراني والمرونة</h2>
-<p>تشمل التهديدات حقن البيانات الكاذبة وإعادة إرسال الرسائل القديمة وحجب الخدمة والوكلاء الخبيثين. وتستخدم المصادقة والمسارات البديلة وخوارزميات الإجماع المتينة للتخفيف منها.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>16. Worked Example: Three-Agent Average Consensus</h2>
-<p>Let the initial battery power proposals be:</p>
-<div class="formula">x(0)=[10\;20\;30]^T\text{ kW}</div>
-<p>Using</p>
-<div class="formula">W=\begin{bmatrix}0.5&0.25&0.25\\0.25&0.5&0.25\\0.25&0.25&0.5\end{bmatrix}</div>
-<p>the average is 20 kW. Repeated multiplication by W makes all proposals converge to 20 kW.</p>
-<div class="formula">\lim_{k\to\infty}W^k x(0)=[20\;20\;20]^T</div></div>
-<div class="ar"><h2>16. مثال محلول: إجماع ثلاثة وكلاء</h2>
-<p>تبدأ اقتراحات قدرة البطاريات بالقيم 10 و20 و30 كيلوواط. متوسطها 20 كيلوواط، ومع تكرار تحديث الإجماع تتقارب جميع القيم إلى 20.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>17. Design Workflow</h2>
-<div class="flow"><div class="flow-box">Define agents</div><div class="arrow">→</div><div class="flow-box">Define local states</div><div class="arrow">→</div><div class="flow-box">Choose graph</div><div class="arrow">→</div><div class="flow-box">Design protocol</div><div class="arrow">→</div><div class="flow-box">Test failures</div></div>
-<ol>
-<li>Define the physical objective and safety limits.</li>
-<li>Select agent boundaries and local measurements.</li>
-<li>Specify communication topology and message content.</li>
-<li>Design consensus, optimization, game, or learning rules.</li>
-<li>Verify convergence and closed-loop stability.</li>
-<li>Test delays, packet loss, topology changes, and attacks.</li>
-<li>Provide safe local fallback operation.</li>
-</ol></div>
-<div class="ar"><h2>17. خطوات التصميم</h2>
-<p>يبدأ التصميم بتحديد الهدف والقيود، ثم تعريف الوكلاء والقياسات وشبكة الاتصال، وبعدها تصميم الخوارزمية والتحقق من التقارب والاستقرار واختبار الأعطال والهجمات.</p></div>
-</section>
-
-<section>
-<div class="en"><h2>18. Key Takeaways</h2><ul>
-<li>MAS distributes intelligence among autonomous interacting agents.</li>
-<li>Graph connectivity is fundamental to consensus.</li>
-<li>Distributed optimization coordinates local decisions toward a global objective.</li>
-<li>MARL is powerful but introduces non-stationarity, safety, and training challenges.</li>
-<li>Communication and cybersecurity must be part of the control design.</li>
-<li>Safe fallback and physical constraints remain essential.</li>
-</ul></div>
-<div class="ar"><h2>18. الخلاصة</h2><ul>
-<li>يوزع النظام متعدد الوكلاء الذكاء بين كيانات مستقلة ومتفاعلة.</li>
-<li>ترابط شبكة الاتصال شرط أساسي للإجماع.</li>
-<li>ينسق التحسين الموزع القرارات المحلية لتحقيق هدف عام.</li>
-<li>التعلم المعزز متعدد الوكلاء قوي لكنه يواجه تحديات الاستقرار والأمان.</li>
-<li>يجب دمج الاتصال والأمن السيبراني ضمن تصميم التحكم.</li>
-</ul></div>
-</section>
-
-<section>
-<div class="en"><h2>🧠 Review Questions</h2><ol>
-<li>What is the difference between decentralized and distributed control?</li>
-<li>How does graph connectivity affect consensus?</li>
-<li>Under what condition does average consensus preserve the initial average?</li>
-<li>Why are equal incremental costs important in economic dispatch?</li>
-<li>What is centralized training with decentralized execution?</li>
-<li>How can delay and packet loss affect distributed control?</li>
-<li>Give two countermeasures against malicious-agent attacks.</li>
-</ol></div>
-<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol>
-<li>ما الفرق بين التحكم اللامركزي والتحكم الموزع؟</li>
-<li>كيف يؤثر ترابط الرسم البياني في الإجماع؟</li>
-<li>متى يحافظ إجماع المتوسط على المتوسط الابتدائي؟</li>
-<li>لماذا تتساوى التكاليف الحدية في التوزيع الاقتصادي؟</li>
-<li>ما معنى التدريب المركزي والتنفيذ اللامركزي؟</li>
-<li>كيف يؤثر التأخير وفقدان الحزم في التحكم؟</li>
-<li>اذكر طريقتين لمواجهة الوكلاء الخبيثين.</li>
-</ol></div>
-</section>
-</main>
-
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
+  <div class="hero">
+    <div class="lecture-number">LECTURE 15 | المحاضرة 15</div>
+    <h1>Multi-Agent AI for Smart Grids</h1>
+    <div class="hero-ar">الذكاء الاصطناعي متعدد الوكلاء في الشبكات الذكية</div>
+    <div class="subtitle">Distributed Intelligence, Consensus, Coordination, and Resilient Energy Management<br>الذكاء الموزع والإجماع والتنسيق وإدارة الطاقة المرنة</div>
+    <div class="toc"><a href="#agents">Agents</a><a href="#consensus">Consensus</a><a href="#dispatch">Distributed Dispatch</a><a href="#marl">MARL</a><a href="#security">Security</a><a href="#applications">Applications</a></div>
   </div>
-</footer>
+
+  <section><div class="en"><h2>🎯 Learning Objectives</h2><ul><li>Explain intelligent agents and multi-agent systems.</li><li>Compare centralized, decentralized, and distributed control.</li><li>Represent communication networks using graphs and Laplacian matrices.</li><li>Derive discrete-time consensus algorithms.</li><li>Understand distributed optimization and economic dispatch.</li><li>Explain multi-agent reinforcement learning.</li><li>Apply MAS concepts to microgrids, DERs, EVs, and markets.</li><li>Assess communication, cybersecurity, privacy, and resilience challenges.</li></ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>شرح الوكيل الذكي والنظام متعدد الوكلاء.</li><li>المقارنة بين التحكم المركزي واللامركزي والموزع.</li><li>تمثيل شبكة الاتصال بالرسوم البيانية ومصفوفة لابلاسيان.</li><li>اشتقاق خوارزميات الإجماع في الزمن المتقطع.</li><li>فهم التحسين الموزع والتوزيع الاقتصادي.</li><li>شرح التعلم المعزز متعدد الوكلاء.</li><li>تطبيق المفاهيم على الشبكات المصغرة والمصادر الموزعة والمركبات والأسواق.</li><li>تقييم الاتصال والأمن السيبراني والخصوصية والمرونة.</li></ul></div></section>
+
+  <section id="agents"><div class="en"><h2>1. Intelligent Agents</h2><p>An intelligent agent is an autonomous computational entity that senses its environment, makes decisions, and performs actions to achieve a goal.</p><div class="flow"><div class="flow-box">Environment</div><div class="arrow">→</div><div class="flow-box">Measurements</div><div class="arrow">→</div><div class="flow-box">Agent Policy</div><div class="arrow">→</div><div class="flow-box">Control Action</div></div><div class="formula">a<sub>i</sub>(k)=π<sub>i</sub>(o<sub>i</sub>(k),m<sub>i</sub>(k),θ<sub>i</sub>)</div><p>Here, o<sub>i</sub> is the local observation, m<sub>i</sub> is information received from neighbors, and π<sub>i</sub> is the agent policy.</p></div><div class="ar"><h2>1. الوكلاء الأذكياء</h2><p>الوكيل الذكي كيان مستقل يقيس البيئة ويتخذ قرارًا وينفذ فعلًا اعتمادًا على القياسات المحلية ومعلومات الجيران.</p></div></section>
+
+  <section><div class="en"><h2>2. Multi-Agent Systems</h2><p>A Multi-Agent System consists of interacting agents that use local information and communication to produce global behavior.</p><div class="grid"><div class="mini-card"><strong>Autonomy</strong><p>Each agent makes local decisions.</p></div><div class="mini-card"><strong>Interaction</strong><p>Agents exchange states, prices, or measurements.</p></div><div class="mini-card"><strong>Coordination</strong><p>Local actions are aligned with a system objective.</p></div><div class="mini-card"><strong>Emergence</strong><p>Global behavior arises from local rules.</p></div></div><div class="highlight">An agent may represent a generator, battery, load, EV charger, microgrid, substation, or market participant.</div></div><div class="ar"><h2>2. الأنظمة متعددة الوكلاء</h2><p>يتكون النظام من عدة وكلاء يتعاونون أو يتنافسون، ويحقق تفاعلهم سلوكًا عامًا على مستوى الشبكة.</p></div></section>
+
+  <section><div class="en"><h2>3. Control Architectures</h2><div class="table-wrap"><table><tr><th>Architecture</th><th>Information</th><th>Advantages</th><th>Limitations</th></tr><tr><td>Centralized</td><td>All data at one controller</td><td>Global view</td><td>Single point of failure</td></tr><tr><td>Decentralized</td><td>Local measurements only</td><td>Fast local response</td><td>Weak coordination</td></tr><tr><td>Distributed</td><td>Local data plus neighbor exchange</td><td>Scalable and resilient</td><td>Communication and convergence issues</td></tr></table></div></div><div class="ar"><h2>3. بنى التحكم</h2><p>يجمع التحكم المركزي البيانات في نقطة واحدة، بينما يعتمد اللامركزي على القياسات المحلية، ويستخدم الموزع تبادل المعلومات بين الجيران.</p></div></section>
+
+  <section><div class="en"><h2>4. Communication Graph</h2><div class="formula">G=(V,E)</div><div class="formula">A=[a<sub>ij</sub>], &nbsp; D<sub>ii</sub>=Σ<sub>j</sub>a<sub>ij</sub>, &nbsp; L=D-A</div><p>Nodes represent agents and edges represent communication links. Connectivity and Laplacian eigenvalues govern information flow and consensus speed.</p></div><div class="ar"><h2>4. رسم الاتصال البياني</h2><p>تمثل العقد الوكلاء، وتمثل الحواف روابط الاتصال، وتستخدم مصفوفة لابلاسيان لتحليل الاتصال والتقارب.</p></div></section>
+
+  <section id="consensus"><div class="en"><h2>5. Consensus</h2><div class="formula">lim<sub>k→∞</sub>|x<sub>i</sub>(k)-x<sub>j</sub>(k)|=0</div><div class="formula">x<sub>i</sub>(k+1)=x<sub>i</sub>(k)+εΣ<sub>j∈N<sub>i</sub></sub>a<sub>ij</sub>[x<sub>j</sub>(k)-x<sub>i</sub>(k)]</div><div class="formula">x(k+1)=(I-εL)x(k)=Wx(k)</div><div class="note">The step size must preserve stability and nonnegative weights.</div></div><div class="ar"><h2>5. الإجماع</h2><p>يصحح كل وكيل حالته اعتمادًا على فروق الحالات مع جيرانه حتى تتقارب جميع الحالات إلى قيمة مشتركة.</p></div></section>
+
+  <section><div class="en"><h2>6. Average Consensus</h2><div class="formula">1ᵀx(k+1)=1ᵀWx(k)=1ᵀx(k)</div><div class="formula">x<sub>i</sub>(∞)=x̄(0)=1/n Σ<sub>i=1</sub><sup>n</sup>x<sub>i</sub>(0)</div><div class="highlight">A connected neighbor network is sufficient; all-to-all communication is not required.</div></div><div class="ar"><h2>6. إجماع المتوسط</h2><p>إذا كانت الشبكة مترابطة والأوزان مناسبة، يحافظ النظام على المتوسط وتتقارب الحالات إليه.</p></div></section>
+
+  <section><div class="en"><h2>7. Leader-Follower Coordination</h2><div class="formula">x<sub>i</sub>(k+1)=x<sub>i</sub>(k)+εΣa<sub>ij</sub>(x<sub>j</sub>-x<sub>i</sub>)+εb<sub>i</sub>(x<sub>0</sub>-x<sub>i</sub>)</div><p>A leader may provide frequency, voltage, or price references. Pinning gains identify agents that directly receive the leader signal.</p></div><div class="ar"><h2>7. تنسيق القائد والتابعين</h2><p>يرسل القائد مرجعًا للتردد أو الجهد أو السعر، وتتعاون بقية الوكلاء لتتبعه.</p></div></section>
+
+  <section id="dispatch"><div class="en"><h2>8. Distributed Economic Dispatch</h2><div class="formula">min Σ<sub>i=1</sub><sup>n</sup>C<sub>i</sub>(P<sub>i</sub>)</div><div class="formula">s.t. ΣP<sub>i</sub>=P<sub>D</sub>, &nbsp; P<sub>i</sub><sup>min</sup>≤P<sub>i</sub>≤P<sub>i</sub><sup>max</sup></div><div class="formula">dC<sub>1</sub>/dP<sub>1</sub>=...=dC<sub>n</sub>/dP<sub>n</sub>=λ</div><p>Agents exchange incremental-cost estimates and update local setpoints without revealing all private cost information.</p></div><div class="ar"><h2>8. التوزيع الاقتصادي الموزع</h2><p>تتعاون الوحدات لتقليل التكلفة الكلية وتحقيق توازن القدرة مع احترام الحدود التشغيلية.</p></div></section>
+
+  <section><div class="en"><h2>9. Distributed Gradient Optimization</h2><div class="formula">z<sub>i</sub>(k+1)=Σ<sub>j</sub>w<sub>ij</sub>z<sub>j</sub>(k)-α<sub>k</sub>∇f<sub>i</sub>(z<sub>i</sub>(k))</div><p>The mixing term coordinates neighboring estimates, while the gradient term improves the local objective.</p><div class="warning">Convergence depends on graph connectivity, convexity, weight design, and step-size selection.</div></div><div class="ar"><h2>9. التحسين الموزع بالتدرج</h2><p>يمزج الوكيل تقديره مع تقديرات الجيران ثم يطبق خطوة تحسين محلية.</p></div></section>
+
+  <section><div class="en"><h2>10. Cooperative and Competitive Agents</h2><div class="grid"><div class="mini-card"><strong>Cooperative</strong><p>Agents share a common objective.</p></div><div class="mini-card"><strong>Competitive</strong><p>Agents maximize individual utility.</p></div></div><div class="formula">u<sub>i</sub>(a<sub>i</sub>,a<sub>-i</sub>)</div><p>A Nash equilibrium occurs when no agent benefits from unilaterally changing its action.</p></div><div class="ar"><h2>10. التعاون والتنافس</h2><p>قد يشترك الوكلاء في هدف واحد، أو يتنافسون لتعظيم أرباحهم أو منافعهم الفردية.</p></div></section>
+
+  <section id="marl"><div class="en"><h2>11. Multi-Agent Reinforcement Learning</h2><div class="formula">π<sub>i</sub>(a<sub>i</sub>|o<sub>i</sub>)</div><div class="grid"><div class="mini-card"><strong>Independent Learners</strong><p>Each agent learns separately.</p></div><div class="mini-card"><strong>Centralized Training</strong><p>Critics may access joint information during training.</p></div><div class="mini-card"><strong>Decentralized Execution</strong><p>Agents act using local observations.</p></div><div class="mini-card"><strong>Shared Reward</strong><p>Encourages cooperation but may create credit-assignment problems.</p></div></div><div class="formula">∇<sub>θi</sub>J=E[∇<sub>θi</sub>logπ<sub>i</sub>(a<sub>i</sub>|o<sub>i</sub>)A<sub>i</sub>]</div></div><div class="ar"><h2>11. التعلم المعزز متعدد الوكلاء</h2><p>يتعلم كل وكيل سياسة قرار محلية، ويمكن استخدام تدريب مركزي وتنفيذ موزع لتحسين الاستقرار.</p></div></section>
+
+  <section><div class="en"><h2>12. MARL Challenges</h2><ul><li>Non-stationarity because all agents learn simultaneously.</li><li>Credit assignment for shared rewards.</li><li>Partial observability.</li><li>Communication delays and packet losses.</li><li>Scalability with many agents.</li><li>Safety and constraint satisfaction.</li></ul></div><div class="ar"><h2>12. تحديات MARL</h2><p>تشمل عدم ثبات البيئة وصعوبة توزيع المكافأة والمراقبة الجزئية وتأخر الاتصال وقابلية التوسع والأمان.</p></div></section>
+
+  <section id="security"><div class="en"><h2>13. Communication, Privacy, and Cybersecurity</h2><div class="grid"><div class="mini-card"><strong>Latency</strong><p>Delayed data can destabilize coordination.</p></div><div class="mini-card"><strong>Packet Loss</strong><p>Missing messages slow or prevent consensus.</p></div><div class="mini-card"><strong>False Data</strong><p>Compromised agents can mislead neighbors.</p></div><div class="mini-card"><strong>Privacy</strong><p>Cost curves and local states may be sensitive.</p></div></div><div class="warning">Resilient MAS designs need authentication, anomaly detection, secure aggregation, and fallback local control.</div></div><div class="ar"><h2>13. الاتصال والخصوصية والأمن السيبراني</h2><p>قد تؤثر التأخيرات وفقد الحزم والبيانات المزيفة في التقارب، لذلك نحتاج إلى مصادقة وكشف شذوذ وتحكم احتياطي.</p></div></section>
+
+  <section><div class="en"><h2>14. Resilience and Fault Tolerance</h2><ul><li>Redundant communication paths.</li><li>Neighbor reconfiguration.</li><li>Byzantine-resilient aggregation.</li><li>Local fallback controllers.</li><li>Graceful degradation under failures.</li></ul><div class="good">A resilient multi-agent system should continue operating safely even when some agents or communication links fail.</div></div><div class="ar"><h2>14. المرونة وتحمل الأعطال</h2><p>يجب أن يستمر النظام بأمان عند فشل بعض الوكلاء أو الروابط، ولو بأداء منخفض.</p></div></section>
+
+  <section id="applications"><div class="en"><h2>15. Applications in Smart Grids</h2><div class="grid"><div class="mini-card"><strong>Microgrids</strong><p>Coordinate DERs, storage, and grid exchange.</p></div><div class="mini-card"><strong>Voltage Control</strong><p>Coordinate inverter reactive power.</p></div><div class="mini-card"><strong>EV Charging</strong><p>Schedule fleets without overloading feeders.</p></div><div class="mini-card"><strong>Demand Response</strong><p>Coordinate flexible loads.</p></div><div class="mini-card"><strong>Restoration</strong><p>Distributed switching after faults.</p></div><div class="mini-card"><strong>Electricity Markets</strong><p>Model bidding and negotiation.</p></div></div></div><div class="ar"><h2>15. التطبيقات في الشبكات الذكية</h2><p>تشمل الشبكات المصغرة والتحكم بالجهد وشحن المركبات والاستجابة للطلب واستعادة الشبكة والأسواق.</p></div></section>
+
+  <section><div class="en"><h2>16. Engineering Workflow</h2><div class="flow"><div class="flow-box">Define Agents</div><div class="arrow">→</div><div class="flow-box">Build Communication Graph</div><div class="arrow">→</div><div class="flow-box">Design Local Objectives</div><div class="arrow">→</div><div class="flow-box">Select Coordination Method</div><div class="arrow">→</div><div class="flow-box">Test Failures & Attacks</div></div><ol><li>Identify local measurements and decisions.</li><li>Define communication links and update rates.</li><li>Choose consensus, optimization, game-theoretic, or MARL methods.</li><li>Validate convergence and constraint satisfaction.</li><li>Test delays, failures, and cyberattacks.</li></ol></div><div class="ar"><h2>16. سير العمل الهندسي</h2><p>نحدد الوكلاء وروابط الاتصال والأهداف المحلية، ثم نختار طريقة التنسيق ونختبر التقارب والأعطال والهجمات.</p></div></section>
+
+  <section><div class="en"><h2>🔬 Research Corner</h2><div class="research"><strong>Emerging directions:</strong> graph-based MARL, federated multi-agent learning, privacy-preserving coordination, resilient consensus, market-aware agents, and hybrid optimization-MARL control.</div></div><div class="ar"><h2>🔬 زاوية البحث العلمي</h2><div class="research">تشمل الاتجاهات الحديثة MARL البياني والتعلم الاتحادي والتنسيق المحافظ على الخصوصية والإجماع المرن والدمج مع التحسين.</div></div></section>
+
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>What is an intelligent agent?</li><li>Compare centralized, decentralized, and distributed control.</li><li>Derive the discrete-time consensus update.</li><li>Under what conditions is average consensus achieved?</li><li>How is distributed economic dispatch formulated?</li><li>What is centralized training with decentralized execution?</li><li>Why is MARL non-stationary?</li><li>How can a MAS resist communication failures and attacks?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>ما هو الوكيل الذكي؟</li><li>قارن التحكم المركزي واللامركزي والموزع.</li><li>اشتق تحديث الإجماع في الزمن المتقطع.</li><li>متى يتحقق إجماع المتوسط؟</li><li>كيف تصاغ مسألة التوزيع الاقتصادي الموزع؟</li><li>ما معنى التدريب المركزي والتنفيذ الموزع؟</li><li>لماذا تعد بيئة MARL غير ثابتة؟</li><li>كيف يقاوم النظام فشل الاتصال والهجمات؟</li></ol></div></section>
+</main>
 <script src="course-navigation.js" defer></script>
 <script src="course-quiz-data.js" defer></script>
 <script src="course-quiz.js" defer></script>
