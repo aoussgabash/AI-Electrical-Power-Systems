@@ -1,78 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-<title>Lab 18 - Federated Learning Simulation</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB laboratory on federated learning for smart-grid load forecasting">
+  <title>Lab 18 - Federated Learning Simulation</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
-<body class="course-template-modern">
+<body>
 <header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-<div class="lecture-number">MATLAB LAB 18 | مختبر MATLAB 18</div>
-<h1>Federated Learning Simulation</h1>
-<div class="hero-ar">محاكاة التعلم الاتحادي</div>
-<div class="subtitle">Local training, FedAvg aggregation, non-IID data, and communication analysis<br>التدريب المحلي ودمج FedAvg والبيانات غير المتجانسة وتحليل الاتصال</div>
-</div>
+  <div class="hero">
+    <div class="lecture-number">LAB 18 | المخبر 18</div>
+    <h1>Federated Learning Simulation</h1>
+    <div class="hero-ar">محاكاة التعلم الاتحادي</div>
+    <div class="subtitle">Local Training, FedAvg Aggregation, Non-IID Data, and Communication Analysis<br>التدريب المحلي ودمج FedAvg والبيانات غير المتجانسة وتحليل الاتصال</div>
+    <div class="toc"><a href="#scenario">Scenario</a><a href="#model">Model</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#experiments">Experiments</a><a href="#validation">Validation</a></div>
+  </div>
 
-<section><div class="en"><h2>🎯 Objectives</h2><ul>
-<li>Create multiple smart-grid clients with private local data.</li>
-<li>Train local linear models without sharing raw measurements.</li>
-<li>Implement weighted Federated Averaging.</li>
-<li>Track global loss across communication rounds.</li>
-<li>Compare IID and non-IID client data.</li>
-<li>Study client participation, communication cost, and malicious updates.</li>
-</ul></div><div class="ar"><h2>🎯 الأهداف</h2><ul>
-<li>إنشاء عدة عملاء ببيانات محلية خاصة.</li>
-<li>تدريب نماذج محلية دون مشاركة القياسات الخام.</li>
-<li>تنفيذ FedAvg الموزون.</li>
-<li>تتبع خطأ النموذج العام عبر جولات الاتصال.</li>
-<li>مقارنة البيانات المتجانسة وغير المتجانسة.</li>
-<li>دراسة المشاركة الجزئية وكلفة الاتصال والتحديثات الخبيثة.</li>
-</ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Create several smart-grid clients with private local data.</li><li>Train local forecasting models without sharing raw measurements.</li><li>Implement sample-weighted Federated Averaging.</li><li>Track global and per-client loss across communication rounds.</li><li>Compare IID and non-IID data.</li><li>Study partial participation, communication cost, privacy noise, and malicious updates.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>إنشاء عدة عملاء ببيانات محلية خاصة.</li><li>تدريب نماذج محلية دون مشاركة القياسات الخام.</li><li>تنفيذ FedAvg الموزون بعدد العينات.</li><li>تتبع الخطأ العام وخطأ كل عميل.</li><li>مقارنة البيانات المتجانسة وغير المتجانسة.</li><li>دراسة المشاركة الجزئية وكلفة الاتصال وضوضاء الخصوصية والتحديثات الخبيثة.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Laboratory Scenario</h2>
-<p>Five distribution feeders collaboratively train a one-step load-forecasting model. Each client keeps its raw load and temperature data locally and sends only model parameters to the server.</p>
-<div class="formula">\hat{P}=w_0+w_1P_{prev}+w_2T</div>
-<div class="formula">w^{t+1}=\sum_k\frac{n_k}{\sum_jn_j}w_k^{t+1}</div></div><div class="ar"><h2>1. سيناريو المختبر</h2><p>تتعاون خمسة مغذيات لتدريب نموذج تنبؤ بالحمل. تبقى بيانات الحمل والحرارة لدى كل عميل، بينما تُرسل معاملات النموذج فقط إلى الخادم.</p></div></section>
+  <section id="scenario"><div class="en"><h2>1. Laboratory Scenario</h2><p>Five distribution feeders collaboratively train a one-step load-forecasting model. Each client keeps load and temperature measurements locally and sends only model parameters to a central server.</p><div class="formula">P̂=w<sub>0</sub>+w<sub>1</sub>P<sub>prev</sub>+w<sub>2</sub>T</div><div class="highlight">Federated learning coordinates model training while raw client data remain local.</div></div><div class="ar"><h2>1. سيناريو المخبر</h2><p>تتعاون خمسة مغذيات لتدريب نموذج تنبؤ بالحمل، بينما تبقى بيانات الحمل والحرارة لدى كل عميل.</p></div></section>
 
-<section><div class="en"><h2>2. Complete MATLAB Program</h2><pre><code>clear; clc; close all;
-rng(18);
+  <section id="model"><div class="en"><h2>2. Federated Objective and FedAvg</h2><div class="formula">F(w)=Σ<sub>k=1</sub><sup>K</sup>(n<sub>k</sub>/N)F<sub>k</sub>(w)</div><div class="formula">w<sub>k</sub><sup>t+1</sup>=LocalTrain(w<sup>t</sup>,D<sub>k</sub>)</div><div class="formula">w<sup>t+1</sup>=Σ<sub>k</sub>(n<sub>k</sub>/Σ<sub>j</sub>n<sub>j</sub>)w<sub>k</sub><sup>t+1</sup></div><div class="warning">When client data are non-IID, many local epochs can increase client drift and bias the global model.</div></div><div class="ar"><h2>2. الهدف الاتحادي وFedAvg</h2><p>يدرب كل عميل نموذجًا محليًا، ثم يدمج الخادم النماذج بأوزان تتناسب مع عدد العينات.</p></div></section>
 
-%% Federated-learning settings
-K = 5;                  % Number of clients
-rounds = 40;            % Communication rounds
+  <section id="workflow"><div class="en"><h2>3. Engineering Workflow</h2><div class="flow"><div class="flow-box">Create Clients</div><div class="arrow">→</div><div class="flow-box">Train Locally</div><div class="arrow">→</div><div class="flow-box">Aggregate Models</div><div class="arrow">→</div><div class="flow-box">Evaluate Clients</div><div class="arrow">→</div><div class="flow-box">Test Privacy & Attacks</div></div><ol><li>Generate private client datasets.</li><li>Initialize one global model.</li><li>Train local copies for several epochs.</li><li>Aggregate local parameters using FedAvg.</li><li>Measure global and client-specific performance.</li><li>Repeat under non-IID data, partial participation, and malicious updates.</li></ol></div><div class="ar"><h2>3. سير العمل الهندسي</h2><p>ننشىء العملاء وندرب النماذج محليًا ثم ندمجها ونقيم الأداء والمتانة والخصوصية.</p></div></section>
+
+  <section id="code"><div class="en"><h2>4. Complete MATLAB Program</h2><pre><code>%% Lab 18: Federated Learning Simulation
+clear; clc; close all; rng(18);
+
+%% Federated settings
+K = 5;
+rounds = 40;
 localEpochs = 4;
-eta = 0.02;             % Local learning rate
+eta = 0.02;
 nSamples = [180 220 260 320 420];
 
-%% Create private client data
+%% Private client data
 Xclient = cell(K,1);
 yclient = cell(K,1);
-
 for k = 1:K
     n = nSamples(k);
     temperature = 10 + 20*rand(n,1);
     previousLoad = 40 + 12*randn(n,1) + 3*k;
-
-    % Non-IID behavior: each feeder has a different offset
-    clientBias = 2.5*(k-3);
+    clientBias = 2.5*(k-3);   % non-IID offset
     loadNow = 8 + 0.82*previousLoad + ...
-              0.55*temperature + clientBias + 2*randn(n,1);
-
-    Xclient{k} = [ones(n,1), previousLoad, temperature];
+        0.55*temperature + clientBias + 2*randn(n,1);
+    Xclient{k} = [ones(n,1),previousLoad,temperature];
     yclient{k} = loadNow;
 end
 
-%% Global validation data
-Xval = [];
-yval = [];
+%% Global validation set
+Xval = []; yval = [];
 for k = 1:K
-    Xval = [Xval; Xclient{k}];
-    yval = [yval; yclient{k}];
+    Xval = [Xval;Xclient{k}];
+    yval = [yval;yclient{k}];
 end
 
 %% Initialize global model
@@ -86,8 +71,7 @@ for r = 1:rounds
     localModels = zeros(p,K);
 
     for k = 1:K
-        Xk = Xclient{k};
-        yk = yclient{k};
+        Xk = Xclient{k}; yk = yclient{k};
         wk = wGlobal;
 
         for e = 1:localEpochs
@@ -100,12 +84,9 @@ for r = 1:rounds
         clientLoss(r,k) = mean((Xk*wk-yk).^2);
     end
 
-    % Sample-weighted FedAvg
     weights = nSamples/sum(nSamples);
     wGlobal = localModels*weights';
-
-    globalPrediction = Xval*wGlobal;
-    lossHistory(r) = mean((globalPrediction-yval).^2);
+    lossHistory(r) = mean((Xval*wGlobal-yval).^2);
 end
 
 %% Results
@@ -114,130 +95,57 @@ disp(wGlobal);
 fprintf('Final global MSE = %.4f\n',lossHistory(end));
 
 figure;
-semilogy(1:rounds,lossHistory,'LineWidth',1.8);
-grid on;
-xlabel('Communication round');
-ylabel('Global MSE');
+semilogy(1:rounds,lossHistory,'LineWidth',1.8); grid on;
+xlabel('Communication round'); ylabel('Global MSE');
 title('Federated Learning Convergence');
 
 figure;
-plot(1:rounds,clientLoss,'LineWidth',1.2);
-grid on;
-xlabel('Communication round');
-ylabel('Local MSE');
-title('Per-Client Training Loss');
-legend('Client 1','Client 2','Client 3','Client 4','Client 5',...
-       'Location','best');
+plot(1:rounds,clientLoss,'LineWidth',1.2); grid on;
+xlabel('Communication round'); ylabel('Local MSE');
+legend('Client 1','Client 2','Client 3','Client 4','Client 5');
 
 figure;
 scatter(yval,Xval*wGlobal,18,'filled'); hold on;
 minY = min(yval); maxY = max(yval);
-plot([minY maxY],[minY maxY],'--','LineWidth',1.3);
-grid on;
-xlabel('True load');
-ylabel('Predicted load');
-title('Global Federated Model');</code></pre></div><div class="ar"><h2>2. البرنامج الكامل</h2><p>ينشئ البرنامج بيانات خاصة لكل عميل، ثم يدرب نموذجًا خطيًا محليًا في كل جولة، ويجمع النماذج حسب عدد العينات، ويتابع خطأ النموذج العام وأداء كل عميل.</p></div></section>
+plot([minY maxY],[minY maxY],'--','LineWidth',1.3); grid on;
+xlabel('True load'); ylabel('Predicted load');
+title('Global Federated Model');
 
-<section><div class="en"><h2>3. How FedAvg Appears in the Code</h2><pre><code>weights = nSamples/sum(nSamples);
-wGlobal = localModels*weights';</code></pre><p>Each column of <code>localModels</code> contains one client model. Multiplying by the sample weights produces the global model.</p><div class="highlight">Raw matrices Xclient and yclient never leave their client loops.</div></div><div class="ar"><h2>3. ظهور FedAvg في الكود</h2><p>يمثل كل عمود نموذج عميل، ثم تُضرب مصفوفة النماذج بأوزان تتناسب مع عدد العينات للحصول على النموذج العام.</p></div></section>
-
-<section><div class="en"><h2>4. Experiment A: Equal vs Sample-Weighted Aggregation</h2><pre><code>% Equal client weights
-wEqual = mean(localModels,2);
-
-% Sample-weighted client weights
-sampleWeights = nSamples/sum(nSamples);
-wWeighted = localModels*sampleWeights';
-
-mseEqual = mean((Xval*wEqual-yval).^2);
-mseWeighted = mean((Xval*wWeighted-yval).^2);
-
-fprintf('Equal-weight MSE   = %.4f\n',mseEqual);
-fprintf('Sample-weight MSE  = %.4f\n',mseWeighted);</code></pre><p>Equal weighting treats every feeder equally. Sample weighting gives larger datasets more influence.</p></div><div class="ar"><h2>4. التجربة A: الدمج المتساوي والموزون</h2><p>قارن بين منح كل عميل الوزن نفسه ومنحه وزنًا يتناسب مع عدد العينات. راقب أثر ذلك في الخطأ العام وأداء العملاء الصغار.</p></div></section>
-
-<section><div class="en"><h2>5. Experiment B: IID Data</h2><pre><code>% Replace different client bias values with one common bias
-clientBias = 0;</code></pre><p>Regenerate all client datasets using the same statistical relationship, then repeat training. Compare convergence speed and final loss with the original non-IID case.</p></div><div class="ar"><h2>5. التجربة B: البيانات المتجانسة</h2><p>ألغِ الاختلاف بين العملاء وأعد التدريب. غالبًا يصبح التقارب أسرع وأكثر استقرارًا عندما تتشابه توزيعات البيانات.</p></div></section>
-
-<section><div class="en"><h2>6. Experiment C: Partial Client Participation</h2><pre><code>participationRate = 0.6;
-selectedCount = max(1,round(participationRate*K));
-selected = randperm(K,selectedCount);
-
-selectedModels = localModels(:,selected);
-selectedSamples = nSamples(selected);
-selectedWeights = selectedSamples/sum(selectedSamples);
-wGlobal = selectedModels*selectedWeights';</code></pre><p>Insert this selection step in each round. Run several trials because random participation changes the result.</p></div><div class="ar"><h2>6. التجربة C: المشاركة الجزئية</h2><p>اختر نسبة من العملاء في كل جولة بدل مشاركة الجميع. قارن عدد الجولات وكلفة الاتصال واستقرار النتائج.</p></div></section>
-
-<section><div class="en"><h2>7. Experiment D: Communication Cost</h2><pre><code>parametersPerModel = numel(wGlobal);
-bytesPerParameter = 8;      % double precision
-clientsPerRound = K;
-
-uploadBytes = rounds*clientsPerRound*parametersPerModel*bytesPerParameter;
-downloadBytes = uploadBytes;
-totalMB = (uploadBytes+downloadBytes)/1024^2;
-
-fprintf('Approximate communication = %.4f MB\n',totalMB);</code></pre><div class="formula">C\approx 2RMBp</div><p>The factor two represents downloading and uploading the model.</p></div><div class="ar"><h2>7. التجربة D: كلفة الاتصال</h2><p>احسب كمية البيانات المرسلة والمستقبلة اعتمادًا على عدد الجولات والعملاء والمعلمات وحجم كل معلمة.</p></div></section>
-
-<section><div class="en"><h2>8. Experiment E: Local Epochs and Client Drift</h2><p>Repeat training with localEpochs equal to 1, 4, 10, and 25.</p><div class="table-wrap"><table><tr><th>Few local epochs</th><th>Many local epochs</th></tr><tr><td>More communication rounds</td><td>Less frequent communication</td></tr><tr><td>Smaller local drift</td><td>Potentially stronger drift under non-IID data</td></tr><tr><td>Higher communication cost</td><td>Possible unstable or biased convergence</td></tr></table></div></div><div class="ar"><h2>8. التجربة E: العصور المحلية</h2><p>زد عدد العصور المحلية وراقب المفاضلة بين تقليل الاتصال وزيادة انجراف النماذج المحلية عندما تختلف البيانات.</p></div></section>
-
-<section><div class="en"><h2>9. Experiment F: Malicious Client</h2><pre><code>maliciousClient = 3;
-attackScale = 8;
-localModels(:,maliciousClient) = ...
-    attackScale*localModels(:,maliciousClient);
-
-wMean = localModels*weights';
-wMedian = median(localModels,2);
-
-mseMean = mean((Xval*wMean-yval).^2);
-mseMedian = mean((Xval*wMedian-yval).^2);
-
-fprintf('FedAvg under attack MSE = %.4f\n',mseMean);
-fprintf('Median aggregation MSE  = %.4f\n',mseMedian);</code></pre><div class="warning">Median aggregation may improve robustness, but it can also reduce efficiency or reject legitimate unusual clients.</div></div><div class="ar"><h2>9. التجربة F: عميل خبيث</h2><p>ضخّم تحديث أحد العملاء ثم قارن FedAvg بالوسيط. لاحظ أن المتانة والأداء والعدالة قد تتعارض.</p></div></section>
-
-<section><div class="en"><h2>10. Per-Client Evaluation</h2><pre><code>finalClientMSE = zeros(K,1);
+%% Per-client evaluation
+finalClientMSE = zeros(K,1);
 for k = 1:K
     finalClientMSE(k) = mean((Xclient{k}*wGlobal-yclient{k}).^2);
 end
-
-disp(table((1:K)',nSamples',finalClientMSE,...
+disp(table((1:K)',nSamples',finalClientMSE, ...
     'VariableNames',{'Client','Samples','MSE'}));
+fprintf('Worst-client MSE = %.4f\n',max(finalClientMSE));</code></pre></div><div class="ar"><h2>4. برنامج MATLAB الكامل</h2><p>ينشئ البرنامج بيانات خاصة لكل عميل، ويدرب نموذجًا محليًا، ثم يطبق FedAvg ويتابع الأداء العام والمحلي.</p></div></section>
 
-fprintf('Worst-client MSE = %.4f\n',max(finalClientMSE));</code></pre><p>Global average performance alone can hide weak performance on a small or unusual feeder.</p></div><div class="ar"><h2>10. تقييم كل عميل</h2><p>احسب الخطأ لكل عميل وأظهر خطأ أسوأ عميل، لأن المتوسط العام قد يخفي ضعفًا كبيرًا لدى بعض المغذيات.</p></div></section>
+  <section id="experiments"><div class="en"><h2>5. Experiments</h2><div class="grid"><div class="mini-card"><strong>Equal vs Weighted</strong><p>Compare equal averaging with sample-weighted FedAvg.</p></div><div class="mini-card"><strong>IID vs Non-IID</strong><p>Set all client biases to zero and compare convergence.</p></div><div class="mini-card"><strong>Partial Participation</strong><p>Select only a fraction of clients per round.</p></div><div class="mini-card"><strong>Communication Cost</strong><p>Estimate upload and download volume.</p></div><div class="mini-card"><strong>Client Drift</strong><p>Compare 1, 4, 10, and 25 local epochs.</p></div><div class="mini-card"><strong>Malicious Client</strong><p>Scale one update and compare mean with median aggregation.</p></div></div><pre><code>% Partial participation example
+participationRate = 0.6;
+selectedCount = max(1,round(participationRate*K));
+selected = randperm(K,selectedCount);
+selectedWeights = nSamples(selected)/sum(nSamples(selected));
+wGlobal = localModels(:,selected)*selectedWeights';
 
-<section><div class="en"><h2>11. Optional Privacy Experiment</h2><pre><code>noiseStd = 0.02;
-noisyModels = localModels + noiseStd*randn(size(localModels));
-wPrivate = noisyModels*weights';
-privacyMSE = mean((Xval*wPrivate-yval).^2);
+% Communication estimate
+parametersPerModel = numel(wGlobal);
+bytesPerParameter = 8;
+totalMB = 2*rounds*K*parametersPerModel*bytesPerParameter/1024^2;
 
-fprintf('Noisy aggregation MSE = %.4f\n',privacyMSE);</code></pre><div class="note">This simple noise experiment illustrates the privacy–utility trade-off, but it is not a complete differential-privacy implementation.</div></div><div class="ar"><h2>11. تجربة الخصوصية الاختيارية</h2><p>أضف ضوضاء إلى تحديثات العملاء وراقب تراجع الدقة. هذه تجربة توضيحية وليست تطبيقًا كاملًا للخصوصية التفاضلية.</p></div></section>
+% Malicious update and robust aggregation
+maliciousClient = 3;
+localModels(:,maliciousClient) = 8*localModels(:,maliciousClient);
+wMean = localModels*weights';
+wMedian = median(localModels,2);</code></pre><div class="warning">Robust aggregation can improve attack resistance but may reduce efficiency or penalize legitimate unusual clients.</div></div><div class="ar"><h2>5. التجارب</h2><p>قارن طرق الدمج وتجانس البيانات والمشاركة الجزئية وكلفة الاتصال وانجراف العملاء والهجمات.</p></div></section>
 
-<section><div class="en"><h2>12. Tasks</h2><ol>
-<li>Increase the number of clients from 5 to 20.</li>
-<li>Use highly unequal dataset sizes.</li>
-<li>Compare IID and strongly non-IID data.</li>
-<li>Vary local learning rate and local epochs.</li>
-<li>Simulate random client dropout.</li>
-<li>Compare weighted mean, equal mean, median, and trimmed mean.</li>
-<li>Add a nonlinear feature and compare linear regression with a neural network.</li>
-<li>Report global MSE, worst-client MSE, rounds, and transmitted bytes.</li>
-</ol></div><div class="ar"><h2>12. المهام</h2><ol>
-<li>ارفع عدد العملاء إلى 20.</li>
-<li>استخدم أحجام بيانات مختلفة جدًا.</li>
-<li>قارن البيانات المتجانسة وغير المتجانسة بشدة.</li>
-<li>غيّر معدل التعلم والعصور المحلية.</li>
-<li>حاكي انسحاب العملاء عشوائيًا.</li>
-<li>قارن المتوسط الموزون والمتساوي والوسيط والمتوسط المشذب.</li>
-<li>أضف علاقة غير خطية وقارن الانحدار بشبكة عصبية.</li>
-<li>اعرض الخطأ العام وخطأ أسوأ عميل والجولات وحجم الاتصال.</li>
-</ol></div></section>
+  <section id="validation"><div class="en"><h2>6. Expected Results and Validation</h2><div class="grid"><div class="mini-card"><strong>Global Convergence</strong><p>Global MSE should decrease across rounds.</p></div><div class="mini-card"><strong>Client Fairness</strong><p>Worst-client error should be reported.</p></div><div class="mini-card"><strong>Non-IID Effect</strong><p>Heterogeneous clients may converge more slowly.</p></div><div class="mini-card"><strong>Attack Robustness</strong><p>Median aggregation may resist extreme updates.</p></div></div><ul><li>Report global MSE and per-client MSE.</li><li>Compare equal and sample-weighted aggregation.</li><li>Repeat random participation experiments.</li><li>Measure communication volume.</li><li>Test model quality after adding update noise.</li></ul><div class="highlight">A good global average does not guarantee acceptable performance for every feeder.</div></div><div class="ar"><h2>6. النتائج المتوقعة والتحقق</h2><p>يجب انخفاض الخطأ العام، مع فحص خطأ كل عميل والعدالة وكلفة الاتصال والمتانة أمام الهجمات.</p></div></section>
 
-<section><div class="en"><h2>13. Mini Project</h2><p>Build a federated day-ahead load-forecasting system for several buildings or feeders. Include client-specific weather and occupancy patterns, partial participation, communication accounting, one malicious client, and personalized local fine-tuning after global training.</p></div><div class="ar"><h2>13. المشروع المصغر</h2><p>ابنِ نظام تنبؤ اتحاديًا بالأحمال لعدة مبانٍ أو مغذيات، مع اختلاف الطقس والإشغال والمشاركة الجزئية وحساب الاتصال وعميل خبيث وتخصيص النموذج محليًا بعد التدريب العام.</p></div></section>
+  <section><div class="en"><h2>7. Student Tasks</h2><ol><li>Compare equal and sample-weighted FedAvg.</li><li>Create IID and strongly non-IID client datasets.</li><li>Use participation rates of 0.4, 0.6, and 1.0.</li><li>Vary local epochs and quantify client drift.</li><li>Add Gaussian noise to local updates.</li><li>Compare mean, median, and trimmed-mean aggregation.</li><li>Report global, average-client, and worst-client errors.</li></ol></div><div class="ar"><h2>7. مهام الطالب</h2><ol><li>مقارنة الدمج المتساوي والموزون.</li><li>إنشاء بيانات IID وغير IID بشدة.</li><li>اختبار نسب مشاركة مختلفة.</li><li>تغيير عدد العصور المحلية وقياس الانجراف.</li><li>إضافة ضوضاء إلى التحديثات.</li><li>مقارنة المتوسط والوسيط والمتوسط المشذب.</li><li>عرض الخطأ العام والمتوسط والأسوأ.</li></ol></div></section>
+
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Secure smart-grid FL:</strong> add personalized models, differential privacy, secure aggregation, asynchronous clients, and adversarial update detection.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">وسّع المخبر إلى نماذج مخصصة وخصوصية تفاضلية وتجميع آمن وعملاء غير متزامنين وكشف التحديثات الخبيثة.</div></div></section>
+
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>What is FedAvg?</li><li>Why are sample weights used?</li><li>What makes data non-IID?</li><li>How do local epochs affect client drift?</li><li>Why is per-client evaluation necessary?</li><li>How does partial participation affect convergence?</li><li>What is the difference between privacy and robustness?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>ما FedAvg؟</li><li>لماذا تستخدم أوزان العينات؟</li><li>ما الذي يجعل البيانات غير متجانسة؟</li><li>كيف تؤثر العصور المحلية في انجراف العملاء؟</li><li>لماذا نحتاج تقييم كل عميل؟</li><li>كيف تؤثر المشاركة الجزئية في التقارب؟</li><li>ما الفرق بين الخصوصية والمتانة؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
 </body>
