@@ -1,57 +1,43 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg"><title>Lab 17 - PINN Swing Equation</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-footer.css">
-</head><body class="course-template-modern"><header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB laboratory on a physics-informed neural network for the swing equation">
+  <title>Lab 17 - PINN Swing Equation</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
+</head>
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LAB 17 | المخبر 17</div>
-  <h1>PINN Solution of the Swing Equation</h1>
-  <div class="hero-ar">حل معادلة التأرجح باستخدام شبكة عصبية موجهة بالفيزياء</div>
-  <div class="subtitle">MATLAB custom training loop with second-order automatic differentiation<br>حلقة تدريب MATLAB مخصصة مع اشتقاق تلقائي من الرتبة الثانية</div>
-</div>
+  <div class="hero">
+    <div class="lecture-number">LAB 17 | المخبر 17</div>
+    <h1>PINN Solution of the Swing Equation</h1>
+    <div class="hero-ar">حل معادلة التأرجح باستخدام شبكة عصبية موجَّهة بالفيزياء</div>
+    <div class="subtitle">MATLAB Custom Training with Second-Order Automatic Differentiation<br>تدريب MATLAB مخصص مع اشتقاق تلقائي من الرتبة الثانية</div>
+    <div class="toc"><a href="#model">Dynamic Model</a><a href="#loss">PINN Loss</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#validation">Validation</a><a href="#tasks">Tasks</a></div>
+  </div>
 
-<section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul>
-<li>Build a PINN that approximates rotor angle δ(t).</li><li>Compute first- and second-order derivatives using automatic differentiation.</li>
-<li>Minimize swing-equation and initial-condition residuals.</li><li>Compare the PINN with a numerical ODE solver.</li><li>Analyze the influence of loss weights and collocation points.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف المخبر</h2><ul>
-<li>بناء PINN لتقريب زاوية الدوار.</li><li>حساب المشتقات الأولى والثانية تلقائيًا.</li><li>تقليل متبقي معادلة التأرجح والشروط الابتدائية.</li><li>المقارنة مع محلل ODE عددي.</li><li>تحليل أوزان الخسارة ونقاط الفحص.</li></ul></div></section>
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Build a PINN that approximates rotor angle δ(t).</li><li>Compute first- and second-order derivatives using automatic differentiation.</li><li>Minimize swing-equation and initial-condition residuals.</li><li>Compare the PINN with an ODE45 reference.</li><li>Analyze loss weights, collocation points, and training stability.</li><li>Extend the formulation to inverse parameter estimation.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>بناء PINN لتقريب زاوية الدوار δ(t).</li><li>حساب المشتقات الأولى والثانية تلقائيًا.</li><li>تقليل متبقي معادلة التأرجح والشروط الابتدائية.</li><li>المقارنة مع الحل المرجعي ODE45.</li><li>تحليل أوزان الخسارة ونقاط الفحص واستقرار التدريب.</li><li>توسيع النموذج إلى تقدير المعاملات.</li></ul></div></section>
 
-<section><div class="en"><h2>1. Dynamic Model</h2>
-<div class="formula">Mδ″ + Dδ′ = Pm − Pmax sinδ</div>
-<div class="formula">δ(0)=δ₀, &nbsp; δ′(0)=ω₀</div>
-<p>The PINN receives time t and outputs δ̂(t).</p></div>
-<div class="ar"><h2>1. النموذج الديناميكي</h2>
-<p>تدخل قيمة الزمن إلى الشبكة وتنتج زاوية الدوار، ثم تُستخدم المشتقات في معادلة التأرجح.</p></div></section>
+  <section><div class="en"><h2>1. Requirements</h2><ul><li>MATLAB</li><li>Deep Learning Toolbox</li></ul><div class="note">The code uses <code>dlnetwork</code>, <code>dlgradient</code> with higher derivatives, and <code>adamupdate</code>.</div></div><div class="ar"><h2>1. المتطلبات</h2><p>يلزم MATLAB مع Deep Learning Toolbox لدعم الشبكات الديناميكية والاشتقاق التلقائي والتدريب المخصص.</p></div></section>
 
-<section><div class="en"><h2>2. Requirements</h2>
-<ul><li>MATLAB</li><li>Deep Learning Toolbox</li></ul>
-<div class="note">The code uses a <code>dlnetwork</code>, <code>dlgradient</code> with higher derivatives, and <code>adamupdate</code>.</div></div>
-<div class="ar"><h2>2. المتطلبات</h2><p>يلزم MATLAB مع Deep Learning Toolbox لدعم الشبكات الديناميكية والاشتقاق التلقائي والتدريب المخصص.</p></div></section>
+  <section id="model"><div class="en"><h2>2. Dynamic Model</h2><div class="formula">Mδ″(t)+Dδ′(t)=P<sub>m</sub>−P<sub>max</sub>sinδ(t)</div><div class="formula">δ(0)=δ<sub>0</sub>, &nbsp; δ′(0)=ω<sub>0</sub></div><p>The neural network receives time t and outputs an approximation δ̂(t).</p><div class="highlight">The governing differential equation supplies supervision even when labeled angle trajectories are unavailable.</div></div><div class="ar"><h2>2. النموذج الديناميكي</h2><p>تدخل قيمة الزمن إلى الشبكة وتنتج زاوية الدوار، ثم تُحسب مشتقات الخرج وتُستخدم داخل معادلة التأرجح.</p></div></section>
 
-<section><div class="en"><h2>3. Complete MATLAB Script</h2>
-<pre><code>%% Lab 17: PINN for the Swing Equation
-clear; clc; close all;
-rng(17);
+  <section id="loss"><div class="en"><h2>3. Physics-Informed Loss</h2><div class="formula">r(t)=Mδ̂″+Dδ̂′−P<sub>m</sub>+P<sub>max</sub>sinδ̂</div><div class="formula">J<sub>physics</sub>=mean[r(t)²]</div><div class="formula">J<sub>IC</sub>=[δ̂(0)−δ<sub>0</sub>]²+[δ̂′(0)−ω<sub>0</sub>]²</div><div class="formula">J=λ<sub>p</sub>J<sub>physics</sub>+λ<sub>δ</sub>J<sub>δ0</sub>+λ<sub>ω</sub>J<sub>ω0</sub></div><div class="warning">Poor loss weighting can satisfy the differential equation while violating the initial conditions, or the opposite.</div></div><div class="ar"><h2>3. الخسارة الموجَّهة بالفيزياء</h2><p>تجمع الخسارة بين متبقي المعادلة وخطأ زاوية البداية وخطأ السرعة الابتدائية، ويجب موازنة الأوزان بعناية.</p></div></section>
+
+  <section id="workflow"><div class="en"><h2>4. Engineering Workflow</h2><div class="flow"><div class="flow-box">Define Physics</div><div class="arrow">→</div><div class="flow-box">Select Collocation Points</div><div class="arrow">→</div><div class="flow-box">Build Network</div><div class="arrow">→</div><div class="flow-box">Train PINN</div><div class="arrow">→</div><div class="flow-box">Compare with ODE45</div></div><ol><li>Define the swing equation and initial conditions.</li><li>Sample time-domain collocation points.</li><li>Construct a smooth neural network using tanh activations.</li><li>Compute first and second derivatives by automatic differentiation.</li><li>Minimize physics and initial-condition losses.</li><li>Validate trajectory error and physical residuals.</li></ol></div><div class="ar"><h2>4. سير العمل الهندسي</h2><p>نحدد المعادلة ونقاط الفحص وبنية الشبكة، ثم ندرب PINN ونقارن الحل مع ODE45 ونفحص المتبقي الفيزيائي.</p></div></section>
+
+  <section id="code"><div class="en"><h2>5. Complete MATLAB Script</h2><pre><code>%% Lab 17: PINN for the Swing Equation
+clear; clc; close all; rng(17);
 
 %% 1) Physical parameters
-M = 4.0;
-D = 1.0;
-Pm = 0.80;
-Pmax = 1.20;
-
-delta0 = 0.30;
-omega0 = 0.00;
-
-tMin = 0;
-tMax = 10;
+M = 4.0; D = 1.0; Pm = 0.80; Pmax = 1.20;
+delta0 = 0.30; omega0 = 0.00;
+tMin = 0; tMax = 10;
 
 %% 2) Collocation points
 numPoints = 500;
@@ -69,49 +55,36 @@ layers = [
     tanhLayer(Name="tanh3")
     fullyConnectedLayer(1,Name="delta")
 ];
-
 net = dlnetwork(layers);
 
 %% 4) Training settings
 numIterations = 8000;
 learnRate = 1e-3;
-
 lambdaPhysics = 1.0;
 lambdaDelta0 = 50.0;
 lambdaOmega0 = 50.0;
-
-averageGrad = [];
-averageSqGrad = [];
-
+averageGrad = []; averageSqGrad = [];
 lossHistory = zeros(numIterations,1);
 physicsHistory = zeros(numIterations,1);
 icHistory = zeros(numIterations,1);
 
 %% 5) Custom training loop
 for iteration = 1:numIterations
-
     [loss,gradients,lossPhysics,lossIC] = ...
-        dlfeval(@modelLoss,net,dlT, ...
-        M,D,Pm,Pmax,delta0,omega0, ...
-        lambdaPhysics,lambdaDelta0,lambdaOmega0);
+        dlfeval(@modelLoss,net,dlT,M,D,Pm,Pmax, ...
+        delta0,omega0,lambdaPhysics,lambdaDelta0,lambdaOmega0);
 
     [net,averageGrad,averageSqGrad] = adamupdate( ...
-        net,gradients,averageGrad,averageSqGrad, ...
-        iteration,learnRate);
+        net,gradients,averageGrad,averageSqGrad,iteration,learnRate);
 
-    lossHistory(iteration) = ...
-        double(gather(extractdata(loss)));
-    physicsHistory(iteration) = ...
-        double(gather(extractdata(lossPhysics)));
-    icHistory(iteration) = ...
-        double(gather(extractdata(lossIC)));
+    lossHistory(iteration) = double(gather(extractdata(loss)));
+    physicsHistory(iteration) = double(gather(extractdata(lossPhysics)));
+    icHistory(iteration) = double(gather(extractdata(lossIC)));
 
     if mod(iteration,500)==0
-        fprintf(['Iteration %5d | Total %.3e | ' ...
-                 'Physics %.3e | IC %.3e\n'], ...
+        fprintf('Iteration %5d | Total %.3e | Physics %.3e | IC %.3e\n', ...
             iteration,lossHistory(iteration), ...
-            physicsHistory(iteration), ...
-            icHistory(iteration));
+            physicsHistory(iteration),icHistory(iteration));
     end
 end
 
@@ -120,71 +93,48 @@ tTest = linspace(tMin,tMax,1000);
 dlTTest = dlarray(tTest,"CB");
 deltaPINN = extractdata(forward(net,dlTTest));
 
-%% 7) Numerical reference solution
+%% 7) Numerical reference
 state0 = [delta0;omega0];
-
-odefun = @(t,x) [
-    x(2)
-    (Pm-Pmax*sin(x(1))-D*x(2))/M
-];
-
+odefun = @(t,x) [x(2); (Pm-Pmax*sin(x(1))-D*x(2))/M];
 [tODE,xODE] = ode45(odefun,[tMin tMax],state0);
-
 deltaODE = interp1(tODE,xODE(:,1),tTest,"pchip");
 
 %% 8) Error
 MAE = mean(abs(deltaPINN-deltaODE));
 RMSE = sqrt(mean((deltaPINN-deltaODE).^2));
-
 fprintf('\nPINN MAE  = %.4e rad\n',MAE);
 fprintf('PINN RMSE = %.4e rad\n',RMSE);
 
 %% 9) Plots
 figure;
 plot(tTest,deltaODE,"k",LineWidth=1.5); hold on;
-plot(tTest,deltaPINN,"--",LineWidth=1.5);
-grid on;
-xlabel("Time (s)");
+plot(tTest,deltaPINN,"--",LineWidth=1.5); grid on;
+legend("ODE45 Reference","PINN"); xlabel("Time (s)");
 ylabel("Rotor Angle delta (rad)");
-legend("ODE45 Reference","PINN");
-title("Swing-Equation Solution");
 
 figure;
 semilogy(lossHistory,LineWidth=1.2); hold on;
 semilogy(physicsHistory,LineWidth=1.2);
-semilogy(icHistory,LineWidth=1.2);
-grid on;
-xlabel("Iteration");
-ylabel("Loss");
+semilogy(icHistory,LineWidth=1.2); grid on;
 legend("Total","Physics","Initial Conditions");
-title("PINN Training History");
+xlabel("Iteration"); ylabel("Loss");
 
 %% Local loss function
 function [loss,gradients,lossPhysics,lossIC] = ...
     modelLoss(net,t,M,D,Pm,Pmax,delta0,omega0, ...
     lambdaPhysics,lambdaDelta0,lambdaOmega0)
 
-    % Network prediction
     delta = forward(net,t);
-
-    % First derivative
     delta_t = dlgradient(sum(delta,"all"),t, ...
         EnableHigherDerivatives=true);
-
-    % Second derivative
     delta_tt = dlgradient(sum(delta_t,"all"),t, ...
         EnableHigherDerivatives=true);
 
-    % Swing-equation residual
-    residual = M*delta_tt + D*delta_t ...
-        - Pm + Pmax*sin(delta);
-
+    residual = M*delta_tt + D*delta_t - Pm + Pmax*sin(delta);
     lossPhysics = mean(residual.^2,"all");
 
-    % Initial conditions
     t0 = dlarray(0,"CB");
     deltaAt0 = forward(net,t0);
-
     delta0_t = dlgradient(sum(deltaAt0,"all"),t0, ...
         EnableHigherDerivatives=true);
 
@@ -192,69 +142,23 @@ function [loss,gradients,lossPhysics,lossIC] = ...
     lossOmega0 = (delta0_t-omega0).^2;
     lossIC = lossDelta0+lossOmega0;
 
-    % Total loss
     loss = lambdaPhysics*lossPhysics ...
         + lambdaDelta0*lossDelta0 ...
         + lambdaOmega0*lossOmega0;
-
-    % Gradients with respect to network parameters
     gradients = dlgradient(loss,net.Learnables);
-end</code></pre></div>
-<div class="ar"><h2>3. الكود الكامل</h2>
-<p>يبني الكود شبكة تستقبل الزمن وتنتج الزاوية، ثم يحسب المشتقتين ويصغر متبقي معادلة التأرجح والشروط الابتدائية.</p></div></section>
+end</code></pre></div><div class="ar"><h2>5. كود MATLAB الكامل</h2><p>يبني الكود شبكة تستقبل الزمن وتنتج زاوية الدوار، ثم يحسب المشتقتين ويصغر الخسارة الفيزيائية والشروط الابتدائية.</p></div></section>
 
-<section><div class="en"><h2>4. Physics Loss</h2>
-<div class="formula">r(t)=Mδ̂″+Dδ̂′−Pm+Pmax sinδ̂</div>
-<div class="formula">Jphysics=mean(r²)</div>
-<p>The network is trained even without labeled trajectory data.</p></div>
-<div class="ar"><h2>4. الخسارة الفيزيائية</h2>
-<p>تُدرب الشبكة باستخدام المعادلة نفسها، حتى دون توفير قيم صحيحة للزاوية داخل المجال.</p></div></section>
+  <section><div class="en"><h2>6. Why Higher Derivatives Are Enabled</h2><p>The second derivative requires differentiating the first derivative. Therefore, the first call to <code>dlgradient</code> must preserve the derivative graph using <code>EnableHigherDerivatives=true</code>.</p></div><div class="ar"><h2>6. لماذا نفعّل الاشتقاقات العليا؟</h2><p>لأن المشتقة الثانية تتطلب اشتقاق المشتقة الأولى، يجب الاحتفاظ بالرسم الحسابي أثناء الاشتقاق الأول.</p></div></section>
 
-<section><div class="en"><h2>5. Initial-Condition Loss</h2>
-<div class="formula">JIC=(δ̂(0)−δ₀)²+(δ̂′(0)−ω₀)²</div>
-<p>Large initial-condition weights help anchor the solution at t=0.</p></div>
-<div class="ar"><h2>5. خسارة الشروط الابتدائية</h2>
-<p>تثبت قيمة الزاوية والسرعة في بداية المحاكاة، وتساعد الأوزان الكبيرة على منع انحراف الحل.</p></div></section>
+  <section id="validation"><div class="en"><h2>7. Expected Results and Validation</h2><div class="grid"><div class="mini-card"><strong>Loss Reduction</strong><p>Total, physics, and IC losses should decrease.</p></div><div class="mini-card"><strong>Trajectory Match</strong><p>The PINN should follow the ODE45 solution.</p></div><div class="mini-card"><strong>Residual Quality</strong><p>The swing-equation residual should remain small over time.</p></div><div class="mini-card"><strong>Initial Conditions</strong><p>Angle and speed at t=0 must be satisfied.</p></div></div><ul><li>Report MAE and RMSE.</li><li>Plot the physical residual over the time domain.</li><li>Compare 100, 500, and 2000 collocation points.</li><li>Repeat training with several random seeds.</li><li>Inspect failure near rapid transients.</li></ul><div class="warning">Low trajectory error alone is insufficient if the differential-equation residual remains large.</div></div><div class="ar"><h2>7. النتائج المتوقعة والتحقق</h2><p>يجب أن تنخفض الخسائر ويتبع الحل مسار ODE45، مع تحقق الشروط الابتدائية وانخفاض المتبقي الفيزيائي.</p></div></section>
 
-<section><div class="en"><h2>6. Why Higher Derivatives Are Enabled</h2>
-<p>The second derivative requires differentiating a derivative. Therefore the first call to automatic differentiation must preserve the derivative graph.</p></div>
-<div class="ar"><h2>6. لماذا نفعّل الاشتقاقات العليا؟</h2>
-<p>لأننا نشتق المشتقة الأولى مرة ثانية، يجب الاحتفاظ بالرسم الحسابي أثناء الاشتقاق الأول.</p></div></section>
+  <section id="tasks"><div class="en"><h2>8. Student Tasks</h2><ol><li>Change inertia M from 4 to 2 and 8.</li><li>Change damping D.</li><li>Increase disturbance severity by changing Pm.</li><li>Compare 100, 500, and 2000 collocation points.</li><li>Test different loss weights.</li><li>Add 10 noisy measured angle samples.</li><li>Replace tanh with another activation and compare.</li></ol></div><div class="ar"><h2>8. مهام الطالب</h2><ol><li>تغيير العطالة M.</li><li>تغيير التخميد D.</li><li>زيادة شدة الاضطراب.</li><li>مقارنة أعداد مختلفة من نقاط الفحص.</li><li>اختبار أوزان خسارة مختلفة.</li><li>إضافة قياسات زاوية مشوشة.</li><li>تغيير دالة التنشيط والمقارنة.</li></ol></div></section>
 
-<section><div class="en"><h2>7. Expected Results</h2>
-<ul><li>Total and physics losses decrease.</li><li>The PINN follows the ODE45 reference trajectory.</li><li>Largest errors may occur near rapid transients.</li><li>Insufficient collocation points can produce oscillatory residuals.</li></ul></div>
-<div class="ar"><h2>7. النتائج المتوقعة</h2><p>يجب أن ينخفض الخطأ ويتبع حل PINN مسار ODE45، وقد تظهر أكبر الأخطاء خلال التغيرات السريعة.</p></div></section>
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Inverse and multi-machine PINN:</strong> make M or D learnable from sparse measurements, then extend the formulation to several coupled generators and compare one shared network with one network per machine.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">اجعل العطالة أو التخميد قابلًا للتعلم من قياسات محدودة، ثم وسّع النموذج إلى عدة مولدات مترابطة.</div></div></section>
 
-<section><div class="en"><h2>8. Student Experiments</h2><div class="task"><ol>
-<li>Change inertia M from 4 to 2 and 8.</li><li>Change damping D.</li><li>Increase disturbance severity by changing Pm.</li>
-<li>Compare 100, 500, and 2000 collocation points.</li><li>Test different loss weights.</li><li>Add 10 noisy measured angle samples to the loss.</li>
-</ol></div></div>
-<div class="ar"><h2>8. تجارب الطالب</h2><div class="task"><ol>
-<li>غيّر العطالة.</li><li>غيّر التخميد.</li><li>زد شدة الاضطراب.</li><li>غيّر عدد نقاط الفحص.</li><li>اختبر أوزان خسارة مختلفة.</li><li>أضف قياسات زاوية مشوبة بالضجيج.</li>
-</ol></div></div></section>
-
-<section><div class="en"><h2>9. Inverse PINN Extension</h2>
-<p>Make M or D learnable and estimate them from sparse trajectory measurements.</p>
-<div class="formula">J=Jphysics+λdata Σ|δ̂(ti)−δmeas,i|²</div></div>
-<div class="ar"><h2>9. توسع إلى مسألة عكسية</h2>
-<p>اجعل العطالة أو التخميد معاملًا قابلًا للتعلم، ثم قدره من عدد محدود من القياسات.</p></div></section>
-
-<section><div class="en"><h2>10. Mini Project</h2>
-<div class="research"><strong>Multi-machine PINN:</strong> Extend the formulation to several coupled generators and compare a shared network with one network per machine.</div></div>
-<div class="ar"><h2>10. مشروع مصغر</h2><div class="research">وسّع النموذج إلى عدة مولدات مترابطة وقارن بين شبكة مشتركة وشبكة مستقلة لكل مولد.</div></div></section>
-
-<section><div class="en"><h2>11. Laboratory Report</h2><ul>
-<li>Derive the swing residual.</li><li>Explain automatic differentiation.</li><li>Report loss weights and collocation points.</li>
-<li>Compare PINN and ODE45 using MAE and RMSE.</li><li>Discuss failure cases.</li><li>Present one inverse-problem extension.</li></ul></div>
-<div class="ar"><h2>11. تقرير المخبر</h2><p>يتضمن اشتقاق المتبقي وشرح الاشتقاق التلقائي وأوزان الخسارة والمقارنة مع ODE45 وحالات الفشل وتوسعًا عكسيًا.</p></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>What is the swing-equation residual?</li><li>Why are tanh activations useful in PINNs?</li><li>Why is second-order automatic differentiation required?</li><li>How do loss weights affect training?</li><li>What are collocation points?</li><li>Why compare against ODE45?</li><li>How is an inverse PINN formulated?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>ما متبقي معادلة التأرجح؟</li><li>لماذا تناسب tanh شبكات PINN؟</li><li>لماذا نحتاج اشتقاقًا تلقائيًا من الرتبة الثانية؟</li><li>كيف تؤثر أوزان الخسارة؟</li><li>ما نقاط الفحص؟</li><li>لماذا نقارن مع ODE45؟</li><li>كيف تصاغ مسألة PINN عكسية؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
