@@ -1,290 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-<meta name="description" content="Graph Neural Networks for Electrical Power Systems">
-<title>Lecture 11 - Graph Neural Networks for Power Systems</title>
-<link rel="stylesheet" href="course-common.css">
-<link rel="stylesheet" href="course-quiz.css">
-<link rel="stylesheet" href="course-footer.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="Graph Neural Networks for Electrical Power Systems">
+  <title>Lecture 11 - Graph Neural Networks for Power Systems</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-quiz.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
-<body class="course-template-modern">
-
-<header>
-  <div class="container">
-    <nav>
-      <div class="logo"><span>AI</span> Power Systems</div>
-      <a class="back" href="index.html">← Home | الرئيسية</a>
-    </nav>
-  </div>
-</header>
-
+<body>
+<header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero">
-  <div class="lecture-number">LECTURE 11 | المحاضرة 11</div>
-  <h1>Graph Neural Networks for Power Systems</h1>
-  <div class="hero-ar">الشبكات العصبية البيانية في أنظمة القدرة الكهربائية</div>
-  <div class="subtitle">Topology-aware learning for state estimation, fault detection, stability, and smart grids<br>تعلم واعٍ بالطوبولوجيا لتقدير الحالة وكشف الأعطال والاستقرار والشبكات الذكية</div>
-  <div class="toc">
-    <a href="#graph">Grid as Graph</a><a href="#matrices">Graph Matrices</a><a href="#signals">Graph Signals</a>
-    <a href="#mp">Message Passing</a><a href="#gcn">GCN</a><a href="#gat">GAT</a><a href="#apps">Applications</a>
+  <div class="hero">
+    <div class="lecture-number">LECTURE 11 | المحاضرة 11</div>
+    <h1>Graph Neural Networks for Power Systems</h1>
+    <div class="hero-ar">الشبكات العصبية البيانية في أنظمة القدرة الكهربائية</div>
+    <div class="subtitle">Topology-Aware Learning for State Estimation, Fault Detection, Stability, and Smart Grids<br>تعلم واعٍ بالطوبولوجيا لتقدير الحالة وكشف الأعطال والاستقرار والشبكات الذكية</div>
+    <div class="toc"><a href="#graph">Grid as Graph</a><a href="#matrices">Graph Matrices</a><a href="#message">Message Passing</a><a href="#gcn">GCN</a><a href="#gat">GAT</a><a href="#apps">Applications</a></div>
   </div>
-</div>
 
-<section id="graph"><div class="en"><h2>1. Why Is a Power Grid a Graph?</h2>
-<p>An electrical power system is naturally represented as a graph G=(V,E), where buses form the node set V and transmission or distribution lines form the edge set E.</p>
+  <section><div class="en"><h2>🎯 Learning Objectives</h2><ul><li>Represent a power network as a graph.</li><li>Explain adjacency, degree, incidence, and Laplacian matrices.</li><li>Understand graph signals and message passing.</li><li>Derive the normalized GCN update.</li><li>Compare GCN, GraphSAGE, and GAT.</li><li>Apply GNNs to state estimation, faults, stability, and OPF surrogates.</li><li>Recognize topology, data-quality, and over-smoothing limitations.</li></ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>تمثيل شبكة القدرة كرسم بياني.</li><li>فهم مصفوفات المجاورة والدرجة والاتصال واللابلاسيان.</li><li>فهم الإشارات البيانية وتمرير الرسائل.</li><li>اشتقاق تحديث GCN المطبع.</li><li>مقارنة GCN وGraphSAGE وGAT.</li><li>تطبيق GNN في تقدير الحالة والأعطال والاستقرار وبدائل OPF.</li><li>معرفة قيود الطوبولوجيا وجودة البيانات وفرط التنعيم.</li></ul></div></section>
 
-<div class="svg-wrap">
-<svg viewBox="0 0 900 420" role="img" aria-label="Electrical grid represented as a graph">
-  <defs>
-    <filter id="glow"><feGaussianBlur stdDeviation="3" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>
-  <rect width="900" height="420" rx="18" fill="#06101d"/>
-  <g stroke="#38bdf8" stroke-width="5" opacity=".85">
-    <line x1="140" y1="200" x2="330" y2="100"/><line x1="140" y1="200" x2="340" y2="300"/>
-    <line x1="330" y1="100" x2="560" y2="105"/><line x1="340" y1="300" x2="560" y2="105"/>
-    <line x1="340" y1="300" x2="585" y2="310"/><line x1="560" y1="105" x2="760" y2="210"/>
-    <line x1="585" y1="310" x2="760" y2="210"/>
-  </g>
-  <g font-family="Arial" font-size="18" text-anchor="middle">
-    <g filter="url(#glow)"><circle cx="140" cy="200" r="34" fill="#22c55e"/><text x="140" y="207" fill="#07111f" font-weight="bold">Bus 1</text></g>
-    <g><circle cx="330" cy="100" r="34" fill="#38bdf8"/><text x="330" y="107" fill="#07111f" font-weight="bold">Bus 2</text></g>
-    <g><circle cx="340" cy="300" r="34" fill="#38bdf8"/><text x="340" y="307" fill="#07111f" font-weight="bold">Bus 3</text></g>
-    <g><circle cx="560" cy="105" r="34" fill="#a78bfa"/><text x="560" y="112" fill="#07111f" font-weight="bold">Bus 4</text></g>
-    <g><circle cx="585" cy="310" r="34" fill="#a78bfa"/><text x="585" y="317" fill="#07111f" font-weight="bold">Bus 5</text></g>
-    <g><circle cx="760" cy="210" r="34" fill="#facc15"/><text x="760" y="217" fill="#07111f" font-weight="bold">Bus 6</text></g>
-  </g>
-  <g fill="#b8c7d9" font-family="Arial" font-size="17">
-    <text x="440" y="42">Nodes = buses | Edges = lines | Features = measurements and states</text>
-    <text x="440" y="395">العقد = قضبان | الحواف = خطوط | الميزات = قياسات وحالات</text>
-  </g>
-</svg>
-</div>
+  <section id="graph"><div class="en"><h2>1. The Power Grid as a Graph</h2><div class="formula">G=(V,E), &nbsp; |V|=N, &nbsp; |E|=M</div><p>Buses are nodes and lines or transformers are edges. Node features may include voltage, angle, injections, demand, generation, and PMU measurements. Edge features may include resistance, reactance, susceptance, rating, tap ratio, status, and power flow.</p><div class="svg-box"><svg viewBox="0 0 900 420" role="img" aria-label="Electrical grid represented as a graph"><rect width="900" height="420" rx="18" fill="#06101d"/><g stroke="#38bdf8" stroke-width="5" opacity=".85"><line x1="140" y1="200" x2="330" y2="100"/><line x1="140" y1="200" x2="340" y2="300"/><line x1="330" y1="100" x2="560" y2="105"/><line x1="340" y1="300" x2="560" y2="105"/><line x1="340" y1="300" x2="585" y2="310"/><line x1="560" y1="105" x2="760" y2="210"/><line x1="585" y1="310" x2="760" y2="210"/></g><g font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold"><circle cx="140" cy="200" r="34" fill="#22c55e"/><text x="140" y="207" fill="#07111f">Bus 1</text><circle cx="330" cy="100" r="34" fill="#38bdf8"/><text x="330" y="107" fill="#07111f">Bus 2</text><circle cx="340" cy="300" r="34" fill="#38bdf8"/><text x="340" y="307" fill="#07111f">Bus 3</text><circle cx="560" cy="105" r="34" fill="#a78bfa"/><text x="560" y="112" fill="#07111f">Bus 4</text><circle cx="585" cy="310" r="34" fill="#a78bfa"/><text x="585" y="317" fill="#07111f">Bus 5</text><circle cx="760" cy="210" r="34" fill="#facc15"/><text x="760" y="217" fill="#07111f">Bus 6</text></g></svg></div><div class="highlight">A GNN preserves the physical neighborhood structure instead of flattening the grid into an unrelated vector.</div></div><div class="ar"><h2>1. شبكة القدرة كرسم بياني</h2><p>تمثل القضبان عقدًا، والخطوط والمحولات حوافًا، وتحمل العقد والحواف القياسات والمعاملات الكهربائية.</p></div></section>
 
-<div class="grid"><div class="mini-card"><strong>Node features</strong><p>Voltage magnitude, angle, injections, demand, generation, PMU measurements.</p></div>
-<div class="mini-card"><strong>Edge features</strong><p>Resistance, reactance, susceptance, rating, status, power flow.</p></div></div>
-<div class="highlight">Unlike a standard ANN, a GNN preserves the physical neighborhood structure of the grid.</div></div>
-<div class="ar"><h2>1. لماذا تُعد الشبكة الكهربائية رسمًا بيانيًا؟</h2>
-<p>يمكن تمثيل شبكة القدرة كرسم بياني تكون فيه القضبان عقدًا، والخطوط والمحولات حوافًا. وتحمل العقد والحواف معلومات كهربائية قابلة للتعلم.</p>
-<div class="highlight">الميزة الأساسية لـ GNN أنها لا تتجاهل طوبولوجيا الشبكة، بل تستخدمها جزءًا من عملية التعلم.</div></div></section>
+  <section id="matrices"><div class="en"><h2>2. Graph Matrices</h2><div class="formula">A<sub>ij</sub>=1 &nbsp; if &nbsp; (i,j)∈E</div><div class="formula">D<sub>ii</sub>=Σ<sub>j</sub>A<sub>ij</sub></div><div class="formula">L=D-A</div><div class="formula">L<sub>sym</sub>=I-D<sup>-1/2</sup>AD<sup>-1/2</sup></div><p>A weighted adjacency matrix can use |b<sub>ij</sub>|, 1/x<sub>ij</sub>, or another physically meaningful coupling. With an oriented incidence matrix B, the unweighted Laplacian satisfies L=BBᵀ.</p><div class="formula">xᵀLx=1/2 Σ<sub>i,j</sub>A<sub>ij</sub>(x<sub>i</sub>-x<sub>j</sub>)²</div></div><div class="ar"><h2>2. مصفوفات الرسم البياني</h2><p>تصف A الاتصال، وD درجة كل عقدة، وB علاقة العقد بالحواف، بينما يقيس L اختلاف الإشارات بين العقد المجاورة.</p></div></section>
 
-<section><div class="en"><h2>2. Formal Graph Definition</h2>
-<div class="formula">G=(V,E), &nbsp; |V|=N, &nbsp; |E|=M</div>
-<p>For an undirected grid model, edge (i,j) means that buses i and j are electrically connected. For directional flows, a directed representation can also be used.</p></div>
-<div class="ar"><h2>2. التعريف الرياضي للرسم البياني</h2>
-<p>يتكون الرسم البياني من مجموعة عقد V ومجموعة حواف E. ويمكن استخدام تمثيل غير موجه للطوبولوجيا، أو موجه عند الحاجة إلى اتجاه التدفق.</p></div></section>
+  <section><div class="en"><h2>3. Graph Signals</h2><div class="formula">X=[x₁ᵀ;x₂ᵀ;...;x<sub>N</sub>ᵀ]∈R<sup>N×F</sup></div><div class="grid"><div class="mini-card"><strong>Voltage Signal</strong><p>|V| and θ at every bus.</p></div><div class="mini-card"><strong>Injection Signal</strong><p>Active and reactive powers P and Q.</p></div><div class="mini-card"><strong>Measurement Signal</strong><p>SCADA, PMU, smart-meter, or pseudo-measurements.</p></div><div class="mini-card"><strong>Edge Signal</strong><p>Flows, loading, status, and electrical parameters.</p></div></div></div><div class="ar"><h2>3. الإشارات البيانية</h2><p>تُسند قيمة أو متجه ميزات لكل قضيب، ويمكن أيضًا إسناد ميزات لكل خط.</p></div></section>
 
-<section id="matrices"><div class="en"><h2>3. Adjacency Matrix</h2>
-<div class="formula">A<sub>ij</sub>=1 if (i,j)∈E, otherwise A<sub>ij</sub>=0</div>
-<p>A weighted adjacency matrix may store electrical coupling instead of binary connectivity:</p>
-<div class="formula">A<sub>ij</sub>=|b<sub>ij</sub>|, &nbsp; 1/x<sub>ij</sub>, &nbsp; or another physically meaningful edge weight</div></div>
-<div class="ar"><h2>3. مصفوفة المجاورة</h2>
-<p>تحدد مصفوفة المجاورة أي عقد مرتبطة. ويمكن جعلها موزونة باستخدام ممانعة الخط أو القابلية أو معامل اقتران كهربائي مناسب.</p></div></section>
+  <section><div class="en"><h2>4. Why Conventional Models Are Limited</h2><div class="table-wrap"><table><tr><th>Model</th><th>Native Structure</th><th>Grid Limitation</th></tr><tr><td>ANN</td><td>Fixed vector</td><td>Ignores locality and topology</td></tr><tr><td>CNN</td><td>Regular grid</td><td>Power networks are irregular</td></tr><tr><td>RNN/LSTM</td><td>Sequence</td><td>Models time, not topology</td></tr><tr><td>Transformer</td><td>Set or sequence</td><td>Topology must be injected</td></tr><tr><td>GNN</td><td>Graph</td><td>Directly uses buses and lines</td></tr></table></div></div><div class="ar"><h2>4. حدود النماذج التقليدية</h2><p>بُنيت GNN أصلًا للتعامل مع علاقات الجوار غير المنتظمة التي تميز شبكات القدرة.</p></div></section>
 
-<section><div class="en"><h2>4. Degree Matrix</h2>
-<div class="formula">D<sub>ii</sub>=Σ<sub>j</sub>A<sub>ij</sub></div>
-<p>The diagonal entry D<sub>ii</sub> measures the total connectivity of node i.</p></div>
-<div class="ar"><h2>4. مصفوفة الدرجات</h2>
-<p>تحتوي D على مجموع أوزان الحواف المتصلة بكل عقدة. وهي مصفوفة قطرية أساسية في التطبيع وبناء لابلاسيان.</p></div></section>
+  <section id="message"><div class="en"><h2>5. Message Passing</h2><div class="formula">m<sub>i</sub><sup>(l)</sup>=AGGREGATE({ψ(h<sub>i</sub><sup>(l)</sup>,h<sub>j</sub><sup>(l)</sup>,e<sub>ij</sub>):j∈N(i)})</div><div class="formula">h<sub>i</sub><sup>(l+1)</sup>=UPDATE(h<sub>i</sub><sup>(l)</sup>,m<sub>i</sub><sup>(l)</sup>)</div><div class="flow"><div class="flow-box">Neighbor Features</div><div class="arrow">→</div><div class="flow-box">Messages</div><div class="arrow">→</div><div class="flow-box">Aggregation</div><div class="arrow">→</div><div class="flow-box">Node Update</div></div><div class="note">Each layer expands the receptive field by one graph hop.</div></div><div class="ar"><h2>5. تمرير الرسائل</h2><p>ترسل العقد المجاورة معلوماتها، ثم تُجمع الرسائل ويُحدَّث تمثيل العقدة.</p></div></section>
 
-<section><div class="en"><h2>5. Incidence Matrix</h2>
-<p>Choose an orientation for each line. The incidence matrix B∈R<sup>N×M</sup> contains +1 at the sending node, −1 at the receiving node, and 0 elsewhere.</p>
-<div class="formula">L = BBᵀ &nbsp; for an unweighted graph</div>
-<div class="note">In DC power-flow models, incidence and weighted Laplacian structures appear naturally in the nodal equations.</div></div>
-<div class="ar"><h2>5. مصفوفة الاتصال</h2>
-<p>تربط مصفوفة الاتصال العقد بالحواف. وتظهر بنيتها مباشرة في نماذج تدفق القدرة المستمر DC وفي تشكيل مصفوفات الشبكة.</p></div></section>
+  <section id="gcn"><div class="en"><h2>6. Graph Convolutional Network</h2><div class="formula">Ã=A+I, &nbsp; D̃<sub>ii</sub>=Σ<sub>j</sub>Ã<sub>ij</sub></div><div class="formula">H<sup>(l+1)</sup>=σ(D̃<sup>-1/2</sup>ÃD̃<sup>-1/2</sup>H<sup>(l)</sup>W<sup>(l)</sup>)</div><ol><li>Transform node features using W.</li><li>Mix neighboring information using normalized adjacency.</li><li>Apply a nonlinear activation.</li><li>Repeat to include more distant buses.</li></ol><div class="warning">Too many layers may cause over-smoothing, making node embeddings nearly indistinguishable.</div></div><div class="ar"><h2>6. شبكة GCN</h2><p>تُضاف وصلات ذاتية ثم تُطبع المجاورة لتجنب هيمنة العقد عالية الدرجة، وبعدها تُجمع ميزات الجيران وتُطبق اللاخطية.</p></div></section>
 
-<section><div class="en"><h2>6. Graph Laplacian</h2>
-<div class="formula">L=D-A</div>
-<div class="formula">L<sub>sym</sub>=I-D<sup>-1/2</sup>AD<sup>-1/2</sup></div>
-<p>The Laplacian measures differences between neighboring node signals and is central to graph signal processing.</p>
-<div class="formula">xᵀLx = 1/2 Σ<sub>i,j</sub>A<sub>ij</sub>(x<sub>i</sub>-x<sub>j</sub>)²</div></div>
-<div class="ar"><h2>6. لابلاسيان الرسم البياني</h2>
-<p>يقيس لابلاسيان مقدار اختلاف الإشارة بين العقد المجاورة. فإذا كانت قيم الجهد متقاربة على الحواف، تكون طاقة الإشارة البيانية منخفضة.</p></div></section>
+  <section><div class="en"><h2>7. Spectral and Spatial Views</h2><div class="formula">L=UΛUᵀ, &nbsp; x̂=Uᵀx</div><div class="formula">g<sub>θ</sub>*<sub>G</sub>x=Ug<sub>θ</sub>(Λ)Uᵀx</div><div class="formula">h′<sub>i</sub>=σ(W<sub>self</sub>h<sub>i</sub>+Σ<sub>j∈N(i)</sub>W<sub>nbr</sub>h<sub>j</sub>)</div><p>The spectral view interprets convolution as graph-frequency filtering, while the spatial view focuses directly on neighborhood aggregation.</p></div><div class="ar"><h2>7. المنظوران الطيفي والمكاني</h2><p>يفسر المنظور الطيفي العملية كمرشح بياني، بينما يركز المنظور المكاني على تبادل الرسائل بين الجيران.</p></div></section>
 
-<section id="signals"><div class="en"><h2>7. Graph Signals in Power Systems</h2>
-<p>A graph signal assigns a value or vector to every bus:</p>
-<div class="formula">X=[x₁ᵀ;x₂ᵀ;...;x<sub>N</sub>ᵀ] ∈ R<sup>N×F</sup></div>
-<div class="grid3"><div class="mini-card"><strong>Voltage signal</strong><p>|V| and angle θ at every bus.</p></div>
-<div class="mini-card"><strong>Injection signal</strong><p>Active and reactive powers P and Q.</p></div>
-<div class="mini-card"><strong>Measurement signal</strong><p>SCADA, PMU, smart-meter, or pseudo-measurements.</p></div></div></div>
-<div class="ar"><h2>7. الإشارات على الرسم البياني</h2>
-<p>يمكن إسناد متجه ميزات لكل قضيب، مثل مقدار الجهد والزاوية والحقن الفعال والردي والقياسات المحلية.</p></div></section>
+  <section><div class="en"><h2>8. GraphSAGE</h2><div class="formula">h<sub>N(i)</sub><sup>(l)</sup>=AGGREGATE({h<sub>j</sub><sup>(l-1)</sup>:j∈N(i)})</div><div class="formula">h<sub>i</sub><sup>(l)</sup>=σ(W<sup>(l)</sup>[h<sub>i</sub><sup>(l-1)</sup> || h<sub>N(i)</sub><sup>(l)</sup>])</div><p>GraphSAGE learns an inductive aggregation rule that can generalize to unseen nodes or changed networks.</p></div><div class="ar"><h2>8. GraphSAGE</h2><p>تتعلم قاعدة تجميع قابلة للتعميم على عقد أو شبكات لم تظهر أثناء التدريب.</p></div></section>
 
-<section><div class="en"><h2>8. Why Ordinary Neural Networks Are Not Enough</h2>
-<div class="table-wrap"><table>
-<tr><th>Model</th><th>Native structure</th><th>Grid limitation</th></tr>
-<tr><td>ANN</td><td>Fixed vector</td><td>Ignores locality and topology</td></tr>
-<tr><td>CNN</td><td>Regular grid</td><td>Power networks are irregular</td></tr>
-<tr><td>RNN/LSTM</td><td>Sequence</td><td>Models time, not topology</td></tr>
-<tr><td>Transformer</td><td>Set/sequence attention</td><td>Topology must be injected explicitly</td></tr>
-<tr><td>GNN</td><td>Graph</td><td>Directly exploits buses and lines</td></tr>
-</table></div></div>
-<div class="ar"><h2>8. لماذا لا تكفي الشبكات التقليدية؟</h2>
-<p>تتعامل ANN مع متجه ثابت، وCNN مع شبكة منتظمة، وRNN مع تسلسل زمني. أما GNN فمبنية أصلًا لتمثيل علاقات الجوار غير المنتظمة.</p></div></section>
+  <section id="gat"><div class="en"><h2>9. Graph Attention Networks</h2><div class="formula">e<sub>ij</sub>=LeakyReLU(aᵀ[Wh<sub>i</sub> || Wh<sub>j</sub>])</div><div class="formula">α<sub>ij</sub>=softmax<sub>j</sub>(e<sub>ij</sub>)</div><div class="formula">h′<sub>i</sub>=σ(Σ<sub>j∈N(i)</sub>α<sub>ij</sub>Wh<sub>j</sub>)</div><div class="good">Attention may emphasize electrically influential neighbors, but learned weights should not automatically be interpreted as physical causality.</div></div><div class="ar"><h2>9. شبكات الانتباه البياني</h2><p>تتعلم وزنًا مختلفًا لكل جار بدل إعطاء جميع الجيران الأهمية نفسها.</p></div></section>
 
-<section id="mp"><div class="en"><h2>9. Message Passing</h2>
+  <section><div class="en"><h2>10. Edge Features and Physics</h2><div class="formula">m<sub>ij</sub>=ψ(h<sub>i</sub>,h<sub>j</sub>,x<sub>ij</sub>,r<sub>ij</sub>,tap<sub>ij</sub>,s<sub>ij</sub>)</div><p>Using physical line data is usually more meaningful than binary adjacency alone. Physics-informed losses can also penalize power-flow mismatch and operating-limit violations.</p><div class="formula">J<sub>total</sub>=J<sub>data</sub>+λ<sub>pf</sub>J<sub>power-flow</sub>+λ<sub>reg</sub>||θ||²</div></div><div class="ar"><h2>10. ميزات الحواف والفيزياء</h2><p>يمكن للرسائل أن تعتمد على المفاعلة والمقاومة ونسبة المحول وحالة الخط، ويمكن إضافة قيود فيزيائية إلى دالة التدريب.</p></div></section>
 
-<div class="svg-wrap">
-<svg viewBox="0 0 900 390" role="img" aria-label="Message passing in a graph neural network">
-  <rect width="900" height="390" rx="18" fill="#06101d"/>
-  <g stroke="#38bdf8" stroke-width="4">
-    <line x1="180" y1="190" x2="420" y2="80"/><line x1="180" y1="190" x2="420" y2="300"/>
-    <line x1="420" y1="80" x2="690" y2="190"/><line x1="420" y1="300" x2="690" y2="190"/>
-  </g>
-  <g fill="none" stroke="#facc15" stroke-width="5" stroke-dasharray="10 9">
-    <path d="M420 80 Q540 95 665 175"/><path d="M420 300 Q550 285 665 205"/>
-  </g>
-  <g font-family="Arial" text-anchor="middle" font-weight="bold">
-    <circle cx="180" cy="190" r="34" fill="#38bdf8"/><text x="180" y="197" fill="#07111f">h₁</text>
-    <circle cx="420" cy="80" r="34" fill="#22c55e"/><text x="420" y="87" fill="#07111f">h₂</text>
-    <circle cx="420" cy="300" r="34" fill="#22c55e"/><text x="420" y="307" fill="#07111f">h₃</text>
-    <circle cx="690" cy="190" r="45" fill="#a78bfa"/><text x="690" y="197" fill="#07111f">h₄′</text>
-  </g>
-  <g fill="#d8e2ec" font-family="Arial" font-size="18" text-anchor="middle">
-    <text x="450" y="355">Neighbors send messages → aggregate → update node representation</text>
-    <text x="450" y="380">ترسل العقد المجاورة رسائل ← تجميع ← تحديث تمثيل العقدة</text>
-  </g>
-</svg>
-</div>
+  <section><div class="en"><h2>11. Output Levels</h2><div class="grid"><div class="mini-card"><strong>Node-Level</strong><p>Estimate voltage or classify a bus condition.</p></div><div class="mini-card"><strong>Edge-Level</strong><p>Predict flow, congestion, or a faulted branch.</p></div><div class="mini-card"><strong>Graph-Level</strong><p>Classify overall stability or security.</p></div><div class="mini-card"><strong>Spatio-Temporal</strong><p>Combine topology with measurements over time.</p></div></div></div><div class="ar"><h2>11. مستويات الخرج</h2><p>قد يكون الخرج لكل عقدة أو حافة أو للشبكة كاملة، أو مكانياً وزمنياً معًا.</p></div></section>
 
-<div class="formula">m<sub>i</sub><sup>(l)</sup>=AGGREGATE({ψ(h<sub>i</sub><sup>(l)</sup>,h<sub>j</sub><sup>(l)</sup>,e<sub>ij</sub>) : j∈N(i)})</div>
-<div class="formula">h<sub>i</sub><sup>(l+1)</sup>=UPDATE(h<sub>i</sub><sup>(l)</sup>,m<sub>i</sub><sup>(l)</sup>)</div>
-<p>Each layer expands the receptive field by one graph hop.</p></div>
-<div class="ar"><h2>9. تمرير الرسائل</h2>
-<p>تستقبل كل عقدة رسائل من جيرانها، ثم تجمعها وتحدث تمثيلها. وبعد طبقتين يمكنها الاستفادة من معلومات الجيران حتى مسافتين بيانيتين.</p></div></section>
+  <section id="apps"><div class="en"><h2>12. Applications in Power Systems</h2><div class="grid"><div class="mini-card"><strong>State Estimation</strong><p>Infer states from incomplete noisy measurements.</p></div><div class="mini-card"><strong>Topology Identification</strong><p>Detect switching and line-status changes.</p></div><div class="mini-card"><strong>Fault Localization</strong><p>Locate disturbances from spatial patterns.</p></div><div class="mini-card"><strong>Voltage Stability</strong><p>Classify secure and insecure states.</p></div><div class="mini-card"><strong>OPF Surrogates</strong><p>Approximate optimization mappings rapidly.</p></div><div class="mini-card"><strong>Renewable Integration</strong><p>Model spatial dependencies among DERs.</p></div></div></div><div class="ar"><h2>12. التطبيقات في نظم القدرة</h2><p>تشمل تقدير الحالة وتحديد الطوبولوجيا والأعطال والاستقرار وبدائل OPF وتحليل الموارد الموزعة.</p></div></section>
 
-<section id="gcn"><div class="en"><h2>10. Graph Convolutional Network (GCN)</h2>
-<p>Add self-loops so each node keeps its own information:</p>
-<div class="formula">Ã=A+I, &nbsp; D̃<sub>ii</sub>=Σ<sub>j</sub>Ã<sub>ij</sub></div>
-<p>The normalized GCN update is:</p>
-<div class="formula">H<sup>(l+1)</sup>=σ(D̃<sup>-1/2</sup>ÃD̃<sup>-1/2</sup>H<sup>(l)</sup>W<sup>(l)</sup>)</div>
-<div class="highlight">Normalization prevents high-degree buses from dominating the aggregation.</div></div>
-<div class="ar"><h2>10. شبكة الالتفاف البياني GCN</h2>
-<p>نضيف وصلات ذاتية ثم نطبع مصفوفة المجاورة. تجمع كل عقدة تمثيلات جيرانها بعد وزنها، ثم تطبق تحويلًا خطيًا ودالة تفعيل.</p></div></section>
+  <section><div class="en"><h2>13. Classical and Learned State Estimation</h2><div class="formula">z=h(x)+e</div><div class="formula">x̂<sub>WLS</sub>=arg min<sub>x</sub>(z-h(x))ᵀR<sup>-1</sup>(z-h(x))</div><div class="formula">X̂=f<sub>GNN</sub>(G,Z)</div><div class="warning">A learned estimator does not eliminate observability analysis, bad-data processing, uncertainty assessment, or physical validation.</div></div><div class="ar"><h2>13. تقدير الحالة التقليدي والمتعلم</h2><p>يتعلم GNN علاقة بين القياسات والحالات، لكنه لا يلغي متطلبات الرصد والتحقق الفيزيائي ومعالجة البيانات السيئة.</p></div></section>
 
-<section><div class="en"><h2>11. Step-by-Step Interpretation</h2>
-<ol><li>Multiply H by W to transform node features.</li><li>Multiply by normalized adjacency to mix neighboring information.</li><li>Apply nonlinear activation.</li><li>Repeat to include more distant buses.</li></ol>
-<div class="warning">Too many GCN layers may cause over-smoothing: node embeddings become nearly indistinguishable.</div></div>
-<div class="ar"><h2>11. تفسير الخطوات</h2>
-<p>تحول الأوزان الميزات، ثم تمزج المجاورة معلومات العقد المتصلة، وتضيف اللاخطية القدرة على تمثيل العلاقات المعقدة. لكن كثرة الطبقات قد تسبب تساوي التمثيلات.</p></div></section>
+  <section><div class="en"><h2>14. Generalization and Limitations</h2><ul><li>Test line outages and switching actions.</li><li>Include different loading and renewable patterns.</li><li>Evaluate missing sensors and topology errors.</li><li>Avoid training on only one fixed topology.</li><li>Control over-smoothing and computational cost.</li><li>Validate simulated data against realistic operating conditions.</li></ul></div><div class="ar"><h2>14. التعميم والقيود</h2><p>يجب اختبار تغير الطوبولوجيا وفقد القياسات وتبدل الأحمال والمتجددة، مع الانتباه إلى فرط التنعيم وقابلية التوسع.</p></div></section>
 
-<section><div class="en"><h2>12. Spectral View</h2>
-<p>The Laplacian eigendecomposition defines graph-frequency components:</p>
-<div class="formula">L=UΛUᵀ, &nbsp; x̂=Uᵀx</div>
-<div class="formula">g<sub>θ</sub>*<sub>G</sub>x = Ug<sub>θ</sub>(Λ)Uᵀx</div>
-<p>Practical GCNs approximate spectral filtering without explicitly computing all eigenvectors.</p></div>
-<div class="ar"><h2>12. المنظور الطيفي</h2>
-<p>تُمثل متجهات لابلاسيان الذاتية ترددات بيانية. ويمكن تفسير الالتفاف البياني كمرشح في هذا المجال، ثم تقريب العملية بطريقة محلية قابلة للتعلم.</p></div></section>
+  <section><div class="en"><h2>15. Engineering Workflow</h2><div class="flow"><div class="flow-box">Grid Model</div><div class="arrow">→</div><div class="flow-box">Graph Construction</div><div class="arrow">→</div><div class="flow-box">Features & Labels</div><div class="arrow">→</div><div class="flow-box">GNN Training</div><div class="arrow">→</div><div class="flow-box">Physical Validation</div></div><div class="research"><strong>Research directions:</strong> spatio-temporal GNNs, physics-informed GNNs, graph Transformers, topology-robust learning, uncertainty-aware estimation, and distributed inference.</div></div><div class="ar"><h2>15. سير العمل الهندسي</h2><p>نبدأ بنموذج الشبكة وبناء الرسم البياني والميزات، ثم ندرب النموذج ونختبره تحت تغيرات واقعية ونقارن نتائجه بالفيزياء.</p></div></section>
 
-<section><div class="en"><h2>13. Spatial View</h2>
-<p>The spatial interpretation focuses directly on neighborhood aggregation rather than graph Fourier modes.</p>
-<div class="formula">h′<sub>i</sub>=σ(W<sub>self</sub>h<sub>i</sub> + Σ<sub>j∈N(i)</sub>W<sub>nbr</sub>h<sub>j</sub>)</div></div>
-<div class="ar"><h2>13. المنظور المكاني</h2>
-<p>يركز المنظور المكاني على الرسائل بين العقد المجاورة مباشرة، وهو أسهل للربط مع البنية الفيزيائية للشبكة.</p></div></section>
-
-<section><div class="en"><h2>14. GraphSAGE</h2>
-<div class="formula">h<sub>N(i)</sub><sup>(l)</sup>=AGGREGATE({h<sub>j</sub><sup>(l-1)</sup>,j∈N(i)})</div>
-<div class="formula">h<sub>i</sub><sup>(l)</sup>=σ(W<sup>(l)</sup>[h<sub>i</sub><sup>(l-1)</sup> || h<sub>N(i)</sub><sup>(l)</sup>])</div>
-<p>GraphSAGE can learn an aggregation rule that generalizes to unseen nodes or changed networks.</p></div>
-<div class="ar"><h2>14. خوارزمية GraphSAGE</h2>
-<p>تجمع GraphSAGE معلومات الجيران ثم تدمجها مع تمثيل العقدة نفسها، وهي مناسبة للتعلم الاستقرائي عند ظهور عقد أو شبكات جديدة.</p></div></section>
-
-<section id="gat"><div class="en"><h2>15. Graph Attention Networks (GAT)</h2>
-<p>GAT learns different importance coefficients for different neighbors:</p>
-<div class="formula">e<sub>ij</sub>=LeakyReLU(aᵀ[Wh<sub>i</sub> || Wh<sub>j</sub>])</div>
-<div class="formula">α<sub>ij</sub>=softmax<sub>j</sub>(e<sub>ij</sub>)</div>
-<div class="formula">h′<sub>i</sub>=σ(Σ<sub>j∈N(i)</sub>α<sub>ij</sub>Wh<sub>j</sub>)</div>
-<div class="good">Attention can assign more weight to electrically influential neighbors, but the learned weight should not automatically be interpreted as physical causality.</div></div>
-<div class="ar"><h2>15. شبكات الانتباه البياني GAT</h2>
-<p>تتعلم GAT وزنًا مختلفًا لكل جار، بدل إعطاء جميع الجيران وزنًا موحدًا. وقد تساعد في التركيز على العقد الأكثر تأثيرًا في حالة تشغيل معينة.</p></div></section>
-
-<section><div class="en"><h2>16. Edge Features and Physics</h2>
-<p>Electrical lines are not identical. Edge-aware message functions may use reactance, resistance, tap ratio, or line status:</p>
-<div class="formula">m<sub>ij</sub>=ψ(h<sub>i</sub>,h<sub>j</sub>,x<sub>ij</sub>,r<sub>ij</sub>,s<sub>ij</sub>)</div>
-<div class="highlight">Using physical edge data is often more meaningful than using a binary adjacency matrix alone.</div></div>
-<div class="ar"><h2>16. ميزات الحواف والفيزياء</h2>
-<p>ينبغي ألا تُعامل جميع الخطوط بالطريقة نفسها. يمكن للرسالة أن تعتمد على المفاعلة والمقاومة ونسبة المحول وحالة الخط.</p></div></section>
-
-<section><div class="en"><h2>17. Node-Level, Edge-Level, and Graph-Level Tasks</h2>
-<div class="grid3"><div class="mini-card"><strong>Node-level</strong><p>Estimate voltage magnitude or classify a bus condition.</p></div>
-<div class="mini-card"><strong>Edge-level</strong><p>Predict line flow, congestion, or faulted branch.</p></div>
-<div class="mini-card"><strong>Graph-level</strong><p>Classify overall stability or operating security.</p></div></div></div>
-<div class="ar"><h2>17. مستويات المهام</h2>
-<p>يمكن أن يكون الخرج لكل عقدة، أو لكل حافة، أو للشبكة كاملة. ويحدد ذلك شكل طبقة الخرج ودالة الخسارة.</p></div></section>
-
-<section id="apps"><div class="en"><h2>18. Applications in Electrical Power Systems</h2>
-<div class="grid"><div class="mini-card"><strong>State estimation</strong><p>Infer voltage states from incomplete and noisy measurements.</p></div>
-<div class="mini-card"><strong>Topology identification</strong><p>Detect switching or line-status changes.</p></div>
-<div class="mini-card"><strong>Fault localization</strong><p>Locate disturbances using spatial measurement patterns.</p></div>
-<div class="mini-card"><strong>Voltage stability</strong><p>Classify secure and insecure operating states.</p></div>
-<div class="mini-card"><strong>Optimal power flow surrogates</strong><p>Approximate optimization mappings quickly.</p></div>
-<div class="mini-card"><strong>Renewable integration</strong><p>Model spatial dependencies among distributed resources.</p></div></div></div>
-<div class="ar"><h2>18. التطبيقات في أنظمة القدرة</h2>
-<p>تشمل تقدير الحالة، كشف تغير الطوبولوجيا، تحديد الأعطال، تقييم الاستقرار، تقريب مسائل تدفق القدرة الأمثل، وتحليل الموارد الموزعة.</p></div></section>
-
-<section><div class="en"><h2>19. From Classical State Estimation to GNN</h2>
-<div class="formula">z=h(x)+e</div>
-<div class="formula">x̂<sub>WLS</sub>=arg min<sub>x</sub>(z-h(x))ᵀR<sup>-1</sup>(z-h(x))</div>
-<p>A GNN instead learns a mapping from graph-structured measurements to states:</p>
-<div class="formula">X̂=f<sub>GNN</sub>(G,Z)</div>
-<div class="warning">A learned estimator does not eliminate the need for observability analysis, bad-data handling, uncertainty assessment, and physical validation.</div></div>
-<div class="ar"><h2>19. من تقدير الحالة التقليدي إلى GNN</h2>
-<p>يحل WLS مسألة تحسين قائمة على نموذج القياس. أما GNN فتعلم علاقة بين القياسات البيانية والحالات. ويجب عدم اعتبارها بديلًا مطلقًا للتحليل الفيزيائي.</p></div></section>
-
-<section><div class="en"><h2>20. Training Objective</h2>
-<div class="formula">J(θ)=1/N<sub>s</sub> Σ<sub>s</sub> ||X̂<sup>(s)</sup>-X<sup>(s)</sup>||²</div>
-<p>Additional physics penalties can be included:</p>
-<div class="formula">J<sub>total</sub>=J<sub>data</sub>+λ<sub>pf</sub>J<sub>power-flow</sub>+λ<sub>reg</sub>||θ||²</div></div>
-<div class="ar"><h2>20. دالة التدريب</h2>
-<p>يمكن تدريب النموذج بخطأ الحالة، ثم إضافة عقوبات فيزيائية لعدم اتزان القدرة أو مخالفة حدود التشغيل.</p></div></section>
-
-<section><div class="en"><h2>21. Generalization to Topology Changes</h2>
-<p>A topology-aware model should be tested under:</p><ul><li>Line outages</li><li>Switching actions</li><li>Different loading levels</li><li>Missing sensors</li><li>Unseen renewable patterns</li></ul>
-<div class="note">Training on only one fixed topology may lead to excellent test accuracy but poor real-world robustness.</div></div>
-<div class="ar"><h2>21. التعميم عند تغير الطوبولوجيا</h2>
-<p>يجب اختبار النموذج عند خروج خطوط وتغير المفاتيح وفقد القياسات وتبدل مستويات الحمل، وليس فقط على نفس الشبكة المستخدمة في التدريب.</p></div></section>
-
-<section><div class="en"><h2>22. Limitations</h2>
-<div class="grid"><div class="mini-card"><strong>Data quality</strong><p>Biased simulations create biased models.</p></div>
-<div class="mini-card"><strong>Topology mismatch</strong><p>Wrong connectivity corrupts message passing.</p></div>
-<div class="mini-card"><strong>Over-smoothing</strong><p>Deep layers may erase local distinctions.</p></div>
-<div class="mini-card"><strong>Scalability</strong><p>Large dynamic grids require efficient sampling and batching.</p></div></div></div>
-<div class="ar"><h2>22. القيود</h2>
-<p>تتأثر GNN بجودة البيانات وصحة الطوبولوجيا وعمق الشبكة وكلفة التدريب على الأنظمة الكبيرة.</p></div></section>
-
-<section><div class="en"><h2>23. From Theory to Grid</h2>
-<div class="flow"><div class="flow-box">Grid model</div><div class="arrow">→</div><div class="flow-box">Graph construction</div><div class="arrow">→</div><div class="flow-box">Features & labels</div><div class="arrow">→</div><div class="flow-box">GNN training</div><div class="arrow">→</div><div class="flow-box">Physical validation</div></div></div>
-<div class="ar"><h2>23. من النظرية إلى الشبكة</h2>
-<p>نبدأ بنموذج الشبكة، ثم نبني الرسم البياني والميزات والتسميات، وبعد التدريب نقارن النتائج بقيود ومعادلات النظام الفيزيائية.</p></div></section>
-
-<section><div class="en"><h2>🔬 Research Corner</h2>
-<div class="research"><strong>Emerging directions:</strong> spatio-temporal GNNs, physics-informed GNNs, graph transformers, topology-robust learning, uncertainty-aware state estimation, and distributed GNN inference at substations.</div></div>
-<div class="ar"><h2>🔬 زاوية البحث العلمي</h2>
-<div class="research">من الاتجاهات الحديثة: GNN مكانية-زمنية، دمج الفيزياء في التدريب، Graph Transformers، التعميم على تغير الطوبولوجيا، تقدير عدم اليقين، والتنفيذ الموزع في المحطات.</div></div></section>
-
-<section><div class="en"><h2>🧠 Review Questions</h2><ol>
-<li>Why is a power grid naturally modeled as a graph?</li><li>What is the difference between adjacency, degree, incidence, and Laplacian matrices?</li>
-<li>Explain one GCN layer mathematically.</li><li>What is message passing?</li><li>How does GAT differ from GCN?</li>
-<li>What causes over-smoothing?</li><li>How can line parameters be incorporated?</li><li>Why must topology changes be included in testing?</li>
-</ol></div>
-<div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol>
-<li>لماذا تمثل الشبكة الكهربائية كرسم بياني طبيعيًا؟</li><li>ما الفرق بين مصفوفات المجاورة والدرجة والاتصال واللابلاسيان؟</li>
-<li>اشرح طبقة GCN رياضيًا.</li><li>ما المقصود بتمرير الرسائل؟</li><li>كيف تختلف GAT عن GCN؟</li>
-<li>ما سبب فرط التنعيم؟</li><li>كيف نضيف معاملات الخطوط؟</li><li>لماذا يجب اختبار تغير الطوبولوجيا؟</li>
-</ol></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Why is a power grid naturally a graph?</li><li>What is the difference between A, D, B, and L?</li><li>Explain message passing.</li><li>Derive one GCN layer.</li><li>How does GAT differ from GCN?</li><li>What causes over-smoothing?</li><li>How are line parameters incorporated?</li><li>Why must topology changes be tested?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>لماذا تمثل شبكة القدرة كرسم بياني؟</li><li>ما الفرق بين A وD وB وL؟</li><li>اشرح تمرير الرسائل.</li><li>اشتق طبقة GCN.</li><li>كيف تختلف GAT عن GCN؟</li><li>ما سبب فرط التنعيم؟</li><li>كيف نضيف معاملات الخطوط؟</li><li>لماذا نختبر تغير الطوبولوجيا؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
 <script src="course-navigation.js" defer></script>
 <script src="course-quiz-data.js" defer></script>
 <script src="course-quiz.js" defer></script>
 <script src="certificate-canvas.js?v=20260817-2" defer></script>
 <script src="course-footer.js" defer></script>
-</body></html>
+</body>
+</html>
