@@ -10,7 +10,7 @@
 
   const type = match[1].toLowerCase();
   const number = Number(match[2]);
-  const maxNumber = 10;
+  const maxNumber = 20;
   const num = String(number).padStart(2, '0');
   const authorName = 'Dr.-Ing. Aouss Gabash';
 
@@ -42,8 +42,14 @@
   const relatedType = type === 'lecture' ? 'lab' : 'lecture';
   const fileName = n => `${type}${String(n).padStart(2, '0')}.html`;
   const relatedFileName = n => `${relatedType}${String(n).padStart(2, '0')}.html`;
-  const difficulty = number <= 4 ? ['Beginner', 'مبتدئ'] : ['Intermediate', 'متوسط'];
-  const duration = type === 'lecture' ? (number <= 8 ? 45 : 55) : (number <= 8 ? 60 : 75);
+  const difficulty = number <= 4
+    ? ['Beginner', 'مبتدئ']
+    : number <= 10
+      ? ['Intermediate', 'متوسط']
+      : ['Advanced', 'متقدم'];
+  const duration = type === 'lecture'
+    ? (number <= 8 ? 45 : number <= 16 ? 55 : 60)
+    : (number <= 8 ? 60 : number <= 16 ? 75 : 90);
 
   const card = ({ className = '', href = '', icon, title, subtitle, meta = '', tag = 'a' }) => {
     const element = document.createElement(tag);
