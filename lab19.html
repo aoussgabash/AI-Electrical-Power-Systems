@@ -1,19 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
-<title>Lab 19 - AI-Based Intrusion Detection</title>
-<link rel="stylesheet" href="course-common.css"><link rel="stylesheet" href="course-footer.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/AGAI.svg">
+  <meta name="description" content="MATLAB laboratory on AI-based intrusion detection for power systems">
+  <title>Lab 19 - AI-Based Intrusion Detection</title>
+  <link rel="stylesheet" href="course-common.css">
+  <link rel="stylesheet" href="course-theme.css?v=20260825-1">
+  <link rel="stylesheet" href="course-footer.css">
 </head>
-<body class="course-template-modern">
+<body>
 <header><div class="container"><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="index.html">← Home | الرئيسية</a></nav></div></header>
 <main class="container">
-<div class="hero"><div class="lecture-number">MATLAB LAB 19 | مختبر MATLAB 19</div><h1>AI-Based Intrusion Detection</h1><div class="hero-ar">كشف الهجمات السيبرانية باستخدام الذكاء الاصطناعي</div><div class="subtitle">Synthetic PMU data, false-data attacks, SVM classification, and robust evaluation<br>بيانات PMU اصطناعية وهجمات بيانات كاذبة وتصنيف SVM وتقييم متين</div></div>
-<section><div class="en"><h2>🎯 Objectives</h2><ul><li>Generate normal and attacked power-system measurements.</li><li>Construct meaningful electrical and residual features.</li><li>Split data into training and test sets without leakage.</li><li>Train an SVM intrusion detector.</li><li>Compute confusion matrix, precision, recall, F1, and false-alarm rate.</li><li>Study noise, class imbalance, threshold selection, and unseen attacks.</li><li>Compare data-driven and physics-informed detection.</li></ul></div><div class="ar"><h2>🎯 الأهداف</h2><ul><li>توليد قياسات طبيعية ومهاجمة لنظام قدرة.</li><li>بناء ميزات كهربائية وبواقي مفيدة.</li><li>تقسيم البيانات إلى تدريب واختبار دون تسرب.</li><li>تدريب كاشف اختراق باستخدام SVM.</li><li>حساب مصفوفة الالتباس وPrecision وRecall وF1 ومعدل الإنذار الكاذب.</li><li>دراسة الضوضاء وعدم توازن الفئات واختيار العتبة والهجمات غير المرئية.</li><li>مقارنة الكشف المعتمد على البيانات بالكشف المدعوم بالفيزياء.</li></ul></div></section>
-<section><div class="en"><h2>1. Laboratory Scenario</h2><p>We simulate PMU-like measurements for voltage magnitude, phase angle, frequency deviation, and active power. Attack samples contain coordinated measurement shifts and occasional replay-like behavior.</p><div class="formula">z_{attack}=z+a+v</div><p>The detector classifies each observation as normal or attacked.</p></div><div class="ar"><h2>1. سيناريو المختبر</h2><p>نحاكي قياسات شبيهة بوحدات PMU تشمل الجهد والزاوية وانحراف التردد والقدرة الفعالة، ثم نضيف هجمات منسقة وانحرافات وإعادة إرسال.</p></div></section>
-<section><div class="en"><h2>2. Complete MATLAB Program</h2><pre><code>clear; clc; close all;
-rng(19);
+  <div class="hero">
+    <div class="lecture-number">LAB 19 | المخبر 19</div>
+    <h1>AI-Based Intrusion Detection</h1>
+    <div class="hero-ar">كشف الهجمات السيبرانية باستخدام الذكاء الاصطناعي</div>
+    <div class="subtitle">Synthetic PMU Data, False-Data Attacks, SVM Classification, and Robust Evaluation<br>بيانات PMU اصطناعية وهجمات بيانات كاذبة وتصنيف SVM وتقييم متين</div>
+    <div class="toc"><a href="#scenario">Scenario</a><a href="#features">Features</a><a href="#workflow">Workflow</a><a href="#code">MATLAB Code</a><a href="#experiments">Experiments</a><a href="#validation">Validation</a></div>
+  </div>
+
+  <section><div class="en"><h2>🎯 Laboratory Objectives</h2><ul><li>Generate normal and attacked power-system measurements.</li><li>Construct electrical and physics-inspired residual features.</li><li>Split and standardize data without leakage.</li><li>Train an RBF-SVM intrusion detector.</li><li>Compute confusion matrix, precision, recall, F1, AUC, and false-alarm rate.</li><li>Study noise, class imbalance, decision thresholds, and unseen attacks.</li><li>Compare data-driven and physics-informed detection.</li></ul></div><div class="ar"><h2>🎯 أهداف المخبر</h2><ul><li>توليد قياسات طبيعية ومهاجمة لنظام قدرة.</li><li>بناء ميزات كهربائية وبواقي مستوحاة من الفيزياء.</li><li>تقسيم البيانات وتطبيعها دون تسرب معلومات.</li><li>تدريب كاشف اختراق باستخدام RBF-SVM.</li><li>حساب مصفوفة الالتباس وPrecision وRecall وF1 وAUC والإنذار الكاذب.</li><li>دراسة الضوضاء وعدم توازن الفئات والعتبات والهجمات غير المرئية.</li><li>مقارنة الكشف البياني بالكشف المدعوم بالفيزياء.</li></ul></div></section>
+
+  <section id="scenario"><div class="en"><h2>1. Laboratory Scenario</h2><p>We simulate PMU-like voltage magnitude, phase angle, frequency deviation, and active-power measurements. Attack samples contain coordinated false-data shifts and replay-like behavior.</p><div class="formula">z<sub>attack</sub>=z+a+v</div><div class="highlight">The classifier labels each sample as normal or attacked, while a residual feature checks whether measurements remain physically consistent.</div></div><div class="ar"><h2>1. سيناريو المخبر</h2><p>نحاكي قياسات شبيهة بوحدات PMU، ثم نضيف هجمات منسقة وإعادة إرسال ونستخدم مصنفًا لتحديد الحالة.</p></div></section>
+
+  <section id="features"><div class="en"><h2>2. Feature Engineering</h2><div class="formula">r<sub>P</sub>=P−P̂(V,θ)</div><div class="formula">P̂=1.10+c<sub>1</sub>θ+c<sub>2</sub>(1−V)</div><div class="grid"><div class="mini-card"><strong>Voltage</strong><p>Magnitude deviation from nominal.</p></div><div class="mini-card"><strong>Angle</strong><p>Phase-angle shift.</p></div><div class="mini-card"><strong>Frequency</strong><p>Frequency deviation.</p></div><div class="mini-card"><strong>Power</strong><p>Active-power measurement.</p></div><div class="mini-card"><strong>Residual</strong><p>Physics-consistency indicator.</p></div><div class="mini-card"><strong>Label</strong><p>0 normal, 1 attack.</p></div></div><div class="warning">Residual features depend on model quality; a poor physical approximation can create false alarms.</div></div><div class="ar"><h2>2. هندسة الميزات</h2><p>تجمع الميزات بين القياسات الخام ومتَبقٍ يقيس اتساق القدرة مع الجهد والزاوية.</p></div></section>
+
+  <section id="workflow"><div class="en"><h2>3. Engineering Workflow</h2><div class="flow"><div class="flow-box">Generate Data</div><div class="arrow">→</div><div class="flow-box">Build Features</div><div class="arrow">→</div><div class="flow-box">Split & Standardize</div><div class="arrow">→</div><div class="flow-box">Train SVM</div><div class="arrow">→</div><div class="flow-box">Stress-Test</div></div><ol><li>Generate normal and attack datasets.</li><li>Construct raw and physics-informed features.</li><li>Split before normalization to avoid leakage.</li><li>Train and calibrate the classifier.</li><li>Evaluate standard metrics and ROC-AUC.</li><li>Test noise, imbalance, thresholds, and unseen attacks.</li></ol></div><div class="ar"><h2>3. سير العمل الهندسي</h2><p>نولد البيانات ونبني الميزات، ثم نقسمها ونطبعها وندرب SVM ونختبر المتانة والتعميم.</p></div></section>
+
+  <section id="code"><div class="en"><h2>4. Complete MATLAB Program</h2><pre><code>%% Lab 19: AI-Based Intrusion Detection
+clear; clc; close all; rng(19);
 
 %% Data size
 Nnormal = 1800;
@@ -21,210 +38,102 @@ Nattack = 600;
 
 %% Normal PMU-like measurements
 Vn = 1.00 + 0.008*randn(Nnormal,1);
-An = 0.00 + 0.020*randn(Nnormal,1);   % angle [rad]
-Fn = 0.00 + 0.015*randn(Nnormal,1);   % frequency deviation [Hz]
-Pn = 1.10 + 0.12*randn(Nnormal,1);    % active power [p.u.]
+An = 0.00 + 0.020*randn(Nnormal,1);
+Fn = 0.00 + 0.015*randn(Nnormal,1);
+Pn = 1.10 + 0.12*randn(Nnormal,1);
 
 %% Attack measurements
 Va = 1.00 + 0.008*randn(Nattack,1);
 Aa = 0.00 + 0.020*randn(Nattack,1);
 Fa = 0.00 + 0.015*randn(Nattack,1);
 Pa = 1.10 + 0.12*randn(Nattack,1);
-
-% Coordinated false-data shifts
 Va = Va + 0.035 + 0.010*randn(Nattack,1);
 Aa = Aa + 0.090 + 0.020*randn(Nattack,1);
 Fa = Fa + 0.060 + 0.020*randn(Nattack,1);
-Pa = Pa + 0.28  + 0.08*randn(Nattack,1);
+Pa = Pa + 0.28 + 0.08*randn(Nattack,1);
 
-%% Physics-inspired residual feature
-% Simple approximate relation: P = c1*angle + c2*(1-V)
-c1 = 8.0;
-c2 = 3.0;
+%% Physics-inspired residual
+c1 = 8.0; c2 = 3.0;
 Rn = Pn - (1.10 + c1*An + c2*(1-Vn));
 Ra = Pa - (1.10 + c1*Aa + c2*(1-Va));
 
-%% Feature matrix and labels
+%% Features and labels
 Xnormal = [Vn An Fn Pn Rn];
 Xattack = [Va Aa Fa Pa Ra];
-X = [Xnormal; Xattack];
-Y = [zeros(Nnormal,1); ones(Nattack,1)];
+X = [Xnormal;Xattack];
+Y = [zeros(Nnormal,1);ones(Nattack,1)];
 
-%% Random train/test split
+%% Train/test split
 cv = cvpartition(Y,'HoldOut',0.30);
 Xtrain = X(training(cv),:);
 Ytrain = Y(training(cv));
-Xtest  = X(test(cv),:);
-Ytest  = Y(test(cv));
+Xtest = X(test(cv),:);
+Ytest = Y(test(cv));
 
-%% Standardization using training statistics only
+%% Standardization from training statistics only
 mu = mean(Xtrain,1);
 sigma = std(Xtrain,[],1);
-sigma(sigma==0) = 1;
+sigma(sigma==0)=1;
 XtrainZ = (Xtrain-mu)./sigma;
-XtestZ  = (Xtest-mu)./sigma;
+XtestZ = (Xtest-mu)./sigma;
 
-%% Train SVM classifier
-mdl = fitcsvm(XtrainZ,Ytrain,...
-    'KernelFunction','rbf',...
-    'KernelScale','auto',...
-    'Standardize',false,...
-    'ClassNames',[0 1]);
+%% RBF-SVM
+mdl = fitcsvm(XtrainZ,Ytrain, ...
+    'KernelFunction','rbf','KernelScale','auto', ...
+    'Standardize',false,'ClassNames',[0 1]);
 mdl = fitPosterior(mdl,XtrainZ,Ytrain);
-
-%% Test predictions
 [pred,score] = predict(mdl,XtestZ);
 
-%% Confusion matrix and metrics
+%% Metrics
 cm = confusionmat(Ytest,pred,'Order',[0 1]);
-TN = cm(1,1); FP = cm(1,2);
-FN = cm(2,1); TP = cm(2,2);
-
-accuracy  = (TP+TN)/sum(cm,'all');
-precision = TP/max(TP+FP,1);
-recall    = TP/max(TP+FN,1);
-F1        = 2*precision*recall/max(precision+recall,eps);
-falseAlarmRate = FP/max(FP+TN,1);
+TN=cm(1,1); FP=cm(1,2); FN=cm(2,1); TP=cm(2,2);
+accuracy=(TP+TN)/sum(cm,'all');
+precision=TP/max(TP+FP,1);
+recall=TP/max(TP+FN,1);
+F1=2*precision*recall/max(precision+recall,eps);
+falseAlarmRate=FP/max(FP+TN,1);
+[fpRate,tpRate,~,AUC]=perfcurve(Ytest,score(:,2),1);
 
 fprintf('Accuracy         = %.3f\n',accuracy);
 fprintf('Precision        = %.3f\n',precision);
 fprintf('Recall           = %.3f\n',recall);
 fprintf('F1 score         = %.3f\n',F1);
 fprintf('False alarm rate = %.3f\n',falseAlarmRate);
-disp('Confusion matrix [TN FP; FN TP]:');
-disp(cm);
+fprintf('AUC              = %.3f\n',AUC);
 
-%% Confusion chart
 figure;
-confusionchart(Ytest,pred,...
-    'RowSummary','row-normalized',...
+confusionchart(Ytest,pred,'RowSummary','row-normalized', ...
     'ColumnSummary','column-normalized');
 title('AI Intrusion Detector');
 
-%% ROC curve
-[fpRate,tpRate,~,AUC] = perfcurve(Ytest,score(:,2),1);
 figure;
 plot(fpRate,tpRate,'LineWidth',1.8); hold on;
-plot([0 1],[0 1],'--');
-grid on;
-xlabel('False Positive Rate');
-ylabel('True Positive Rate');
-title(sprintf('ROC Curve, AUC = %.3f',AUC));
+plot([0 1],[0 1],'--'); grid on;
+xlabel('False Positive Rate'); ylabel('True Positive Rate');
+title(sprintf('ROC Curve, AUC = %.3f',AUC));</code></pre></div><div class="ar"><h2>4. برنامج MATLAB الكامل</h2><p>ينشئ البرنامج البيانات والميزات، ثم يدرب SVM ويحسب المقاييس الأساسية ومنحنى ROC.</p></div></section>
 
-%% Feature visualization
-figure;
-gscatter(Xtest(:,5),Xtest(:,3),Ytest);
-grid on;
-xlabel('Physics residual');
-ylabel('Frequency deviation');
-title('Normal and Attack Samples');</code></pre></div><div class="ar"><h2>2. البرنامج الكامل</h2><p>ينشئ البرنامج بيانات طبيعية ومهاجمة، ويضيف ميزة بواقي مستوحاة من الفيزياء، ويقسم البيانات ويطبّعها اعتمادًا على التدريب فقط، ثم يدرب SVM ويحسب مؤشرات التقييم.</p></div></section>
-<section><div class="en"><h2>3. Why the Residual Feature Helps</h2><div class="formula">r_P=P-\hat{P}(V,\theta)</div><p>Raw measurements may overlap, but an attack can violate the expected physical relationship among voltage, angle, and power. The residual exposes this inconsistency.</p><div class="highlight">Physics-informed features often improve generalization when attack data are limited.</div></div><div class="ar"><h2>3. أهمية ميزة البواقي</h2><p>قد تتداخل القياسات الخام بين الحالة الطبيعية والهجوم، لكن البواقي تكشف عدم الاتساق بين الجهد والزاوية والقدرة وفق النموذج الفيزيائي.</p></div></section>
-<section><div class="en"><h2>4. Experiment A: Remove the Physics Feature</h2><pre><code>XtrainNoR = XtrainZ(:,1:4);
-XtestNoR  = XtestZ(:,1:4);
-
-mdlNoR = fitcsvm(XtrainNoR,Ytrain,...
-    'KernelFunction','rbf','KernelScale','auto');
-predNoR = predict(mdlNoR,XtestNoR);
-cmNoR = confusionmat(Ytest,predNoR,'Order',[0 1]);
-disp(cmNoR);</code></pre><p>Compare recall and false-alarm rate with and without the residual feature.</p></div><div class="ar"><h2>4. التجربة A: حذف الميزة الفيزيائية</h2><p>أعد التدريب دون البواقي وقارن الاستدعاء والإنذارات الكاذبة لتحديد قيمة المعلومات الفيزيائية.</p></div></section>
-<section><div class="en"><h2>5. Experiment B: Class Imbalance</h2><p>Reduce the attack class to 5% of all samples. Accuracy may remain high even when the detector misses many attacks.</p><pre><code>attackKeep = randperm(Nattack,round(0.05*Nnormal));
-Ximbalanced = [Xnormal; Xattack(attackKeep,:)];
-Yimbalanced = [zeros(Nnormal,1); ones(numel(attackKeep),1)];</code></pre><div class="warning">Always report recall, precision, F1, false-alarm rate, and the confusion matrix.</div></div><div class="ar"><h2>5. التجربة B: عدم توازن الفئات</h2><p>قلل الهجمات إلى نسبة صغيرة ولاحظ كيف يمكن أن تبدو الدقة العامة مرتفعة رغم ضعف اكتشاف الهجمات.</p></div></section>
-<section><div class="en"><h2>6. Experiment C: Noise Robustness</h2><pre><code>noiseLevels = [0 0.25 0.50 1.00];
-results = zeros(numel(noiseLevels),2);
-
-for q = 1:numel(noiseLevels)
-    Xnoisy = XtestZ + noiseLevels(q)*randn(size(XtestZ));
-    predQ = predict(mdl,Xnoisy);
-    cmQ = confusionmat(Ytest,predQ,'Order',[0 1]);
-    results(q,1) = (cmQ(1,1)+cmQ(2,2))/sum(cmQ,'all');
-    results(q,2) = cmQ(2,2)/max(sum(cmQ(2,:)),1);
-end
-
-disp(table(noiseLevels',results(:,1),results(:,2),...
-    'VariableNames',{'Noise','Accuracy','Recall'}));</code></pre></div><div class="ar"><h2>6. التجربة C: المتانة للضوضاء</h2><p>أضف مستويات مختلفة من الضوضاء إلى بيانات الاختبار وراقب تراجع الدقة والاستدعاء.</p></div></section>
-<section><div class="en"><h2>7. Experiment D: Detection Threshold</h2><pre><code>probAttack = score(:,2);
+  <section id="experiments"><div class="en"><h2>5. Experiments</h2><div class="grid"><div class="mini-card"><strong>Remove Residual</strong><p>Retrain using only raw features.</p></div><div class="mini-card"><strong>Class Imbalance</strong><p>Reduce attack samples to 5%.</p></div><div class="mini-card"><strong>Noise Robustness</strong><p>Add test-time Gaussian noise.</p></div><div class="mini-card"><strong>Threshold Selection</strong><p>Trade recall against false alarms.</p></div><div class="mini-card"><strong>Unseen Attack</strong><p>Test a different attack pattern.</p></div><div class="mini-card"><strong>Feature Ablation</strong><p>Remove one feature at a time.</p></div></div><pre><code>% Threshold experiment
+probAttack = score(:,2);
 thresholds = 0.10:0.05:0.90;
 metricTable = zeros(numel(thresholds),3);
-
 for q = 1:numel(thresholds)
     predT = probAttack &gt;= thresholds(q);
     cmT = confusionmat(Ytest,predT,'Order',[0 1]);
-    TN = cmT(1,1); FP = cmT(1,2);
-    FN = cmT(2,1); TP = cmT(2,2);
-    metricTable(q,1) = TP/max(TP+FN,1); % recall
-    metricTable(q,2) = FP/max(FP+TN,1); % false alarm
-    metricTable(q,3) = 2*TP/max(2*TP+FP+FN,1); % F1
-end
+    TN=cmT(1,1); FP=cmT(1,2); FN=cmT(2,1); TP=cmT(2,2);
+    metricTable(q,1)=TP/max(TP+FN,1);
+    metricTable(q,2)=FP/max(FP+TN,1);
+    metricTable(q,3)=2*TP/max(2*TP+FP+FN,1);
+end</code></pre><div class="warning">Accuracy alone is misleading when attack samples are rare.</div></div><div class="ar"><h2>5. التجارب</h2><p>اختبر حذف البواقي وعدم التوازن والضوضاء والعتبات والهجمات غير المرئية وحذف الميزات.</p></div></section>
 
-figure;
-plot(thresholds,metricTable,'LineWidth',1.5);
-grid on;
-xlabel('Decision threshold');
-ylabel('Metric value');
-legend('Recall','False alarm rate','F1');
-title('Threshold Selection');</code></pre></div><div class="ar"><h2>7. التجربة D: عتبة القرار</h2><p>غيّر عتبة التصنيف ولاحظ المفاضلة بين اكتشاف المزيد من الهجمات وتقليل الإنذارات الكاذبة.</p></div></section>
-<section><div class="en"><h2>8. Experiment E: Unseen Attack Type</h2><pre><code>Nunseen = 300;
-Vu = 1.00 + 0.008*randn(Nunseen,1);
-Au = 0.00 + 0.020*randn(Nunseen,1);
-Fu = 0.00 + 0.015*randn(Nunseen,1);
-Pu = 1.10 + 0.12*randn(Nunseen,1);
+  <section id="validation"><div class="en"><h2>6. Expected Results and Validation</h2><div class="grid"><div class="mini-card"><strong>High Recall</strong><p>Critical attacks should rarely be missed.</p></div><div class="mini-card"><strong>Controlled False Alarms</strong><p>Normal operation should not trigger excessive alarms.</p></div><div class="mini-card"><strong>Residual Benefit</strong><p>Physics features should improve unseen-attack detection.</p></div><div class="mini-card"><strong>Robustness</strong><p>Performance should degrade gradually under noise.</p></div></div><ul><li>Report confusion matrix, precision, recall, F1, AUC, and false-alarm rate.</li><li>Compare with and without the residual feature.</li><li>Repeat the split using several random seeds.</li><li>Test class imbalance explicitly.</li><li>Evaluate at least one unseen attack type.</li></ul><div class="highlight">A useful security detector must be accurate, robust, physically plausible, and operationally acceptable.</div></div><div class="ar"><h2>6. النتائج المتوقعة والتحقق</h2><p>يجب تحقيق استدعاء مرتفع مع إنذارات كاذبة مقبولة، وإظهار فائدة البواقي والمتانة أمام الضوضاء والهجمات الجديدة.</p></div></section>
 
-% Replay-like attack: frequency looks normal, angle-power relation is altered
-Au = Au - 0.07;
-Pu = Pu + 0.22;
-Ru = Pu - (1.10 + c1*Au + c2*(1-Vu));
-Xu = [Vu Au Fu Pu Ru];
-XuZ = (Xu-mu)./sigma;
-predUnseen = predict(mdl,XuZ);
+  <section><div class="en"><h2>7. Student Tasks</h2><ol><li>Remove the residual and compare all metrics.</li><li>Create a 5% attack dataset.</li><li>Test four noise levels.</li><li>Select a threshold that maximizes F1.</li><li>Create a replay-like unseen attack.</li><li>Compare SVM with an ensemble classifier.</li><li>Report the most safety-critical failure case.</li></ol></div><div class="ar"><h2>7. مهام الطالب</h2><ol><li>حذف البواقي ومقارنة المقاييس.</li><li>إنشاء مجموعة هجمات بنسبة 5%.</li><li>اختبار أربعة مستويات ضوضاء.</li><li>اختيار عتبة تعظم F1.</li><li>إنشاء هجوم إعادة إرسال غير مرئي.</li><li>مقارنة SVM مع نموذج تجميعي.</li><li>تحديد أخطر حالة فشل.</li></ol></div></section>
 
-fprintf('Detection rate for unseen attack = %.3f\n',mean(predUnseen));</code></pre><p>This test measures generalization beyond the exact attack distribution used during training.</p></div><div class="ar"><h2>8. التجربة E: نوع هجوم غير مرئي</h2><p>اختبر النموذج على هجوم لم يظهر في التدريب، لأن الأداء على الهجمات المعروفة لا يضمن التعميم.</p></div></section>
-<section><div class="en"><h2>9. Experiment F: Adversarial Evasion</h2><pre><code>XattackTest = XtestZ(Ytest==1,:);
-Xevade = XattackTest;
+  <section><div class="en"><h2>🔬 Research Extension</h2><div class="research"><strong>Cyber-physical detector:</strong> combine temporal models, graph topology, state-estimation residuals, adversarial testing, and online drift monitoring.</div></div><div class="ar"><h2>🔬 امتداد بحثي</h2><div class="research">ادمج النماذج الزمنية وطوبولوجيا الشبكة وبواقي تقدير الحالة والاختبارات الخصومية ومراقبة الانجراف.</div></div></section>
 
-% Simple illustrative perturbation toward normal feature mean
-normalMean = mean(XtrainZ(Ytrain==0,:),1);
-epsilon = 0.15;
-Xevade = Xevade + epsilon*sign(normalMean-Xevade);
-
-predBefore = predict(mdl,XattackTest);
-predAfter  = predict(mdl,Xevade);
-
-fprintf('Attack detection before perturbation = %.3f\n',mean(predBefore));
-fprintf('Attack detection after perturbation  = %.3f\n',mean(predAfter));</code></pre><div class="note">This is an educational evasion simulation, not a full gradient-based adversarial attack.</div></div><div class="ar"><h2>9. التجربة F: المراوغة الخصومية</h2><p>حرّك ميزات الهجوم قليلًا باتجاه متوسط البيانات الطبيعية وراقب تغير نسبة الكشف. التجربة تعليمية لتوضيح حساسية المصنف.</p></div></section>
-<section><div class="en"><h2>10. Compare Several Models</h2><pre><code>% Decision tree
-mdlTree = fitctree(XtrainZ,Ytrain);
-predTree = predict(mdlTree,XtestZ);
-
-% Ensemble of trees
-mdlEns = fitcensemble(XtrainZ,Ytrain,'Method','Bag');
-predEns = predict(mdlEns,XtestZ);
-
-% Linear discriminant
-mdlLDA = fitcdiscr(XtrainZ,Ytrain);
-predLDA = predict(mdlLDA,XtestZ);
-
-models = {'SVM';'Tree';'Ensemble';'LDA'};
-preds = {pred;predTree;predEns;predLDA};
-F1all = zeros(4,1);
-
-for m = 1:4
-    cmM = confusionmat(Ytest,preds{m},'Order',[0 1]);
-    TN = cmM(1,1); FP = cmM(1,2);
-    FN = cmM(2,1); TP = cmM(2,2);
-    F1all(m) = 2*TP/max(2*TP+FP+FN,1);
-end
-
-disp(table(models,F1all));</code></pre></div><div class="ar"><h2>10. مقارنة نماذج متعددة</h2><p>قارن SVM بشجرة قرار وتجميع أشجار ومصنف خطي باستخدام F1 وليس الدقة العامة فقط.</p></div></section>
-<section><div class="en"><h2>11. Tasks</h2><ol><li>Change attack magnitude and class ratio.</li><li>Add measurement spikes, drift, replay, and packet-loss features.</li><li>Use cross-validation to tune SVM hyperparameters.</li><li>Compare raw, statistical, temporal, and physics-informed features.</li><li>Study detection delay using sliding windows.</li><li>Build a one-class anomaly detector trained only on normal data.</li><li>Test robustness under an unseen topology or operating point.</li><li>Report accuracy, precision, recall, F1, AUC, and false-alarm rate.</li></ol></div><div class="ar"><h2>11. المهام</h2><ol><li>غيّر شدة الهجوم ونسبة الفئات.</li><li>أضف النبضات والانجراف وإعادة الإرسال وفقدان الحزم.</li><li>استخدم التحقق المتقاطع لضبط SVM.</li><li>قارن الميزات الخام والإحصائية والزمنية والفيزيائية.</li><li>ادرس تأخير الكشف باستخدام النوافذ المنزلقة.</li><li>ابنِ كاشف شذوذ يتدرب على البيانات الطبيعية فقط.</li><li>اختبر المتانة عند نقطة تشغيل أو بنية شبكة جديدة.</li><li>اعرض جميع مؤشرات التقييم الأساسية.</li></ol></div></section>
-<section><div class="en"><h2>12. Mini Project</h2><p>Develop a PMU cyberattack detector for a small multi-bus system. Generate time-series measurements under normal operation, load changes, line outages, and several false-data attacks. Combine an electrical residual detector with an AI classifier, evaluate unseen attacks, and design a safe operator alarm policy.</p></div><div class="ar"><h2>12. المشروع المصغر</h2><p>طوّر كاشف هجمات لقياسات PMU في شبكة متعددة العقد، مع تشغيل طبيعي وتغير حمل وفصل خط وعدة هجمات. ادمج كاشف بواقي كهربائيًا مع مصنف ذكاء اصطناعي واختبر هجمات غير مرئية وصمم سياسة إنذار آمنة للمشغل.</p></div></section>
+  <section><div class="en"><h2>🧠 Review Questions</h2><ol><li>Why is train-only standardization necessary?</li><li>What does the physics residual represent?</li><li>Why is recall important in intrusion detection?</li><li>How does class imbalance distort accuracy?</li><li>What does the ROC curve show?</li><li>Why test unseen attacks?</li><li>How can a detector be made physics-informed?</li></ol></div><div class="ar"><h2>🧠 أسئلة المراجعة</h2><ol><li>لماذا يجب التطبيع باستخدام التدريب فقط؟</li><li>ماذا تمثل البواقي الفيزيائية؟</li><li>لماذا يعد Recall مهمًا؟</li><li>كيف يشوه عدم توازن الفئات الدقة؟</li><li>ماذا يبين منحنى ROC؟</li><li>لماذا نختبر هجمات غير مرئية؟</li><li>كيف نجعل الكاشف موجَّهًا بالفيزياء؟</li></ol></div></section>
 </main>
-<footer class="site-footer">
-  <div class="container footer-wrap ag-global-footer">
-    <span>© 2026 Dr.-Ing. Aouss Gabash | <span lang="ar" dir="rtl">الدكتور المهندس أوس غباش</span></span>
-    <span>AG Academic Ecosystem | <span lang="ar" dir="rtl">منظومة AG الأكاديمية</span></span>
-    <span>Germany | <span lang="ar" dir="rtl">ألمانيا</span> • Syria | <span lang="ar" dir="rtl">سوريا</span></span>
-  </div>
-</footer>
-<script src="course-navigation.js" defer></script><script src="course-footer.js" defer></script>
-</body></html>
+<script src="course-navigation.js" defer></script>
+<script src="course-footer.js" defer></script>
+</body>
+</html>
