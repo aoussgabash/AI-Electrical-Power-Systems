@@ -17,7 +17,7 @@
   }
 
   @bottom-left {
-    content: "aoussgabash.com";
+    content: "ai.aoussgabash.com";
     font-family: Arial, sans-serif;
     font-size: 7.5pt;
     color: #475569;
@@ -50,6 +50,40 @@ body {
   orphans: 3;
 }
 
+/* Never publish interactive website controls in the academic PDF edition. */
+header,
+nav,
+footer,
+button,
+.mobile-menu-toggle,
+.navlinks,
+.back,
+.back-to-top,
+.to-top,
+.course-footer,
+.site-footer,
+.course-actions,
+.course-action-panel,
+.course-action-card,
+.course-metadata-bar,
+.course-page-navigation,
+.course-nav-link,
+.course-nav-home,
+.quiz,
+.quiz-container,
+.quiz-section,
+.quiz-actions,
+.quiz-result,
+[data-course-quiz],
+[data-quiz-submit],
+[data-quiz-reset],
+[data-quiz-certificate],
+[data-progress-reset],
+[data-learning-dashboard],
+#reading-progress-track {
+  display: none !important;
+}
+
 main,
 .container {
   width: 100% !important;
@@ -62,7 +96,19 @@ main,
   padding: 8mm 0 6mm !important;
   margin: 0 !important;
   text-align: center !important;
+  border: none !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
   break-after: avoid-page;
+}
+
+.hero::before {
+  content: "";
+  display: block;
+  width: 32mm;
+  height: 1.4mm;
+  margin: 0 auto 7mm;
+  background: #0284c7;
 }
 
 .hero h1,
@@ -135,6 +181,8 @@ h6 {
 
 h2 {
   margin: 0 0 2.5mm !important;
+  padding-bottom: 1.5mm !important;
+  border-bottom: 0.3mm solid #dbe4ee;
   font-size: 17pt !important;
   line-height: 1.25 !important;
 }
@@ -304,6 +352,14 @@ figure svg {
   text-align: right !important;
   font-size: 15pt !important;
   color: #334155 !important;
+}
+
+.publication-reference-list p {
+  margin: 0 0 3mm !important;
+  padding-left: 7mm;
+  text-indent: -7mm;
+  font-size: 9.5pt !important;
+  line-height: 1.5 !important;
 }
 
 .publication-table {
