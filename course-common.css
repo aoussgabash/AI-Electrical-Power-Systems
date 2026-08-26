@@ -67,3 +67,18 @@ body > header .brand img,
   object-fit:contain;
   background:var(--agai-bg);
 }
+
+/* Course 2: restore the gold halo while keeping the internal backgrounds blue. */
+html.course-two-page body.course-two-page main.container > section.academic-course-banner.academic-course-2,
+html.course-two-page body.course-two-page main.container > section.course-action-panel.course-2-actions,
+html.course-two-page body.course-two-page main.container > section.academic-overview{
+  box-shadow:0 0 0 1px rgba(251,191,36,.08),0 0 28px rgba(251,191,36,.18),0 20px 48px rgba(0,0,0,.28)!important;
+}
+html.course-two-page body.course-two-page .course-action-panel.course-2-actions .course-action-card,
+html.course-two-page body.course-two-page .academic-course-banner.academic-course-2 [style*="border"],
+html.course-two-page body.course-two-page .academic-overview [style*="border"]{
+  box-shadow:0 0 0 1px rgba(251,191,36,.05),0 0 18px rgba(251,191,36,.11),0 10px 24px rgba(0,0,0,.20)!important;
+}
+html.course-two-page body.course-two-page .course-action-panel.course-2-actions .course-action-card:hover{
+  box-shadow:0 0 0 1px rgba(251,191,36,.12),0 0 26px rgba(251,191,36,.22),0 14px 30px rgba(0,0,0,.24)!important;
+}
