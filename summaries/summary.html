@@ -44,8 +44,46 @@
 
   <script src="summary.js" defer></script>
   <script>
+    const summaryRoot = document.getElementById('summary-root');
+    let renderTimer;
+
+    function normalizeEquationColors() {
+      const mathSelectors = [
+        '.math','.equation','.formula','.formula-box','.math-block',
+        'mjx-container','math','[class*="math"]','[class*="equation"]','[class*="formula"]'
+      ].join(',');
+
+      summaryRoot.querySelectorAll(mathSelectors).forEach(element => {
+        element.style.setProperty('color', '#0b3654', 'important');
+        element.querySelectorAll('[style*="color"],font[color]').forEach(child => {
+          child.style.setProperty('color', '#0b3654', 'important');
+          child.removeAttribute('color');
+        });
+      });
+    }
+
+    async function renderSummaryMath() {
+      normalizeEquationColors();
+      if (!window.MathJax?.typesetPromise) return;
+      try {
+        if (MathJax.typesetClear) MathJax.typesetClear([summaryRoot]);
+        await MathJax.typesetPromise([summaryRoot]);
+        normalizeEquationColors();
+      } catch (error) {
+        console.warn('MathJax summary rendering:', error);
+      }
+    }
+
+    const observer = new MutationObserver(() => {
+      clearTimeout(renderTimer);
+      renderTimer = setTimeout(renderSummaryMath, 120);
+    });
+    observer.observe(summaryRoot, {childList:true, subtree:true});
+
+    window.addEventListener('load', () => setTimeout(renderSummaryMath, 250));
+
     document.getElementById('print-summary').addEventListener('click', async () => {
-      if (window.MathJax?.typesetPromise) await MathJax.typesetPromise([document.getElementById('summary-root')]);
+      await renderSummaryMath();
       window.print();
     });
   </script>
