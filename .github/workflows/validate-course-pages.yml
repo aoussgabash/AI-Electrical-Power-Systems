@@ -1,0 +1,48 @@
+name: Validate course pages
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'index.html'
+      - 'lecture*.html'
+      - 'lab*.html'
+      - 'course-footer.js'
+      - 'course-navigation.js'
+      - 'academic-overview.js'
+      - 'scripts/validate-course-pages.mjs'
+      - '.github/workflows/validate-course-pages.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'lecture*.html'
+      - 'lab*.html'
+      - 'course-footer.js'
+      - 'course-navigation.js'
+      - 'academic-overview.js'
+      - 'scripts/validate-course-pages.mjs'
+      - '.github/workflows/validate-course-pages.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-course-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate all 20 lectures and 20 laboratories
+        run: node scripts/validate-course-pages.mjs
