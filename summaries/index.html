@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>All Course Summaries | جميع ملخصات المقرر</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/brand/AGAI.svg">
+  <style>
+    :root{--bg:#07111f;--panel:#0d2136;--line:rgba(125,211,252,.24);--blue:#38bdf8;--gold:#fbbf24;--text:#eef8ff;--muted:#a9bfd0}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);font-family:Arial,"Noto Sans Arabic",Tahoma,sans-serif;line-height:1.55}
+    header{position:sticky;top:0;z-index:5;background:rgba(7,17,31,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
+    nav{width:min(1120px,calc(100% - 28px));margin:auto;min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}.logo{font-weight:900}.logo span{color:var(--blue)}
+    a{color:inherit}.back{padding:10px 14px;border:1px solid var(--line);border-radius:12px;text-decoration:none;font-weight:800}
+    main{width:min(1120px,calc(100% - 28px));margin:34px auto 60px}.hero{text-align:center;margin-bottom:28px}.hero h1{margin:0 0 8px;font-size:clamp(1.8rem,4vw,3rem)}.hero .ar{direction:rtl;font-size:1.35rem;color:#dff6ff}.hero p{max-width:780px;margin:14px auto;color:var(--muted)}
+    .course{margin-top:30px;padding:22px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,rgba(13,33,54,.96),rgba(8,24,41,.96));box-shadow:0 18px 46px rgba(0,0,0,.22)}
+    .course.two{border-color:rgba(251,191,36,.36);background:linear-gradient(145deg,rgba(46,38,18,.94),rgba(18,24,34,.96))}.course h2{margin:0 0 5px}.course .subtitle{direction:rtl;color:var(--muted);margin-bottom:18px}
+    .group-title{margin:20px 0 10px;font-size:1.05rem;color:#fff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
+    .card{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:78px;padding:13px 14px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:#0b2238;text-decoration:none;transition:.18s ease}.two .card{background:#272316;border-color:rgba(251,191,36,.24)}.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:var(--blue);outline:none}.two .card:hover,.two .card:focus-visible{border-color:var(--gold)}
+    .card strong{display:block}.card small{display:block;color:var(--muted);direction:rtl;margin-top:2px}.icon{font-size:1.35rem}.status{font-size:.7rem;color:#7dd3fc}.two .status{color:#fde68a}
+    .note{margin-top:26px;padding:16px;border:1px solid var(--line);border-radius:15px;background:rgba(56,189,248,.07);text-align:center;color:#d8ecf8}.note .ar{direction:rtl;margin-top:5px}
+  </style>
+</head>
+<body>
+<header><nav><div class="logo"><span>AI</span> Power Systems</div><a class="back" href="../index.html">← Home | الرئيسية</a></nav></header>
+<main>
+  <section class="hero">
+    <h1>All Course Summaries</h1>
+    <div class="ar">جميع ملخصات المحاضرات والمخابر</div>
+    <p>Each link opens a concise bilingual summary generated directly from the corresponding website page, ready for printing or saving as PDF.</p>
+  </section>
+
+  <section class="course" id="course-1">
+    <h2>Course 1 — Artificial Intelligence and Machine Learning Fundamentals</h2>
+    <div class="subtitle">المقرر الأول — أساسيات الذكاء الاصطناعي وتعلم الآلة</div>
+    <h3 class="group-title">Lecture Summaries | ملخصات المحاضرات</h3>
+    <div class="grid" data-type="lecture" data-from="1" data-to="10"></div>
+    <h3 class="group-title">Laboratory Summaries | ملخصات المخابر</h3>
+    <div class="grid" data-type="lab" data-from="1" data-to="10"></div>
+  </section>
+
+  <section class="course two" id="course-2">
+    <h2>Course 2 — AI Applications in Electrical Power Systems</h2>
+    <div class="subtitle">المقرر الثاني — تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية</div>
+    <h3 class="group-title">Lecture Summaries | ملخصات المحاضرات</h3>
+    <div class="grid" data-type="lecture" data-from="11" data-to="20"></div>
+    <h3 class="group-title">Laboratory Summaries | ملخصات المخابر</h3>
+    <div class="grid" data-type="lab" data-from="11" data-to="20"></div>
+  </section>
+
+  <div class="note">The website remains the complete interactive reference. These pages are concise print-ready summaries.<div class="ar">يبقى الموقع المرجع الكامل والتفاعلي، بينما تمثل هذه الصفحات ملخصات مختصرة جاهزة للطباعة.</div></div>
+</main>
+<script>
+  document.querySelectorAll('.grid[data-type]').forEach(grid => {
+    const type = grid.dataset.type;
+    const from = Number(grid.dataset.from);
+    const to = Number(grid.dataset.to);
+    for(let n=from;n<=to;n++){
+      const num=String(n).padStart(2,'0');
+      const isLecture=type==='lecture';
+      const link=document.createElement('a');
+      link.className='card';
+      link.href=`summary.html?type=${type}&number=${num}`;
+      link.innerHTML=`<span><strong>${isLecture?'Lecture':'MATLAB Lab'} ${num}</strong><small>${isLecture?'ملخص المحاضرة':'ملخص المختبر'} ${num}</small><span class="status">Bilingual PDF Summary</span></span><span class="icon">${isLecture?'▥':'⚡'}</span>`;
+      grid.appendChild(link);
+    }
+  });
+</script>
+</body>
+</html>
