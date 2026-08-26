@@ -1,72 +1,57 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-10';
-  const COURSE_NAV_VERSION = '20260826-10';
+  const COURSE_THEME_VERSION = '20260826-11';
+  const COURSE_NAV_VERSION = '20260826-11';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
   const isLabPage = /^lab\d{2}\.html$/.test(page);
   const isCourseContentPage = isLecturePage || isLabPage;
 
-  const synchronizeHomepageCatalog = () => {
+  const cleanText = value => (value || '').replace(/\s+/g, ' ').trim();
+
+  const synchronizeHomepageCatalog = async () => {
     if (page !== 'index.html' && page !== '') return;
 
-    const actualLectures = {
-      5:['Artificial Neural Networks','الشبكات العصبية الاصطناعية','Neurons, multilayer networks, forward propagation, backpropagation, and training.'],
-      6:['Genetic Algorithms','الخوارزميات الجينية','Population-based evolutionary optimization for electrical-engineering problems.'],
-      7:['Deep Learning','التعلم العميق','Deep neural architectures, feature learning, CNNs, RNNs, and engineering applications.'],
-      11:['Graph Neural Networks for Power Systems','الشبكات العصبية البيانية في أنظمة القدرة الكهربائية','Topology-aware learning for state estimation, fault detection, stability, and smart grids.'],
-      12:['Reinforcement Learning in Energy Management','التعلم المعزز في إدارة الطاقة','Sequential decision-making for batteries, microgrids, demand response, and grid control.'],
-      13:['Explainable Artificial Intelligence','الذكاء الاصطناعي القابل للتفسير','SHAP, LIME, feature importance, and trustworthy engineering decisions.'],
-      14:['Generative AI and Large Language Models','الذكاء الاصطناعي التوليدي والنماذج اللغوية الكبيرة','LLMs, embeddings, prompting, retrieval-augmented generation, and engineering assistants.'],
-      15:['Multi-Agent AI for Smart Grids','الذكاء الاصطناعي متعدد الوكلاء للشبكات الذكية','Distributed coordination, consensus, negotiation, and cooperative grid control.'],
-      16:['Digital Twins for Power Systems','التوأم الرقمي لأنظمة القدرة','Real-time synchronization, simulation, monitoring, and predictive maintenance.'],
-      17:['Physics-Informed Artificial Intelligence','الذكاء الاصطناعي الموجّه بالفيزياء','Physics-informed neural networks, constraints, and dynamic-system learning.'],
-      18:['Federated Learning for Smart Grids','التعلم الاتحادي للشبكات الذكية','Privacy-aware distributed learning across grid participants.'],
-      19:['AI Cybersecurity for Power Systems','الأمن السيبراني المدعوم بالذكاء الاصطناعي لأنظمة القدرة','Attack detection, resilient AI, and cyber-physical security.'],
-      20:['Autonomous AI Power Systems','أنظمة القدرة ذاتية التشغيل بالذكاء الاصطناعي','Integrated sensing, prediction, decision, safety, and autonomous control.']
-    };
-
-    const actualLabs = {
-      2:['Fuzzy Logic Voltage Control','التحكم بالجهد باستخدام المنطق الضبابي'],
-      3:['Machine Learning Load Forecasting','التنبؤ بالأحمال باستخدام تعلم الآلة'],
-      4:['AI-Based PV Power Forecasting','التنبؤ بقدرة الأنظمة الكهروضوئية باستخدام الذكاء الاصطناعي'],
-      5:['Genetic Algorithm for Economic Dispatch','الخوارزمية الجينية للتوزيع الاقتصادي'],
-      6:['AI-Based Optimal Power Flow','تدفق القدرة الأمثل باستخدام الذكاء الاصطناعي'],
-      7:['Battery Energy Storage Optimization','تحسين تشغيل أنظمة تخزين طاقة البطاريات'],
-      8:['Integrated PV-Battery Smart Energy Management','الإدارة الذكية المتكاملة للطاقة الشمسية والبطاريات'],
-      11:['Graph Neural Network for State Estimation','الشبكة العصبية البيانية لتقدير الحالة'],
-      12:['Battery Scheduling with Deep Q-Learning','جدولة البطارية باستخدام التعلم العميق المعزز DQN'],
-      13:['Explaining a Load-Forecasting Model','تفسير نموذج التنبؤ بالأحمال'],
-      14:['Building a Power Engineering RAG Assistant','بناء مساعد هندسي معزز بالاسترجاع'],
-      15:['Multi-Agent Energy Management','إدارة الطاقة متعددة الوكلاء'],
-      16:['Building a Simple Digital Twin','بناء توأم رقمي مبسط'],
-      17:['PINN Solution of the Swing Equation','حل معادلة التأرجح باستخدام PINN'],
-      18:['Federated Learning Simulation','محاكاة التعلم الاتحادي'],
-      19:['AI-Based Intrusion Detection','كشف التسلل باستخدام الذكاء الاصطناعي'],
-      20:['Autonomous Microgrid Supervisor','مشرف ذاتي التشغيل لشبكة مصغرة']
-    };
-
-    document.querySelectorAll('.course-card').forEach(card => {
+    const cards = [...document.querySelectorAll('.course-card[href]')];
+    await Promise.all(cards.map(async card => {
       const href = card.getAttribute('href') || '';
-      const match = href.match(/^(lecture|lab)(\d{2})\.html$/i);
-      if (!match) return;
-      const type = match[1].toLowerCase();
-      const number = Number(match[2]);
-      const data = type === 'lecture' ? actualLectures[number] : actualLabs[number];
-      if (!data) return;
+      if (!/^(lecture|lab)\d{2}\.html$/i.test(href)) return;
 
-      const title = card.querySelector('h3');
-      const arabic = card.querySelector('.arabic');
-      const description = card.querySelector('p');
-      if (title) title.textContent = data[0];
-      if (arabic) arabic.textContent = data[1];
-      if (description) description.textContent = type === 'lecture'
-        ? data[2]
-        : 'Hands-on MATLAB laboratory with code, analysis, experiments, and student tasks.';
+      try {
+        const response = await fetch(`${href}?catalog-sync=20260826-11`, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      card.dataset.search = `${data[0]} ${data[1]} ${type === 'lecture' ? data[2] : 'MATLAB laboratory code analysis experiments'}`.toLowerCase();
-    });
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const pageTitle = cleanText(doc.querySelector('h1')?.textContent);
+        const arabicTitle = cleanText(
+          doc.querySelector('.hero-ar')?.textContent ||
+          doc.querySelector('[lang="ar"].hero-subtitle')?.textContent ||
+          doc.querySelector('.subtitle-ar')?.textContent
+        );
+        const summary = cleanText(
+          doc.querySelector('.hero .subtitle')?.textContent ||
+          doc.querySelector('.hero p:not([lang="ar"])')?.textContent ||
+          doc.querySelector('meta[name="description"]')?.getAttribute('content')
+        );
+
+        if (!pageTitle) return;
+
+        const titleNode = card.querySelector('h3');
+        const arabicNode = card.querySelector('.arabic');
+        const descriptionNode = card.querySelector('p');
+        if (titleNode) titleNode.textContent = pageTitle;
+        if (arabicNode && arabicTitle) arabicNode.textContent = arabicTitle;
+        if (descriptionNode && summary) descriptionNode.textContent = summary;
+
+        card.dataset.search = `${pageTitle} ${arabicTitle} ${summary}`.toLowerCase();
+        card.dataset.catalogVerified = 'true';
+      } catch (error) {
+        console.warn(`Could not synchronize ${href}:`, error);
+        card.dataset.catalogVerified = 'false';
+      }
+    }));
   };
 
   const removeLegacyMarkup = () => {
@@ -123,7 +108,7 @@
   };
 
   const startCourseFeatures = () => {
-    synchronizeHomepageCatalog();
+    void synchronizeHomepageCatalog();
     if (!isCourseContentPage) return;
 
     loadCourseTheme();
@@ -143,7 +128,7 @@
     }
 
     const courseFeatures = document.createElement('script');
-    courseFeatures.src = 'course-footer-legacy.js?v=20260826-10';
+    courseFeatures.src = 'course-footer-legacy.js?v=20260826-11';
     courseFeatures.defer = true;
     courseFeatures.dataset.courseLegacy = 'true';
     courseFeatures.addEventListener('load', () => {
