@@ -1,0 +1,119 @@
+name: Generate Course Summary PDFs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'lecture*.html'
+      - 'lab*.html'
+      - 'summaries/**'
+      - 'scripts/generate-summary-pdfs.sh'
+      - '.github/workflows/generate-summary-pdfs.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: course-summary-pdfs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate-pdfs:
+    name: Build and validate 40 bilingual PDFs
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PDF validation tools and fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils zip fonts-dejavu-core fonts-noto-core fonts-noto-extra
+          fc-cache -f -v >/dev/null
+
+      - name: Verify Chrome availability
+        run: |
+          google-chrome --version || chromium --version || chromium-browser --version
+
+      - name: Generate all lecture and laboratory PDFs
+        run: |
+          chmod +x scripts/generate-summary-pdfs.sh
+          scripts/generate-summary-pdfs.sh
+
+      - name: Validate generated PDF set
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          count=$(find summaries/pdf -maxdepth 1 -type f -name '*.pdf' | wc -l)
+          if [ "$count" -ne 40 ]; then
+            echo "Expected 40 PDF files, but found $count." >&2
+            find summaries/pdf -maxdepth 1 -type f -printf '%f\n' | sort
+            exit 1
+          fi
+
+          failed=0
+          for pdf in summaries/pdf/*.pdf; do
+            if [ ! -s "$pdf" ]; then
+              echo "Empty PDF: $pdf" >&2
+              failed=1
+              continue
+            fi
+
+            pages=$(pdfinfo "$pdf" | awk '/^Pages:/ {print $2}')
+            if [ -z "$pages" ] || [ "$pages" -lt 2 ]; then
+              echo "Invalid page count in $pdf: ${pages:-unknown}" >&2
+              failed=1
+            fi
+
+            text_file="$(mktemp)"
+            pdftotext "$pdf" "$text_file"
+            if grep -Eqi 'Summary unavailable|تعذر إنشاء الملخص|Source page returned' "$text_file"; then
+              echo "Source-generation error detected in $pdf" >&2
+              failed=1
+            fi
+            rm -f "$text_file"
+          done
+
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+
+          test -s summaries/AI-Course-Summaries.zip
+          unzip -t summaries/AI-Course-Summaries.zip >/dev/null
+          echo "Validated 40 PDFs and the ZIP archive successfully."
+
+      - name: Create generation manifest
+        shell: bash
+        run: |
+          {
+            echo "AI Applications in Electrical Power Systems"
+            echo "Bilingual PDF summaries"
+            echo "Generated from commit: $GITHUB_SHA"
+            echo "Generated at (UTC): $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo
+            find summaries/pdf -maxdepth 1 -type f -name '*.pdf' -printf '%f\n' | sort
+          } > summaries/pdf/GENERATION-MANIFEST.txt
+
+      - name: Upload complete PDF package
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-Course-Summaries-${{ github.run_number }}
+          path: |
+            summaries/pdf/
+            summaries/AI-Course-Summaries.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Upload ZIP archive separately
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-Course-Summaries-ZIP-${{ github.run_number }}
+          path: summaries/AI-Course-Summaries.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
