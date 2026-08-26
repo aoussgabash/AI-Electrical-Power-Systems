@@ -1,8 +1,9 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-12';
-  const COURSE_NAV_VERSION = '20260826-12';
+  const COURSE_THEME_VERSION = '20260826-13';
+  const COURSE_NAV_VERSION = '20260826-13';
+  const CATALOG_VERSION = '20260826-13';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
   const isLabPage = /^lab\d{2}\.html$/.test(page);
@@ -19,20 +20,37 @@
     const syncStyle = document.createElement('style');
     syncStyle.id = 'course-catalog-sync-style';
     syncStyle.textContent = `
-      html[data-catalog-syncing="true"] .course-card{pointer-events:none;opacity:.58;filter:saturate(.7);transition:opacity .2s ease}
-      html[data-catalog-syncing="true"] .course-card::after{content:"Synchronizing title… | جارٍ مطابقة العنوان";display:block;margin-top:12px;color:#9fc7df;font-size:.72rem}
-      html[data-catalog-syncing="false"] .course-card{opacity:1;filter:none}
+      .course-card[data-catalog-state="loading"],
+      .course-card[data-catalog-state="error"]{pointer-events:none!important}
+      .course-card[data-catalog-state="loading"]{opacity:.62;filter:saturate(.72)}
+      .course-card[data-catalog-state="error"]{opacity:.55;filter:grayscale(.3)}
+      .course-card[data-catalog-state="verified"]{opacity:1;filter:none}
     `;
     document.getElementById(syncStyle.id)?.remove();
     document.head.appendChild(syncStyle);
-    document.documentElement.dataset.catalogSyncing = 'true';
 
-    await Promise.all(cards.map(async card => {
+    const verifyCard = async card => {
       const href = card.getAttribute('href') || '';
-      if (!/^(lecture|lab)\d{2}\.html$/i.test(href)) return;
+      const match = href.match(/^(lecture|lab)(\d{2})\.html$/i);
+      if (!match) return;
+
+      const type = match[1].toLowerCase();
+      const number = match[2];
+      const titleNode = card.querySelector('h3');
+      const arabicNode = card.querySelector('.arabic');
+      const descriptionNode = card.querySelector('p');
+      const fallbackLabel = type === 'lecture' ? `Lecture ${number}` : `MATLAB Lab ${number}`;
+      const fallbackArabic = type === 'lecture' ? `المحاضرة ${number}` : `المخبر ${number}`;
+
+      card.dataset.catalogState = 'loading';
+      card.setAttribute('aria-disabled', 'true');
+      card.setAttribute('tabindex', '-1');
+      if (titleNode) titleNode.textContent = `${fallbackLabel} — Verifying title…`;
+      if (arabicNode) arabicNode.textContent = `${fallbackArabic} — جارٍ التحقق من العنوان`;
+      if (descriptionNode) descriptionNode.textContent = 'Reading the verified title from the linked course page.';
 
       try {
-        const response = await fetch(`${href}?catalog-sync=20260826-12`, { cache: 'no-store' });
+        const response = await fetch(`${href}?catalog-sync=${CATALOG_VERSION}`, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const html = await response.text();
@@ -51,27 +69,30 @@
 
         if (!pageTitle) throw new Error('Missing H1 title');
 
-        const titleNode = card.querySelector('h3');
-        const arabicNode = card.querySelector('.arabic');
-        const descriptionNode = card.querySelector('p');
         if (titleNode) titleNode.textContent = pageTitle;
-        if (arabicNode && arabicTitle) arabicNode.textContent = arabicTitle;
-        if (descriptionNode && summary) descriptionNode.textContent = summary;
+        if (arabicNode) arabicNode.textContent = arabicTitle || fallbackArabic;
+        if (descriptionNode) descriptionNode.textContent = summary || 'Open the verified course page for complete scientific content.';
 
         card.dataset.search = `${pageTitle} ${arabicTitle} ${summary}`.toLowerCase();
-        card.dataset.catalogVerified = 'true';
+        card.dataset.catalogState = 'verified';
+        card.removeAttribute('aria-disabled');
+        card.removeAttribute('tabindex');
       } catch (error) {
-        console.warn(`Could not synchronize ${href}:`, error);
-        card.dataset.catalogVerified = 'false';
+        console.error(`Catalog verification failed for ${href}:`, error);
+        if (titleNode) titleNode.textContent = `${fallbackLabel} — Temporarily unavailable`;
+        if (arabicNode) arabicNode.textContent = `${fallbackArabic} — تعذر التحقق من العنوان`;
+        if (descriptionNode) descriptionNode.textContent = 'This card is disabled because its title could not be verified against the linked page.';
+        card.dataset.catalogState = 'error';
+        card.dataset.search = `${fallbackLabel} ${fallbackArabic}`.toLowerCase();
       }
-    }));
+    };
 
-    document.documentElement.dataset.catalogSyncing = 'false';
+    await Promise.allSettled(cards.map(verifyCard));
   };
 
   const removeLegacyMarkup = () => {
     if (!isCourseContentPage) return;
-    document.querySelectorAll('footer').forEach((footer) => footer.remove());
+    document.querySelectorAll('footer').forEach(footer => footer.remove());
     document.documentElement.dataset.courseFooterCentralized = 'true';
   };
 
@@ -118,7 +139,7 @@
       overview.defer = true;
       overview.dataset.academicOverview = 'true';
       document.body.appendChild(overview);
-    }, {once:true});
+    }, { once: true });
     document.body.appendChild(navigation);
   };
 
@@ -143,7 +164,7 @@
     }
 
     const courseFeatures = document.createElement('script');
-    courseFeatures.src = 'course-footer-legacy.js?v=20260826-12';
+    courseFeatures.src = `course-footer-legacy.js?v=${COURSE_THEME_VERSION}`;
     courseFeatures.defer = true;
     courseFeatures.dataset.courseLegacy = 'true';
     courseFeatures.addEventListener('load', () => {
