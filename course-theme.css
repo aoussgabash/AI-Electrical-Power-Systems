@@ -87,22 +87,22 @@ pre code{padding:0;background:transparent;color:inherit}
 img,svg,video,canvas{max-width:100%;height:auto}
 a{color:var(--blue)}
 
-/* Course 2 internal-page identity */
+/* Course 2 internal-page identity: gold accents without gold-tinted backgrounds */
 html.course-two-page,
 html.course-two-page body,
 body.course-two-page{
   --blue:#fbbf24;
   --line:rgba(251,191,36,.18);
-  --card:#1d2230;
-  --card2:#161a22;
+  --card:#0f2238;
+  --card2:#0b1b2c;
 }
 html.course-two-page body,
 body.course-two-page{
-  background:radial-gradient(circle at 85% 5%,rgba(251,191,36,.12),transparent 28%),linear-gradient(180deg,#111722,#17130c);
+  background:linear-gradient(180deg,#07111f,#0a1728);
 }
 html.course-two-page header,
 body.course-two-page header{
-  background:rgba(18,16,11,.95);
+  background:rgba(7,17,31,.95);
   border-bottom-color:rgba(251,191,36,.24);
 }
 html.course-two-page header .logo span,
@@ -122,21 +122,21 @@ body.course-two-page .hero-ar{color:#fff0b3}
 html.course-two-page section,
 body.course-two-page section{
   border-color:rgba(251,191,36,.20);
-  background:radial-gradient(circle at 92% 8%,rgba(251,191,36,.06),transparent 30%),linear-gradient(180deg,#1e2430,#181c25);
+  background:linear-gradient(180deg,#0f2238,#0b1b2c);
   box-shadow:0 16px 38px rgba(0,0,0,.18);
 }
 html.course-two-page .toc a,
 body.course-two-page .toc a{
   color:#fff2b8;
   border-color:rgba(251,191,36,.28);
-  background:rgba(251,191,36,.07);
+  background:#0b1b2c;
 }
 html.course-two-page .toc a:hover,
-body.course-two-page .toc a:hover{border-color:#fbbf24;background:rgba(251,191,36,.14)}
+body.course-two-page .toc a:hover{border-color:#fbbf24;background:rgba(251,191,36,.08)}
 html.course-two-page .highlight,
 html.course-two-page .note,
 body.course-two-page .highlight,
-body.course-two-page .note{border-left-color:#fbbf24;background:rgba(251,191,36,.06)}
+body.course-two-page .note{border-left-color:#fbbf24;background:#0b1b2c}
 html.course-two-page .ar .highlight,
 html.course-two-page .ar .note,
 body.course-two-page .ar .highlight,
@@ -152,20 +152,20 @@ body.course-two-page .equation,
 body.course-two-page pre,
 body.course-two-page .svg-box{
   border-color:rgba(251,191,36,.18);
-  background:#131820;
+  background:#081523;
 }
 html.course-two-page .flow-box,
-body.course-two-page .flow-box{border-color:rgba(251,191,36,.32);background:#171b24}
+body.course-two-page .flow-box{border-color:rgba(251,191,36,.32);background:#0b1b2c}
 html.course-two-page .arrow,
 body.course-two-page .arrow{color:#fbbf24}
 html.course-two-page th,
-body.course-two-page th{background:#1b2029;color:#fff2b8}
+body.course-two-page th{background:#0b1b2c;color:#fff2b8}
 html.course-two-page code,
-body.course-two-page code{color:#fde68a;background:#19170f}
+body.course-two-page code{color:#fde68a;background:#071522}
 html.course-two-page header .back,
 body.course-two-page header .back{border-color:rgba(251,191,36,.24);color:#fff7d6}
 html.course-two-page header .back:hover,
-body.course-two-page header .back:hover{background:rgba(251,191,36,.10);border-color:#fbbf24}
+body.course-two-page header .back:hover{background:rgba(251,191,36,.08);border-color:#fbbf24}
 html.course-two-page a:focus-visible,
 html.course-two-page button:focus-visible,
 body.course-two-page a:focus-visible,
