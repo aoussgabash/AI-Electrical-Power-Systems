@@ -64,10 +64,11 @@
       if (kind === 'current') cardStyle += `;cursor:default;border-color:${accentSoft};background:${isCourseOne ? 'linear-gradient(145deg,#102f49,#0a2035)' : 'linear-gradient(145deg,#302915,#1b1d21)'}`;
       if (kind === 'related') cardStyle += `;border-color:${isCourseOne ? 'rgba(250,204,21,.38)' : 'rgba(251,191,36,.54)'}`;
       if (kind === 'download') cardStyle += `;border-color:${isCourseOne ? 'rgba(56,189,248,.58)' : 'rgba(251,191,36,.68)'};background:${isCourseOne ? 'linear-gradient(145deg,#0d527e,#0a304e)' : 'linear-gradient(145deg,#6b4d0d,#31240d)'}`;
+      if (kind === 'agent') cardStyle += ';border-color:rgba(52,211,153,.58);background:linear-gradient(145deg,#0f4b46,#0a2b31)';
       element.setAttribute('style', cardStyle);
 
       const iconElement = document.createElement('span');
-      iconElement.setAttribute('style', `${iconStyle};color:${isCourseOne ? (kind === 'related' ? '#facc15' : kind === 'download' ? '#7dd3fc' : '#38bdf8') : '#fbbf24'}`);
+      iconElement.setAttribute('style', `${iconStyle};color:${kind === 'agent' ? '#6ee7b7' : isCourseOne ? (kind === 'related' ? '#facc15' : kind === 'download' ? '#7dd3fc' : '#38bdf8') : '#fbbf24'}`);
       iconElement.setAttribute('aria-hidden','true');
       iconElement.textContent = icon;
 
@@ -146,6 +147,10 @@
 
     actions.appendChild(card({tag:'div',kind:'current',icon:type === 'lecture' ? '▥' : '⚡',title:type === 'lecture' ? `Lecture ${num}` : `MATLAB Lab ${num}`,subtitle:type === 'lecture' ? `المحاضرة ${num}` : `المختبر ${num}`,meta:`Course ${courseNumber} · ${duration} min · ${difficulty[0]} | ${difficulty[1]}`}));
     actions.appendChild(card({kind:'related',href:`${relatedType}${num}.html`,icon:type === 'lecture' ? '⚡' : '▥',title:type === 'lecture' ? `MATLAB Lab ${num}` : `Lecture ${num}`,subtitle:type === 'lecture' ? `فتح مختبر الطاقة الكهربائية ${num}` : `فتح المحاضرة ${num}`,meta:type === 'lecture' ? 'Electrical Power Lab | مخبر طاقة كهربائية' : 'Read Lesson | قراءة المحاضرة'}));
+
+    if (type === 'lecture' && number === 2) {
+      actions.appendChild(card({kind:'agent',href:'python-ai-agent.html',icon:'🤖',title:'Build Your First AI Agent with Python',subtitle:'ابنِ أول وكيل ذكي باستخدام بايثون',meta:'Interactive bilingual beginner lesson | درس تفاعلي ثنائي اللغة للمبتدئين'}));
+    }
 
     const download = card({kind:'download',href:`pdf/${type}${num}.pdf`,icon:'↓',title:type === 'lecture' ? 'Download Lecture PDF' : 'Download Lab PDF',subtitle:type === 'lecture' ? 'تحميل المحاضرة بصيغة PDF' : 'تحميل المختبر بصيغة PDF',meta:`Course ${courseNumber} · Prepared by ${authorName}`});
     download.setAttribute('download',`${type}_${num}.pdf`);
