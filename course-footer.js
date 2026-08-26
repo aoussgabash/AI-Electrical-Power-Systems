@@ -1,8 +1,8 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-9';
-  const COURSE_NAV_VERSION = '20260826-9';
+  const COURSE_THEME_VERSION = '20260826-10';
+  const COURSE_NAV_VERSION = '20260826-10';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
   const isLabPage = /^lab\d{2}\.html$/.test(page);
@@ -12,6 +12,9 @@
     if (page !== 'index.html' && page !== '') return;
 
     const actualLectures = {
+      5:['Artificial Neural Networks','الشبكات العصبية الاصطناعية','Neurons, multilayer networks, forward propagation, backpropagation, and training.'],
+      6:['Genetic Algorithms','الخوارزميات الجينية','Population-based evolutionary optimization for electrical-engineering problems.'],
+      7:['Deep Learning','التعلم العميق','Deep neural architectures, feature learning, CNNs, RNNs, and engineering applications.'],
       11:['Graph Neural Networks for Power Systems','الشبكات العصبية البيانية في أنظمة القدرة الكهربائية','Topology-aware learning for state estimation, fault detection, stability, and smart grids.'],
       12:['Reinforcement Learning in Energy Management','التعلم المعزز في إدارة الطاقة','Sequential decision-making for batteries, microgrids, demand response, and grid control.'],
       13:['Explainable Artificial Intelligence','الذكاء الاصطناعي القابل للتفسير','SHAP, LIME, feature importance, and trustworthy engineering decisions.'],
@@ -25,15 +28,22 @@
     };
 
     const actualLabs = {
-      11:['GNN State Estimation','تقدير الحالة باستخدام الشبكات العصبية البيانية'],
-      12:['Battery Scheduling with DQN','جدولة البطارية باستخدام DQN'],
-      13:['Explainable Load Forecasting','تفسير نموذج التنبؤ بالأحمال'],
-      14:['Power Engineering RAG Assistant','مساعد هندسي معزز بالاسترجاع'],
+      2:['Fuzzy Logic Voltage Control','التحكم بالجهد باستخدام المنطق الضبابي'],
+      3:['Machine Learning Load Forecasting','التنبؤ بالأحمال باستخدام تعلم الآلة'],
+      4:['AI-Based PV Power Forecasting','التنبؤ بقدرة الأنظمة الكهروضوئية باستخدام الذكاء الاصطناعي'],
+      5:['Genetic Algorithm for Economic Dispatch','الخوارزمية الجينية للتوزيع الاقتصادي'],
+      6:['AI-Based Optimal Power Flow','تدفق القدرة الأمثل باستخدام الذكاء الاصطناعي'],
+      7:['Battery Energy Storage Optimization','تحسين تشغيل أنظمة تخزين طاقة البطاريات'],
+      8:['Integrated PV-Battery Smart Energy Management','الإدارة الذكية المتكاملة للطاقة الشمسية والبطاريات'],
+      11:['Graph Neural Network for State Estimation','الشبكة العصبية البيانية لتقدير الحالة'],
+      12:['Battery Scheduling with Deep Q-Learning','جدولة البطارية باستخدام التعلم العميق المعزز DQN'],
+      13:['Explaining a Load-Forecasting Model','تفسير نموذج التنبؤ بالأحمال'],
+      14:['Building a Power Engineering RAG Assistant','بناء مساعد هندسي معزز بالاسترجاع'],
       15:['Multi-Agent Energy Management','إدارة الطاقة متعددة الوكلاء'],
-      16:['Simple Digital Twin','بناء توأم رقمي مبسط'],
-      17:['PINN Swing-Equation Solution','حل معادلة التأرجح باستخدام PINN'],
+      16:['Building a Simple Digital Twin','بناء توأم رقمي مبسط'],
+      17:['PINN Solution of the Swing Equation','حل معادلة التأرجح باستخدام PINN'],
       18:['Federated Learning Simulation','محاكاة التعلم الاتحادي'],
-      19:['AI Intrusion Detection','كشف الهجمات باستخدام الذكاء الاصطناعي'],
+      19:['AI-Based Intrusion Detection','كشف التسلل باستخدام الذكاء الاصطناعي'],
       20:['Autonomous Microgrid Supervisor','مشرف ذاتي التشغيل لشبكة مصغرة']
     };
 
@@ -43,8 +53,6 @@
       if (!match) return;
       const type = match[1].toLowerCase();
       const number = Number(match[2]);
-      if (number < 11) return;
-
       const data = type === 'lecture' ? actualLectures[number] : actualLabs[number];
       if (!data) return;
 
@@ -135,7 +143,7 @@
     }
 
     const courseFeatures = document.createElement('script');
-    courseFeatures.src = 'course-footer-legacy.js?v=20260826-9';
+    courseFeatures.src = 'course-footer-legacy.js?v=20260826-10';
     courseFeatures.defer = true;
     courseFeatures.dataset.courseLegacy = 'true';
     courseFeatures.addEventListener('load', () => {
