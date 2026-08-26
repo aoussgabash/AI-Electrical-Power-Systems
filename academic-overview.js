@@ -123,8 +123,13 @@
     .academic-overview-icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(56,189,248,.4);border-radius:13px;background:rgba(56,189,248,.1);color:#7dd3fc;font-size:1.25rem;font-weight:900}
     .academic-overview ol{margin:0;padding-left:22px}.academic-overview li{margin:0 0 12px;color:#dbe7f1}.academic-overview li:last-child{margin-bottom:0}.academic-overview li span{display:block}.academic-overview li span[lang="ar"]{margin-top:3px;color:#c9d8e5;text-align:right;line-height:1.8}
     .academic-prerequisites>p{margin:0 0 9px;color:#d7e3ed}.academic-prerequisites>p[lang="ar"]{text-align:right;line-height:1.8}.academic-topic-chip{margin-top:14px;padding:9px 11px;border:1px solid rgba(250,204,21,.35);border-radius:10px;background:rgba(250,204,21,.08);color:#fff1a8;font-size:.82rem;font-weight:700}
-    @media(max-width:760px){.academic-overview{grid-template-columns:1fr}.academic-overview-card{padding:16px}}
-    @media print{.academic-overview{display:grid!important;grid-template-columns:1.35fr .65fr!important;width:100%!important;margin:4mm 0!important}.academic-overview-card{background:#fff!important;color:#172033!important;border-color:#cbd5e1!important;box-shadow:none!important}.academic-overview-heading h2,.academic-overview li,.academic-prerequisites>p{color:#172033!important}.academic-overview-heading p,.academic-overview li span[lang="ar"]{color:#334155!important}.academic-topic-chip{color:#172033!important;background:#fffbeb!important;border-color:#d6b84c!important}}
+    .learn-by-coding-placement{width:min(1100px,100%);margin:24px auto;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+    .learn-by-coding-card{min-height:116px!important;width:100%!important;display:grid!important;grid-template-columns:58px minmax(0,1fr) 32px!important;align-items:center!important;gap:16px!important;padding:20px 22px!important;border:1px solid rgba(56,189,248,.55)!important;border-radius:20px!important;background:linear-gradient(145deg,#123652,#0b2238)!important;color:#f8fbff!important;text-decoration:none!important;text-align:left!important;box-shadow:0 15px 34px rgba(0,0,0,.24)!important;box-sizing:border-box!important}
+    .learn-by-coding-card:hover,.learn-by-coding-card:focus-visible{transform:translateY(-2px);border-color:#67e8f9!important;box-shadow:0 18px 42px rgba(14,165,233,.18)!important}
+    .learn-by-coding-icon{width:54px;height:54px;display:grid;place-items:center;border:1px solid rgba(56,189,248,.42);border-radius:15px;background:rgba(3,18,32,.44);font-size:28px;line-height:1}
+    .learn-by-coding-content{display:flex;min-width:0;flex-direction:column;gap:3px}.learn-by-coding-label{color:#7dd3fc;font-size:.82rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.learn-by-coding-title{color:#fff;font-size:1.12rem;font-weight:850;line-height:1.4}.learn-by-coding-ar{color:#eaf4fb;font-size:1rem;font-weight:700;line-height:1.7;text-align:right;direction:rtl}.learn-by-coding-arrow{color:#fde047;font-size:26px;text-align:center}
+    @media(max-width:760px){.academic-overview{grid-template-columns:1fr}.academic-overview-card{padding:16px}.learn-by-coding-card{grid-template-columns:48px minmax(0,1fr) 24px!important;padding:17px 15px!important;gap:11px!important}.learn-by-coding-icon{width:46px;height:46px;font-size:24px}.learn-by-coding-title{font-size:1rem}.learn-by-coding-ar{font-size:.94rem}}
+    @media print{.academic-overview{display:grid!important;grid-template-columns:1.35fr .65fr!important;width:100%!important;margin:4mm 0!important}.academic-overview-card{background:#fff!important;color:#172033!important;border-color:#cbd5e1!important;box-shadow:none!important}.academic-overview-heading h2,.academic-overview li,.academic-prerequisites>p{color:#172033!important}.academic-overview-heading p,.academic-overview li span[lang="ar"]{color:#334155!important}.academic-topic-chip{color:#172033!important;background:#fffbeb!important;border-color:#d6b84c!important}.learn-by-coding-placement{display:none!important}}
   `;
   document.getElementById(style.id)?.remove();
   document.head.appendChild(style);
@@ -134,4 +139,32 @@
   if (actions) actions.insertAdjacentElement('afterend', overview);
   else if (banner) banner.insertAdjacentElement('afterend', overview);
   else (document.querySelector('main') || document.body).prepend(overview);
+
+  if (type === 'lecture' && number === 2) {
+    const agentCard = document.querySelector('.course-action-agent');
+    const firstTopic = [...document.querySelectorAll('main > section')].find(section => {
+      const heading = section.querySelector('.en h2');
+      return heading && heading.textContent.trim().startsWith('1.');
+    });
+
+    if (agentCard && firstTopic) {
+      const placement = document.createElement('section');
+      placement.className = 'learn-by-coding-placement';
+      placement.setAttribute('aria-label','Learn by Coding');
+
+      agentCard.className = 'learn-by-coding-card';
+      agentCard.removeAttribute('style');
+      agentCard.innerHTML = `
+        <span class="learn-by-coding-icon" aria-hidden="true">💻</span>
+        <span class="learn-by-coding-content">
+          <span class="learn-by-coding-label">Learn by Coding</span>
+          <strong class="learn-by-coding-title">Build Your First AI Agent with Python</strong>
+          <span class="learn-by-coding-ar" lang="ar" dir="rtl">ابنِ أول وكيل ذكي باستخدام بايثون</span>
+        </span>
+        <span class="learn-by-coding-arrow" aria-hidden="true">→</span>`;
+
+      placement.appendChild(agentCard);
+      firstTopic.insertAdjacentElement('afterend', placement);
+    }
+  }
 })();
