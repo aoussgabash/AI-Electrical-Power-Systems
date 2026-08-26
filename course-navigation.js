@@ -149,12 +149,22 @@
     actions.appendChild(card({kind:'related',href:`${relatedType}${num}.html`,icon:type === 'lecture' ? '⚡' : '▥',title:type === 'lecture' ? `MATLAB Lab ${num}` : `Lecture ${num}`,subtitle:type === 'lecture' ? `فتح مختبر الطاقة الكهربائية ${num}` : `فتح المحاضرة ${num}`,meta:type === 'lecture' ? 'Electrical Power Lab | مخبر طاقة كهربائية' : 'Read Lesson | قراءة المحاضرة'}));
 
     if (type === 'lecture' && number === 2) {
-      actions.appendChild(card({kind:'agent',href:'python-ai-agent.html',icon:'🤖',title:'Build Your First AI Agent with Python',subtitle:'ابنِ أول وكيل ذكي باستخدام بايثون',meta:'Interactive bilingual beginner lesson | درس تفاعلي ثنائي اللغة للمبتدئين'}));
+      actions.appendChild(card({kind:'agent',href:'python-ai-agent.html',icon:'💻',title:'Build Your First AI Agent with Python',subtitle:'ابنِ أول وكيل ذكي باستخدام بايثون',meta:'Learn by Coding | تعلّم من خلال البرمجة'}));
     }
 
-    const download = card({kind:'download',href:`pdf/${type}${num}.pdf`,icon:'↓',title:type === 'lecture' ? 'Download Lecture PDF' : 'Download Lab PDF',subtitle:type === 'lecture' ? 'تحميل المحاضرة بصيغة PDF' : 'تحميل المختبر بصيغة PDF',meta:`Course ${courseNumber} · Prepared by ${authorName}`});
-    download.setAttribute('download',`${type}_${num}.pdf`);
-    actions.appendChild(download);
+    const summary = card({
+      tag:'div',
+      kind:'download',
+      icon:'📄',
+      title:type === 'lecture' ? 'Lecture Summary (PDF) — Coming Soon' : 'Lab Summary (PDF) — Coming Soon',
+      subtitle:type === 'lecture' ? 'ملخص المحاضرة (PDF) — قريبًا' : 'ملخص المختبر (PDF) — قريبًا',
+      meta:'The website remains the complete interactive reference | الموقع هو المرجع الكامل التفاعلي'
+    });
+    summary.setAttribute('aria-disabled','true');
+    summary.setAttribute('title','New concise PDF summaries are being prepared | جارٍ إعداد الملخصات الجديدة');
+    summary.style.opacity = '.82';
+    summary.style.cursor = 'default';
+    actions.appendChild(summary);
 
     const anchor = hero || main.firstElementChild;
     if (anchor?.parentNode) {
