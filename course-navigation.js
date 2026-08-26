@@ -152,19 +152,14 @@
       actions.appendChild(card({kind:'agent',href:'python-ai-agent.html',icon:'💻',title:'Build Your First AI Agent with Python',subtitle:'ابنِ أول وكيل ذكي باستخدام بايثون',meta:'Learn by Coding | تعلّم من خلال البرمجة'}));
     }
 
-    const summary = card({
-      tag:'div',
+    actions.appendChild(card({
       kind:'download',
+      href:`summaries/summary.html?type=${type}&number=${num}`,
       icon:'📄',
-      title:type === 'lecture' ? 'Lecture Summary (PDF) — Coming Soon' : 'Lab Summary (PDF) — Coming Soon',
-      subtitle:type === 'lecture' ? 'ملخص المحاضرة (PDF) — قريبًا' : 'ملخص المختبر (PDF) — قريبًا',
-      meta:'The website remains the complete interactive reference | الموقع هو المرجع الكامل التفاعلي'
-    });
-    summary.setAttribute('aria-disabled','true');
-    summary.setAttribute('title','New concise PDF summaries are being prepared | جارٍ إعداد الملخصات الجديدة');
-    summary.style.opacity = '.82';
-    summary.style.cursor = 'default';
-    actions.appendChild(summary);
+      title:type === 'lecture' ? 'Lecture Summary (PDF)' : 'Lab Summary (PDF)',
+      subtitle:type === 'lecture' ? 'ملخص المحاضرة (PDF)' : 'ملخص المختبر (PDF)',
+      meta:'Open the concise bilingual summary | افتح الملخص المختصر ثنائي اللغة'
+    }));
 
     const anchor = hero || main.firstElementChild;
     if (anchor?.parentNode) {
