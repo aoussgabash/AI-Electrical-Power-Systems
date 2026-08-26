@@ -1,8 +1,8 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-11';
-  const COURSE_NAV_VERSION = '20260826-11';
+  const COURSE_THEME_VERSION = '20260826-12';
+  const COURSE_NAV_VERSION = '20260826-12';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
   const isLabPage = /^lab\d{2}\.html$/.test(page);
@@ -14,12 +14,25 @@
     if (page !== 'index.html' && page !== '') return;
 
     const cards = [...document.querySelectorAll('.course-card[href]')];
+    if (!cards.length) return;
+
+    const syncStyle = document.createElement('style');
+    syncStyle.id = 'course-catalog-sync-style';
+    syncStyle.textContent = `
+      html[data-catalog-syncing="true"] .course-card{pointer-events:none;opacity:.58;filter:saturate(.7);transition:opacity .2s ease}
+      html[data-catalog-syncing="true"] .course-card::after{content:"Synchronizing title… | جارٍ مطابقة العنوان";display:block;margin-top:12px;color:#9fc7df;font-size:.72rem}
+      html[data-catalog-syncing="false"] .course-card{opacity:1;filter:none}
+    `;
+    document.getElementById(syncStyle.id)?.remove();
+    document.head.appendChild(syncStyle);
+    document.documentElement.dataset.catalogSyncing = 'true';
+
     await Promise.all(cards.map(async card => {
       const href = card.getAttribute('href') || '';
       if (!/^(lecture|lab)\d{2}\.html$/i.test(href)) return;
 
       try {
-        const response = await fetch(`${href}?catalog-sync=20260826-11`, { cache: 'no-store' });
+        const response = await fetch(`${href}?catalog-sync=20260826-12`, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const html = await response.text();
@@ -36,7 +49,7 @@
           doc.querySelector('meta[name="description"]')?.getAttribute('content')
         );
 
-        if (!pageTitle) return;
+        if (!pageTitle) throw new Error('Missing H1 title');
 
         const titleNode = card.querySelector('h3');
         const arabicNode = card.querySelector('.arabic');
@@ -52,6 +65,8 @@
         card.dataset.catalogVerified = 'false';
       }
     }));
+
+    document.documentElement.dataset.catalogSyncing = 'false';
   };
 
   const removeLegacyMarkup = () => {
@@ -128,7 +143,7 @@
     }
 
     const courseFeatures = document.createElement('script');
-    courseFeatures.src = 'course-footer-legacy.js?v=20260826-11';
+    courseFeatures.src = 'course-footer-legacy.js?v=20260826-12';
     courseFeatures.defer = true;
     courseFeatures.dataset.courseLegacy = 'true';
     courseFeatures.addEventListener('load', () => {
