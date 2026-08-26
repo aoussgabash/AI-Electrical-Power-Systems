@@ -1,19 +1,41 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-13';
-  const COURSE_NAV_VERSION = '20260826-13';
-  const CATALOG_VERSION = '20260826-13';
+  const COURSE_THEME_VERSION = '20260826-14';
+  const COURSE_NAV_VERSION = '20260826-14';
+  const CATALOG_VERSION = '20260826-14';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
+  const pageMatch = page.match(/^(lecture|lab)(\d{2})\.html$/);
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
   const isLabPage = /^lab\d{2}\.html$/.test(page);
   const isCourseContentPage = isLecturePage || isLabPage;
 
   const cleanText = value => (value || '').replace(/\s+/g, ' ').trim();
 
+  const applyCourseIdentity = () => {
+    if (pageMatch) {
+      const number = Number(pageMatch[2]);
+      document.documentElement.classList.toggle('course-one-page', number <= 10);
+      document.documentElement.classList.toggle('course-two-page', number >= 11);
+      document.body?.classList.toggle('course-one-page', number <= 10);
+      document.body?.classList.toggle('course-two-page', number >= 11);
+    }
+
+    document.querySelectorAll('.course-card[href]').forEach(card => {
+      const href = card.getAttribute('href') || '';
+      const match = href.match(/^(lecture|lab)(\d{2})\.html$/i);
+      if (!match) return;
+      const number = Number(match[2]);
+      card.classList.toggle('course-one-card', number <= 10);
+      card.classList.toggle('course-two-card', number >= 11);
+      card.dataset.course = number <= 10 ? '1' : '2';
+    });
+  };
+
   const synchronizeHomepageCatalog = async () => {
     if (page !== 'index.html' && page !== '') return;
 
+    applyCourseIdentity();
     const cards = [...document.querySelectorAll('.course-card[href]')];
     if (!cards.length) return;
 
@@ -144,6 +166,7 @@
   };
 
   const startCourseFeatures = () => {
+    applyCourseIdentity();
     void synchronizeHomepageCatalog();
     if (!isCourseContentPage) return;
 
