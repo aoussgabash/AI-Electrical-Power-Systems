@@ -1,9 +1,9 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-21';
-  const COURSE_NAV_VERSION = '20260826-21';
-  const CATALOG_VERSION = '20260826-21';
+  const COURSE_THEME_VERSION = '20260826-22';
+  const COURSE_NAV_VERSION = '20260826-22';
+  const CATALOG_VERSION = '20260826-22';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const pageMatch = page.match(/^(lecture|lab)(\d{2})\.html$/);
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
@@ -62,16 +62,16 @@
       }
       @media(max-width:620px){
         body header .back{
-          min-width:64px!important;
-          width:64px!important;
-          max-width:64px!important;
-          min-height:64px!important;
-          height:64px!important;
-          max-height:64px!important;
-          flex:0 0 64px!important;
+          min-width:48px!important;
+          width:48px!important;
+          max-width:48px!important;
+          min-height:48px!important;
+          height:48px!important;
+          max-height:48px!important;
+          flex:0 0 48px!important;
           padding:0!important;
           margin:0!important;
-          border-radius:18px!important;
+          border-radius:14px!important;
           box-sizing:border-box!important;
         }
         body header .back svg{width:22px!important;height:22px!important}
