@@ -1,9 +1,9 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-17';
-  const COURSE_NAV_VERSION = '20260826-17';
-  const CATALOG_VERSION = '20260826-17';
+  const COURSE_THEME_VERSION = '20260826-18';
+  const COURSE_NAV_VERSION = '20260826-18';
+  const CATALOG_VERSION = '20260826-18';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const pageMatch = page.match(/^(lecture|lab)(\d{2})\.html$/);
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
@@ -61,7 +61,15 @@
         box-shadow:0 0 0 3px rgba(34,211,238,.10)!important;
       }
       @media(max-width:620px){
-        body header .back{min-width:50px!important;width:50px!important;padding:10px!important;border-radius:14px!important}
+        body header .back{
+          min-width:80px!important;
+          width:80px!important;
+          min-height:80px!important;
+          height:80px!important;
+          padding:0!important;
+          border-radius:20px!important;
+        }
+        body header .back svg{width:34px!important;height:34px!important}
         body header .back span{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
       }
     `;
