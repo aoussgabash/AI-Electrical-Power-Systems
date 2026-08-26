@@ -1,9 +1,9 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-14';
-  const COURSE_NAV_VERSION = '20260826-14';
-  const CATALOG_VERSION = '20260826-14';
+  const COURSE_THEME_VERSION = '20260826-15';
+  const COURSE_NAV_VERSION = '20260826-15';
+  const CATALOG_VERSION = '20260826-15';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const pageMatch = page.match(/^(lecture|lab)(\d{2})\.html$/);
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
@@ -11,6 +11,36 @@
   const isCourseContentPage = isLecturePage || isLabPage;
 
   const cleanText = value => (value || '').replace(/\s+/g, ' ').trim();
+
+  const injectHomepageCourseButtonStyles = () => {
+    if (page !== 'index.html' && page !== '') return;
+    const style = document.createElement('style');
+    style.id = 'homepage-course-button-identity';
+    style.textContent = `
+      .buttons .btn[href="#course-1"]{
+        background:linear-gradient(135deg,#0284c7,#2563eb)!important;
+        border-color:rgba(56,189,248,.72)!important;
+        color:#fff!important;
+        box-shadow:0 12px 30px rgba(37,99,235,.22)!important;
+      }
+      .buttons .btn[href="#course-2"]{
+        background:linear-gradient(135deg,#9a6700 0%,#d97706 52%,#fbbf24 100%)!important;
+        border-color:#fbbf24!important;
+        color:#fff8dc!important;
+        box-shadow:0 14px 34px rgba(245,158,11,.34),inset 0 1px 0 rgba(255,255,255,.18)!important;
+      }
+      .buttons .btn[href="#course-2"]:hover,
+      .buttons .btn[href="#course-2"]:focus-visible{
+        background:linear-gradient(135deg,#b7791f 0%,#f59e0b 55%,#fde047 100%)!important;
+        border-color:#fde68a!important;
+        color:#211707!important;
+        box-shadow:0 18px 44px rgba(245,158,11,.42),0 0 22px rgba(251,191,36,.15)!important;
+        transform:translateY(-2px);
+      }
+    `;
+    document.getElementById(style.id)?.remove();
+    document.head.appendChild(style);
+  };
 
   const applyCourseIdentity = () => {
     if (pageMatch) {
@@ -166,6 +196,7 @@
   };
 
   const startCourseFeatures = () => {
+    injectHomepageCourseButtonStyles();
     applyCourseIdentity();
     void synchronizeHomepageCatalog();
     if (!isCourseContentPage) return;
