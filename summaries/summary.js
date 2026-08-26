@@ -11,7 +11,7 @@
   const kindEn = type === 'lecture' ? 'Lecture' : 'MATLAB Laboratory';
   const kindAr = type === 'lecture' ? 'المحاضرة' : 'المختبر';
 
-  backLink.href = sourcePath;
+  if (backLink) backLink.href = sourcePath;
 
   const references = [
     'A. Gabash, <em>Flexible Optimal Operations of Energy Supply Networks with Renewable Energy Generation and Battery Storage</em>. Saarbrücken, Germany: Südwestdeutscher Verlag für Hochschulschriften, 2014.',
@@ -22,51 +22,76 @@
   ];
 
   const clean = value => (value || '').replace(/\s+/g, ' ').trim();
-  const html = node => node ? node.innerHTML : '';
   const text = node => clean(node?.textContent);
-  const stripNumber = value => clean(value).replace(/^\d+\.?\s*/, '').replace(/^[^\p{L}\p{N}]+/u, '');
+  const html = node => node?.innerHTML || '';
+  const stripNumber = value => clean(value).replace(/^\d+[.)-]?\s*/, '').replace(/^[^\p{L}\p{N}]+/u, '');
   const pageNo = n => `<span class="page-no">${n}</span>`;
   const sectionTitle = (en, ar) => `<div class="section-title"><h2>${en}</h2><div class="ar" lang="ar" dir="rtl">${ar}</div></div>`;
 
-  function getPair(section) {
-    return {
-      en: section?.querySelector('.en') || null,
-      ar: section?.querySelector('.ar') || null
-    };
+  function pair(section) {
+    return {en: section?.querySelector('.en') || null, ar: section?.querySelector('.ar') || null};
   }
 
-  function findSection(sections, enTerms, arTerms = []) {
+  function heading(section, language = 'en') {
+    return stripNumber(text(pair(section)[language]?.querySelector('h2,h3')));
+  }
+
+  function findSection(sections, terms) {
     return sections.find(section => {
-      const pair = getPair(section);
-      const enHeading = text(pair.en?.querySelector('h2')).toLowerCase();
-      const arHeading = text(pair.ar?.querySelector('h2'));
-      return enTerms.some(term => enHeading.includes(term.toLowerCase())) || arTerms.some(term => arHeading.includes(term));
-    });
+      const value = `${heading(section, 'en')} ${heading(section, 'ar')}`.toLowerCase();
+      return terms.some(term => value.includes(term.toLowerCase()));
+    }) || null;
   }
 
-  function listItems(container, limit = 6) {
-    return [...(container?.querySelectorAll('li') || [])].slice(0, limit).map(item => `<li>${item.innerHTML}</li>`).join('');
+  function uniqueSections(items) {
+    return items.filter((item, index) => item && items.indexOf(item) === index);
   }
 
-  function firstParagraphs(container, limit = 2) {
-    return [...(container?.querySelectorAll(':scope > p') || [])].slice(0, limit).map(p => `<p>${p.innerHTML}</p>`).join('');
+  function paragraphs(container, limit = 2) {
+    const direct = [...(container?.querySelectorAll(':scope > p') || [])];
+    const all = direct.length ? direct : [...(container?.querySelectorAll('p') || [])];
+    return all.slice(0, limit).map(p => `<p>${p.innerHTML}</p>`).join('');
   }
 
-  function highlights(container, limit = 1) {
-    return [...(container?.querySelectorAll('.highlight') || [])].slice(0, limit).map(item => `<div class="callout">${item.innerHTML}</div>`).join('');
+  function list(container, limit = 6, ordered = false) {
+    const items = [...(container?.querySelectorAll('li') || [])].slice(0, limit);
+    if (!items.length) return '';
+    const tag = ordered ? 'ol' : 'ul';
+    return `<${tag}>${items.map(item => `<li>${item.innerHTML}</li>`).join('')}</${tag}>`;
   }
 
-  function conceptCards(container, limit = 6, isArabic = false) {
-    const cards = [...(container?.querySelectorAll('.mini-card,.pair') || [])].slice(0, limit);
-    return cards.map(card => {
-      const strong = card.querySelector('strong,.tag');
-      const p = card.querySelector('p');
-      return `<div class="concept${isArabic ? ' ar' : ''}"><strong>${html(strong)}</strong>${p ? `<span>${p.innerHTML}</span>` : ''}</div>`;
-    }).join('');
+  function callout(container) {
+    const item = container?.querySelector('.highlight,.callout,.note,.result,.formula-box');
+    return item ? `<div class="callout">${item.innerHTML}</div>` : '';
+  }
+
+  function cards(container, isArabic = false, limit = 6) {
+    const nodes = [...(container?.querySelectorAll('.mini-card,.pair,.card,.step,.feature,.application-card') || [])].slice(0, limit);
+    if (nodes.length) {
+      return nodes.map(node => {
+        const title = node.querySelector('strong,.tag,h3,h4');
+        const body = node.querySelector('p');
+        return `<div class="concept${isArabic ? ' ar' : ''}"><strong>${html(title) || stripNumber(text(node)).slice(0, 80)}</strong>${body ? `<span>${body.innerHTML}</span>` : ''}</div>`;
+      }).join('');
+    }
+    const items = [...(container?.querySelectorAll('li') || [])].slice(0, limit);
+    return items.map(item => `<div class="concept${isArabic ? ' ar' : ''}"><span>${item.innerHTML}</span></div>`).join('');
+  }
+
+  function panel(section, language, fallbackTitle, options = {}) {
+    const container = pair(section)[language];
+    const isArabic = language === 'ar';
+    const title = heading(section, language) || fallbackTitle;
+    const body = [
+      paragraphs(container, options.paragraphs ?? 2),
+      list(container, options.items ?? 5, options.ordered),
+      callout(container)
+    ].join('');
+    return `<div class="panel${isArabic ? ' ar' : ''}"${isArabic ? ' lang="ar" dir="rtl"' : ''}><h3>${title}</h3>${body || `<p>${isArabic ? 'راجع صفحة الموقع الكاملة لهذا القسم.' : 'See the complete website page for this section.'}</p>`}</div>`;
   }
 
   function renderError(message) {
-    root.innerHTML = `<section class="page" style="display:grid;place-items:center;text-align:center"><div><h1>Summary unavailable</h1><p>${message}</p><p class="rtl">تعذر إنشاء الملخص من صفحة المصدر.</p></div></section>`;
+    root.innerHTML = `<section class="page" style="display:grid;place-items:center;text-align:center"><div><h1>Summary unavailable</h1><p>${message}</p><p class="rtl">تعذر إنشاء الملخص من صفحة المصدر.</p><p><a href="${sourcePath}">Open source page | فتح صفحة المصدر</a></p></div></section>`;
   }
 
   async function build() {
@@ -79,37 +104,26 @@
       const titleEn = text(hero?.querySelector('h1')) || `${kindEn} ${number}`;
       const titleAr = text(hero?.querySelector('.hero-ar')) || `${kindAr} ${number}`;
       const subtitle = html(hero?.querySelector('.subtitle'));
-      const sections = [...doc.querySelectorAll('main > section')];
+      const allSections = [...doc.querySelectorAll('main > section')].filter(section => section.querySelector('.en,.ar'));
+      if (!allSections.length) throw new Error('No bilingual course sections were found');
 
-      const objectives = findSection(sections, ['learning objectives','learning outcomes'], ['أهداف التعلم','مخرجات التعلم']) || sections[0];
-      const definition = findSection(sections, ['what is artificial intelligence','introduction'], ['ما هو الذكاء الاصطناعي','مقدمة']);
-      const comparison = findSection(sections, ['machine learning, and deep learning','ai, machine learning'], ['التعلم الآلي والتعلم العميق']);
-      const methods = findSection(sections, ['main ai methods','methods'], ['طرائق الذكاء الاصطناعي']);
-      const agents = findSection(sections, ['intelligent agents'], ['الوكلاء الأذكياء']);
-      const motivation = findSection(sections, ['why ai in electrical power systems'], ['لماذا نستخدم الذكاء الاصطناعي']);
-      const applications = findSection(sections, ['applications in electrical power systems'], ['تطبيقات الذكاء الاصطناعي']);
-      const example = findSection(sections, ['example:','worked example'], ['مثال:','مثال محلول']);
-      const advantages = findSection(sections, ['advantages'], ['مزايا']);
-      const challenges = findSection(sections, ['challenges','limitations'], ['التحديات','القيود']);
-      const summary = findSection(sections, ['summary'], ['الخلاصة']);
-      const review = findSection(sections, ['review questions'], ['أسئلة المراجعة']);
+      const objectives = findSection(allSections, ['learning objectives','learning outcomes','objectives','أهداف التعلم','مخرجات التعلم']) || allSections[0];
+      const review = findSection(allSections, ['review questions','questions','أسئلة المراجعة','تمارين']);
+      const summary = findSection(allSections, ['summary','conclusion','key takeaways','الخلاصة','أهم النقاط']);
+      const example = findSection(allSections, ['worked example','example','case study','مثال','حالة دراسية']);
+      const challenges = findSection(allSections, ['challenge','limitation','safety','التحديات','القيود','السلامة']);
+      const applications = findSection(allSections, ['application','power system','workflow','results','تطبيقات','نظام الطاقة','سير العمل','النتائج']);
 
-      const objPair = getPair(objectives);
-      const defPair = getPair(definition);
-      const compPair = getPair(comparison);
-      const methodsPair = getPair(methods);
-      const agentsPair = getPair(agents);
-      const motivationPair = getPair(motivation);
-      const applicationsPair = getPair(applications);
-      const examplePair = getPair(example);
-      const advantagesPair = getPair(advantages);
-      const challengesPair = getPair(challenges);
-      const summaryPair = getPair(summary);
-      const reviewPair = getPair(review);
+      const contentSections = allSections.filter(section => ![objectives, review, summary].includes(section));
+      const foundations = uniqueSections(contentSections.slice(0, 2));
+      const core = uniqueSections(contentSections.slice(2, 6));
+      const practice = uniqueSections([example, applications, challenges, ...contentSections.slice(6)]).slice(0, 3);
 
       document.title = `${kindEn} ${number} Summary - ${titleEn}`;
 
-      root.innerHTML = `
+      let page = 1;
+      const pages = [];
+      pages.push(`
         <section class="page cover">
           <div>
             <div class="brand"><span>AI</span> Power Systems</div>
@@ -127,101 +141,75 @@
           <div class="cover-footer">
             <div><div>Prepared by | إعداد</div><div class="author">Dr.-Ing. Aouss Gabash</div></div>
             <div style="text-align:right"><div>Full interactive content</div><a href="${sourceUrl}">${sourceUrl}</a></div>
-          </div>
-          ${pageNo(1)}
-        </section>
+          </div>${pageNo(page++)}
+        </section>`);
 
+      const objectivesPair = pair(objectives);
+      pages.push(`
         <section class="page">
-          ${sectionTitle('Learning Outcomes and Foundation','مخرجات التعلم والأساس العلمي')}
+          ${sectionTitle('Learning Outcomes and Foundations','مخرجات التعلم والأسس')}
           <div class="bilingual">
-            <div class="panel"><h3>Learning Outcomes</h3><ul>${listItems(objPair.en, 6)}</ul></div>
-            <div class="panel ar" lang="ar" dir="rtl"><h3>مخرجات التعلم</h3><ul>${listItems(objPair.ar, 6)}</ul></div>
+            <div class="panel"><h3>Learning Outcomes</h3>${list(objectivesPair.en, 7)}</div>
+            <div class="panel ar" lang="ar" dir="rtl"><h3>مخرجات التعلم</h3>${list(objectivesPair.ar, 7)}</div>
           </div>
-          <div style="height:14px"></div>
-          <div class="bilingual">
-            <div class="panel"><h3>${stripNumber(text(defPair.en?.querySelector('h2'))) || 'Artificial Intelligence'}</h3>${firstParagraphs(defPair.en, 2)}${highlights(defPair.en)}</div>
-            <div class="panel ar" lang="ar" dir="rtl"><h3>${stripNumber(text(defPair.ar?.querySelector('h2'))) || 'الذكاء الاصطناعي'}</h3>${firstParagraphs(defPair.ar, 2)}${highlights(defPair.ar)}</div>
-          </div>
-          <div style="height:14px"></div>
-          ${sectionTitle('AI, Machine Learning, and Deep Learning','الذكاء الاصطناعي والتعلم الآلي والتعلم العميق')}
-          <div class="concept-grid">
-            ${conceptCards(compPair.en, 3)}
-            ${conceptCards(compPair.ar, 3, true)}
-          </div>
-          ${pageNo(2)}
-        </section>
+          ${foundations.map(section => `<div style="height:14px"></div><div class="bilingual">${panel(section,'en','Foundation')}${panel(section,'ar','الأساس')}</div>`).join('')}
+          ${pageNo(page++)}
+        </section>`);
 
-        <section class="page">
-          ${sectionTitle('Methods and Intelligent Agents','الطرائق والوكلاء الأذكياء')}
-          <div class="concept-grid">
-            ${conceptCards(methodsPair.en, 6)}
-            ${conceptCards(methodsPair.ar, 6, true)}
-          </div>
-          <div style="height:16px"></div>
-          <div class="bilingual">
-            <div class="panel"><h3>${stripNumber(text(agentsPair.en?.querySelector('h2'))) || 'Intelligent Agents'}</h3>${firstParagraphs(agentsPair.en, 2)}${highlights(agentsPair.en)}</div>
-            <div class="panel ar" lang="ar" dir="rtl"><h3>${stripNumber(text(agentsPair.ar?.querySelector('h2'))) || 'الوكلاء الأذكياء'}</h3>${firstParagraphs(agentsPair.ar, 2)}${highlights(agentsPair.ar)}</div>
-          </div>
-          ${pageNo(3)}
-        </section>
+      if (core.length) {
+        pages.push(`
+          <section class="page">
+            ${sectionTitle('Key Concepts and Methods','المفاهيم والطرائق الأساسية')}
+            ${core.map(section => {
+              const p = pair(section);
+              const cardContent = `${cards(p.en,false,4)}${cards(p.ar,true,4)}`;
+              return `<div style="margin-bottom:16px"><div class="bilingual">${panel(section,'en','Key Concept',{paragraphs:1,items:4})}${panel(section,'ar','مفهوم أساسي',{paragraphs:1,items:4})}</div>${cardContent ? `<div class="concept-grid" style="margin-top:10px">${cardContent}</div>` : ''}</div>`;
+            }).join('')}
+            ${pageNo(page++)}
+          </section>`);
+      }
 
-        <section class="page">
-          ${sectionTitle('AI in Electrical Power Systems','الذكاء الاصطناعي في أنظمة الطاقة الكهربائية')}
-          <div class="bilingual">
-            <div class="panel"><h3>${stripNumber(text(motivationPair.en?.querySelector('h2'))) || 'Why AI?'}</h3>${firstParagraphs(motivationPair.en, 2)}${highlights(motivationPair.en)}</div>
-            <div class="panel ar" lang="ar" dir="rtl"><h3>${stripNumber(text(motivationPair.ar?.querySelector('h2'))) || 'لماذا الذكاء الاصطناعي؟'}</h3>${firstParagraphs(motivationPair.ar, 2)}${highlights(motivationPair.ar)}</div>
-          </div>
-          <div style="height:14px"></div>
-          <div class="concept-grid">
-            ${conceptCards(applicationsPair.en, 6)}
-            ${conceptCards(applicationsPair.ar, 6, true)}
-          </div>
-          ${pageNo(4)}
-        </section>
+      if (practice.length) {
+        pages.push(`
+          <section class="page">
+            ${sectionTitle(type === 'lab' ? 'Laboratory Workflow and Results' : 'Applications and Worked Example',type === 'lab' ? 'سير عمل المختبر والنتائج' : 'التطبيقات والمثال المحلول')}
+            ${practice.map(section => `<div style="margin-bottom:16px" class="example"><div class="bilingual">${panel(section,'en',type === 'lab' ? 'Laboratory Step' : 'Application',{paragraphs:3,items:6})}${panel(section,'ar',type === 'lab' ? 'خطوة مخبرية' : 'تطبيق',{paragraphs:3,items:6})}</div></div>`).join('')}
+            ${pageNo(page++)}
+          </section>`);
+      }
 
-        <section class="page">
-          ${sectionTitle('Worked Example','مثال محلول')}
-          <div class="example bilingual">
-            <div><h3>${stripNumber(text(examplePair.en?.querySelector('h2'))) || 'AI-Based Power-System Decision'}</h3>${firstParagraphs(examplePair.en, 3)}<ul>${listItems(examplePair.en, 5)}</ul>${highlights(examplePair.en)}</div>
-            <div class="ar" lang="ar" dir="rtl"><h3>${stripNumber(text(examplePair.ar?.querySelector('h2'))) || 'قرار في نظام الطاقة باستخدام الذكاء الاصطناعي'}</h3>${firstParagraphs(examplePair.ar, 3)}<ul>${listItems(examplePair.ar, 5)}</ul>${highlights(examplePair.ar)}</div>
-          </div>
-          <div style="height:16px"></div>
-          ${sectionTitle('Advantages and Limitations','المزايا والقيود')}
-          <div class="bilingual">
-            <div class="panel"><h3>Advantages</h3><ul>${listItems(advantagesPair.en, 6)}</ul><h3>Challenges</h3><ul>${listItems(challengesPair.en, 5)}</ul>${highlights(challengesPair.en)}</div>
-            <div class="panel ar" lang="ar" dir="rtl"><h3>المزايا</h3><ul>${listItems(advantagesPair.ar, 6)}</ul><h3>التحديات</h3><ul>${listItems(challengesPair.ar, 5)}</ul>${highlights(challengesPair.ar)}</div>
-          </div>
-          ${pageNo(5)}
-        </section>
-
+      const summaryPair = pair(summary || contentSections.at(-1));
+      const reviewPair = pair(review);
+      pages.push(`
         <section class="page">
           ${sectionTitle('Key Takeaways and Review','أهم النقاط والمراجعة')}
           <div class="takeaways">
-            <div class="takeaway"><h3>Key Takeaways</h3><ul>${listItems(summaryPair.en, 6)}</ul></div>
-            <div class="takeaway ar" lang="ar" dir="rtl"><h3>أهم النقاط</h3><ul>${listItems(summaryPair.ar, 6)}</ul></div>
+            <div class="takeaway"><h3>Key Takeaways</h3>${list(summaryPair.en,7) || paragraphs(summaryPair.en,3)}</div>
+            <div class="takeaway ar" lang="ar" dir="rtl"><h3>أهم النقاط</h3>${list(summaryPair.ar,7) || paragraphs(summaryPair.ar,3)}</div>
           </div>
           <div style="height:16px"></div>
           <div class="bilingual">
-            <div class="panel"><h3>Review Questions</h3><ol>${listItems(reviewPair.en, 7)}</ol></div>
-            <div class="panel ar" lang="ar" dir="rtl"><h3>أسئلة المراجعة</h3><ol>${listItems(reviewPair.ar, 7)}</ol></div>
-          </div>
-          ${pageNo(6)}
-        </section>
+            <div class="panel"><h3>Review Questions</h3>${list(reviewPair.en,8,true) || '<p>Review the objectives and explain the main concepts in your own words.</p>'}</div>
+            <div class="panel ar" lang="ar" dir="rtl"><h3>أسئلة المراجعة</h3>${list(reviewPair.ar,8,true) || '<p>راجع الأهداف واشرح المفاهيم الرئيسة بأسلوبك الخاص.</p>'}</div>
+          </div>${pageNo(page++)}
+        </section>`);
 
+      pages.push(`
         <section class="page">
           ${sectionTitle('References','المراجع')}
           <ol class="references">${references.map(ref => `<li>${ref}</li>`).join('')}</ol>
           <div style="height:20px"></div>
           <div class="online">
-            <h2>Continue Learning Online</h2>
-            <h2 class="ar" lang="ar" dir="rtl">تابع التعلم عبر الموقع</h2>
+            <h2>Continue Learning Online</h2><h2 class="ar" lang="ar" dir="rtl">تابع التعلم عبر الموقع</h2>
             <p>The website is the complete, current, and interactive academic reference.</p>
             <p class="ar" lang="ar" dir="rtl">الموقع هو المرجع الأكاديمي الكامل والمحدّث والتفاعلي.</p>
             <p><a href="${sourceUrl}">${sourceUrl}</a></p>
           </div>
-          <p class="source-note">This summary was generated from the corresponding website page. Content updates should be made in the source page first. | تم إنشاء هذا الملخص من صفحة الموقع المقابلة، ويجب إجراء تحديثات المحتوى في صفحة المصدر أولًا.</p>
-          ${pageNo(7)}
-        </section>`;
+          <p class="source-note">This summary is generated directly from the corresponding course page. Update the source page first so the summary remains synchronized. | يُولّد هذا الملخص مباشرةً من صفحة المقرر المقابلة، لذلك يجب تحديث صفحة المصدر أولًا ليبقى الملخص متزامنًا.</p>
+          ${pageNo(page++)}
+        </section>`);
+
+      root.innerHTML = pages.join('');
     } catch (error) {
       console.error(error);
       renderError(error.message);
