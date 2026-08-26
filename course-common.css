@@ -1,3 +1,5 @@
+@import url("design-system.css");
+
 /* Shared enhancements for all lecture and laboratory pages */
 
 #reading-progress-track{position:fixed;top:0;left:0;width:100%;height:4px;background:rgba(255,255,255,.08);z-index:9999;pointer-events:none}
@@ -17,20 +19,20 @@ pre,code{tab-size:4}pre{max-width:100%}img,svg,video,canvas{max-width:100%}::sel
 .course-meta-quiz{color:#fde047!important}
 
 /* Shared template used by the identical modern lecture/lab pages. */
-body.course-template-modern{--bg:#07111f;--card:#0f2238;--card2:#0b1b2c;--text:#f4f7fb;--muted:#b8c7d9;--blue:#38bdf8;--green:#22c55e;--yellow:#facc15;--red:#fb7185;--violet:#a78bfa;--line:rgba(255,255,255,.10);margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,#07111f,#0a1728);color:var(--text);line-height:1.8}
+body.course-template-modern{--bg:var(--agai-bg);--card:var(--agai-surface);--card2:var(--agai-surface-2);--text:var(--agai-text);--muted:var(--agai-muted);--blue:var(--agai-primary);--green:var(--agai-success);--yellow:var(--agai-accent);--red:var(--agai-danger);--violet:var(--agai-violet);--line:var(--agai-line);margin:0;font-family:Arial,Tahoma,sans-serif;background:linear-gradient(180deg,var(--agai-bg),var(--agai-bg-soft));color:var(--text);line-height:1.8}
 body.course-template-modern *{box-sizing:border-box}body.course-template-modern{scroll-behavior:smooth}
-body.course-template-modern .container{width:min(1100px,92%);margin:auto}
+body.course-template-modern .container{width:var(--agai-container);margin:auto}
 body.course-template-modern header{background:rgba(7,17,31,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
 body.course-template-modern nav:not(.course-page-navigation){display:flex;justify-content:space-between;align-items:center;gap:14px;padding:17px 0}
 body.course-template-modern .logo{font-weight:bold}body.course-template-modern .logo span{color:var(--blue)}
-body.course-template-modern .back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+body.course-template-modern .back{color:white;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:var(--agai-radius-sm)}
 body.course-template-modern .hero{text-align:center;padding:58px 0 34px}body.course-template-modern .lecture-number{color:var(--blue);font-weight:bold;letter-spacing:1px}
 body.course-template-modern h1{font-size:clamp(2rem,6vw,3.6rem);line-height:1.15;margin:10px 0}
 body.course-template-modern .hero-ar{direction:rtl;font-size:1.5rem;color:#e5edf6}body.course-template-modern .subtitle{color:var(--muted);margin-top:10px}
 body.course-template-modern .toc{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:18px 0}
 body.course-template-modern .toc a{color:#dff5ff;text-decoration:none;background:var(--card2);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
-body.course-template-modern section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
-body.course-template-modern h2{margin-top:0;color:#edf8ff}body.course-template-modern h3{color:var(--blue)}body.course-template-modern p,body.course-template-modern li{color:#d8e2ec}
+body.course-template-modern section{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:var(--agai-radius-lg);padding:22px}
+body.course-template-modern h2{margin-top:0;color:#edf8ff}body.course-template-modern h3{color:var(--blue)}body.course-template-modern p,body.course-template-modern li{color:var(--agai-text-soft)}
 body.course-template-modern .en{direction:ltr;text-align:left}body.course-template-modern .ar{direction:rtl;text-align:right;border-top:1px dashed var(--line);padding-top:18px;margin-top:18px}
 body.course-template-modern .highlight,body.course-template-modern .note{background:var(--card2);border-left:4px solid var(--blue);border-radius:10px;padding:15px;margin:15px 0}
 body.course-template-modern .ar .highlight,body.course-template-modern .ar .note{border-left:none;border-right:4px solid var(--blue)}
@@ -39,7 +41,7 @@ body.course-template-modern .warning{background:rgba(251,113,133,.08);border:1px
 body.course-template-modern .research{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.32);border-radius:12px;padding:16px;margin:15px 0}
 body.course-template-modern .formula{direction:ltr;text-align:center;background:#06101d;border:1px solid var(--line);padding:18px;margin:16px 0;border-radius:12px;font-size:1.16rem;font-family:"Times New Roman",serif;overflow-x:auto}
 body.course-template-modern .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}body.course-template-modern .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-body.course-template-modern .mini-card{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px}body.course-template-modern .mini-card strong{color:white}
+body.course-template-modern .mini-card{background:var(--card2);border:1px solid var(--line);border-radius:var(--agai-radius-md);padding:16px}body.course-template-modern .mini-card strong{color:white}
 body.course-template-modern .flow{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin:20px 0}
 body.course-template-modern .flow-box{background:#0b1b2c;border:1px solid rgba(56,189,248,.3);padding:14px 17px;border-radius:12px;text-align:center;min-width:120px}
 body.course-template-modern .arrow{color:var(--blue);font-size:1.5rem;font-weight:bold}
@@ -63,5 +65,5 @@ body > header .brand img,
 .hero-logo img{
   content:url("assets/brand/AGAI.svg");
   object-fit:contain;
-  background:#07111f;
+  background:var(--agai-bg);
 }
