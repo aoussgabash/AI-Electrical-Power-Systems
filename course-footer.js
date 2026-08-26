@@ -1,9 +1,9 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-20';
-  const COURSE_NAV_VERSION = '20260826-20';
-  const CATALOG_VERSION = '20260826-20';
+  const COURSE_THEME_VERSION = '20260826-21';
+  const COURSE_NAV_VERSION = '20260826-21';
+  const CATALOG_VERSION = '20260826-21';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const pageMatch = page.match(/^(lecture|lab)(\d{2})\.html$/);
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
@@ -20,7 +20,7 @@
     back.setAttribute('aria-label', 'Back to previous page | العودة إلى الصفحة السابقة');
     back.setAttribute('title', 'Back | عودة');
     back.innerHTML = `
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 12H5"></path>
         <path d="m12 19-7-7 7-7"></path>
       </svg>
@@ -74,7 +74,7 @@
           border-radius:18px!important;
           box-sizing:border-box!important;
         }
-        body header .back svg{width:22px!important;height:22px!important;stroke-width:2!important}
+        body header .back svg{width:22px!important;height:22px!important}
         body header .back span{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
       }
     `;
@@ -169,8 +169,22 @@
   };
 
   const removeLegacyMarkup = () => {
-    document.querySelectorAll('footer').forEach(footer => footer.remove());
+    document.querySelectorAll('footer').forEach(footer => {
+      if (footer.id !== 'ag-central-footer') footer.remove();
+    });
     document.documentElement.dataset.courseFooterCentralized = 'true';
+  };
+
+  const enforceCentralFooter = () => {
+    removeLegacyMarkup();
+    if (document.documentElement.dataset.centralFooterObserver === 'true') return;
+    document.documentElement.dataset.centralFooterObserver = 'true';
+    const observer = new MutationObserver(() => {
+      document.querySelectorAll('footer').forEach(footer => {
+        if (footer.id !== 'ag-central-footer') footer.remove();
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
   };
 
   const loadCourseTheme = () => {
@@ -185,7 +199,7 @@
       theme.dataset.courseTheme = 'true';
       document.head.appendChild(theme);
     }
-    removeLegacyMarkup();
+    enforceCentralFooter();
   };
 
   const loadCentralComponents = () => {
@@ -221,11 +235,15 @@
     enhanceBackNavigation();
     applyCourseIdentity();
     void synchronizeHomepageCatalog();
-    removeLegacyMarkup();
+    enforceCentralFooter();
     loadCentralComponents();
     if (!isCourseContentPage) return;
     loadCourseTheme();
-    const finish = () => { loadCentralComponents(); reloadCourseNavigation(); };
+    const finish = () => {
+      enforceCentralFooter();
+      loadCentralComponents();
+      reloadCourseNavigation();
+    };
     const existingLegacy = document.querySelector('script[data-course-legacy]');
     if (existingLegacy) {
       if (existingLegacy.dataset.loaded === 'true') finish();
@@ -239,7 +257,10 @@
     courseFeatures.src = `course-footer-legacy.js?v=${COURSE_THEME_VERSION}`;
     courseFeatures.defer = true;
     courseFeatures.dataset.courseLegacy = 'true';
-    courseFeatures.addEventListener('load', () => { courseFeatures.dataset.loaded = 'true'; finish(); }, { once: true });
+    courseFeatures.addEventListener('load', () => {
+      courseFeatures.dataset.loaded = 'true';
+      finish();
+    }, { once: true });
     courseFeatures.addEventListener('error', finish, { once: true });
     document.head.appendChild(courseFeatures);
   };
