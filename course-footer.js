@@ -1,9 +1,9 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-19';
-  const COURSE_NAV_VERSION = '20260826-19';
-  const CATALOG_VERSION = '20260826-19';
+  const COURSE_THEME_VERSION = '20260826-20';
+  const COURSE_NAV_VERSION = '20260826-20';
+  const CATALOG_VERSION = '20260826-20';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const pageMatch = page.match(/^(lecture|lab)(\d{2})\.html$/);
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
@@ -20,7 +20,7 @@
     back.setAttribute('aria-label', 'Back to previous page | العودة إلى الصفحة السابقة');
     back.setAttribute('title', 'Back | عودة');
     back.innerHTML = `
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 12H5"></path>
         <path d="m12 19-7-7 7-7"></path>
       </svg>
@@ -74,7 +74,7 @@
           border-radius:18px!important;
           box-sizing:border-box!important;
         }
-        body header .back svg{width:30px!important;height:30px!important}
+        body header .back svg{width:22px!important;height:22px!important;stroke-width:2!important}
         body header .back span{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
       }
     `;
