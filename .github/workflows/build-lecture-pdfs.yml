@@ -88,6 +88,35 @@ jobs:
           mkdir -p build/pdf-html pdf
           node scripts/build-lecture-pdfs.mjs
 
+      - name: Remove publication information tables
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          pattern = re.compile(
+              r'\s*<h2>Publication Information \| معلومات النشر</h2>\s*'
+              r'<table class="publication-table">.*?</table>',
+              re.DOTALL,
+          )
+
+          files = sorted(Path('build/pdf-html').glob('*.html'))
+          changed = 0
+          for file in files:
+              content = file.read_text(encoding='utf-8')
+              updated, count = pattern.subn('', content)
+              if count:
+                  file.write_text(updated, encoding='utf-8')
+                  changed += 1
+
+          if changed != len(files):
+              raise SystemExit(
+                  f'Removed the table from {changed} of {len(files)} publication files.'
+              )
+
+          print(f'Removed publication information tables from all {changed} files.')
+          PY
+
       - name: Render professional PDFs with WeasyPrint
         timeout-minutes: 10
         run: |
