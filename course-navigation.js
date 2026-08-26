@@ -26,16 +26,28 @@
     .course-action-card{min-height:122px;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:16px 14px!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:17px!important;background:linear-gradient(145deg,#123652,#0b2238)!important;color:#f8fbff!important;text-decoration:none!important;text-align:center!important;box-shadow:0 10px 24px rgba(0,0,0,.18)!important;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,background .2s ease!important;cursor:pointer!important;overflow:hidden!important}
     .course-action-card:hover,.course-action-card:focus-visible{transform:translateY(-4px)!important;border-color:rgba(56,189,248,.78)!important;box-shadow:0 16px 32px rgba(0,0,0,.3)!important;outline:none!important;background:linear-gradient(145deg,#174567,#0d2b46)!important}
     .course-action-current{cursor:default!important;border-color:rgba(56,189,248,.38)!important;background:linear-gradient(145deg,#102f49,#0a2035)!important}.course-action-current:hover{transform:none!important}
-    .course-action-icon{font-size:2rem!important;line-height:1!important}.course-action-content{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important}
+    .course-action-icon{width:46px!important;height:46px!important;display:grid!important;place-items:center!important;border:1px solid rgba(56,189,248,.32)!important;border-radius:14px!important;background:rgba(3,18,32,.42)!important;color:#38bdf8!important;box-shadow:inset 0 0 18px rgba(56,189,248,.08)!important}
+    .course-action-icon svg{width:27px!important;height:27px!important;display:block!important;fill:none!important;stroke:currentColor!important;stroke-width:1.9!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+    .course-action-related .course-action-icon{color:#facc15!important;border-color:rgba(250,204,21,.34)!important}.course-action-download .course-action-icon{color:#7dd3fc!important}.course-action-quiz .course-action-icon{color:#4ade80!important;border-color:rgba(74,222,128,.36)!important}
+    .course-action-content{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important}
     .course-action-content strong{font-size:1.04rem!important;color:#fff!important;line-height:1.35!important}.course-action-subtitle{direction:rtl!important;text-align:center!important;color:#dceaf6!important;font-size:.9rem!important;line-height:1.45!important}.course-action-meta{color:#9fb7ca!important;font-size:.76rem!important;line-height:1.4!important;margin-top:4px!important}
-    .course-action-arrow{font-size:1.25rem!important;color:#fde047!important;line-height:1!important}.course-action-related{border-color:rgba(250,204,21,.38)!important}.course-action-quiz{border-color:rgba(34,197,94,.45)!important}.course-action-download{border-color:rgba(56,189,248,.58)!important;background:linear-gradient(145deg,#0d527e,#0a304e)!important}
+    .course-action-arrow{width:24px!important;height:24px!important;display:grid!important;place-items:center!important;color:#fde047!important;line-height:1!important}.course-action-arrow svg{width:18px!important;height:18px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+    .course-action-related{border-color:rgba(250,204,21,.38)!important}.course-action-quiz{border-color:rgba(34,197,94,.45)!important}.course-action-download{border-color:rgba(56,189,248,.58)!important;background:linear-gradient(145deg,#0d527e,#0a304e)!important}
 
-    @media(max-width:760px){.course-action-panel{grid-template-columns:1fr!important;width:calc(100% - 24px)!important;padding:14px!important;gap:12px!important;border-radius:20px!important}.course-action-card{min-height:94px!important;padding:14px 16px!important}.course-author-signature{border-radius:13px;text-align:center;padding:9px 12px}}
+    @media(max-width:760px){.course-action-panel{grid-template-columns:1fr!important;width:calc(100% - 24px)!important;padding:14px!important;gap:12px!important;border-radius:20px!important}.course-action-card{min-height:104px!important;padding:14px 16px!important}.course-author-signature{border-radius:13px;text-align:center;padding:9px 12px}}
     @page{size:A4 portrait;margin:14mm 14mm 18mm}
     @media print{html,body{background:#fff!important;color:#000!important;font-family:Arial,Tahoma,sans-serif!important}header,.course-action-panel,.course-page-navigation,#reading-progress-track,[data-course-quiz],footer,.site-footer,.course-footer,.back,.to-top{display:none!important}main,.container{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}.hero{padding:0 0 8mm!important;margin:0!important;border-bottom:1px solid #888!important}.course-author-signature{display:flex!important;margin:5mm auto 0!important;padding:2.5mm 4mm!important;border:1px solid #777!important;background:#fff!important;color:#000!important;box-shadow:none!important}.course-author-label,.course-author-name,h1,h2,h3,strong,p,li,.subtitle,.hero-ar,.ar,.en{color:#000!important}section{background:#fff!important;color:#000!important;border:1px solid #aaa!important;box-shadow:none!important;margin:7mm 0!important;padding:7mm!important;break-inside:auto}.mini-card,.highlight,.note,.warning,.research,.task,.formula,pre,.svg-wrap,.svg-box{background:#fff!important;color:#000!important;border:1px solid #aaa!important;box-shadow:none!important;break-inside:avoid}.ar{direction:rtl!important;text-align:right!important}.en{direction:ltr!important;text-align:left!important}a{color:#000!important;text-decoration:none!important}table,img,svg{break-inside:avoid;page-break-inside:avoid;max-width:100%!important}}
   `;
   document.getElementById(style.id)?.remove();
   document.head.appendChild(style);
+
+  const icons = {
+    lecture: '<svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>',
+    lab: '<svg viewBox="0 0 24 24"><path d="M9 3h6"/><path d="M10 3v5l-5.4 9.1A2.5 2.5 0 0 0 6.75 21h10.5a2.5 2.5 0 0 0 2.15-3.9L14 8V3"/><path d="M7.5 15h9"/><path d="m12.5 10-2 3h3l-2 3"/></svg>',
+    download: '<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 19h14"/></svg>',
+    quiz: '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6"/><path d="M9 12h3"/><path d="m14.5 15 1.2 1.2 2.3-2.7"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m14 7 5 5-5 5"/></svg>'
+  };
 
   const label = type === 'lecture'
     ? { en: 'Lecture', ar: 'المحاضرة' }
@@ -58,7 +70,7 @@
         <span class="course-action-subtitle">${subtitle}</span>
         ${meta ? `<span class="course-action-meta">${meta}</span>` : ''}
       </span>
-      ${tag !== 'div' ? '<span class="course-action-arrow" aria-hidden="true">→</span>' : ''}`;
+      ${tag !== 'div' ? `<span class="course-action-arrow" aria-hidden="true">${icons.arrow}</span>` : ''}`;
     return element;
   };
 
@@ -107,16 +119,16 @@
   actions.appendChild(card({
     tag: 'div',
     className: 'course-action-current',
-    icon: type === 'lecture' ? '📖' : '⚡',
+    icon: type === 'lecture' ? icons.lecture : icons.lab,
     title: `${label.en} ${num}`,
     subtitle: `${label.ar} ${num}`,
-    meta: `⏱ ${duration} min · 📊 ${difficulty[0]} | ${difficulty[1]}`
+    meta: `${duration} min · ${difficulty[0]} | ${difficulty[1]}`
   }));
 
   actions.appendChild(card({
     className: 'course-action-related',
     href: relatedFileName(number),
-    icon: type === 'lecture' ? '⚡' : '📖',
+    icon: type === 'lecture' ? icons.lab : icons.lecture,
     title: type === 'lecture' ? `MATLAB Lab ${num}` : `Lecture ${num}`,
     subtitle: type === 'lecture' ? `فتح المختبر ${num}` : `فتح المحاضرة ${num}`,
     meta: type === 'lecture' ? 'Programming Exercise | تمرين برمجي' : 'Read Lesson | قراءة المحاضرة'
@@ -125,7 +137,7 @@
   const download = card({
     className: 'course-action-download',
     href: `pdf/${type}${num}.pdf`,
-    icon: '📥',
+    icon: icons.download,
     title: type === 'lecture' ? 'Download Lecture PDF' : 'Download Lab PDF',
     subtitle: type === 'lecture' ? 'تحميل المحاضرة بصيغة PDF' : 'تحميل المختبر بصيغة PDF',
     meta: `Prepared by ${authorName}`
@@ -140,7 +152,7 @@
     const quiz = document.querySelector('[data-course-quiz]');
     if (!quiz || type !== 'lecture') return;
     quiz.id ||= 'quiz';
-    const quizLink = card({className:'course-action-quiz',href:'#quiz',icon:'📝',title:'Quiz',subtitle:'ابدأ الاختبار',meta:'Start Assessment | بدء التقييم'});
+    const quizLink = card({className:'course-action-quiz',href:'#quiz',icon:icons.quiz,title:'Quiz',subtitle:'ابدأ الاختبار',meta:'Start Assessment | بدء التقييم'});
     quizLink.addEventListener('click', event => {
       event.preventDefault();
       quiz.scrollIntoView({ behavior: 'smooth', block: 'start' });
