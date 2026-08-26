@@ -9,6 +9,11 @@
  --agai-shadow-sm:0 8px 18px rgba(0,0,0,.16);--agai-shadow-md:0 12px 30px rgba(0,0,0,.22);--agai-shadow-lg:0 18px 42px rgba(0,0,0,.28);
  --agai-transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,background .2s ease;
  --agai-container:min(1100px,92%);
+
+ /* Compatibility aliases used by the current homepage during migration. */
+ --bg:var(--agai-bg);--bg2:var(--agai-bg-soft);--panel:var(--agai-surface);--panel2:var(--agai-surface-2);
+ --text:var(--agai-text);--muted:var(--agai-muted);--blue:var(--agai-primary);--blue2:var(--agai-primary-strong);
+ --gold:var(--agai-accent);--green:var(--agai-success);--line:var(--agai-line);
 }
 *,*::before,*::after{box-sizing:border-box}html{scroll-behavior:smooth}body{accent-color:var(--agai-primary)}
 ::selection{background:rgba(56,189,248,.35);color:#fff}
@@ -22,4 +27,14 @@
 .agai-badge{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:5px 10px;border:1px solid var(--agai-line);border-radius:999px;background:var(--agai-surface-2);color:var(--agai-text-soft);font-size:.82rem;font-weight:700}.agai-badge-primary{color:#dff7ff;border-color:rgba(56,189,248,.38);background:rgba(56,189,248,.10)}.agai-badge-success{color:#dcfce7;border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.09)}.agai-badge-warning{color:#fff7a8;border-color:rgba(250,204,21,.40);background:rgba(250,204,21,.09)}
 .agai-note,.agai-success,.agai-warning,.agai-research{padding:16px;border-radius:var(--agai-radius-md);margin:15px 0;background:var(--agai-surface-2);border:1px solid var(--agai-line)}.agai-note{border-inline-start:4px solid var(--agai-primary)}.agai-success{border-color:rgba(34,197,94,.34);background:rgba(34,197,94,.08)}.agai-warning{border-color:rgba(251,113,133,.34);background:rgba(251,113,133,.08)}.agai-research{border-color:rgba(167,139,250,.34);background:rgba(167,139,250,.08)}
 .agai-input,.agai-select,.agai-textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--agai-line);border-radius:var(--agai-radius-sm);background:#06101d;color:var(--agai-text);font:inherit}.agai-input:focus,.agai-select:focus,.agai-textarea:focus{border-color:var(--agai-primary);outline:2px solid rgba(56,189,248,.16);outline-offset:1px}
+
+/* Existing homepage components now inherit the central system without changing their HTML. */
+.btn{transition:var(--agai-transition)}
+.btn:hover,.btn:focus-visible{transform:translateY(-2px);border-color:var(--agai-primary);box-shadow:var(--agai-shadow-sm);outline:none}
+.part,.feature,.course-card,.author-box,.stat,.progress-panel,.progress-card,.progress-stat{border-color:var(--agai-line)!important}
+.part,.feature,.course-card,.author-box{border-radius:var(--agai-radius-lg)!important}
+.course-card,.part,.feature,.academic-profile-link{transition:var(--agai-transition)!important}
+.course-card:hover,.part:hover,.feature:hover,.academic-profile-link:hover{border-color:var(--agai-line-primary)!important;box-shadow:var(--agai-shadow-lg)!important}
+#search{border-radius:var(--agai-radius-md)!important}.filter{transition:var(--agai-transition)}.filter:hover,.filter:focus-visible{border-color:var(--agai-primary);outline:none}
+
 :focus-visible{outline:2px solid var(--agai-primary);outline-offset:3px}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}@media(max-width:760px){.agai-grid{grid-template-columns:1fr}.agai-card{padding:16px}}
