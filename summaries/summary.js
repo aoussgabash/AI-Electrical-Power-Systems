@@ -61,8 +61,39 @@
   }
 
   function callout(container) {
-    const item = container?.querySelector('.highlight,.callout,.note,.result,.formula-box');
+    const item = container?.querySelector('.highlight,.callout,.note,.result');
     return item ? `<div class="callout">${item.innerHTML}</div>` : '';
+  }
+
+  function scientificMedia(container, limit = 3) {
+    if (!container) return '';
+    const selector = [
+      '.math-block','.equation','.formula','.formula-box','math','mjx-container',
+      'figure','table','svg','img:not(.icon):not(.logo)'
+    ].join(',');
+    const nodes = [...container.querySelectorAll(selector)].filter(node => {
+      return !node.parentElement?.closest(selector) || node.parentElement?.closest(selector) === node;
+    }).slice(0, limit);
+
+    return nodes.map(original => {
+      const clone = original.cloneNode(true);
+      clone.querySelectorAll?.('img[src],source[src],video[src]').forEach(media => {
+        const src = media.getAttribute('src');
+        if (src) media.setAttribute('src', new URL(src, sourceUrl).href);
+      });
+      clone.querySelectorAll?.('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:')) link.setAttribute('href', new URL(href, sourceUrl).href);
+      });
+      if (clone.matches?.('img')) {
+        const alt = clone.getAttribute('alt') || '';
+        return `<figure>${clone.outerHTML}${alt ? `<figcaption>${alt}</figcaption>` : ''}</figure>`;
+      }
+      if (clone.matches?.('svg')) return `<figure>${clone.outerHTML}</figure>`;
+      if (clone.matches?.('table')) return `<div class="table-wrap">${clone.outerHTML}</div>`;
+      if (clone.matches?.('math,mjx-container')) return `<div class="math-block">${clone.outerHTML}</div>`;
+      return clone.outerHTML;
+    }).join('');
   }
 
   function cards(container, isArabic = false, limit = 6) {
@@ -85,7 +116,8 @@
     const body = [
       paragraphs(container, options.paragraphs ?? 2),
       list(container, options.items ?? 5, options.ordered),
-      callout(container)
+      callout(container),
+      scientificMedia(container, options.media ?? 2)
     ].join('');
     return `<div class="panel${isArabic ? ' ar' : ''}"${isArabic ? ' lang="ar" dir="rtl"' : ''}><h3>${title}</h3>${body || `<p>${isArabic ? 'راجع صفحة الموقع الكاملة لهذا القسم.' : 'See the complete website page for this section.'}</p>`}</div>`;
   }
@@ -163,7 +195,7 @@
             ${core.map(section => {
               const p = pair(section);
               const cardContent = `${cards(p.en,false,4)}${cards(p.ar,true,4)}`;
-              return `<div style="margin-bottom:16px"><div class="bilingual">${panel(section,'en','Key Concept',{paragraphs:1,items:4})}${panel(section,'ar','مفهوم أساسي',{paragraphs:1,items:4})}</div>${cardContent ? `<div class="concept-grid" style="margin-top:10px">${cardContent}</div>` : ''}</div>`;
+              return `<div style="margin-bottom:16px"><div class="bilingual">${panel(section,'en','Key Concept',{paragraphs:1,items:4,media:2})}${panel(section,'ar','مفهوم أساسي',{paragraphs:1,items:4,media:2})}</div>${cardContent ? `<div class="concept-grid" style="margin-top:10px">${cardContent}</div>` : ''}</div>`;
             }).join('')}
             ${pageNo(page++)}
           </section>`);
@@ -173,7 +205,7 @@
         pages.push(`
           <section class="page">
             ${sectionTitle(type === 'lab' ? 'Laboratory Workflow and Results' : 'Applications and Worked Example',type === 'lab' ? 'سير عمل المختبر والنتائج' : 'التطبيقات والمثال المحلول')}
-            ${practice.map(section => `<div style="margin-bottom:16px" class="example"><div class="bilingual">${panel(section,'en',type === 'lab' ? 'Laboratory Step' : 'Application',{paragraphs:3,items:6})}${panel(section,'ar',type === 'lab' ? 'خطوة مخبرية' : 'تطبيق',{paragraphs:3,items:6})}</div></div>`).join('')}
+            ${practice.map(section => `<div style="margin-bottom:16px" class="example"><div class="bilingual">${panel(section,'en',type === 'lab' ? 'Laboratory Step' : 'Application',{paragraphs:3,items:6,media:3})}${panel(section,'ar',type === 'lab' ? 'خطوة مخبرية' : 'تطبيق',{paragraphs:3,items:6,media:3})}</div></div>`).join('')}
             ${pageNo(page++)}
           </section>`);
       }
