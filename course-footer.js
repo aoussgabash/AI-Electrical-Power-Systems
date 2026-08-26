@@ -1,9 +1,9 @@
 (() => {
   'use strict';
 
-  const COURSE_THEME_VERSION = '20260826-15';
-  const COURSE_NAV_VERSION = '20260826-15';
-  const CATALOG_VERSION = '20260826-15';
+  const COURSE_THEME_VERSION = '20260826-16';
+  const COURSE_NAV_VERSION = '20260826-16';
+  const CATALOG_VERSION = '20260826-16';
   const page = location.pathname.split('/').pop()?.toLowerCase() || 'index.html';
   const pageMatch = page.match(/^(lecture|lab)(\d{2})\.html$/);
   const isLecturePage = /^lecture\d{2}\.html$/.test(page);
@@ -143,7 +143,6 @@
   };
 
   const removeLegacyMarkup = () => {
-    if (!isCourseContentPage) return;
     document.querySelectorAll('footer').forEach(footer => footer.remove());
     document.documentElement.dataset.courseFooterCentralized = 'true';
   };
@@ -199,6 +198,11 @@
     injectHomepageCourseButtonStyles();
     applyCourseIdentity();
     void synchronizeHomepageCatalog();
+
+    // Every page in the AI site must use the shared AG footer and Site Information link.
+    removeLegacyMarkup();
+    loadCentralComponents();
+
     if (!isCourseContentPage) return;
 
     loadCourseTheme();
