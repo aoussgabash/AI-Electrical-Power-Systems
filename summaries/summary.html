@@ -6,11 +6,31 @@
   <title>Course Summary | ملخص المقرر</title>
   <link rel="icon" type="image/svg+xml" href="../assets/brand/AGAI.svg">
   <link rel="stylesheet" href="summary-print.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(','\\)'], ['$', '$']],
+        displayMath: [['\\[','\\]'], ['$$','$$']],
+        processEscapes: true,
+        tags: 'ams'
+      },
+      chtml: {
+        scale: 0.96,
+        displayAlign: 'center',
+        displayIndent: '0'
+      },
+      options: {
+        skipHtmlTags: ['script','noscript','style','textarea','pre','code']
+      },
+      startup: {typeset: false}
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
   <div class="no-print" style="width:min(100%,210mm);margin:14px auto;display:flex;gap:10px;justify-content:space-between;align-items:center;padding:0 6px">
     <a id="back-link" href="../index.html" style="text-decoration:none;font-weight:700;color:#0f5f8f">← Back | رجوع</a>
-    <button type="button" onclick="window.print()" style="border:0;border-radius:10px;padding:10px 15px;background:#0f5f8f;color:#fff;font-weight:800;cursor:pointer">Print / Save PDF | طباعة / حفظ PDF</button>
+    <button id="print-summary" type="button" style="border:0;border-radius:10px;padding:10px 15px;background:#0f5f8f;color:#fff;font-weight:800;cursor:pointer">Print / Save PDF | طباعة / حفظ PDF</button>
   </div>
 
   <main id="summary-root" class="sheet" aria-live="polite">
@@ -23,5 +43,11 @@
   </main>
 
   <script src="summary.js" defer></script>
+  <script>
+    document.getElementById('print-summary').addEventListener('click', async () => {
+      if (window.MathJax?.typesetPromise) await MathJax.typesetPromise([document.getElementById('summary-root')]);
+      window.print();
+    });
+  </script>
 </body>
 </html>
