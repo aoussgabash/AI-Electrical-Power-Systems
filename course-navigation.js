@@ -14,12 +14,26 @@
     const authorName = 'Dr.-Ing. Aouss Gabash';
     if (number < 1 || number > 20) return;
 
+    const isCourseOne = number <= 10;
+    const courseNumber = isCourseOne ? 1 : 2;
+    const courseTitle = isCourseOne
+      ? 'Artificial Intelligence and Machine Learning Fundamentals'
+      : 'AI Applications in Electrical Power Systems';
+    const courseTitleAr = isCourseOne
+      ? 'أساسيات الذكاء الاصطناعي وتعلم الآلة'
+      : 'تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية';
+    const academicYear = isCourseOne ? 'Fourth Year Undergraduate' : 'Fifth Year Undergraduate';
+    const academicYearAr = isCourseOne ? 'السنة الجامعية الرابعة' : 'السنة الجامعية الخامسة';
+    const localNumber = isCourseOne ? number : number - 10;
+    const localNum = String(localNumber).padStart(2, '0');
     const difficulty = number <= 4 ? ['Beginner','مبتدئ'] : number <= 10 ? ['Intermediate','متوسط'] : ['Advanced','متقدم'];
-    const duration = type === 'lecture' ? (number <= 8 ? 45 : number <= 16 ? 55 : 60) : (number <= 8 ? 60 : number <= 16 ? 75 : 90);
+    const duration = type === 'lecture' ? (isCourseOne ? 50 : 60) : (isCourseOne ? 75 : 90);
     const relatedType = type === 'lecture' ? 'lab' : 'lecture';
+    const documentKind = type === 'lecture' ? 'Lecture' : 'MATLAB Laboratory';
+    const documentKindAr = type === 'lecture' ? 'محاضرة' : 'مخبر MATLAB';
 
     const panelStyle = [
-      'width:min(100%,820px)','margin:28px auto 34px','padding:20px','display:grid',
+      'width:min(100%,820px)','margin:20px auto 34px','padding:20px','display:grid',
       'grid-template-columns:1fr','gap:14px','align-items:stretch',
       'border:1px solid rgba(56,189,248,.24)','border-radius:24px',
       'background:linear-gradient(145deg,rgba(9,38,62,.96),rgba(5,24,42,.96))',
@@ -100,7 +114,40 @@
       hero.appendChild(author);
     }
 
-    document.querySelectorAll('.course-action-panel,.course-metadata-bar').forEach(panel => panel.remove());
+    document.querySelectorAll('.academic-course-banner,.course-action-panel,.course-metadata-bar').forEach(panel => panel.remove());
+
+    const banner = document.createElement('section');
+    banner.className = `academic-course-banner academic-course-${courseNumber}`;
+    banner.setAttribute('aria-label',`Course ${courseNumber} academic information`);
+    banner.setAttribute('style',[
+      'width:min(100%,1100px)','margin:26px auto 18px','padding:20px',
+      'display:grid','grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr)','gap:18px','align-items:center',
+      `border:1px solid ${isCourseOne ? 'rgba(56,189,248,.42)' : 'rgba(250,204,21,.42)'}`,
+      'border-radius:22px',
+      `background:${isCourseOne ? 'linear-gradient(135deg,rgba(8,55,87,.96),rgba(7,28,48,.96))' : 'linear-gradient(135deg,rgba(65,48,12,.92),rgba(8,33,52,.97))'}`,
+      'box-shadow:0 18px 40px rgba(0,0,0,.22)','box-sizing:border-box','color:#fff'
+    ].join(';'));
+
+    const identity = document.createElement('div');
+    identity.setAttribute('style','min-width:0');
+    identity.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px">
+        <span style="display:inline-flex;align-items:center;min-height:30px;padding:5px 11px;border-radius:999px;background:${isCourseOne ? 'rgba(56,189,248,.14)' : 'rgba(250,204,21,.14)'};border:1px solid ${isCourseOne ? 'rgba(56,189,248,.45)' : 'rgba(250,204,21,.45)'};color:${isCourseOne ? '#dff7ff' : '#fff4b8'};font-size:.78rem;font-weight:800;letter-spacing:.04em">COURSE ${courseNumber} · ${isCourseOne ? '4TH YEAR' : '5TH YEAR'}</span>
+        <span style="color:#b8ccdc;font-size:.84rem">${academicYear} | ${academicYearAr}</span>
+      </div>
+      <h2 style="margin:0 0 5px;color:#fff;font-size:clamp(1.25rem,3vw,1.75rem);line-height:1.25">${courseTitle}</h2>
+      <div lang="ar" dir="rtl" style="color:#e5edf5;font-size:1.08rem;line-height:1.7;text-align:right">${courseTitleAr}</div>`;
+
+    const facts = document.createElement('div');
+    facts.setAttribute('style','display:grid;grid-template-columns:1fr 1fr;gap:9px');
+    const fact = (label,value,accent=false) => `<div style="min-height:62px;padding:10px;border:1px solid ${accent ? (isCourseOne ? 'rgba(56,189,248,.42)' : 'rgba(250,204,21,.42)') : 'rgba(255,255,255,.12)'};border-radius:12px;background:rgba(3,18,32,.34);text-align:center;display:flex;flex-direction:column;justify-content:center"><span style="color:#98b1c5;font-size:.72rem;line-height:1.3">${label}</span><strong style="color:#fff;font-size:.9rem;line-height:1.35;margin-top:3px">${value}</strong></div>`;
+    facts.innerHTML =
+      fact(`${documentKind} | ${documentKindAr}`,`${localNum} / 10`,true) +
+      fact('Global Number | الرقم العام',num) +
+      fact('Study Time | زمن الدراسة',`${duration} min`) +
+      fact('Level | المستوى',`${difficulty[0]} | ${difficulty[1]}`);
+
+    banner.append(identity,facts);
 
     const actions = document.createElement('section');
     actions.className = 'course-action-panel';
@@ -111,7 +158,7 @@
       tag:'div',kind:'current',icon:type === 'lecture' ? '▥' : '⚡',
       title:type === 'lecture' ? `Lecture ${num}` : `MATLAB Lab ${num}`,
       subtitle:type === 'lecture' ? `المحاضرة ${num}` : `المختبر ${num}`,
-      meta:`${duration} min · ${difficulty[0]} | ${difficulty[1]}`
+      meta:`Course ${courseNumber} · ${duration} min · ${difficulty[0]} | ${difficulty[1]}`
     }));
 
     actions.appendChild(card({
@@ -125,13 +172,25 @@
       kind:'download',href:`pdf/${type}${num}.pdf`,icon:'↓',
       title:type === 'lecture' ? 'Download Lecture PDF' : 'Download Lab PDF',
       subtitle:type === 'lecture' ? 'تحميل المحاضرة بصيغة PDF' : 'تحميل المختبر بصيغة PDF',
-      meta:`Prepared by ${authorName}`
+      meta:`Course ${courseNumber} · Prepared by ${authorName}`
     });
     download.setAttribute('download',`${type}_${num}.pdf`);
     actions.appendChild(download);
 
-    if (hero?.parentNode) hero.insertAdjacentElement('afterend', actions);
-    else main.prepend(actions);
+    const anchor = hero || main.firstElementChild;
+    if (anchor?.parentNode) {
+      anchor.insertAdjacentElement('afterend',banner);
+      banner.insertAdjacentElement('afterend',actions);
+    } else {
+      main.prepend(actions);
+      main.prepend(banner);
+    }
+
+    const responsiveStyle = document.createElement('style');
+    responsiveStyle.id = 'academic-course-banner-responsive';
+    responsiveStyle.textContent = '@media(max-width:760px){.academic-course-banner{grid-template-columns:1fr!important;width:calc(100% - 24px)!important;padding:16px!important}.academic-course-banner>div:last-child{grid-template-columns:1fr 1fr!important}}@media(max-width:430px){.academic-course-banner>div:last-child{grid-template-columns:1fr!important}}@media print{.academic-course-banner,.course-action-panel{display:none!important}}';
+    document.getElementById(responsiveStyle.id)?.remove();
+    document.head.appendChild(responsiveStyle);
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCourseNavigation, {once:true});
