@@ -48,6 +48,26 @@
     const summaryRoot = document.getElementById('summary-root');
     let renderTimer;
 
+    function normalizePublicLinks() {
+      const publicBase = 'https://ai.aoussgabash.com/';
+      summaryRoot.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href') || '';
+        if (/^https?:\/\/(?:127\.0\.0\.1|localhost):\d+\//i.test(href)) {
+          const path = href.replace(/^https?:\/\/(?:127\.0\.0\.1|localhost):\d+\//i, '');
+          const publicUrl = new URL(path, publicBase).href;
+          if (link.textContent.trim() === href) link.textContent = publicUrl;
+          link.href = publicUrl;
+        }
+      });
+
+      const walker = document.createTreeWalker(summaryRoot, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(node => {
+        node.nodeValue = node.nodeValue.replace(/https?:\/\/(?:127\.0\.0\.1|localhost):\d+\//gi, publicBase);
+      });
+    }
+
     function normalizeEquationColors() {
       const mathSelectors = [
         '.math','.equation','.formula','.formula-box','.math-block',
@@ -64,11 +84,13 @@
     }
 
     async function renderSummaryMath() {
+      normalizePublicLinks();
       normalizeEquationColors();
       if (!window.MathJax?.typesetPromise) return;
       try {
         if (MathJax.typesetClear) MathJax.typesetClear([summaryRoot]);
         await MathJax.typesetPromise([summaryRoot]);
+        normalizePublicLinks();
         normalizeEquationColors();
       } catch (error) {
         console.warn('MathJax summary rendering:', error);
