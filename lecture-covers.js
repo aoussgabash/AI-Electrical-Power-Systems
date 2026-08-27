@@ -18,7 +18,7 @@
   style.id = 'shared-lecture-cover-style';
   style.textContent = `
     .lecture-cover{
-      width:min(100%,1100px);
+      width:min(100%,1240px);
       margin:22px auto 34px;
       overflow:hidden;
       border:1px solid rgba(56,189,248,.35);
@@ -35,14 +35,20 @@
       display:block;
       width:100%;
       height:auto;
-      aspect-ratio:16/9;
-      object-fit:cover;
+      max-height:none;
+      object-fit:contain;
       object-position:center;
+      background:#071a2b;
     }
     @media(max-width:700px){
       .lecture-cover{
+        width:100%;
         margin:16px auto 26px;
         border-radius:16px;
+      }
+      .lecture-cover img{
+        width:100%;
+        height:auto;
       }
     }
   `;
@@ -55,8 +61,6 @@
   const image = document.createElement('img');
   image.src = `assets/images/lecture${match[1]}-ai-power.png`;
   image.alt = document.querySelector('main .hero h1')?.textContent?.trim() || `Lecture ${match[1]}`;
-  image.width = 1536;
-  image.height = 1024;
   image.loading = number === 1 ? 'eager' : 'lazy';
   image.decoding = 'async';
   image.addEventListener('error', () => figure.remove(), { once: true });
