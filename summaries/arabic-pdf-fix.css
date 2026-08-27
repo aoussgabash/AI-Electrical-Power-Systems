@@ -1,0 +1,39 @@
+@font-face{font-family:"AG DejaVu";src:url("../assets/fonts/DejaVuSans.ttf") format("truetype");font-style:normal;font-weight:400;font-display:block}
+@font-face{font-family:"AG DejaVu";src:url("../assets/fonts/DejaVuSans-Bold.ttf") format("truetype");font-style:normal;font-weight:700 900;font-display:block}
+
+.ar,.rtl,[lang="ar"],[dir="rtl"]{
+  font-family:"AG DejaVu",DejaVu Sans,Tahoma,Arial,sans-serif!important;
+  direction:rtl!important;
+  text-align:right;
+  unicode-bidi:isolate!important;
+  letter-spacing:normal!important;
+  word-spacing:.12em!important;
+  font-kerning:normal;
+  font-variant-ligatures:normal;
+  text-rendering:geometricPrecision;
+}
+
+.ar h1,.ar h2,.ar h3,.ar strong,
+[lang="ar"] h1,[lang="ar"] h2,[lang="ar"] h3,[lang="ar"] strong{
+  font-family:"AG DejaVu",DejaVu Sans,Tahoma,Arial,sans-serif!important;
+}
+
+.ar p,[lang="ar"] p,.ar li,[lang="ar"] li{
+  unicode-bidi:isolate!important;
+  white-space:normal!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+  line-height:1.9!important;
+}
+
+.online .ar{text-align:center!important}
+.source-note{display:grid;gap:8px;line-height:1.65}
+.source-note .source-note-en{direction:ltr;text-align:left;unicode-bidi:isolate}
+.source-note .source-note-ar{direction:rtl;text-align:right;unicode-bidi:isolate;font-family:"AG DejaVu",DejaVu Sans,Tahoma,Arial,sans-serif!important;word-spacing:.12em}
+
+@media print{
+  .ar,.rtl,[lang="ar"],[dir="rtl"]{
+    font-family:"AG DejaVu",DejaVu Sans,Tahoma,Arial,sans-serif!important;
+    -webkit-font-smoothing:antialiased;
+  }
+}
