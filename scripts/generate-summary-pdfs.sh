@@ -38,7 +38,7 @@ render_pdf() {
     --hide-scrollbars \
     --run-all-compositor-stages-before-draw \
     --virtual-time-budget=12000 \
-    --print-to-pdf-no-header \
+    --no-pdf-header-footer \
     --print-to-pdf="$output" \
     "$url" >/tmp/chrome-summary.log 2>&1
 
