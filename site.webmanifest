@@ -1,0 +1,22 @@
+{
+  "name": "AI Applications in Electrical Power Systems",
+  "short_name": "AI Power Systems",
+  "description": "Bilingual academic platform by Dr.-Ing. Aouss Gabash",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
