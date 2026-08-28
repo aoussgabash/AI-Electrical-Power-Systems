@@ -1,0 +1,92 @@
+name: Add unified favicons to all HTML pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/add-unified-favicons.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-html:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Add unified AG favicon links to every HTML file
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          block = '''<!-- Unified AG favicon identity -->
+          <link rel="icon" href="/favicon.ico" sizes="any">
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+          <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+          <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+          <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192x192.png">
+          <link rel="manifest" href="/site.webmanifest">
+          <!-- /Unified AG favicon identity -->'''
+
+          start_marker = '<!-- Unified AG favicon identity -->'
+          end_marker = '<!-- /Unified AG favicon identity -->'
+
+          changed = []
+          for path in sorted(Path('.').rglob('*.html')):
+              text = path.read_text(encoding='utf-8')
+              original = text
+
+              # Remove a previously generated block, if present.
+              text = re.sub(
+                  rf'\s*{re.escape(start_marker)}.*?{re.escape(end_marker)}\s*',
+                  '\n',
+                  text,
+                  flags=re.S,
+              )
+
+              # Remove older favicon and manifest declarations to prevent conflicts.
+              text = re.sub(
+                  r'^\s*<link\b[^>]*\brel=["\'](?:icon|shortcut icon|apple-touch-icon|manifest)["\'][^>]*>\s*\n?',
+                  '',
+                  text,
+                  flags=re.I | re.M,
+              )
+
+              # Insert inside <head>, preferably after the viewport declaration.
+              viewport = re.search(r'(<meta\b[^>]*\bname=["\']viewport["\'][^>]*>)', text, flags=re.I)
+              if viewport:
+                  pos = viewport.end()
+                  text = text[:pos] + '\n' + block + text[pos:]
+              else:
+                  head = re.search(r'<head\b[^>]*>', text, flags=re.I)
+                  if not head:
+                      print(f'SKIP (no <head>): {path}')
+                      continue
+                  pos = head.end()
+                  text = text[:pos] + '\n' + block + text[pos:]
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  changed.append(str(path))
+
+          print(f'Updated {len(changed)} HTML files:')
+          for item in changed:
+              print(f'  - {item}')
+          PY
+
+      - name: Commit updated HTML pages
+        run: |
+          if git diff --quiet; then
+            echo "No HTML changes were needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '*.html' '**/*.html'
+          git commit -m "Add unified AG favicons to all HTML pages"
+          git push
