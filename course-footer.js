@@ -41,7 +41,8 @@
   const pageName = (location.pathname.split('/').pop() || '').toLowerCase();
   const reviewedQuizFiles = {
     'lecture01.html': 'lecture01-quiz-data.js?v=20260831-1',
-    'lecture02.html': 'lecture02-quiz-data.js?v=20260831-1'
+    'lecture02.html': 'lecture02-quiz-data.js?v=20260831-1',
+    'lecture03.html': 'lecture03-quiz-data.js?v=20260831-1'
   };
 
   loadScript('course-footer-core.js?v=20260828-1', () => {
