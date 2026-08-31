@@ -96,6 +96,35 @@
     return String(value).replace(/\d/g, digit => digits[Number(digit)]);
   }
 
+  function containsArabic(value) {
+    return /[\u0600-\u06FF]/.test(String(value));
+  }
+
+  function rtlTextImage(text, options = {}) {
+    const {
+      fontSize = 42,
+      fontWeight = 600,
+      color = '#334155',
+      width = 1500,
+      padding = 28
+    } = options;
+
+    const scale = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = width * scale;
+    canvas.height = (fontSize + padding * 2) * scale;
+    const context = canvas.getContext('2d');
+    context.scale(scale, scale);
+    context.clearRect(0, 0, width, canvas.height / scale);
+    context.direction = 'rtl';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillStyle = color;
+    context.font = `${fontWeight} ${fontSize}px "DejaVu Sans", "Noto Sans Arabic", Arial, sans-serif`;
+    context.fillText(String(text), width / 2, (fontSize + padding * 2) / 2);
+    return canvas.toDataURL('image/png');
+  }
+
   function makeCertificateId(studentName, completedAt) {
     const source = `${studentName}|${lectureNumber}|${completedAt || ''}|${location.hostname}`;
     let hash = 2166136261;
@@ -186,6 +215,8 @@
         () => Boolean(window.pdfMake)
       );
 
+      if (document.fonts?.ready) await document.fonts.ready;
+
       const fontFile = 'DejaVuSans.ttf';
       const fontBoldFile = 'DejaVuSans-Bold.ttf';
       window.pdfMake.vfs = window.pdfMake.vfs || {};
@@ -213,6 +244,29 @@
       const verificationUrl = `https://aoussgabash.com/?certificate=${encodeURIComponent(certificateId)}`;
       const safeName = studentName.trim().replace(/[^\p{L}\p{N}_-]+/gu, '_').replace(/^_+|_+$/g, '') || 'Student';
 
+      const arabicCertificateTitle = rtlTextImage('شهادة إتمام المحاضرة', {
+        fontSize: 44,
+        fontWeight: 700,
+        color: '#334155'
+      });
+      const arabicCourseTitle = rtlTextImage('تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية', {
+        fontSize: 34,
+        fontWeight: 500,
+        color: '#334155'
+      });
+      const arabicResult = rtlTextImage(`النتيجة: ${toArabicIndicDigits(stored.percent)}٪ — ${levelAr}`, {
+        fontSize: 34,
+        fontWeight: 700,
+        color: '#15803d'
+      });
+      const arabicStudentName = containsArabic(studentName)
+        ? rtlTextImage(studentName.trim(), {
+            fontSize: 54,
+            fontWeight: 700,
+            color: '#111827'
+          })
+        : null;
+
       const docDefinition = {
         pageSize: 'A4',
         pageOrientation: 'landscape',
@@ -233,12 +287,14 @@
         content: [
           { text: 'AI POWER SYSTEMS', alignment: 'center', color: '#0284c7', bold: true, fontSize: 15, characterSpacing: 2, margin: [0, 2, 0, 2] },
           { text: 'Certificate of Lecture Completion', alignment: 'center', color: '#075985', bold: true, fontSize: 31, margin: [0, 2, 0, 0] },
-          { text: 'شهادة إتمام المحاضرة', alignment: 'center', color: '#334155', bold: true, fontSize: 22, margin: [0, 0, 0, 8] },
+          { image: arabicCertificateTitle, width: 360, alignment: 'center', margin: [0, -2, 0, 5] },
           { text: 'This certifies that', alignment: 'center', fontSize: 14, margin: [0, 2, 0, 0] },
-          { text: studentName.trim(), alignment: 'center', bold: true, fontSize: 28, color: '#111827', margin: [25, 3, 25, 3], decoration: 'underline', decorationColor: '#94a3b8' },
-          { text: `has successfully completed Lecture ${lectureNumber}`, alignment: 'center', fontSize: 15, margin: [0, 4, 0, 1] },
+          arabicStudentName
+            ? { image: arabicStudentName, width: 430, alignment: 'center', margin: [0, -3, 0, 0] }
+            : { text: studentName.trim(), alignment: 'center', bold: true, fontSize: 28, color: '#111827', margin: [25, 3, 25, 3], decoration: 'underline', decorationColor: '#94a3b8' },
+          { text: `has successfully completed Lecture ${lectureNumber}`, alignment: 'center', fontSize: 15, margin: [0, 2, 0, 1] },
           { text: 'AI Applications in Electrical Power Systems', alignment: 'center', bold: true, fontSize: 21, margin: [0, 3, 0, 0] },
-          { text: 'تطبيقات الذكاء الاصطناعي في أنظمة الطاقة الكهربائية', alignment: 'center', color: '#334155', fontSize: 17, margin: [0, 0, 0, 7] },
+          { image: arabicCourseTitle, width: 500, alignment: 'center', margin: [0, -3, 0, 3] },
           {
             columns: [
               { width: '*', text: '' },
@@ -261,9 +317,9 @@
               },
               { width: '*', text: '' }
             ],
-            margin: [0, 3, 0, 4]
+            margin: [0, 2, 0, 2]
           },
-          { text: `النتيجة: ${toArabicIndicDigits(stored.percent)}٪ — ${levelAr}`, alignment: 'center', bold: true, fontSize: 17, color: '#15803d', margin: [0, 0, 0, 5] },
+          { image: arabicResult, width: 310, alignment: 'center', margin: [0, -4, 0, 1] },
           {
             columns: [
               {
@@ -272,7 +328,7 @@
                   { text: `Completion Date: ${completedDate}`, alignment: 'center', color: '#475569', fontSize: 12 },
                   { text: 'Dr.-Ing. Aouss Gabash', alignment: 'center', bold: true, fontSize: 15, margin: [0, 8, 0, 0] },
                   { text: 'IEEE Senior Member', alignment: 'center', color: '#64748b', fontSize: 11 },
-                  { text: 'Version 1.0', alignment: 'center', color: '#64748b', fontSize: 10, margin: [0, 3, 0, 0] }
+                  { text: 'Version 1.1', alignment: 'center', color: '#64748b', fontSize: 10, margin: [0, 3, 0, 0] }
                 ]
               },
               {
@@ -293,7 +349,7 @@
               }
             ],
             columnGap: 12,
-            margin: [35, 5, 35, 0]
+            margin: [35, 3, 35, 0]
           }
         ],
         metadata: {
