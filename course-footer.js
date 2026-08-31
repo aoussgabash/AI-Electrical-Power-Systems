@@ -38,7 +38,14 @@
     document.head.appendChild(script);
   };
 
+  const pageName = (location.pathname.split('/').pop() || '').toLowerCase();
+
   loadScript('course-footer-core.js?v=20260828-1', () => {
     loadScript('lecture-covers.js?v=20260827-1');
+
+    // Load the reviewed 10-question bank only on Lecture 01.
+    if (pageName === 'lecture01.html') {
+      loadScript('lecture01-quiz-data.js?v=20260831-1');
+    }
   });
 })();
