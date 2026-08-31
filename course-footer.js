@@ -39,13 +39,15 @@
   };
 
   const pageName = (location.pathname.split('/').pop() || '').toLowerCase();
+  const reviewedQuizFiles = {
+    'lecture01.html': 'lecture01-quiz-data.js?v=20260831-1',
+    'lecture02.html': 'lecture02-quiz-data.js?v=20260831-1'
+  };
 
   loadScript('course-footer-core.js?v=20260828-1', () => {
     loadScript('lecture-covers.js?v=20260827-1');
 
-    // Load the reviewed 10-question bank only on Lecture 01.
-    if (pageName === 'lecture01.html') {
-      loadScript('lecture01-quiz-data.js?v=20260831-1');
-    }
+    const reviewedQuiz = reviewedQuizFiles[pageName];
+    if (reviewedQuiz) loadScript(reviewedQuiz);
   });
 })();
