@@ -48,6 +48,7 @@
 
   loadScript('course-footer-core.js?v=20260828-1', () => {
     loadScript('lecture-covers.js?v=20260827-1');
+    loadScript('arabic-formula-fix.js?v=20260831-1');
 
     const reviewedQuiz = reviewedQuizFiles[pageName];
     if (reviewedQuiz) loadScript(reviewedQuiz);
