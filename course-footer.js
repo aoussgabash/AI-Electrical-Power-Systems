@@ -43,7 +43,7 @@
     'lecture01.html': 'lecture01-quiz-data.js?v=20260831-1',
     'lecture02.html': 'lecture02-quiz-data.js?v=20260831-1',
     'lecture03.html': 'lecture03-quiz-data.js?v=20260831-1',
-    'lecture04.html': 'lecture04-quiz-data-v2.js?v=20260831-2'
+    'lecture04.html': 'lecture04-quiz-data.js?v=20260831-3'
   };
 
   loadScript('course-footer-core.js?v=20260828-1', () => {
