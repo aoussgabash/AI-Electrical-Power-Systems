@@ -29,11 +29,7 @@
   <div class="subtitle">Sequential decision-making for batteries, microgrids, demand response, and grid control<br>اتخاذ القرار المتتابع للبطاريات والشبكات المصغرة والاستجابة للطلب والتحكم بالشبكة</div>
 </div>
 
-<section><div class="en"><h2>🎯 Learning Objectives</h2><ul>
-<li>Formulate energy management as a Markov decision process.</li><li>Define state, action, reward, policy, and return.</li>
-<li>Derive Bellman equations and Q-learning updates.</li><li>Explain DQN, actor-critic, PPO, DDPG, and SAC.</li>
-<li>Design a reward for battery scheduling.</li><li>Recognize safety and generalization challenges.</li></ul></div>
-<div class="ar"><h2>🎯 أهداف التعلم</h2><ul><li>صياغة إدارة الطاقة كعملية قرار ماركوفية.</li><li>تعريف الحالة والفعل والمكافأة والسياسة والعائد.</li><li>اشتقاق معادلات بيلمان وQ-learning.</li><li>فهم DQN وActor-Critic وPPO وDDPG وSAC.</li><li>تصميم مكافأة لجدولة البطارية.</li><li>فهم الأمان والتعميم.</li></ul></div></section>
+<section><div class="en"><h2>🎯 Learning Objectives</h2><p>By the end of this lecture, students should be able to:</p><ul><li>Formulate an energy-management problem as a Markov decision process.</li><li>Define states, actions, rewards, policies, returns, and value functions.</li><li>Derive Bellman equations and the Q-learning update.</li><li>Compare DQN, actor–critic, PPO, DDPG, and SAC according to their action spaces and training principles.</li><li>Design a reward function for battery scheduling or microgrid control.</li><li>Evaluate safety, exploration, generalization, and constraint satisfaction in deployment.</li></ul></div><div class="ar"><h2>🎯 أهداف التعلم</h2><p>بعد الانتهاء من هذه المحاضرة، يجب أن يكون الطالب قادرًا على:</p><ul><li>صياغة مسألة إدارة الطاقة على شكل عملية قرار ماركوفية.</li><li>تعريف الحالات والأفعال والمكافآت والسياسات والعوائد ودوال القيمة.</li><li>اشتقاق معادلات بيلمان وتحديث التعلم Q.</li><li>مقارنة DQN وActor–Critic وPPO وDDPG وSAC وفق فضاءات الأفعال ومبادئ التدريب.</li><li>تصميم دالة مكافأة لجدولة البطارية أو التحكم بالشبكة المصغرة.</li><li>تقييم الأمان والاستكشاف والتعميم وتحقيق القيود عند النشر.</li></ul></div></section>
 
 <section><div class="en"><h2>1. Reinforcement Learning Loop</h2>
 <div class="flow"><div class="flow-box">State sₜ</div><div class="arrow">→</div><div class="flow-box">Agent selects aₜ</div><div class="arrow">→</div><div class="flow-box">Environment</div><div class="arrow">→</div><div class="flow-box">Reward rₜ and next state</div></div>
